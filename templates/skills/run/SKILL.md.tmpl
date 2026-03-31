@@ -218,7 +218,7 @@ Step 2: [what] — [why] [status, item_id]
 
 ## Cycles (Repeat up to MAX_CYCLES times)
 
-**Treat TodoWrite as hypotheses.** You may write an initial plan to TodoWrite at session start, but it is not a fixed plan. Each cycle's results bring new information, so always update TodoWrite in step 3 (insert new tasks, delete unnecessary tasks, reprioritize). Do not continue just "because it was decided at the start."
+**Treat TodoWrite as hypotheses.** You may write an initial plan to TodoWrite at session start, but it is not a fixed plan — write tasks for the current cycle only, not a multi-cycle roadmap. Each cycle's results bring new information, so always update TodoWrite in step 3 (insert new tasks, delete unnecessary tasks, reprioritize). Do not continue just "because it was decided at the start."
 
 ### 1. Research Judgment
 
@@ -228,9 +228,9 @@ Step 2: [what] — [why] [status, item_id]
 
 1. **Check the big picture**: Review plan.md (including `Thesis`, `Story Arc`, and `Approach Principles`) and project.yaml. "How far can the paper's story be told now? Where does it break off?"
 2. **Story coherence**: Re-examine the why of each Story Arc step. "Why is this step needed after the previous one? How does it connect to the next?" If a step's why is unclear, fix the story itself before filling gaps
-3. **Identify gaps**: Where the story breaks off = the most important gap. Check existing items while creating new items with appropriate kinds for newly identified gaps
+3. **Identify gaps**: Scan the story for all gaps that can be worked on now — not just where it first breaks off. Independent gaps across different story arc steps can all be tackled in the same cycle. Check existing items while creating new items with appropriate kinds for newly identified gaps
 4. **Depth check**: Review stable items. Read their `detail` fields — do they mention unexplored angles or open sub-questions? Deepening understanding of a stable result — finding its limits, connecting it to other results, testing it against edge cases — can be more valuable than starting the next open item. Move promising items back to `active` and spawn child items for new directions
-5. **Design tasks with kind in mind**: Don't make everything a question. For conjecture, "search for refutation"; for caution, "find problems"; for example, "calculate the concrete case" — kind directly becomes the cognitive mode instruction to the researcher
+5. **Design tasks with kind in mind**: Gather tasks from all actionable items — story order in the paper does not imply research order. Don't make everything a question. For conjecture, "search for refutation"; for caution, "find problems"; for example, "calculate the concrete case" — kind directly becomes the cognitive mode instruction to the researcher
 6. **Update TodoWrite**: Update based on findings
 
 #### Agent selection guidelines (not rigid priorities):
