@@ -18,29 +18,47 @@ If the module lacks necessary functionality, record this in the deliverable and 
 ## Startup Reading
 
 1. `.claude/common.md`
-2. Task instructions from PI (physical setup, observable definitions, success criteria)
-3. Related theoretical results (PI specifies paths)
-4. Check existing modules in `simulations/lib/` (understand available APIs)
+2. `simulations/CONVENTIONS.md` (naming rules for this project — if the file does not exist, you will create it in §1 Design)
+3. Task instructions from PI (physical setup, observable definitions, success criteria)
+4. Related theoretical results (PI specifies paths)
+5. Check existing modules in `simulations/lib/` (understand available APIs)
 
 ## Directory Structure
 
 ```
 simulations/
-  lib/                    # Simulation framework modules (managed by engine-builder. Read-only)
-  src/{slug}.{ext}        # Measurement scripts (managed by simulator)
-  src/{slug}_plot.{ext}   # Plot scripts (managed by simulator)
-  results/{slug}/         # Per-task output directory (see Results Directory Management)
-  results/archive/        # Retired results (superseded or unreliable data)
-  test/                   # Module tests (managed by engine-builder. Read-only)
+  lib/                              # Simulation framework modules (managed by engine-builder. Read-only)
+  src/{slug}.{ext}                  # Measurement scripts (managed by simulator)
+  src/{slug}_plot.{ext}             # Plot scripts (managed by simulator)
+  results/{category}/{slug}/        # Per-task output directory (see below)
+  results/archive/                  # Retired results (superseded or unreliable data)
+  test/                             # Module tests (managed by engine-builder. Read-only)
 ```
+
+### Naming Conventions (`simulations/CONVENTIONS.md`)
+
+`simulations/CONVENTIONS.md` defines this project's data organization — category directories, slug naming, and file naming patterns. Read it at startup (item 2 in Startup Reading). If it does not exist yet, create it when you first produce results — define the category structure, slug patterns, and file naming conventions so subsequent sessions follow the same rules. When a new type of measurement doesn't fit existing categories, add a new category to CONVENTIONS.md.
 
 ### Results Directory Management
 
-Each `results/{slug}/` directory must be self-explanatory to someone encountering it months later.
+Each `results/{category}/{slug}/` directory must be self-explanatory to someone encountering it months later.
 
 - **`REPORT.md`**: Every results directory contains a report for the human researcher (see §6 Results README for full spec)
-- **File naming**: Use descriptive names encoding key parameters (e.g., `energy_L16_T0.5.csv` rather than `data1.csv`). The content should be identifiable from the filename alone
-- **Data format**: Use CSV with a header row for tabular data (widely readable, version-control friendly). Include column descriptions in the README. For very large datasets, note the format choice and rationale in the README
+- **File naming**: Follow `CONVENTIONS.md`. Encode key parameters in the filename so the content is identifiable without opening it
+
+#### Data Format
+
+Use **TSV** (tab-separated values, `.tsv` extension) for all tabular output. Tab characters almost never appear in numerical data, so TSV avoids the quoting/escaping ambiguities of CSV.
+
+Every data file begins with a structured metadata header — comment lines (`#`) recording the conditions under which the data was produced. This makes each file self-contained (interpretable without external context) and machine-searchable (scripts can scan for `# key=value` patterns across files):
+
+```
+# {one-line description of what this file contains}
+# {key}={value}  {key}={value}  ...   (physical parameters)
+# {key}={value}  {key}={value}  ...   (algorithm parameters)
+{column_1}\t{column_2}\t...
+{data row}
+```
 
 ## Workflow
 
@@ -48,8 +66,11 @@ Each `results/{slug}/` directory must be self-explanatory to someone encounterin
 
 Before writing code, clarify the following:
 - **What modules to use**: Check `simulations/lib/` APIs. If insufficient, record in deliverable
-- **Check existing scripts**: Search `simulations/src/` for scripts measuring the same or similar observables. Extend an existing script rather than creating a new file when possible — accumulating parallel scripts makes the codebase harder to navigate. Record the decision in the deliverable
-- **Check existing results**: Search `simulations/results/` for directories containing data for the same observables/parameters. If this task supersedes old results (re-measurement after bug fix, improved parameters, etc.), move the old directory to `results/archive/` before producing new data. Never delete old results — always archive (archived data remains searchable and recoverable). Record what was archived and why in the deliverable
+- **Check existing scripts and results**: Search `simulations/src/` and `simulations/results/` for scripts and directories covering the same or similar observables. Prefer extending what exists over creating parallel files — when each session creates new scripts and directories independently, the codebase fragments. Specifically:
+  - If an existing script measures the same observable, extend it rather than writing a new file
+  - If a results directory already covers the same observable and parameters, add data to it rather than creating a new directory
+  - If this task supersedes old results (bug fix, improved parameters), move the old directory to `results/archive/` before producing new data. Archived data remains searchable and recoverable — never delete results
+  - Record the decision (extended / new / archived) and why in the deliverable
 - **What to compute**: Mathematical definition of observables (from PI's instructions and theoretical results. If ambiguous, choose the most natural interpretation and record it in the deliverable)
 - **How to confirm correctness**: Verification plan (see verification protocol in §2)
 
@@ -59,7 +80,7 @@ Write or extend a script in `src/`. If extending an existing script (per §1), u
 
 Code principles:
 - Specify parameters via command-line arguments or constants at the script's top
-- Output results in machine-readable format to `results/{slug}/`
+- Output results in machine-readable format to `results/{category}/{slug}/`
 - Make random seeds fixable (reproducibility)
 - Include progress display (for monitoring long computations)
 
@@ -76,7 +97,7 @@ Numerical computation reliability is guaranteed only through verification. First
 Execute production-parameter computations with verified code.
 - Record execution commands in deliverable (reproducibility)
 - Record execution time
-- Save raw data to the task output directory (`simulations/results/{slug}/`)
+- Save raw data to the task output directory (`simulations/results/{category}/{slug}/`)
 
 Bash tool timeout is 10 minutes. For computations exceeding this, split the parameter range into multiple runs or write intermediate results to files for subsequent runs to read.
 
@@ -90,7 +111,7 @@ Bash tool timeout is 10 minutes. For computations exceeding this, split the para
 
 Output analysis results as figures that humans can grasp intuitively. Visualization is also a means of visually confirming result reliability — data anomalies and systematic biases are easier to spot in plots than in numerical tables.
 
-**Plot scripts**: Implement as `src/{slug}_plot.{ext}` using **{{ simulation.visualization }}** (follows the project's configured visualization backend). Read data from `simulations/results/{slug}/` and output PNGs to the same directory. Use PNG format (widely supported raster format that agents and humans can inspect directly).
+**Plot scripts**: Implement as `src/{slug}_plot.{ext}` using **{{ simulation.visualization }}** (follows the project's configured visualization backend). Read data from `simulations/results/{category}/{slug}/` and output PNGs to the same directory. Use PNG format (widely supported raster format that agents and humans can inspect directly).
 
 **Figure design guidelines**:
 - One message per figure. The axis labels and title should make clear what the figure shows
@@ -105,7 +126,7 @@ Output analysis results as figures that humans can grasp intuitively. Visualizat
 
 ### 6. Results README
 
-Write `results/{slug}/REPORT.md` — a self-contained explanation of this simulation for the human researcher (the user). The user often reviews results by browsing the `results/` directory, so this file is their primary entry point. Write in **{{ language }}**.
+Write `results/{category}/{slug}/REPORT.md` — a self-contained explanation of this simulation for the human researcher (the user). The user often reviews results by browsing the `results/` directory, so this file is their primary entry point. Write in **{{ language }}**.
 
 **Content and structure** (section names are examples — adapt to {{ language }}):
 
