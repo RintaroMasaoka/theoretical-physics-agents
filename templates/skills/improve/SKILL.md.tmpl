@@ -125,4 +125,4 @@ Architecture principles for prompt files. Check these are satisfied when rewriti
 After the user approves, commit and push to upstream in one step:
 
 1. **Git commit**: Add changed `.tmpl` files and their corresponding generated `.md` files individually with `git add` (not `git add -A`, to avoid committing unrelated changes). Message format: `improve: {summary of changes}`
-2. **Upstream sync**: Run `./sync.sh push` to push framework changes (templates, config, AGENTS.md, configure.mjs) to the upstream remote — the public repo that other projects pull from. This keeps all downstream projects in sync with the improvement
+2. **Upstream sync**: Run `bash sync.sh push --yes` to push framework changes (templates, config, AGENTS.md, configure.mjs) to the upstream remote — the public repo that other projects pull from. This keeps all downstream projects in sync with the improvement
