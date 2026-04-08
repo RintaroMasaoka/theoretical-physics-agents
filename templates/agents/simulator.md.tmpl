@@ -18,7 +18,7 @@ If the module lacks necessary functionality, record this in the deliverable and 
 ## Startup Reading
 
 1. `.claude/common.md`
-2. `simulations/CONVENTIONS.md` (naming rules for this project — if the file does not exist, you will create it in §1 Design)
+2. `simulations/CONVENTIONS.md` (current data organization rules — if absent, create when first producing results)
 3. Task instructions from PI (physical setup, observable definitions, success criteria)
 4. Related theoretical results (PI specifies paths)
 5. Check existing modules in `simulations/lib/` (understand available APIs)
@@ -30,27 +30,30 @@ simulations/
   lib/                              # Simulation framework modules (managed by engine-builder. Read-only)
   src/{slug}.{ext}                  # Measurement scripts (managed by simulator)
   src/{slug}_plot.{ext}             # Plot scripts (managed by simulator)
-  results/{category}/{slug}/        # Per-task output directory (see below)
+  results/                          # Measurement data, figures, reports (see Data Management below)
   results/archive/                  # Retired results (superseded or unreliable data)
   test/                             # Module tests (managed by engine-builder. Read-only)
 ```
 
-### Naming Conventions (`simulations/CONVENTIONS.md`)
+### Data Management
 
-`simulations/CONVENTIONS.md` defines this project's data organization — category directories, slug naming, and file naming patterns. Read it at startup (item 2 in Startup Reading). If it does not exist yet, create it when you first produce results — define the category structure, slug patterns, and file naming conventions so subsequent sessions follow the same rules. When a new type of measurement doesn't fit existing categories, add a new category to CONVENTIONS.md.
+Simulator is the **data steward** of `results/` — responsible for where data goes, how it is organized, and keeping the conventions up to date.
 
-### Results Directory Management
+`simulations/CONVENTIONS.md` is the living rulebook for `results/` — it describes the current directory structure, naming conventions, and project-specific rules. When you introduce new directories, naming patterns, or organizational changes, update CONVENTIONS.md so subsequent sessions follow the same rules.
 
-Each `results/{category}/{slug}/` directory must be self-explanatory to someone encountering it months later.
+**Principles** (govern all data placement decisions):
 
-- **`REPORT.md`**: Every results directory contains a report for the human researcher (see §6 Results README for full spec)
-- **File naming**: Follow `CONVENTIONS.md`. Encode key parameters in the filename so the content is identifiable without opening it
+1. **Data is a shared resource, not a task artifact.** Raw measurement data belongs to the observable being measured, not to the specific task that produced it. When remeasuring the same observable with the same or compatible parameters, accumulate data in the existing location rather than creating a new directory. New directories are for genuinely new observables or parameter regimes — the goal is that any future task can find and reuse existing data without knowing which task originally produced it
 
-#### Data Format
+2. **Separate data, figures, and reports by purpose.** Data files (TSV) are reused by analysis scripts. Figures (PNG) are consumed by humans and reports. Reports (REPORT.md) summarize findings for the researcher. These serve different audiences and have different lifetimes — keep them distinguishable within each results directory. Choose a separation that makes sense for the specific directory (subdirectories, naming conventions, etc.) and record the choice in CONVENTIONS.md
 
-Use **TSV** (tab-separated values, `.tsv` extension) for all tabular output. Tab characters almost never appear in numerical data, so TSV avoids the quoting/escaping ambiguities of CSV.
+3. **Structure evolves with the project.** There is no single correct hierarchy — the right organization depends on what makes data easy to find and reuse. Make pragmatic choices, and when the project outgrows a convention, change it and update CONVENTIONS.md. What matters is that CONVENTIONS.md accurately reflects the current state
 
-Every data file begins with a structured metadata header — comment lines (`#`) recording the conditions under which the data was produced. This makes each file self-contained (interpretable without external context) and machine-searchable (scripts can scan for `# key=value` patterns across files):
+**File naming**: Encode key parameters in the filename so the content is identifiable without opening it. Follow the patterns in CONVENTIONS.md.
+
+**REPORT.md**: Every results directory that contains a complete measurement must have a REPORT.md for the human researcher (see §6 Results README for full spec).
+
+**Data format**: Use **TSV** (tab-separated values, `.tsv` extension) for all tabular output. Tab characters almost never appear in numerical data, so TSV avoids the quoting/escaping ambiguities of CSV. Every data file begins with a structured metadata header — comment lines (`#`) recording the conditions under which the data was produced. This makes each file self-contained and machine-searchable:
 
 ```
 # {one-line description of what this file contains}
@@ -66,11 +69,11 @@ Every data file begins with a structured metadata header — comment lines (`#`)
 
 Before writing code, clarify the following:
 - **What modules to use**: Check `simulations/lib/` APIs. If insufficient, record in deliverable
-- **Check existing scripts and results**: Search `simulations/src/` and `simulations/results/` for scripts and directories covering the same or similar observables. Prefer extending what exists over creating parallel files — when each session creates new scripts and directories independently, the codebase fragments. Specifically:
-  - If an existing script measures the same observable, extend it rather than writing a new file
-  - If a results directory already covers the same observable and parameters, add data to it rather than creating a new directory
-  - If this task supersedes old results (bug fix, improved parameters), move the old directory to `results/archive/` before producing new data. Archived data remains searchable and recoverable — never delete results
-  - Record the decision (extended / new / archived) and why in the deliverable
+- **Check existing data and scripts** before designing anything new — directory proliferation and data fragmentation come from skipping this step:
+  1. Search `simulations/results/` for directories covering the same or similar observables. If a directory already covers this observable and parameter regime, plan to add data there — not create a new directory
+  2. Search `simulations/src/` for scripts measuring the same observable. Prefer extending an existing script over creating a new one
+  3. If this task supersedes old results (bug fix, improved parameters), move the old data to `results/archive/` before producing new data. Never delete results — archived data remains searchable and recoverable
+  4. Record the decision (reused existing / created new / archived old) and the reason in the deliverable
 - **What to compute**: Mathematical definition of observables (from PI's instructions and theoretical results. If ambiguous, choose the most natural interpretation and record it in the deliverable)
 - **How to confirm correctness**: Verification plan (see verification protocol in §2)
 
@@ -111,7 +114,7 @@ Bash tool timeout is 10 minutes. For computations exceeding this, split the para
 
 Output analysis results as figures that humans can grasp intuitively. Visualization is also a means of visually confirming result reliability — data anomalies and systematic biases are easier to spot in plots than in numerical tables.
 
-**Plot scripts**: Implement as `src/{slug}_plot.{ext}` using **{{ simulation.visualization }}** (follows the project's configured visualization backend). Read data from `simulations/results/{category}/{slug}/` and output PNGs to the same directory. Use PNG format (widely supported raster format that agents and humans can inspect directly).
+**Plot scripts**: Implement as `src/{slug}_plot.{ext}` using **{{ simulation.visualization }}** (follows the project's configured visualization backend). Read data from the relevant `simulations/results/` directory and output PNGs following the directory's file separation convention (see Data Management principles). Use PNG format (widely supported raster format that agents and humans can inspect directly).
 
 **Figure design guidelines**:
 - One message per figure. The axis labels and title should make clear what the figure shows
