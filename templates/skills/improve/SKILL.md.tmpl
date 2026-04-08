@@ -46,16 +46,16 @@ This project uses a template-based generation system. Prompt files are generated
 
 | Layer | Path | Role |
 |---|---|---|
-| **Template (source of truth)** | `.claude/templates/**/*.tmpl` | Edit these |
+| **Template (source of truth)** | `templates/**/*.tmpl` | Edit these |
 | **Generated (do not edit)** | `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, `.claude/CLAUDE.md`, `.claude/common.md` | Overwritten by `node configure.mjs` |
 | **Config values** | `.claude/config/config.yaml` | Variables substituted into templates via `{{ key }}` syntax |
 
 When reading a target for review, read the `.tmpl` file. When making changes, edit the `.tmpl` file.
 
-**Mapping**: To find the template for a generated file, replace `.claude/` with `.claude/templates/` and append `.tmpl`:
-- `.claude/agents/researcher.md` → `.claude/templates/agents/researcher.md.tmpl`
-- `.claude/skills/run/SKILL.md` → `.claude/templates/skills/run/SKILL.md.tmpl`
-- `.claude/common.md` → `.claude/templates/common.md.tmpl`
+**Mapping**: To find the template for a generated file, strip the `.claude/` prefix, prepend `templates/`, and append `.tmpl`:
+- `.claude/agents/researcher.md` → `templates/agents/researcher.md.tmpl`
+- `.claude/skills/run/SKILL.md` → `templates/skills/run/SKILL.md.tmpl`
+- `.claude/common.md` → `templates/common.md.tmpl`
 
 ---
 
@@ -77,27 +77,15 @@ After writing the `.tmpl` file, run `node configure.mjs` to regenerate all runti
 
 ### 3. Verification Agent
 
-Have a `subagent_type: "reviewer"` Agent verify the rewritten file. The reviewer verifies the target read-only and only flags issues, providing an independent perspective from the person who made the fix. The fixer knows the problem's context and is thus less likely to notice coherence issues. Have an agent "verify whole-file coherence as a first-time reader" without that context.
+Have a `subagent_type: "prompt-reviewer"` Agent verify the rewritten file. The prompt-reviewer reads the file as a first-time reader with no change context, catching coherence issues the fixer would overlook.
 
 Prompt:
 ```
-Read the prompt file as a first-time reader and flag issues from the following perspectives.
+## Task
 
 Target file: {path}
 
 Pay special attention to: {areas changed in this fix}
-
-## Verification Criteria
-
-1. **Traces**: References to past incidents or specific examples that remain.
-   Descriptions that would make a first-time reader wonder "why this example?"
-2. **Balance**: Specific sections emphasized disproportionately to their importance.
-   Paragraphs that feel like they were added later
-3. **Instructions without reasons**: Directives that say "do this" without explaining "why"
-4. **Duplication / scatter**: Same point scattered across multiple locations
-
-Include a quote of the relevant passage and a suggested improvement for each finding.
-If no issues are found, report "No issues found."
 ```
 
 ### 4. Reflect Verification Results
@@ -114,7 +102,7 @@ Get approval from the user via AskUserQuestion before committing.
 
 Architecture principles for prompt files. Check these are satisfied when rewriting.
 
-1. Separation of concerns — Each file covers only its own responsibilities. Common rules go in `.claude/templates/common.md.tmpl` once only
+1. Separation of concerns — Each file covers only its own responsibilities. Common rules go in `templates/common.md.tmpl` once only
 2. Low coupling — Minimize dependencies between files
 3. File-path communication — Instead of loading raw data into prompts, write to files and pass paths (prevents prompt bloat and enables data reuse)
 
