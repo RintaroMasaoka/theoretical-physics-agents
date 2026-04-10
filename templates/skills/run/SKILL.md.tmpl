@@ -37,19 +37,21 @@ You decide the research direction, delegate work to workers, and drive the proje
 
 ```
 project.yaml              # Project state + research items
-research/
-  notes/                   # PI's knowledge base (Obsidian wiki-linked, publication-quality)
-    index.md               # Map of Content (MOC). Wiki-linked overview of the entire knowledge base
-    {topic}.md             # One note per atomic topic. Organization via wiki-links and tags, not directories
-    {subdir}/              # Optional subdirectories — PI may introduce them freely but they are not required
-  plan.md                 # Research plan (managed by PI)
-  agenda.md                # Agenda for next meeting (PI writes, /meeting reads)
+closed_items.yaml         # Closed research items (moved from project.yaml)
+plan.md                   # Research plan (managed by PI)
+notes/                    # PI's knowledge base (Obsidian wiki-linked, publication-quality)
+  index.md                # Map of Content (MOC). Wiki-linked overview of the entire knowledge base
+  {name}.md               # One note per atomic topic
+  {subdir}/               # Optional subdirectories — PI may introduce them freely
+concepts/                 # Concept definitions (PI + workers can write)
+  {term}.md               # One concept per file. See §Concept notes
+literature/
   reading_list.md          # Literature list
   papers/{id}/             # Downloaded paper sources
-  work/                    # Worker deliverables
-    reading_{id}.md        # reader output (PI annotates with strikethrough if errors found)
-    attempt_{N}_{slug}.md  # researcher output (critic appends annotations)
-paper/                     # Paper deliverables (managed by /write skill)
+work/                     # Worker deliverables
+  reading_{id}.md          # reader output (PI annotates with strikethrough if errors found)
+  attempt_{N}_{slug}.md    # researcher output (critic appends annotations)
+manuscript/               # Paper deliverables (managed by /write skill)
 simulations/               # Numerical computations
   lib/                     # Simulation framework modules (managed by engine-builder)
   src/                     # Measurement scripts (managed by simulator)
@@ -59,22 +61,33 @@ simulations/               # Numerical computations
   src/archive/             # Retired scripts (superseded versions, abandoned experiments)
 logs/                      # Progress records for humans + session handoff
   last_session.md          # Summary of the last /run session (carries PI's thinking to the next session)
-meetings/                  # Meeting minutes
+meetings/                  # Meeting minutes + agenda
+  agenda.md                # Agenda for next meeting (PI writes, /meeting reads)
 ```
 
 ### Writing principle — current-state, not history
 
-Applies to all PI-managed documents (notes, plan.md, index.md). Each file should be self-contained (reading that file alone should suffice to understand the topic). Write only what is currently true — the document represents the present understanding, not a log of how that understanding evolved. Specifically:
-- State conclusions and their evidence directly. Do not narrate the path ("Session 10 found X, then Session 11 revised to Y") — just state Y with its evidence
+Applies to all PI-managed documents: **project.yaml**, notes, plan.md, index.md. Each document should describe the present understanding, not the history of how that understanding evolved. Session logs belong in `logs/` and meeting minutes in `meetings/` — those are the history's home. project.yaml, notes, and plan.md are the research's current face.
+
+Concretely:
+- State conclusions and their evidence directly. Do not narrate the investigation path ("Session 10 found X, then Session 11 revised to Y") — just state Y with its evidence
 - Meeting annotations (`> [Meeting ...]`) are temporary markers for direction changes. Once the direction change is understood and reflected in the content, remove the annotation — the content itself is the record
 - File guides should list only current, valid references. Remove entries for superseded or rejected deliverables
 - If a research direction was abandoned, a one-line note in `dead-ends.md` suffices. Do not preserve detailed step histories
 
-### research/notes/ — PI's Knowledge Base
+**project.yaml fields** — same principle applies:
+- `detail`: What is currently known, at what confidence, what remains open. Not "Session N found X, Session M revised to Y" — just the current state
+- `finding`: The distilled result in its final form. When understanding evolves, rewrite the finding — do not append numbered updates
+- `notes`: Operational guidance for PI's future self (methodology cautions, known pitfalls, how to interpret this item). Not a session log — session-by-session records belong in `logs/`
+- When an item reaches `stable`, rewrite its fields to reflect what the result means in the current research context, not how it was obtained
+
+**plan.md Strategy Notes** — describes the current strategic situation as a coherent narrative. When the situation changes, rewrite the section rather than appending updates. A reader encountering Strategy Notes for the first time should understand the current state without needing to mentally reconstruct the chronology
+
+### notes/ — PI's Knowledge Base
 
 A wiki-linked knowledge base that serves as the intellectual backbone of the research. Worker agents read `index.md` and navigate to topic files via wiki-links as needed.
 
-**Purpose**: Distill the raw materials in `research/work/` into curated, structured knowledge. Worker deliverables are provisional and narrow-scoped — notes are where PI synthesizes them into reliable, interconnected understanding. Notes are not session logs or private memos; they are publication-quality knowledge meant to be read by collaborators and to serve as draft material for the paper.
+**Purpose**: Distill the raw materials in `work/` into curated, structured knowledge. Worker deliverables are provisional and narrow-scoped — notes are where PI synthesizes them into reliable, interconnected understanding. Notes are not session logs or private memos; they are publication-quality knowledge meant to be read by collaborators and to serve as draft material for the paper.
 
 **Quality standard** — each note should satisfy all three criteria:
 1. **Paper-draft material**: Prose, equations, and citations at a level usable in a paper draft
@@ -82,7 +95,7 @@ A wiki-linked knowledge base that serves as the intellectual backbone of the res
 3. **Pedagogically clear**: Core concepts are introduced with enough context that a physicist outside the immediate subfield can understand the reasoning
 
 **Wiki-link format** (Obsidian-compatible):
-- `[[note-name]]` — link to another note (filename without extension or path prefix)
+- `[[note-name]]` — link to another note. Resolves by filename (without extension) project-wide, so filenames must be unique even across subdirectories
 - `[[note-name#heading]]` — link to a specific heading within a note
 - `[[note-name|display text]]` — link with custom display text
 
@@ -93,10 +106,29 @@ A wiki-linked knowledge base that serves as the intellectual backbone of the res
 **index.md (Map of Content)**: The entry point and navigational hub. Contains wiki-linked sections that group notes by theme. Keep entries brief — one line per note with a wiki-link and a one-sentence summary. Detailed discussion belongs in individual notes, not in index.md. The grouping in index.md reflects conceptual structure, not file paths.
 
 **Writing principles**:
-- **Self-contained**: Reading a single note file should suffice to understand the topic. Define terms at first use or link to the defining note via `[[...]]`
+- **Self-contained**: Reading a single note file should suffice to understand the topic. Link terms to their concept notes via `[[...]]`; for terms used only locally, an inline definition suffices
 - **Current-state**: Write only what is currently understood to be true. When understanding changes, rewrite the note rather than appending corrections (git preserves history; stale content in notes misleads worker agents who read them for context)
 - **Atomic topics**: Each note covers one coherent topic. When a note grows to cover multiple distinct topics, split it into separate notes and link them
 - **Link generously**: Whenever a note references a concept, method, or result discussed elsewhere, use a wiki-link. The link graph is itself a map of how ideas connect
+- **Define via concept notes**: When introducing or using a non-obvious term, link to its concept note (`[[term]]`) rather than defining it inline. If no concept note exists, create one in `concepts/` (see §Concept notes below)
+
+### concepts/ — Concept Definitions
+
+Atomic definitions that keep jargon self-documenting. Concept notes live in `concepts/`, separate from the discussion notes in `notes/`. Both PI and worker agents (including concept-checker) can write to `concepts/`.
+
+A concept note defines a single concept, term, or method. It is small (typically < 1 page) and linked from any file via `[[term]]`. This ensures every non-trivial term has one canonical definition.
+
+**When to create**: When PI introduces or uses a term that a collaborator unfamiliar with the project would not immediately understand. The threshold: "would a physicist in this subfield, but not in this project, need this defined?" When in doubt, create the note — a short definition costs little, but an undefined term costs every future reader.
+
+**Format**: No rigid template — write whatever makes the concept clear. Typical elements:
+- Definition (mathematical and/or physical)
+- Why this concept matters to the research
+- Connections to related concepts (via `[[...]]` links)
+- Verification status if the concept involves a specific claim
+
+**Naming**: Use lowercase with underscores (e.g., `helicity_modulus.md`, `compact_boson.md`). The filename is the wiki-link target — `[[helicity_modulus]]` resolves to `concepts/helicity_modulus.md`. Concept filenames share the same wiki-link namespace as `notes/` — ensure no collisions. If a topic warrants both a concept definition and an extended discussion, name them distinctly (e.g., `concepts/helicity_modulus.md` for the definition, `notes/helicity_modulus_analysis.md` for the discussion) and link between them.
+
+A well-written concept note that clarifies a subtle distinction is paper-draft material in its own right.
 
 ## Research Items (project.yaml)
 
@@ -156,14 +188,37 @@ status represents PI's operational disposition toward the item — "how should I
 | **open** | Not yet started. Should be prioritized |
 | **active** | Currently investing cycles |
 | **stable** | Has results PI can reference. Not actively working on it, but deepening is always an option |
-| **closed** | Not being pursued. Reason in `detail` (e.g., "dropped: no progress after N attempts", "reframed → {id}: question was inadequate", "exhausted: fully understood, no open angles") |
+| **closed** | Not being pursued. **Move to `closed_items.yaml`** — see §Closing items |
 
 `detail` (free text): The primary carrier of nuance — more important than status. Must describe:
 - What is currently known and at what confidence level
 - Unexplored angles or open sub-questions (if any)
 - For `closed`: the reason (dropped, reframed, exhausted)
 
-`detail` is what PI in later sessions reads to judge how much to rely on the result and whether to revisit. Make it scannable independently of the research notes.
+`detail` is what PI in later sessions reads to judge how much to rely on the result and whether to revisit. Make it scannable independently of the research notes. Write in current-state style — describe the present understanding, not the chronology of sessions that produced it.
+
+`notes` (free text, optional): Operational guidance for PI's future self. Use for methodology cautions, known pitfalls, interpretation guidance, or pointers to related items. This is **not** a session log — "attempt_9: REJECT", "Session 13: added X" belong in `logs/`, not here. If the information is about what happened rather than what to watch out for, it belongs elsewhere.
+
+### Closing items
+
+Closed items are removed from `project.yaml` and appended to `closed_items.yaml`. This keeps project.yaml focused on the current research — closed items are past questions that no longer drive work.
+
+Procedure:
+1. Append the item (with all fields) to `closed_items.yaml`
+2. Remove it from `project.yaml`
+3. If the closed item has children that are still active/stable, move only the closed item and reparent the children under an appropriate active item
+
+`closed_items.yaml` is a flat list — no nesting required. Format:
+
+```yaml
+# Closed research items (moved from project.yaml)
+- id: T3
+  kind: task
+  text: "..."
+  status: closed
+  detail: "dropped: ..."
+  closed_date: "YYYY-MM-DD"
+```
 
 ---
 
@@ -171,20 +226,20 @@ status represents PI's operational disposition toward the item — "how should I
 
 1. Read `logs/last_session.md` (if it exists — understand the previous session's thinking, decisions, and next directions)
 2. Read `project.yaml`
-3. Read `research/notes/index.md` (if it exists. Read topic files as needed)
-4. Read `research/plan.md` (if it exists)
-5. Read `research/reading_list.md`
+3. Read `notes/index.md` (if it exists. Read topic files as needed)
+4. Read `plan.md` (if it exists)
+5. Read `literature/reading_list.md`
 6. Read worker deliverables as needed
 
 **Unread paper principle:** For papers marked `unread` in reading_list.md, PI must not describe their content, claims, methods, or results (even if PI's training data contains knowledge, information from unread sources is unverified and unreliable). Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated (see `.claude/common.md` verification procedures). If there are ★★★ and unread papers, run reader with top priority in the first cycle
 
 **Feedback processing:**
-- If `research/plan.md` contains `> [Meeting ...]` markers: A direction change was decided in a meeting. **Read and understand the reason for the change before starting work.** Do not revert plan.md changes. Understood annotations may be naturally cleaned up during work
-- In the **Approach Principles** section of `research/plan.md`: Cross-step principles agreed in meetings. Follow them throughout the entire session. PI must not change this section unilaterally; changes are decided in meetings
+- If `plan.md` contains `> [Meeting ...]` markers: A direction change was decided in a meeting. **Read and understand the reason for the change before starting work.** Do not revert plan.md changes. Understood annotations may be naturally cleaned up during work
+- In the **Approach Principles** section of `plan.md`: Cross-step principles agreed in meetings. Follow them throughout the entire session. PI must not change this section unilaterally; changes are decided in meetings
 
 **Initial check:**
 - topic is empty → Display "Please set a theme via `/meeting`" and stop
-- `research/plan.md` does not exist → Create and Write a research plan (template):
+- `plan.md` does not exist → Create and Write a research plan (template):
 
 ```markdown
 # Research Plan
@@ -204,13 +259,13 @@ Step 2: [what] — [why] [status, item_id]
 ## Strategy Notes
 [Current approach, reasons for pivots, next focus]
 ```
-- `research/notes/` does not exist → Create the directory and `research/notes/index.md` as the Map of Content. The initial index.md should contain wiki-linked sections grouping notes by theme (initially mostly empty — to be populated as notes are created). Also create initial seed notes as appropriate for the research. Examples (not mandated — adjust to suit the project):
-  - `glossary.md`: Core term definitions. Framework correspondences and distinctions
-  - `contributions.md`: Contributions of this research. With structured assessments
-  - `existing-tools.md`: Known tools from the literature. With sources and verification status
-  - `dead-ends.md`: Attempted approaches and reasons for failure
+- `notes/` does not exist → Create `notes/` and `notes/index.md` as the Map of Content. Create initial seed notes as appropriate for the research. Examples (not mandated — adjust to suit the project):
+  - `notes/contributions.md`: Contributions of this research. With structured assessments
+  - `notes/existing-tools.md`: Known tools from the literature. With sources and verification status
+  - `notes/dead-ends.md`: Attempted approaches and reasons for failure
 
-  File organization (flat vs. subdirectories) is PI's choice. Start flat and introduce subdirectories only when the number of notes warrants it
+  File organization within `notes/` (flat vs. subdirectories) is PI's choice
+- `concepts/` does not exist → Create `concepts/` and populate with concept notes for core terms (e.g., `concepts/dynamical_critical_exponent.md`, `concepts/BKT_phase.md`). Flat structure — concept notes are atomic definitions, and a flat layout keeps wiki-link resolution simple
 
 **Verification status**: When mentioning "existing tools" or "contributions of this research" in research notes, attach a tag indicating what means verified the claim. Tag examples: `[sympy]`, `[numerical]`, `[limiting case]`, `[literature: arXiv:XXXX]`, `[unverified]`.
 
@@ -241,10 +296,12 @@ Step 2: [what] — [why] [status, item_id]
 - Build/extend/refine simulation framework → **engine-builder** (build model-specific modules in `simulations/lib/`, or invoke with "refine lib" for self-directed quality improvement. Run before simulator if modules don't exist yet)
 - Numerical verification of theoretical predictions → **simulator** (measure, analyze, and visualize using existing `lib/` modules. Built-in verification protocol)
 - Verify note/plan readability → **self-check** (has no research context; catches undefined terms and jargon that PI overlooks)
+- Build/maintain concept definitions → **concept-checker** (reads a file as a first-time reader and creates concept notes in `concepts/` for undefined terms. Use after writing notes or when jargon may have accumulated)
+- Synthesize project documentation → **curator** (rewrites project.yaml item descriptions and plan.md Strategy Notes to current-state form; see §3 Document synthesis for when to dispatch)
 
 **PI judges as a researcher.** The above are guidelines only; judge freely according to the research situation.
 
-**Close decision**: Items that show no progress after repeated cycles can be closed (detail: "dropped: ..."). This is not "failure" but "an honest academic judgment." Reframing (reconstituting the question itself, detail: "reframed → {new_id}: ...") is also a viable option.
+**Close decision**: Items that show no progress after repeated cycles can be closed. This is not "failure" but "an honest academic judgment." Reframing (reconstituting the question itself) is also a viable option. When closing, follow the §Closing items procedure — move the item to `closed_items.yaml` with the reason (e.g., "dropped: ...", "reframed → {new_id}: ...").
 - Continue research if there is progress even without full resolution.
 - For important questions, up to 5 attempts are acceptable.
 - For truly important questions, up to 20 attempts are acceptable.
@@ -302,6 +359,7 @@ Dynamic data by agent:
 - **engine-builder**: For new features: `Model definition` (Hamiltonian, lattice structure, boundary conditions) / `Computational method` (Monte Carlo, molecular dynamics, etc.) / `Required features` (which observables/update algorithms needed) / existing module path if any. For refinement: `"Refine lib"` suffices — engine-builder self-diagnoses via its diagnostic checklist
 - **simulator**: `Target: {item_id}` / `Physical setup` / `Mathematical definition of observables` / `Success criteria` (what to compare against and what constitutes verification success) / `Deliverable number: {N}` (serial number managed by PI) / file paths to related theoretical results / `simulations/lib/` module list (if empty, run engine-builder first) / `Existing scripts in src/: {list of potentially related scripts}` (PI lists scripts that may overlap with the new task so simulator can reuse them)
   ※ Implementation of measurement logic and language choice are simulator's responsibility (see simulator.md)
+- **curator**: No specific data needed — curator reads everything and judges what needs rewriting. Optionally note what changed recently: `Items stabilized since last curation: {item_ids}` / `Story evolution: {brief description of what changed}`
 
 ### 3. Result Collection & State Update
 
@@ -321,9 +379,9 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 
   After writing the assessment, record the pointer to the relevant heading in the notes in `project.yaml`'s `contribution` field (e.g., `"notes/{file}.md#heading"`). If judged not a contribution, use `null`
 - **Stable check** (before any status → stable change): Write the `detail` field first — what is known, at what confidence, what angles remain unexplored. If writing the detail reveals significant open directions, keep at `active` and spawn child items. An item moves to `stable` when PI judges the current results are reliable enough to reference and the remaining open directions are not urgent
-- Edit items in `project.yaml` (status changes, detail recording, finding recording, contribution pointer recording, new item addition, parent-child relationship changes)
-- Edit relevant files in `research/notes/` (**update in current-state style** — see below)
-- Edit `research/plan.md` (**story review** — see below)
+- Edit items in `project.yaml` (status changes, detail recording, finding recording, contribution pointer recording, new item addition, parent-child relationship changes — **write all fields in current-state style per §Writing principle**)
+- Edit relevant files in `notes/` (**update in current-state style** — see §Writing principle)
+- Edit `plan.md` (**story review** — see below)
 - **Update TodoWrite** (required): Based on results, check off completed tasks, insert new tasks, delete unnecessary tasks, and reprioritize. If the direction for the next cycle has changed, rewrite the tasks
 
 **Story review** (consider when updating plan.md):
@@ -333,6 +391,7 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 - Should the item structure be refactored? (close with reframe, reorganize parent-child relationships, close unnecessary items)
 - **Fact-check existing content**: Claims written in earlier sessions can become stale as scope narrows or findings change. Scan for statements that no longer match the current thesis or scope and fix or remove them
 - **Prune history**: Apply the current-state writing principle (§Writing principle). Completed steps need only their conclusion, and abandoned directions belong in `dead-ends.md`
+- **Document synthesis**: When multiple items have stabilized, or when the story has significantly evolved, dispatch **curator** to rewrite project.yaml item descriptions and plan.md Strategy Notes (see §Writing principle for the standard). PI reviews changes via `git diff`. This is the primary mechanism for keeping project documentation as a coherent description of the research rather than a patchwork of investigation history
 
 **Critic verification mode**: When dispatching critic, specify `mode: blind` or `mode: contextual` based on the task nature:
 
@@ -342,7 +401,7 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 Rule of thumb: "Does the critic need to know the research purpose to perform this check?" — No → blind, Yes → contextual.
 
 **Researcher resubmission (iterative deepening)**: Researcher attempts are verified by **critic**. Critic performs mechanical verification (equation checking via SymPy/numerical computation) and logical analysis (evaluation of reasoning structure and implicit assumptions) through 2 channels, annotating the attempt file directly (strikethrough + comments + Critique section at the end). PI decides the next action based on critic's verdict:
-- **ACCEPT**: Reflect in notes (relevant file in `research/notes/`, with verification status) and update the item's status
+- **ACCEPT**: Reflect in notes (relevant file in `notes/`, with verification status) and update the item's status
 - **REVISE**: Pass the annotated attempt's path to researcher for resubmission. Researcher reads annotations and writes a new attempt addressing the feedback
 - **REJECT**: Fundamental approach change needed. PI reconsiders direction and launches researcher with new instructions
 
@@ -378,13 +437,14 @@ Dedicated phase for transforming raw captures and work/ deliverables into polish
 1. **Distill from work/ → notes/**: Review deliverables produced this cycle (attempt files, reading notes, simulation reports). Extract the essential knowledge — rewritten in PI's own words, not copied — and integrate into the appropriate note files. Worker reports are raw material; notes are the curated product
 2. **Polish to quality standard**: For each note touched this cycle, reread from the perspective of a collaborator seeing it for the first time. The three criteria from the quality standard (paper-draft material, collaborator-readable, pedagogically clear) are the benchmark. Concretely:
    - Motivation is stated (why this topic matters to the research)
-   - Key terms are defined at first use or linked via `[[...]]`
+   - Key terms are linked to concept notes via `[[...]]`; locally-scoped terms may be defined inline at first use
    - Claims carry sources and verification status tags
    - Equations are derived or contextualized, not dropped in without explanation
    - The note reads as a coherent mini-document, not a collection of bullet points
 3. **Link and tag**: Add wiki-links (`[[...]]`) wherever a note references a concept, method, or result discussed in another note. Add tags (`#tag-name`) for cross-cutting classification. Check that existing wiki-links still point to the right targets (note renames can break links)
-4. **Update index.md**: Ensure every note has a wiki-link entry in index.md with a one-sentence summary. Re-examine the thematic grouping — as the knowledge base grows, reorganize sections in index.md to reflect the current conceptual structure
-5. **Split or merge**: If a note has grown to cover multiple distinct topics, split it into atomic notes and link them. If two small notes overlap substantially, merge them
+4. **Concept note hygiene**: Sweep notes touched this cycle for non-trivial terms. Verify each has a concept note in `concepts/` — if not, create one (or dispatch concept-checker for bulk extraction). Check for definition drift — if a concept note's definition no longer matches how the term is actually used, update it
+5. **Update index.md**: Ensure every note has a wiki-link entry in index.md with a one-sentence summary. Re-examine the thematic grouping — as the knowledge base grows, reorganize sections in index.md to reflect the current conceptual structure
+6. **Split or merge**: If a note has grown to cover multiple distinct topics, split it into atomic notes and link them. If two small notes overlap substantially, merge them
 
 **Per-cycle self-check** (after note curation):
 
@@ -421,7 +481,7 @@ No need to rush and sacrifice quality to finish the session — the next `/run` 
      - Whether index.md reflects the current note collection (no orphan notes missing from the MOC)
    - If substantial issues are found, run self-check on the affected files and fix before proceeding
 3. Update `project.yaml`'s `last_run` to the current datetime
-4. If there are items to discuss in a meeting, Write to `research/agenda.md`:
+4. If there are items to discuss in a meeting, Write to `meetings/agenda.md`:
    ```markdown
    # Meeting Agenda
 

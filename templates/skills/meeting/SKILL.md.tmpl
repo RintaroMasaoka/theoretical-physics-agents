@@ -57,7 +57,7 @@ AskUserQuestion: Ask user to describe the research theme overview in Other
 
 **Where to reflect:**
 - Set topic, field, created_at, questions in `project.yaml`
-- Create research plan in `research/plan.md` (including `Thesis`, `Story Arc`, `Approach Principles`, and `Strategy Notes`)
+- Create research plan in `plan.md` (including `Thesis`, `Story Arc`, `Approach Principles`, and `Strategy Notes`)
 - If git is not initialized: `git init && git add -A && git commit -m "init: {topic}"`
 
 **Principle:** The user decides "what" and "why." AI decides "how." AI drafts the wording of questions and confirms with the user.
@@ -67,8 +67,8 @@ AskUserQuestion: Ask user to describe the research theme overview in Other
 Review the overall research direction and open discussion.
 
 ```
-Data loading: research/notes/index.md + plan.md + latest meeting minutes
-    ▼ If agenda.md exists (agenda accumulated by PI during /run), load → immediately delete (prevent consumed agenda from carrying over to next time)
+Data loading: notes/index.md + plan.md + latest meeting minutes
+    ▼ If meetings/agenda.md exists (agenda accumulated by PI during /run), load → immediately delete (prevent consumed agenda from carrying over to next time)
     ▼ Present progress report
     ▼ If loaded agenda items exist, display and discuss them as well
     ▼ AI presents high-level observations
@@ -87,8 +87,9 @@ Key achievements since last meeting: [summary]
 ```
 
 **Where to reflect:**
-- Structural changes (add/delete/modify story steps, rewrite Thesis) → Edit `research/plan.md` directly + update `project.yaml`. Leave a `> [Meeting YYYY-MM-DD] {reason for change}` marker at changes so PI can understand the context
-- Cross-step approach principles → Add them to the **Approach Principles** section of `research/plan.md`. Record them with a `> [Meeting YYYY-MM-DD] {reason for change}` marker
+- Structural changes (add/delete/modify story steps, rewrite Thesis) → Edit `plan.md` directly + update `project.yaml`. Leave a `> [Meeting YYYY-MM-DD] {reason for change}` marker at changes so PI can understand the context
+- Cross-step approach principles → Add them to the **Approach Principles** section of `plan.md`. Record them with a `> [Meeting YYYY-MM-DD] {reason for change}` marker
+- **Significance rewrite**: When the discussion recontextualizes results or establishes what findings mean in the story, rewrite the affected items' `detail`/`finding` fields in `project.yaml` and the `Strategy Notes` section in `plan.md` to reflect that synthesis. Meetings produce understanding that won't propagate to documents unless explicitly written. The meeting is the moment of synthesis — capture it in the documents, not just in the minutes
 
 **Principle:** Focus on overall direction, not individual question management. Alignment on "what do we want to say with this research."
 
@@ -114,7 +115,8 @@ Users may leave at any natural stopping point. Post-processing that writes every
 |---|---|
 | Session start | Create meeting minutes file + update `last_meeting` (→ see Initialization section) |
 | When a topic arises | Append to "Discussion Items" in minutes via Edit |
-| When a decision is made | Append to "Decisions" + immediately reflect in relevant files. If it is an approach principle, write it into the **Approach Principles** section of `research/plan.md` |
+| When a decision is made | Append to "Decisions" + immediately reflect in relevant files. If it is an approach principle, write it into the **Approach Principles** section of `plan.md` |
+| When significance is discussed | Rewrite affected items' `detail`/`finding` in `project.yaml` and `Strategy Notes` in `plan.md` to reflect the synthesis. Record in "Changes Applied" |
 | When a file is changed | Append to "Changes Applied" in minutes + git commit |
 
 **Git commits:** Specify changed files individually with `git add` (prevent unintended file inclusion), and commit in `meeting: {summary of changes}` format. The prefix enables tracking meeting-driven changes in git log.
