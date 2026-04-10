@@ -85,50 +85,11 @@ Concretely:
 
 ### notes/ — PI's Knowledge Base
 
-A wiki-linked knowledge base that serves as the intellectual backbone of the research. Worker agents read `index.md` and navigate to topic files via wiki-links as needed.
-
-**Purpose**: Distill the raw materials in `work/` into curated, structured knowledge. Worker deliverables are provisional and narrow-scoped — notes are where PI synthesizes them into reliable, interconnected understanding. Notes are not session logs or private memos; they are publication-quality knowledge meant to be read by collaborators and to serve as draft material for the paper.
-
-**Quality standard** — each note should satisfy all three criteria:
-1. **Paper-draft material**: Prose, equations, and citations at a level usable in a paper draft
-2. **Collaborator-readable**: A co-researcher unfamiliar with session history can follow the argument and evidence
-3. **Pedagogically clear**: Core concepts are introduced with enough context that a physicist outside the immediate subfield can understand the reasoning
-
-**Wiki-link format** (Obsidian-compatible):
-- `[[note-name]]` — link to another note. Resolves by filename (without extension) project-wide, so filenames must be unique even across subdirectories
-- `[[note-name#heading]]` — link to a specific heading within a note
-- `[[note-name|display text]]` — link with custom display text
-
-**Organization via links, not directories**: The primary organizational mechanism is wiki-links and tags, not folder hierarchy. Directories are optional convenience — PI may use a flat structure, introduce subdirectories, or reorganize freely as the knowledge base grows. What matters is that notes are interconnected through wiki-links and discoverable through index.md.
-
-**Tags**: Use inline tags (`#tag-name`) to classify notes along cross-cutting dimensions (e.g., `#conjecture`, `#verified`, `#key-result`, `#open-question`). Tags complement wiki-links: links express relationships between specific topics, while tags express shared properties across topics.
-
-**index.md (Map of Content)**: The entry point and navigational hub. Contains wiki-linked sections that group notes by theme. Keep entries brief — one line per note with a wiki-link and a one-sentence summary. Detailed discussion belongs in individual notes, not in index.md. The grouping in index.md reflects conceptual structure, not file paths.
-
-**Writing principles**:
-- **Self-contained**: Reading a single note file should suffice to understand the topic. Link terms to their concept notes via `[[...]]`; for terms used only locally, an inline definition suffices
-- **Current-state**: Write only what is currently understood to be true. When understanding changes, rewrite the note rather than appending corrections (git preserves history; stale content in notes misleads worker agents who read them for context)
-- **Atomic topics**: Each note covers one coherent topic. When a note grows to cover multiple distinct topics, split it into separate notes and link them
-- **Link generously**: Whenever a note references a concept, method, or result discussed elsewhere, use a wiki-link. The link graph is itself a map of how ideas connect
-- **Define via concept notes**: When introducing or using a non-obvious term, link to its concept note (`[[term]]`) rather than defining it inline. If no concept note exists, create one in `concepts/` (see §Concept notes below)
+Obsidian-compatible wiki-linked knowledge base. PI synthesizes worker deliverables into publication-quality notes here. `index.md` is the entry point (Map of Content); individual notes are linked via `[[note-name]]`. Write in current-state style — rewrite when understanding changes, don't append. Quality maintenance (polishing, wiki-links, staleness cleanup) is curator's responsibility.
 
 ### concepts/ — Concept Definitions
 
-Atomic definitions that keep jargon self-documenting. Concept notes live in `concepts/`, separate from the discussion notes in `notes/`. Both PI and worker agents (including concept-checker) can write to `concepts/`.
-
-A concept note defines a single concept, term, or method. It is small (typically < 1 page) and linked from any file via `[[term]]`. This ensures every non-trivial term has one canonical definition.
-
-**When to create**: When PI introduces or uses a term that a collaborator unfamiliar with the project would not immediately understand. The threshold: "would a physicist in this subfield, but not in this project, need this defined?" When in doubt, create the note — a short definition costs little, but an undefined term costs every future reader.
-
-**Format**: No rigid template — write whatever makes the concept clear. Typical elements:
-- Definition (mathematical and/or physical)
-- Why this concept matters to the research
-- Connections to related concepts (via `[[...]]` links)
-- Verification status if the concept involves a specific claim
-
-**Naming**: Use lowercase with underscores (e.g., `helicity_modulus.md`, `compact_boson.md`). The filename is the wiki-link target — `[[helicity_modulus]]` resolves to `concepts/helicity_modulus.md`. Concept filenames share the same wiki-link namespace as `notes/` — ensure no collisions. If a topic warrants both a concept definition and an extended discussion, name them distinctly (e.g., `concepts/helicity_modulus.md` for the definition, `notes/helicity_modulus_analysis.md` for the discussion) and link between them.
-
-A well-written concept note that clarifies a subtle distinction is paper-draft material in its own right.
+Atomic definitions (one term per file) in `concepts/`. Linked from any file via `[[term]]`. Concept-checker and curator manage creation and maintenance; PI may also create them when introducing new terms.
 
 ## Research Items (project.yaml)
 
