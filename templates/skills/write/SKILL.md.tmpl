@@ -32,10 +32,10 @@ Draft research findings as an academic paper. The responsibility is to shape the
 ## Directory Structure
 
 ```
-project.yaml              # Read-only (/write does not modify)
+plan.md                   # Read-only (item tree, Story Arc, strategy)
+items/                    # Read-only (item context, kind, status)
 notes/                    # Read-only — reference for research content
 concepts/                 # Read-only — concept definitions
-plan.md                   # Read-only — reference for Story Arc
 work/                     # Read-only — reference for evidence
 meetings/
   agenda.md               # Writable — destination for reporting research gaps
@@ -55,7 +55,7 @@ logs/
 
 | Agent | Role |
 |---|---|
-| **outliner** | Design the overall paper structure from research items and Story Arc |
+| **outliner** | Design the overall paper structure from the Story Arc and item tree |
 | **writer** | Draft a specified section as an academic paper |
 | **reviewer** | Verify the logical consistency of a section |
 | **finalizer** | Integrate all sections and produce the final version |
@@ -66,9 +66,9 @@ logs/
 ## Session Start
 
 1. Read `logs/last_write_session.md` (if it exists)
-2. Read `project.yaml`
-3. Read `notes/index.md` (read topic files as needed)
-4. Read `plan.md`
+2. Read `plan.md` (Story Arc with item tree)
+3. Read `items/*.md` (all items files — understand kind, status, context)
+4. Read `notes/index.md` (read topic files as needed)
 5. Read `manuscript/outline.md` (if it exists)
 6. Check existing section drafts (Glob `manuscript/sections/*.md`)
 
@@ -113,7 +113,7 @@ Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_
 ```
 
 Dynamic data by agent:
-- **outliner**: (no additional data — reads project.yaml, notes/index.md, plan.md on its own)
+- **outliner**: (no additional data — reads plan.md, items/, notes/index.md on its own)
 - **writer**: `Assigned section: #{N} {title} (slug: {slug})` / `Related Items: {ids}` / `Evidence: {paths}` / For revisions: `Review report: {path}`
 - **reviewer**: `Target section: manuscript/sections/{N}_{slug}.md` / `Related Items: {ids}`
 - **finalizer**: `Audit report: {path}` (if available)

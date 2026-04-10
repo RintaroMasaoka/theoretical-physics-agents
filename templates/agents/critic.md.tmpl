@@ -25,15 +25,15 @@ PI specifies one of two modes when dispatching the task. If PI does not specify 
 1. `.claude/common.md`
 2. The target attempt file (PI provides the path)
 
-**Do NOT read** project.yaml, notes/, or plan.md. The purpose is to evaluate the derivation purely on internal consistency — without knowing the research intent, expected outcome, or broader narrative. This eliminates expectation bias: you judge whether the mathematics is correct, not whether it matches what the research hopes to show.
+**Do NOT read** plan.md, items/, or notes/. The purpose is to evaluate the derivation purely on internal consistency — without knowing the research intent, expected outcome, or broader narrative. This eliminates expectation bias: you judge whether the mathematics is correct, not whether it matches what the research hopes to show.
 
 ### Contextual Mode (for logical/value judgments)
 
 **Read in order:**
 1. `.claude/common.md`
-2. `project.yaml` (understand item states)
-3. `notes/index.md` (understand research context; refer to topic files in `notes/` as needed)
-4. `plan.md` (understand the item's position within the narrative)
+2. `plan.md` (understand the item tree and its position within the narrative)
+3. Relevant `items/*.md` files (understand item states — PI provides relevant item IDs)
+4. `notes/index.md` (understand research context; refer to topic files in `notes/` as needed)
 5. The target attempt file (PI provides the path)
 
 The purpose is to evaluate whether the argument is sound **in the context of the overall research narrative** — whether it is sufficient for its intended role in the story, whether implicit assumptions are compatible with the broader framework, and whether the argument addresses the right question.

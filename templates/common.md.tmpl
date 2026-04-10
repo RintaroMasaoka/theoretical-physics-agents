@@ -1,14 +1,23 @@
 # Worker Common Rules
 
-## Research Items (project.yaml)
+## Information Architecture
 
-`project.yaml`'s `items:` contains a nested structure of items. Each item has a `kind` (narrative, task, question, conjecture, example, caution, gap, observation, etc.) and a `status` (open, active, stable, closed).
+Research information is organized in 4 layers:
 
-The `detail` field is the primary carrier of nuance — more important than status. It must describe what is currently known and at what confidence level, and any unexplored angles. For `closed` items, include the reason (e.g., "dropped: ...", "reframed → {id}: ...", "exhausted: ..."). This helps PI in subsequent sessions judge how much to rely on the result and whether to revisit.
+| Layer | Location | Worker access | What it contains |
+|---|---|---|---|
+| **Research map** | `plan.md` | Read-only | Story Arc (the narrative backbone of the research) with item tree, strategy, principles |
+| **Item context** | `items/*.md` | Read-only | Per-item work context: evidence, revisions, children, current state |
+| **Established knowledge** | `notes/*.md`, `concepts/` | Read-only (except `concepts/` — concept-checker may create entries) | Verified results, distilled understanding, concept definitions |
+| **Session context** | `logs/last_session.md` | Not relevant to workers | PI's volatile work context for session handoff |
+
+**plan.md tree**: The Story Arc in plan.md lists items as `{id} [{status}]: {description}`. Items with complex context link to `items/{id}.md`; simple items appear only as lines in plan.md with no corresponding file. Each item has a `kind` (narrative, task, question, conjecture, example, caution, gap, observation, etc.) and a `status` (open, active, stable, closed).
+
+**items/*.md**: Frontmatter contains `id`, `parent`, `kind`, `status`, `contribution`. Body contains current state, evidence chain, revision history, and children. The `parent` field tracks the item's position in the tree hierarchy.
 
 Item status determination requires the context of the entire research and is PI's responsibility.
 
-- **Read-only** (only PI writes)
+- Only PI writes to plan.md and items/
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified
 
@@ -27,7 +36,7 @@ This is a record for humans to review progress later, not a decision input for P
 
 ## Research Notes Format
 
-`notes/` is an Obsidian-compatible wiki-linked knowledge base maintained by PI. `concepts/` contains atomic concept definitions (writable by all agents — see concept-checker). Both are read-only for most worker agents unless otherwise specified. Understanding the syntax lets you follow cross-references and assess the reliability of claims.
+`notes/` is an Obsidian-compatible wiki-linked knowledge base maintained by PI (read-only for workers). `concepts/` contains atomic concept definitions; concept-checker may create entries, but other workers treat it as read-only. Understanding the syntax lets you follow cross-references and assess the reliability of claims.
 
 Syntax:
 - **Wiki-links**: `[[note-name]]`, `[[note-name#heading]]`, `[[note-name|display text]]` — references to other note files. To follow a link, search for `{note-name}.md` project-wide (wiki-links resolve by filename, not by directory path)
@@ -40,6 +49,5 @@ Convention — **concept notes**: Files in `concepts/` are small (< 1 page) and 
 
 - Write deliverables and logs in **{{ language }}** (technical terms, proper nouns, and equations may remain in their original language)
 - Write equations in LaTeX notation (inline: `$...$`, display: `$$...$$`). Do not embed raw variable names or expressions in prose — always wrap them in `$...$`. Use `$$` instead of `\(\)`, `\[\]`, or LaTeX environment names — `$$` is the standard syntax recognized by most Markdown readers
-- AskUserQuestion is prohibited (users are often away during `/run` and `/write`, and asking questions interrupts the session. However, you may respond if the user initiates communication)
+- Do not request user input in any form (users are often away during `/run` and `/write`, and asking questions interrupts the session. However, you may respond if the user initiates communication)
 - No writing outside the project directory
-- Each agent writes only to its designated output location (see individual agent definitions)
