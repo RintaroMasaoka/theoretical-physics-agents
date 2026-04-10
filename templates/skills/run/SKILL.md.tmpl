@@ -161,7 +161,7 @@ items:
 
 Stable items receive a `contribution` field. The value is a pointer to an assessment heading in the research notes (e.g., `"notes/{file}.md#winding-gap-formula"`). The location of the assessment is up to PI (write in an existing file or create a dedicated one). Items that are not contributions of this research get `contribution: null`.
 
-**Contribution assessment is a research activity, not label-stamping.** One-word classification labels leave no reasoning trail and have low accuracy. Instead, write a structured assessment in the notes — the process of writing the assessment itself forces deep thought. The judgment is PI's responsibility; do not take the researcher's self-assessment at face value (those who did the thinking tend to overestimate novelty). See §Result Collection's Contribution assessment for specific procedures.
+**Contribution assessment is a research activity, not label-stamping.** One-word classification labels leave no reasoning trail and have low accuracy. Instead, write a structured assessment in the notes — the process of writing the assessment itself forces deep thought. The judgment is PI's responsibility; do not take the researcher's self-assessment at face value (those who did the thinking tend to overestimate novelty). See §Result Collection for assessment criteria.
 
 ### kind (Item Type)
 
@@ -297,7 +297,7 @@ Step 2: [what] — [why] [status, item_id]
 - Numerical verification of theoretical predictions → **simulator** (measure, analyze, and visualize using existing `lib/` modules. Built-in verification protocol)
 - Verify note/plan readability → **self-check** (has no research context; catches undefined terms and jargon that PI overlooks)
 - Build/maintain concept definitions → **concept-checker** (reads a file as a first-time reader and creates concept notes in `concepts/` for undefined terms. Use after writing notes or when jargon may have accumulated)
-- Synthesize project documentation → **curator** (rewrites project.yaml item descriptions and plan.md Strategy Notes to current-state form; see §3 Document synthesis for when to dispatch)
+- Maintain knowledge base → **curator** (note quality polishing, wiki-link/concept hygiene, staleness cleanup, documentation synthesis. Dispatch after notes accumulate changes or at session end)
 
 **PI judges as a researcher.** The above are guidelines only; judge freely according to the research situation.
 
@@ -359,25 +359,13 @@ Dynamic data by agent:
 - **engine-builder**: For new features: `Model definition` (Hamiltonian, lattice structure, boundary conditions) / `Computational method` (Monte Carlo, molecular dynamics, etc.) / `Required features` (which observables/update algorithms needed) / existing module path if any. For refinement: `"Refine lib"` suffices — engine-builder self-diagnoses via its diagnostic checklist
 - **simulator**: `Target: {item_id}` / `Physical setup` / `Mathematical definition of observables` / `Success criteria` (what to compare against and what constitutes verification success) / `Deliverable number: {N}` (serial number managed by PI) / file paths to related theoretical results / `simulations/lib/` module list (if empty, run engine-builder first) / `Existing scripts in src/: {list of potentially related scripts}` (PI lists scripts that may overlap with the new task so simulator can reuse them)
   ※ Implementation of measurement logic and language choice are simulator's responsibility (see simulator.md)
-- **curator**: No specific data needed — curator reads everything and judges what needs rewriting. Optionally note what changed recently: `Items stabilized since last curation: {item_ids}` / `Story evolution: {brief description of what changed}`
+- **curator**: Curator reads everything and judges what needs attention. Optionally note what changed: `Items updated: {item_ids}` / `Deliverables this cycle: {paths}` / `Notes touched: {files}`
 
 ### 3. Result Collection & State Update
 
 Retrieve deliverable paths from task return values and Read deliverables directly as needed:
 - **Handling FAILED tasks**: If an agent returns `FAILED:`, its deliverable does not exist. Papers remaining `unread` are subject to the "unread paper principle" above. Typical response is to retry reader in the next cycle or note it in `agenda.md` for user consultation
-- **Contribution assessment** (required): When receiving researcher results, assess whether the result qualifies as a contribution of this research. This assessment applies not only to the researcher's new results but also periodically to contribution claims already in the notes — past assessments can become stale as research progresses.
-
-  **Assessment procedure** — Write the following in an appropriate place in the notes (must be written before recording the pointer in `project.yaml`):
-  1. **Decompose**: Break the result into components and identify each component's provenance (existing literature / application of existing methods / newly constructed in this research)
-  2. **Non-triviality rationale**: Concretely discuss whether the combination/connection of components is trivial. "Would an expert say 'that's obvious' or 'interesting'?" — write the answer concretely (why obvious, why not obvious)
-  3. **Where the value lies**: Is the value in the result itself, in the reasoning process, or in connecting different fields/frameworks? The answer to a referee asking "so what?"
-  4. **Difference from the closest existing research**: Specific comparison. What is the same and what differs
-
-  **Source verification** (execute when mentioning existing research in assessment steps 1 & 4):
-  - If the comparison paper is not `read` in `reading_list.md` → explicitly note "provisional judgment as {paper name} is unread" in the assessment, and do not finalize
-  - For negative evidence ("paper X only covers the Y case, etc."), explicitly state confidence level — reading notes are selective extractions, and the reader may have omitted it
-
-  After writing the assessment, record the pointer to the relevant heading in the notes in `project.yaml`'s `contribution` field (e.g., `"notes/{file}.md#heading"`). If judged not a contribution, use `null`
+- **Contribution assessment**: Review the researcher's contribution self-assessment in the deliverable. Write PI's independent judgment in the appropriate notes file — PI may agree with, refine, or overturn the researcher's view. Do not take the researcher's self-assessment at face value; PI's own assessment of provenance, non-triviality, and difference from existing work is what counts. When referencing papers not marked `read` in reading_list.md, note "provisional judgment as {paper} is unread." Record the pointer in project.yaml's `contribution` field (e.g., `"notes/{file}.md#heading"`), or `null` if not a contribution
 - **Stable check** (before any status → stable change): Write the `detail` field first — what is known, at what confidence, what angles remain unexplored. If writing the detail reveals significant open directions, keep at `active` and spawn child items. An item moves to `stable` when PI judges the current results are reliable enough to reference and the remaining open directions are not urgent
 - Edit items in `project.yaml` (status changes, detail recording, finding recording, contribution pointer recording, new item addition, parent-child relationship changes — **write all fields in current-state style per §Writing principle**)
 - Edit relevant files in `notes/` (**update in current-state style** — see §Writing principle)
@@ -416,46 +404,14 @@ Not every attempt needs to go through critic — PI may accept clearly high-qual
 
 **Simulator resubmission**: If simulator returns incomplete results (insufficient parameter range, insufficient statistical precision, algorithm improvement needed, etc.), PI can instruct additional computation and resubmit. On resubmission, pass the previous deliverable path and existing code path, and specify concretely what to improve. For additional computation on the same physical setup/observables, update the same deliverable number; for changed setup or observables, create a new number
 
-**Note capture** (record findings while they are fresh — prose quality and linking are handled in §4 Note Curation):
-1. **Select target**: Check index.md and write in the most appropriate note file. If no suitable file exists, create a new note and add a `[[wiki-link]]` entry to index.md
-2. **Staleness check**: Research evolves and claims that were accurate earlier can become outdated or irrelevant (e.g., general-d statements persisting after the scope narrowed to d=2). When touching a file, scan existing content for claims that no longer match the current research scope, thesis, or findings — not just for direct contradictions with the new result. Fix or delete stale content before writing new content
-3. **Attribution check**: Attach sources and verification status to existing literature results. For contributions of this research, only record judgments that have gone through assessment (§Contribution assessment)
-4. **Verification state check**: When writing specific claims about external papers, confirm that the paper is `read` in reading_list.md
-5. **Read critically, write in your own words**: Do not take worker reports at face value; describe as PI's own understanding. After writing, reread from the perspective of "someone reading only this file"
-6. **Prune historical traces**: Apply the current-state writing principle (§Writing principle) to the file being edited
-7. **Annotations on worker deliverables**: If errors are found in reading/attempt notes, annotate the original file directly (`~~error~~ [→ correction]`)
-8. **Update index.md**: Reflect changes in the note list
+**Note capture** (record findings while they are fresh):
+1. Write PI's synthesis of the results in the appropriate note file (check index.md; create a new note + index.md entry if needed). Write in PI's own words — worker deliverables are raw material, notes are curated understanding
+2. If errors are found in worker deliverables, annotate the original file directly (`~~error~~ [→ correction]`)
 
-### 4. Note Curation
+**Knowledge base maintenance** (dispatch curator when needed — not every cycle):
+After notes have accumulated changes across multiple cycles, or after substantial new content, dispatch **curator** for knowledge base maintenance. Curator handles quality polishing, wiki-link integrity, staleness cleanup, concept note hygiene, and readability review. PI reviews changes via `git diff` when curator returns.
 
-Dedicated phase for transforming raw captures and work/ deliverables into polished, wiki-linked knowledge base entries. §3's note capture records findings quickly; this phase ensures the knowledge base meets its quality standard.
-
-**When to run this phase**: Every cycle where notes were updated in §3, or where unprocessed work/ deliverables remain. If the cycle produced no new knowledge (e.g., only launched tasks), skip to §5.
-
-**Procedure**:
-
-1. **Distill from work/ → notes/**: Review deliverables produced this cycle (attempt files, reading notes, simulation reports). Extract the essential knowledge — rewritten in PI's own words, not copied — and integrate into the appropriate note files. Worker reports are raw material; notes are the curated product
-2. **Polish to quality standard**: For each note touched this cycle, reread from the perspective of a collaborator seeing it for the first time. The three criteria from the quality standard (paper-draft material, collaborator-readable, pedagogically clear) are the benchmark. Concretely:
-   - Motivation is stated (why this topic matters to the research)
-   - Key terms are linked to concept notes via `[[...]]`; locally-scoped terms may be defined inline at first use
-   - Claims carry sources and verification status tags
-   - Equations are derived or contextualized, not dropped in without explanation
-   - The note reads as a coherent mini-document, not a collection of bullet points
-3. **Link and tag**: Add wiki-links (`[[...]]`) wherever a note references a concept, method, or result discussed in another note. Add tags (`#tag-name`) for cross-cutting classification. Check that existing wiki-links still point to the right targets (note renames can break links)
-4. **Concept note hygiene**: Sweep notes touched this cycle for non-trivial terms. Verify each has a concept note in `concepts/` — if not, create one (or dispatch concept-checker for bulk extraction). Check for definition drift — if a concept note's definition no longer matches how the term is actually used, update it
-5. **Update index.md**: Ensure every note has a wiki-link entry in index.md with a one-sentence summary. Re-examine the thematic grouping — as the knowledge base grows, reorganize sections in index.md to reflect the current conceptual structure
-6. **Split or merge**: If a note has grown to cover multiple distinct topics, split it into atomic notes and link them. If two small notes overlap substantially, merge them
-
-**Per-cycle self-check** (after note curation):
-
-Note quality has two layers of verification: **per-cycle self-check** catches jargon and self-containedness issues in individual files, and **session-end coherence check** catches cross-file inconsistencies that only emerge after multiple cycles.
-
-When notes or plan.md were substantially changed in this cycle (new content added or significant rewrites — not minor edits like status tag changes):
-1. Launch **self-check agent** on each changed file (can run in parallel with other agents via Pattern A/B). Pass each file individually — self-check has no research context, which lets it catch jargon and missing definitions that PI (who has full context) would overlook
-2. Review the findings and Edit to fix valid issues before proceeding to the next cycle
-3. Focus on issues that genuinely impede understanding. Not every finding needs a fix — use judgment
-
-### 5. Next Cycle (Return to Step 1)
+### 4. Next Cycle (Return to Step 1)
 
 ---
 
@@ -466,20 +422,8 @@ No need to rush and sacrifice quality to finish the session — the next `/run` 
 
 **Do not suggest transitioning to `/write`** in the final report or elsewhere. The user decides when the research is mature enough for writing. `/run`'s job is to deepen understanding, not to move toward paper production.
 
-1. **Simulation housekeeping** (if simulator ran during the session):
-   Results archiving is the simulator's responsibility at task time (§1 Design in simulator.md). This step covers `src/` script cleanup, batched at session end because multiple simulator tasks may touch overlapping scripts within a session.
-   - List all scripts in `simulations/src/` and check for:
-     - **Superseded scripts**: A newer version exists (e.g., `foo.jl` superseded by `foo_v2.jl`). Move the old version to `src/archive/` and rename the new version to drop the suffix, updating any references
-     - **Dead scripts**: Scripts from abandoned experiments that no longer serve any active or stable item. Move to `src/archive/`
-   - When in doubt, keep the script — archiving can happen in a later session. Never delete; always move to the archive directory. Archive directories preserve files for reference (searchable via Grep, recoverable if needed) while keeping the active workspace clean. Record moves in `logs/last_session.md`
-2. **Final coherence check** (if notes or plan.md were changed during the session):
-   - Per-cycle self-checks verify individual files; this step catches cross-file issues. PI checks:
-     - Whether wiki-links point to existing notes (no broken `[[...]]` links)
-     - Whether referenced attempt file state descriptions are current
-     - Whether claims superseded during the session remain
-     - Whether terminology is consistent across files (per-cycle checks cover within-file usage; this catches divergence between files)
-     - Whether index.md reflects the current note collection (no orphan notes missing from the MOC)
-   - If substantial issues are found, run self-check on the affected files and fix before proceeding
+1. **Simulation housekeeping** (if simulator ran): Check `simulations/src/` for superseded scripts (e.g., `foo.jl` superseded by `foo_v2.jl`) and dead scripts from abandoned experiments. Move to `src/archive/` — never delete. When in doubt, keep. Record moves in `logs/last_session.md`
+2. **Knowledge base coherence** (if notes changed during the session): Dispatch **curator** for session-end review (cross-file coherence: broken wiki-links, terminology consistency, orphan notes, stale references). Alternatively, perform a quick manual check if changes were minor
 3. Update `project.yaml`'s `last_run` to the current datetime
 4. If there are items to discuss in a meeting, Write to `meetings/agenda.md`:
    ```markdown
