@@ -23,16 +23,14 @@ Item status determination requires the context of the entire research and is PI'
 
 ## Inter-Agent Communication
 
-Loading large amounts of data into prompts wastes context window. Writing to files allows reading only the necessary parts.
+PI will not paste data into your task prompt. Instead, PI provides file paths; you read only the sections you need. This keeps both PI's and your context windows efficient.
 
 - **Input**: Receive task instructions and file paths from PI; Read the necessary data yourself
 - **Output**: Write deliverables to files and return `DONE: {deliverable path}` as the Task return value
-- Never load raw data directly into prompts — always communicate via files
 
 ## Logs (Progress Records for Humans)
 
-Write a work summary to `logs/{agent}_{timestamp}.md`.
-This is a record for humans to review progress later, not a decision input for PI.
+Write a work summary to `logs/{agent}_{timestamp}.md`. The deliverable contains your analytical output. The log is a brief narrative summary of what you did, what you found, and any issues encountered — it helps the human researcher audit the research process. Logs are not a decision input for PI.
 
 ## Research Notes Format
 

@@ -185,7 +185,7 @@ Obsidian-compatible wiki-linked knowledge base. PI synthesizes verified results 
 
 **Current-state only**: notes/ describes what is known now, not how it was discovered. When understanding changes, rewrite the note. Work history lives in items/ (evidence and revisions) and work/ (raw attempts).
 
-**Quality standard**: Publication-quality prose usable as draft material. Collaborator-readable without items/ context. Claims carry verification status tags (`[sympy]`, `[numerical]`, `[limiting case]`, `[literature: arXiv:XXXX]`, `[unverified]`).
+**Quality standard**: Publication-quality prose usable as draft material. Collaborator-readable without items/ context. Claims carry inline verification status tags: `[sympy]`, `[numerical]`, `[limiting case]`, `[literature: arXiv:XXXX]`, `[unverified]`. notes/ primarily contains verified results; when a specific claim within a promoted result lacks independent verification, mark it `[unverified]` so readers know not to rely on it without checking.
 
 Quality maintenance (polishing, wiki-links, staleness cleanup) is curator's responsibility.
 
@@ -240,7 +240,7 @@ Remove the item from plan.md's tree. If the closure is informative (why it faile
 **Unread paper principle:** For papers marked `unread` in reading_list.md, PI must not describe their content, claims, methods, or results (even if PI's training data contains knowledge, information from unread sources is unverified and unreliable). Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated (see `.claude/common.md` verification procedures). If there are ★★★ and unread papers, run reader with top priority in the first cycle
 
 **Feedback processing:**
-- If `plan.md` contains `> [Meeting ...]` markers: A direction change was decided in a meeting. **Read and understand the reason for the change before starting work.** Do not revert plan.md changes. Understood annotations may be naturally cleaned up during work
+- If `plan.md` contains `> [Meeting ...]` markers (e.g., `> [Meeting 2026-04-10] Changed approach to X because Y`): A direction change was decided in a meeting. These markers are inserted by the `/meeting` skill. **Read and understand the reason for the change before starting work.** Do not revert plan.md changes. Understood annotations may be naturally cleaned up during work
 - In the **Approach Principles** section of `plan.md`: Cross-step principles agreed in meetings. Follow them throughout the entire session. PI must not change this section unilaterally; changes are decided in meetings
 
 **Initial check:**
@@ -273,7 +273,7 @@ Step 1: [what] — [why] [status]
 ```
 
 - `notes/` does not exist → Create `notes/` and `notes/index.md` as the Map of Content. Create initial seed notes as appropriate (e.g., contributions, existing tools, dead-ends)
-- `concepts/` does not exist → Create `concepts/` with concept notes for core terms
+- `concepts/` does not exist → Create `concepts/` and write initial concept notes for core terms directly (PI bootstraps; ongoing maintenance is handled by concept-checker and curator)
 - `items/` does not exist → Create `items/` and `items/archive/`
 
 ---
@@ -302,9 +302,9 @@ Step 1: [what] — [why] [status]
 - Further research needed after verification → **researcher** (resubmit with access to previous notes and feedback)
 - Build/extend/refine simulation framework → **engine-builder** (build model-specific modules in `simulations/lib/`, or invoke with "refine lib" for self-directed quality improvement. Run before simulator if modules don't exist yet)
 - Numerical verification of theoretical predictions → **simulator** (measure, analyze, and visualize using existing `lib/` modules. Built-in verification protocol)
-- Verify note/plan readability → **self-check** (has no research context; catches undefined terms and jargon that PI overlooks)
-- Build/maintain concept definitions → **concept-checker** (reads a file as a first-time reader and creates concept notes in `concepts/` for undefined terms. Use after writing notes or when jargon may have accumulated)
-- Maintain knowledge base → **curator** (note quality polishing, wiki-link/concept hygiene, items/ refresh, staleness cleanup. Dispatch after notes accumulate changes or at session end)
+- Verify note/plan readability → **self-check** (reviews prose for readability problems — unclear arguments, undefined terms, logical gaps. Flags issues for PI to fix. Has no research context, so it catches what PI overlooks)
+- Build/maintain concept definitions → **concept-checker** (creates or updates concept definition files in `concepts/` for technical terms that lack entries. Ensures the terminology base is complete. Use after writing notes or when jargon may have accumulated)
+- Maintain knowledge base → **curator** (note quality polishing, wiki-link/concept hygiene, items/ refresh, staleness cleanup. Dispatch after notes accumulate changes, when items/ files exceed ~150 lines, or at session end)
 
 **PI judges as a researcher.** The above are guidelines only; judge freely according to the research situation.
 
