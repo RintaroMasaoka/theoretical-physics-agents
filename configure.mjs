@@ -9,9 +9,9 @@
  *
  * Source of truth:
  *   Config values:  .claude/config/config.yaml
- *   Prompt content: templates/**\/*.tmpl
+ *   Prompt content: templates/**\/*.src
  * Generated (do not edit directly — overwritten on each run):
- *   .claude/**\/*.md  (mirrors templates/ structure, .tmpl extension stripped)
+ *   .claude/**\/*.md  (mirrors templates/ structure, .src extension stripped)
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "fs";
@@ -20,7 +20,7 @@ import { fileURLToPath } from "url";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = join(ROOT, ".claude", "config", "config.yaml");
-const TMPL_DIR = join(ROOT, "templates");
+const SRC_DIR = join(ROOT, "templates");
 const OUT_DIR = join(ROOT, ".claude");
 
 // ── YAML parsing ──────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ function render(template, config) {
   });
 }
 
-// ── Recursive glob for .tmpl files ───────────────────────────────────
+// ── Recursive glob for .src files ────────────────────────────────────
 
 function findTemplates(dir) {
   const results = [];
@@ -93,7 +93,7 @@ function findTemplates(dir) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
       results.push(...findTemplates(full));
-    } else if (entry.endsWith(".tmpl")) {
+    } else if (entry.endsWith(".src")) {
       results.push(full);
     }
   }
@@ -129,7 +129,7 @@ if (mode === "--check") {
   const allPlaceholders = new Set();
   const templateKeys = {};
 
-  for (const tmplPath of findTemplates(TMPL_DIR)) {
+  for (const tmplPath of findTemplates(SRC_DIR)) {
     const rel = relative(ROOT, tmplPath);
     const content = readFileSync(tmplPath, "utf-8");
     const keys = findPlaceholders(content);
@@ -164,9 +164,9 @@ if (mode === "--check") {
 // ── Render templates ──────────────────────────────────────────────────
 console.log(mode === "--dry-run" ? "Would generate:" : "Generated:");
 
-for (const tmplPath of findTemplates(TMPL_DIR)) {
-  const rel = relative(TMPL_DIR, tmplPath);
-  const outRel = rel.replace(/\.tmpl$/, "");
+for (const tmplPath of findTemplates(SRC_DIR)) {
+  const rel = relative(SRC_DIR, tmplPath);
+  const outRel = rel.replace(/\.src$/, "");
   const dst = join(OUT_DIR, outRel);
 
   const content = readFileSync(tmplPath, "utf-8");
