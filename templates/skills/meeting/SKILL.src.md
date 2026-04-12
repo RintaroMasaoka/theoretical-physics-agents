@@ -19,7 +19,7 @@ Arguments: $ARGUMENTS
 Initialization
     ▼ Data loading: plan.md
     ▼ Context-dependent start
-        ├─ No theme set → Start with theme setting
+        ├─ No theme set → Tell user to run /launch first
         └─ Theme already set → Present progress report and open discussion
     ▼ Free discussion with user
     ▼ Reflect decisions as they are made
@@ -47,20 +47,7 @@ After initialization, commit with `meeting: init YYYY-MM-DD HH:MM`.
 
 ### When No Theme Is Set
 
-Set the research theme and direction.
-
-```
-AskUserQuestion: Ask user to describe the research theme overview in Other
-    ▼ AI presents several approach options → Refine direction (2-3 rounds)
-    ▼ Reflect in plan.md
-```
-
-**Where to reflect:**
-- Set topic, field, created_at in `plan.md` frontmatter
-- Create research plan in `plan.md` (including `Thesis`, `Story Arc`, `Approach Principles`, and `Strategy Notes`)
-- If git is not initialized: `git init && git add -A && git commit -m "init: {topic}"`
-
-**Principle:** The user decides "what" and "why." AI decides "how." AI drafts the wording of questions and confirms with the user.
+Research theme has not been configured. Tell the user to run `/launch` to set the theme and direction, then end the session.
 
 ### When Theme Is Already Set
 
