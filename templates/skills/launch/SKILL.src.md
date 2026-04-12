@@ -56,7 +56,7 @@ Step 2: ...
 
 ## Strategy Notes
 
-### 現在のフェーズ: {phase description}
+### Current Phase: {phase description}
 
 {Current status, next steps, open questions}
 

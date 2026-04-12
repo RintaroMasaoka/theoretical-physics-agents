@@ -124,12 +124,12 @@ last_run: "YYYY-MM-DDTHH:MM"
 ```markdown
 ## Story Arc
 Step 1: **{title}** [{status}]
-  - spectral_gap_lower_bound [stable]: {description} — {one-line summary}
-  - [winding_gap_formula](items/winding_gap_formula.md) [stable]: {description}
-    - continuum_winding_conservation [stable]: {description}
-    - [clock_model_verification](items/clock_model_verification.md) [stable]: {description}
-      - clock_kappa_measurement [stable]: {description}
-  - [large_L_verification](items/large_L_verification.md) [active]: {description}
+  - basic_property_proof [stable]: {description} — {one-line summary}
+  - [main_theorem](items/main_theorem.md) [stable]: {description}
+    - auxiliary_lemma [stable]: {description}
+    - [special_case_check](items/special_case_check.md) [stable]: {description}
+      - parameter_scan [stable]: {description}
+  - [numerical_verification](items/numerical_verification.md) [active]: {description}
 ```
 
 **Current-state writing**: plan.md describes the present situation. Strategy Notes reads as a coherent narrative, not a changelog. When the situation changes, rewrite rather than append. Operational detail (seed counts, L values) belongs in last_session.md or items/, not in Strategy Notes.
@@ -140,11 +140,11 @@ Each complex item gets a markdown file with YAML frontmatter:
 
 ```markdown
 ---
-id: winding_gap_formula
+id: main_theorem
 parent: (parent id)
 kind: question
 status: stable
-contribution: notes/winding_gap.md   # pointer to promoted notes/ file (empty if not promoted)
+contribution: notes/main_result.md   # pointer to promoted notes/ file (empty if not promoted)
 ---
 
 # {item description}
@@ -153,20 +153,20 @@ contribution: notes/winding_gap.md   # pointer to promoted notes/ file (empty if
 [What is known, confidence level, open angles]
 
 ## Evidence
-- attempt_14: Coulomb escape derivation. critic ACCEPT
-- Sim 25: 13-temperature verification
+- attempt_14: Analytical derivation of key formula. critic ACCEPT
+- Sim 25: Multi-parameter numerical verification
 [append-only — never delete evidence entries]
 
 ## Revisions
-- z=2 (attempt_5) → retracted (attempt_9) → z=2πκ-2 (attempt_14)
+- v1 (attempt_5) → retracted (attempt_9) → v2 with corrected exponent (attempt_14)
 [append-only — the revision chain is the provenance trail]
 
 ## Children
 
-### continuum_winding_conservation [stable]: 連続体 vortex pair creation の禁止
+### auxiliary_lemma [stable]: Key supporting result for the main theorem
 [inline description for simple children]
 
-### clock_model_verification → [items/clock_model_verification.md](items/clock_model_verification.md)
+### special_case_check → [items/special_case_check.md](items/special_case_check.md)
 [link for complex children with their own file]
 ```
 
@@ -199,7 +199,7 @@ Atomic definitions (one term per file). Linked from any file via `[[term]]`. Con
 
 ### Naming Convention
 
-Item IDs are **descriptive slugs**: lowercase words joined by underscores that convey the item's content at a glance (e.g., `winding_gap_formula`, `clock_model_verification`, `large_L_verification`). The `kind` is tracked in frontmatter, not encoded in the name.
+Item IDs are **descriptive slugs**: lowercase words joined by underscores that convey the item's content at a glance (e.g., `main_theorem_proof`, `scaling_limit_check`, `finite_size_analysis`). The `kind` is tracked in frontmatter, not encoded in the name.
 
 - 2–4 words, concise but self-explanatory
 - Lowercase with underscores (`snake_case`)

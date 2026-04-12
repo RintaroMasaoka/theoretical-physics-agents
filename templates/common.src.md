@@ -11,7 +11,7 @@ Research information is organized in 4 layers:
 | **Established knowledge** | `notes/*.md`, `concepts/` | Read-only (except `concepts/` — concept-checker may create entries) | Verified results, distilled understanding, concept definitions |
 | **Session context** | `logs/last_session.md` | Not relevant to workers | PI's volatile work context for session handoff |
 
-**plan.md tree**: The Story Arc in plan.md lists items as `{id} [{status}]: {description}`. Item IDs are descriptive slugs (`snake_case`, e.g., `winding_gap_formula`). Items with complex context link to `items/{id}.md`; simple items appear only as lines in plan.md with no corresponding file. Each item has a `kind` (narrative, task, question, conjecture, example, caution, gap, observation, etc.) and a `status` (open, active, stable, closed).
+**plan.md tree**: The Story Arc in plan.md lists items as `{id} [{status}]: {description}`. Item IDs are descriptive slugs (`snake_case`, e.g., `main_theorem_proof`). Items with complex context link to `items/{id}.md`; simple items appear only as lines in plan.md with no corresponding file. Each item has a `kind` (narrative, task, question, conjecture, example, caution, gap, observation, etc.) and a `status` (open, active, stable, closed).
 
 **items/*.md**: Frontmatter contains `id`, `parent`, `kind`, `status`, `contribution`. Body contains current state, evidence chain, revision history, and children. The `parent` field tracks the item's position in the tree hierarchy.
 
