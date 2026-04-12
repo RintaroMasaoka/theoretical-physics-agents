@@ -1,6 +1,6 @@
 # Project Configuration
 #
-# Edit values here, then run `node configure.mjs` to apply.
+# Edit values here, then run `node scripts/configure.mjs` to apply.
 # Templates are in templates/; generated .md files are in .claude/ and .claude/agents/.
 # Do not edit generated .md files directly — they will be overwritten.
 
