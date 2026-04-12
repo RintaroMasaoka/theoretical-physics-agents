@@ -6,9 +6,24 @@ Research information is organized as a **tree** under `research/`. Every node is
 
 | File | Role |
 |---|---|
-| `note.md` | Research content: current state, evidence, revisions (required) |
-| `story.md` | Narrative structure of children: how they relate, their order (optional) |
-| `principles.md` | Constraints specific to this subtree (optional) |
+| `note.md` | Research content for this node (required). At root: thesis and background. At other nodes: current state, evidence, revisions |
+| `story.md` | Narrative structure of children (optional). At root: the paper's overall narrative arc. At interior nodes: how child topics relate and in what order |
+| `principles.md` | Constraints specific to this subtree (optional). At root: cross-cutting approach principles |
+
+Example tree:
+```
+research/
+  note.md              (thesis, background)
+  story.md             (paper narrative arc)
+  principles.md        (cross-cutting constraints)
+  paradox_resolution/
+    note.md            (this direction's content)
+  lattice_bkt/
+    note.md
+    story.md           (how children relate)
+    coulomb_escape/
+      note.md
+```
 
 | Layer | Location | Worker access | What it contains |
 |---|---|---|---|

@@ -76,18 +76,19 @@ research/
 
 ```
 research/                          ← read note.md + story.md + principles.md
-  └─ lattice_bkt/                  ← read note.md + story.md (if exists)
-       └─ coulomb_escape/          ← cursor: read note.md + children
-            └─ children...         ← working context
+  └─ lattice_bkt/                  ← read note.md + story.md + principles.md (if exist)
+       └─ coulomb_escape/          ← cursor: read note.md + story.md + principles.md + direct children's note.md
   └─ paradox_resolution/           ← NOT loaded (sibling branch)
 ```
+
+"From root to cursor" is **inclusive** — the cursor node's own story.md and principles.md are loaded (story.md describes the cursor's children, which are the working context).
 
 This gives PI everything it needs: thesis and background (root note.md), narrative context (story.md at each level), applicable constraints (principles.md at each level), and the working subtree.
 
 | Scope | What PI loads | When |
 |---|---|---|
 | **Ancestor chain** | note.md + story.md + principles.md at each ancestor from root to cursor | Always at session start |
-| **Working context** | Cursor node's note.md + all children's note.md | Always at session start |
+| **Working context** | Cursor node's note.md + direct children's note.md (depth 1 only) | Always at session start |
 | **Root Story Arc** | `research/story.md` (already in ancestor chain) | Available from session start; revisited when a major subtree completes |
 
 ### Session Cursor (`plan.md`)
@@ -316,7 +317,7 @@ Update status to `closed`. If the closure is informative, add an entry to `notes
 1. Read `plan.md` (the cursor — where the previous session left off)
 2. Read `logs/last_session.md` (if it exists — previous session's operational context)
 3. Read the **ancestor chain** from root to cursor: for each folder in the path, read `note.md`, `story.md` (if exists), and `principles.md` (if exists)
-4. Read the **cursor folder's children**: `ls` the folder → read all children's note.md
+4. Read the **cursor folder's direct children**: `ls` the folder → read each child's note.md (depth 1 only — not recursive)
 5. Read `notes/index.md` (if it exists; read topic files as needed)
 6. Read `literature/reading_list.md`
 
@@ -450,7 +451,7 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 - **Float-up protocol**: After updating a leaf, check if the parent's work is complete:
   1. `ls` the parent folder — are all children stable or closed?
   2. If yes, read the parent's note.md. Update its Current State and status
-  3. Update the parent's story.md if the narrative has evolved
+  3. Update the parent's story.md if the narrative has evolved (update child role descriptions to reflect results; revise narrative if relationships between children changed)
   4. Continue floating up as long as levels complete
   5. When the cursor's subtree fully completes: read `research/story.md` to decide the next direction. **Update plan.md cursor** to the new focus
 
@@ -464,7 +465,7 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 **Critic verification mode**:
 
 - **Blind mode**: For mechanical/mathematical checks. Critic reads only the attempt file, without research context. Eliminates expectation bias
-- **Contextual mode**: For logical/value judgments. Critic reads the ancestor chain (note.md + story.md + principles.md) and notes/ to understand the full context
+- **Contextual mode**: For logical/value judgments. Critic reads the ancestor chain from root to the **target node being critiqued** (not PI's current cursor) — note.md + story.md + principles.md at each level — plus notes/
 
 Rule of thumb: "Does the critic need to know the research purpose?" — No → blind, Yes → contextual.
 
