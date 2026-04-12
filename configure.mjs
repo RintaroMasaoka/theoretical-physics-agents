@@ -9,9 +9,9 @@
  *
  * Source of truth:
  *   Config values:  .claude/config/config.yaml
- *   Prompt content: templates/**\/*.src
+ *   Prompt content: templates/**\/*.src.md
  * Generated (do not edit directly — overwritten on each run):
- *   .claude/**\/*.md  (mirrors templates/ structure, .src extension stripped)
+ *   .claude/**\/*.md  (mirrors templates/ structure, .src infix stripped)
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "fs";
@@ -85,7 +85,7 @@ function render(template, config) {
   });
 }
 
-// ── Recursive glob for .src files ────────────────────────────────────
+// ── Recursive glob for .src.md files ─────────────────────────────────
 
 function findTemplates(dir) {
   const results = [];
@@ -93,7 +93,7 @@ function findTemplates(dir) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
       results.push(...findTemplates(full));
-    } else if (entry.endsWith(".src")) {
+    } else if (entry.endsWith(".src.md")) {
       results.push(full);
     }
   }
@@ -166,7 +166,7 @@ console.log(mode === "--dry-run" ? "Would generate:" : "Generated:");
 
 for (const tmplPath of findTemplates(SRC_DIR)) {
   const rel = relative(SRC_DIR, tmplPath);
-  const outRel = rel.replace(/\.src$/, "");
+  const outRel = rel.replace(/\.src\.md$/, ".md");
   const dst = join(OUT_DIR, outRel);
 
   const content = readFileSync(tmplPath, "utf-8");
