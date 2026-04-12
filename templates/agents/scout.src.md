@@ -16,7 +16,7 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 ## Startup Reading
 
 1. `.claude/common.md`
-2. `plan.md` (understand research questions from the Story Arc and item tree)
+2. `research/note.md` + `research/story.md` (root — understand research questions from thesis and Story Arc)
 3. `notes/index.md` (if it exists — understand the overall research picture)
 4. `literature/reading_list.md` (if it exists)
 
@@ -47,4 +47,4 @@ Last updated: YYYY-MM-DD HH:MM
 Priority: ★★★ directly relevant, ★★☆ important for methods/background, ★☆☆ peripheral
 Status: unread / read / skipped
 
-Priority is determined by whether keywords from the research questions in plan.md's Story Arc appear in the title or abstract. When uncertain, assign ★★☆ and let PI adjust after reader close-reading.
+Priority is determined by whether keywords from the research questions in research/story.md appear in the title or abstract. When uncertain, assign ★★☆ and let PI adjust after reader close-reading.

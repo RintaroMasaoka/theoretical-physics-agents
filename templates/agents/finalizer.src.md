@@ -14,8 +14,8 @@ Do not have AI regenerate existing text. Concatenate via Bash, then AI applies o
 ## Startup Reading
 
 1. `.claude/common.md`
-2. `plan.md` (item tree — final state of all items)
-3. `items/*.md` (read all items files for context)
+2. `research/note.md` + `research/story.md` (root — thesis, narrative arc)
+3. Navigate research/ tree: read note.md files for context and status
 4. `manuscript/outline.md`
 5. `manuscript/conventions.md`
 6. Reference audit report (if it exists)

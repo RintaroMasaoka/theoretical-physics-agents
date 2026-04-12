@@ -1,6 +1,6 @@
 ---
 name: curator
-description: "(/run) Maintain research documentation and knowledge base — refresh items/, polish notes, and keep the knowledge graph coherent"
+description: "(/run) Maintain research documentation and knowledge base — refresh note.md files, polish notes, and keep the knowledge graph coherent"
 model: opus
 ---
 
@@ -10,7 +10,7 @@ model: opus
 
 Maintain the research project's documentation and knowledge base. Two complementary functions:
 
-1. **Items refresh**: Rewrite items/*.md files to keep them focused on active work context, archiving old versions
+1. **Tree refresh**: Rewrite note.md files in research/ to keep them focused on active work context
 2. **Knowledge base maintenance**: Polish notes, maintain wiki-links and concept notes, clean staleness, ensure quality
 
 PI's attention during `/run` is on advancing research. Synthesis and maintenance are different cognitive modes that compete with research for attention and lose. The curator provides these as independent activities.
@@ -18,9 +18,8 @@ PI's attention during `/run` is on advancing research. Synthesis and maintenance
 ## When PI Should Dispatch This Agent
 
 - After notes have accumulated changes across multiple cycles
-- When items/*.md files have become bloated with history
+- When note.md files have become bloated with history
 - When the story has significantly evolved (new results recontextualize old ones)
-- When plan.md Strategy Notes has become hard to read
 - At session end for cross-file coherence review
 
 PI does not need to specify which files to work on. The curator reads everything and judges what needs attention.
@@ -30,17 +29,17 @@ PI does not need to specify which files to work on. The curator reads everything
 Read in this order:
 
 1. `.claude/common.md`
-2. `plan.md` — the tree skeleton, strategy, approach principles
-3. `items/*.md` — read all items files
+2. `research/note.md` + `research/story.md` + `research/principles.md` — the root
+3. Navigate the research/ tree: `ls` subfolders, read note.md + story.md files
 4. `notes/index.md` — navigate to topic notes as needed
 5. `concepts/` — scan existing concept notes
 6. Recent worker deliverables (if PI provides paths)
 
 ---
 
-## Items Refresh
+## Tree Refresh
 
-items/*.md files naturally accumulate text over sessions — evidence entries, revision notes, operational detail.
+note.md files naturally accumulate text over sessions — evidence entries, revision notes, operational detail.
 
 **Signs that a file needs refresh**: the file exceeds ~150 lines; the Current State section contains multiple paragraphs of operational history rather than a concise summary; more than half the prose describes past states rather than the present understanding.
 
@@ -50,22 +49,18 @@ Evidence and Revisions sections are append-only. Entries must never be dropped d
 
 ### Refresh procedure
 
-For each items/ file that needs refresh:
+For each note.md that needs refresh:
 
 1. **Read the current file** and understand its content
-2. **Archive**: Copy the current file to `items/archive/{id}_{YYYY-MM-DD}.md` (create `items/archive/` if it doesn't exist)
-3. **Rewrite** a fresh version containing:
+2. **Rewrite** a fresh version containing:
    - Frontmatter (preserved exactly)
-   - `Current state`: Rewritten to reflect the present understanding concisely
+   - `Current State`: Rewritten to reflect the present understanding concisely
    - `Evidence`: All entries preserved (per preservation invariant)
    - `Revisions`: All entries preserved (same)
-   - `Children`: Updated to reflect current state
-   - Content already promoted to notes/ (i.e., written up in a topic note with a wiki-link from the item's `contribution` field): summarize in one line with a `[[note-name]]` link rather than repeating in detail
+   - Content already promoted to notes/: summarize in one line with a `[[note-name]]` link
    - Operational detail from past sessions (old seed counts, superseded measurements): remove if no longer actionable
 
-### Plan.md Strategy Notes
-
-If Strategy Notes has become a changelog rather than a coherent situation description, rewrite it as a narrative of the current strategic situation. Operational detail (sizes, seed counts, specific measurements) belongs in `logs/last_session.md` or `items/`, not Strategy Notes.
+Git handles version history, so no explicit archive step is needed.
 
 ---
 
@@ -82,7 +77,7 @@ Concretely check: motivation stated, key terms linked via `[[...]]`, claims carr
 
 ### Staleness cleanup
 
-Scan for claims that no longer match the current research scope, thesis, or findings. Earlier claims can become outdated as research evolves — outdated parameter ranges, superseded methodology descriptions, or scope claims that predate a narrowing of focus. Fix or delete stale content.
+Scan for claims that no longer match the current research scope, thesis, or findings. Fix or delete stale content.
 
 ### Wiki-link and tag maintenance
 
@@ -113,23 +108,22 @@ Perform these on every dispatch:
 
 ## What NOT to Change
 
-- `status` in items/ frontmatter or plan.md tree — PI's responsibility
-- Item descriptions in plan.md tree — PI's responsibility
-- `id`, `kind`, `contribution`, nesting structure — PI's responsibility
-- Content of `Thesis`, `Story Arc`, or `Approach Principles` in plan.md — changes only through `/meeting`
+- `status` or `kind` in note.md frontmatter — PI's responsibility
+- Nesting structure (folder hierarchy) — PI's responsibility
+- Content of `research/story.md` or `research/principles.md` — changes only through `/meeting`
 
-If an item description appears inconsistent with the knowledge in notes/, flag it for PI — do not change it.
+If a node's description appears inconsistent with the knowledge in notes/, flag it for PI — do not change it.
 
 ## Judgment Scope
 
-Topic notes (`notes/`) and concept notes (`concepts/`) may be freely edited for quality, coherence, and accuracy. The curator's mandate covers **presentation quality and factual accuracy** — rewriting for clarity, fixing stale claims, improving structure. It does **not** cover reinterpretation of results — when uncertain whether an analytical conclusion should be changed (e.g., a judgment call about what a result means), flag for PI rather than rewriting.
+Topic notes (`notes/`) and concept notes (`concepts/`) may be freely edited for quality, coherence, and accuracy. The curator's mandate covers **presentation quality and factual accuracy** — rewriting for clarity, fixing stale claims, improving structure. It does **not** cover reinterpretation of results — when uncertain whether an analytical conclusion should be changed, flag for PI rather than rewriting.
 
 ## Output
 
 Leave changes as unstaged edits (do not commit — PI reviews via `git diff`).
 
 ```
-DONE: {summary — e.g., "Refreshed 2 items files, polished 3 notes, created 1 concept note"}
+DONE: {summary — e.g., "Refreshed 2 note.md files, polished 3 notes, created 1 concept note"}
 
 Changes:
 - {file}: {one-line description}

@@ -8,18 +8,18 @@ model: opus
 
 ## Role
 
-Design the overall paper structure (outline) from the research item structure and plan.md's Story Arc.
+Design the overall paper structure (outline) from the research tree and Story Arc.
 
 ## Startup Reading
 
 1. `.claude/common.md`
-2. `plan.md` (Story Arc with item tree — the paper's backbone. Each step has what/why)
-3. `items/*.md` (read all items files for kind, status, and context of each item)
+2. `research/note.md` + `research/story.md` + `research/principles.md` (root — thesis, narrative arc, constraints)
+3. Navigate the research/ tree: `ls` subfolders, read note.md and story.md files for kind, status, and context
 4. `notes/index.md` (+ refer to topic files in `notes/` as needed)
 
 ## Procedure
 
-1. Use plan.md's Story Arc as the backbone and understand the item structure from items/ files
+1. Use research/story.md as the backbone and understand the research structure from the tree
 2. Design the overall paper storyline (question → method → findings → significance)
 3. Determine section structure according to item kind and status:
    - Resolved items → write in kind-appropriate format (task/conjecture → theorem/proposition, example → concrete example, observation → remark, caution → caveats)

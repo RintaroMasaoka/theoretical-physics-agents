@@ -2,22 +2,26 @@
 
 ## Information Architecture
 
-Research information is organized in 4 layers:
+Research information is organized as a **tree** under `research/`. Every node is a folder containing up to three files:
+
+| File | Role |
+|---|---|
+| `note.md` | Research content: current state, evidence, revisions (required) |
+| `story.md` | Narrative structure of children: how they relate, their order (optional) |
+| `principles.md` | Constraints specific to this subtree (optional) |
 
 | Layer | Location | Worker access | What it contains |
 |---|---|---|---|
-| **Research map** | `plan.md` | Read-only | Story Arc (the narrative backbone of the research) with item tree, strategy, principles |
-| **Item context** | `items/*.md` | Read-only | Per-item work context: evidence, revisions, children, current state |
+| **Research tree** | `research/` (recursive folders) | Read-only | Thesis, background, story arc, per-node context, evidence, revisions |
 | **Established knowledge** | `notes/*.md`, `concepts/` | Read-only (except `concepts/` — concept-checker may create entries) | Verified results, distilled understanding, concept definitions |
+| **Session cursor** | `plan.md` | Not relevant to workers | PI's current focus position in the tree |
 | **Session context** | `logs/last_session.md` | Not relevant to workers | PI's volatile work context for session handoff |
 
-**plan.md tree**: The Story Arc in plan.md lists items as `{id} [{status}]: {description}`. Item IDs are descriptive slugs (`snake_case`, e.g., `main_theorem_proof`). Items with complex context link to `items/{id}.md`; simple items appear only as lines in plan.md with no corresponding file. Each item has a `kind` (narrative, task, question, conjecture, example, caution, gap, observation, etc.) and a `status` (open, active, stable, closed).
+**Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for research content, `story.md` for narrative structure, `principles.md` for constraints. Navigate up by reading the parent folder's files. The root (`research/note.md`) contains thesis and background; `research/story.md` contains the paper's narrative arc; `research/principles.md` contains cross-cutting approach principles.
 
-**items/*.md**: Frontmatter contains `id`, `parent`, `kind`, `status`, `contribution`. Body contains current state, evidence chain, revision history, and children. The `parent` field tracks the item's position in the tree hierarchy.
+Each node has a `kind` and `status` in its note.md frontmatter. Node status determination is PI's responsibility.
 
-Item status determination requires the context of the entire research and is PI's responsibility.
-
-- Only PI writes to plan.md and items/
+- Only PI writes to the research tree and plan.md
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified
 
@@ -37,15 +41,15 @@ Write a work summary to `logs/{agent}_{timestamp}.md`. The deliverable contains 
 `notes/` is an Obsidian-compatible wiki-linked knowledge base maintained by PI (read-only for workers). `concepts/` contains atomic concept definitions; concept-checker may create entries, but other workers treat it as read-only. Understanding the syntax lets you follow cross-references and assess the reliability of claims.
 
 Syntax:
-- **Wiki-links**: `[[note-name]]`, `[[note-name#heading]]`, `[[note-name|display text]]` — references to other note files. To follow a link, search for `{note-name}.md` project-wide (wiki-links resolve by filename, not by directory path)
-- **Tags**: `#tag-name` — inline classification labels (e.g., `#conjecture`, `#verified`, `#key-result`)
-- **Verification status tags**: `[sympy]`, `[numerical]`, `[limiting case]`, `[literature: arXiv:XXXX]`, `[unverified]` — indicate how a claim was verified. Treat `[unverified]` claims with appropriate caution; do not cite them as established results
+- **Wiki-links**: `[[note-name]]`, `[[note-name#heading]]`, `[[note-name|display text]]` — references to other note files. To follow a link, search for `{note-name}.md` project-wide
+- **Tags**: `#tag-name` — inline classification labels
+- **Verification status tags**: `[sympy]`, `[numerical]`, `[limiting case]`, `[literature: arXiv:XXXX]`, `[unverified]` — indicate how a claim was verified. Treat `[unverified]` claims with appropriate caution
 
-Convention — **concept notes**: Files in `concepts/` are small (< 1 page) and define a single concept or term. When a non-obvious term appears, it links to the concept note via `[[term]]` instead of being defined inline. This keeps definitions canonical and reusable
+Convention — **concept notes**: Files in `concepts/` define a single concept or term. When a non-obvious term appears, it links via `[[term]]` instead of being defined inline
 
 ## Constraints
 
 - Write deliverables and logs in **{{ language }}** (technical terms, proper nouns, and equations may remain in their original language)
-- Write equations in LaTeX notation (inline: `$...$`, display: `$$...$$`). Do not embed raw variable names or expressions in prose — always wrap them in `$...$`. Use `$$` instead of `\(\)`, `\[\]`, or LaTeX environment names — `$$` is the standard syntax recognized by most Markdown readers
-- Do not request user input in any form (users are often away during `/run` and `/write`, and asking questions interrupts the session. However, you may respond if the user initiates communication)
+- Write equations in LaTeX notation (inline: `$...$`, display: `$$...$$`). Do not embed raw variable names or expressions in prose — always wrap them in `$...$`. Use `$$` instead of `\(\)`, `\[\]`, or LaTeX environment names
+- Do not request user input in any form (users are often away during `/run` and `/write`. However, you may respond if the user initiates communication)
 - No writing outside the project directory

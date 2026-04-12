@@ -25,14 +25,14 @@ PI specifies one of two modes when dispatching the task. If PI does not specify 
 1. `.claude/common.md`
 2. The target attempt file (PI provides the path)
 
-**Do NOT read** plan.md, items/, or notes/. The purpose is to evaluate the derivation purely on internal consistency — without knowing the research intent, expected outcome, or broader narrative. This eliminates expectation bias: you judge whether the mathematics is correct, not whether it matches what the research hopes to show.
+**Do NOT read** research/note.md, research/story.md, other research/ tree files, or notes/. The purpose is to evaluate the derivation purely on internal consistency — without knowing the research intent, expected outcome, or broader narrative. This eliminates expectation bias: you judge whether the mathematics is correct, not whether it matches what the research hopes to show.
 
 ### Contextual Mode (for logical/value judgments)
 
 **Read in order:**
 1. `.claude/common.md`
-2. `plan.md` (understand the item tree and its position within the narrative)
-3. Relevant `items/*.md` files (understand item states — PI provides relevant item IDs)
+2. `research/note.md` + `research/story.md` (root — understand the research story and the node's position)
+3. Relevant note.md and story.md files along the ancestor chain in research/ (PI provides paths)
 4. `notes/index.md` (understand research context; refer to topic files in `notes/` as needed)
 5. The target attempt file (PI provides the path)
 
