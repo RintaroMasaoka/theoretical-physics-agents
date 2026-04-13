@@ -47,6 +47,10 @@ PI will not paste data into your task prompt. Instead, PI provides file paths; y
 - **Input**: Receive task instructions and file paths from PI; Read the necessary data yourself
 - **Output**: Write deliverables to files and return `DONE: {deliverable path}` as the Task return value
 
+## Epistemic Status of Deliverables
+
+Worker deliverables (`work/`) are **proposals** — one agent's reasoning in a single pass. They may contain errors, unwarranted assumptions, or off-target framing. Your deliverable is input to PI's evaluation process, not text that will be copied into the research tree. Write with full analytical depth, but know that PI will independently evaluate, and may revise or reject your framing
+
 ## Logs (Progress Records for Humans)
 
 Write a work summary to `logs/{agent}_{timestamp}.md`. The deliverable contains your analytical output. The log is a brief narrative summary of what you did, what you found, and any issues encountered — it helps the human researcher audit the research process. Logs are not a decision input for PI.

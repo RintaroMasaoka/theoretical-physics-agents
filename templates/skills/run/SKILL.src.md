@@ -491,12 +491,10 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 
 Rule of thumb: "Does the critic need to know the research purpose?" — No → blind, Yes → contextual.
 
-**Researcher resubmission**: Critic annotates the attempt (strikethrough + comments + Critique section). PI decides:
-- **ACCEPT**: Update log.md evidence. Dispatch curator to update note.md if warranted
+**Researcher resubmission**: Every researcher attempt must go through critic before PI adopts its results into the research tree. Worker deliverables are single-pass outputs that may contain errors or off-target framing — critic provides independent verification that PI cannot perform alone (because PI is anchored by reading the attempt). If PI decides to close the node without adopting results, critic is not required. Critic annotates the attempt (strikethrough + comments + Critique section). PI decides:
+- **ACCEPT**: Update log.md evidence (with verification basis). Dispatch curator to update note.md if warranted
 - **REVISE**: Pass annotated attempt path to researcher for resubmission
 - **REJECT**: Fundamental approach change. PI reconsiders direction
-
-Not every attempt needs critic — PI may accept clearly high-quality results directly.
 
 **Simulator result verification**: PI checks:
 - Whether each verification protocol item was actually executed
@@ -508,8 +506,9 @@ Not every attempt needs critic — PI may accept clearly high-quality results di
 **Simulator resubmission**: Pass previous deliverable path and code path, specify what to improve. Same physical setup → same deliverable number; changed setup → new number.
 
 **Note capture** (record findings while fresh):
-1. Write PI's synthesis in the appropriate log.md. Write in PI's own words — deliverables are raw material, log entries are curated understanding
-2. If errors found in deliverables, annotate directly (`~~error~~ [→ correction]`)
+1. Write PI's synthesis in the appropriate log.md. **Write in PI's own words** — deliverables are proposals, log entries are PI's curated understanding. Do not copy-paste prose from deliverables into log.md or note.md. Re-derive the conclusion independently: if you cannot state the result in your own words, you have not yet understood it well enough to adopt it
+2. Evidence entries should record what was verified and how: e.g., `attempt_14: z = 2πκ − 2 derivation. critic ACCEPT (mechanical: PASS 3/3, logical: sound)`
+3. If errors found in deliverables, annotate directly (`~~error~~ [→ correction]`)
 
 **Knowledge base maintenance** (dispatch curator when needed — not every cycle):
 After log.md files accumulate changes, dispatch **curator** for note.md polishing, wiki-link integrity, log.md compression, staleness cleanup. PI reviews via `git diff`.
