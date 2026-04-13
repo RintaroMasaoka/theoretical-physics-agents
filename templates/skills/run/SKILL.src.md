@@ -39,57 +39,53 @@ Research information forms a **tree** under `research/`. PI navigates this tree 
 
 ### The Research Tree (`research/`)
 
-Every node is a **folder** containing up to three files:
+Every node is a **folder**. Files within a node are separated by **accumulation pattern** — content that stays concise vs content that grows linearly — to control summarization pressure.
 
-| File | Required | Role |
-|---|---|---|
-| `note.md` | Yes | Research content: current state, evidence, revisions |
-| `story.md` | No | Narrative structure of children: how they relate, their order |
-| `principles.md` | No | Constraints specific to this subtree |
+| File | Required | Accumulation | Role |
+|---|---|---|---|
+| `note.md` | Yes | Overwrite (Current State) + Append (Evidence) | Core research context: what PI needs to make decisions |
+| `dead_ends.md` | No | Append-only | Failed approaches and lessons learned. Separated to prevent note.md bloat |
+| `directives.md` | No | Append (meetings only) | Rules and conventions. PI cannot modify unilaterally |
 
 Children are subfolders. The tree can nest to arbitrary depth.
 
 ```
 research/
-  note.md                    ← Root: thesis + background
-  story.md                   ← Paper narrative arc (how top-level children relate)
-  principles.md              ← Cross-cutting approach principles
+  note.md                    ← Root: thesis + background + argument structure
   paradox_resolution/
     note.md                  ← This direction's research content
     variational_bound/
       note.md                ← Leaf node
   lattice_bkt/
-    note.md
-    story.md                 ← How coulomb_escape, winding_gap etc. relate
+    note.md                  ← Includes children decomposition in Current State
+    dead_ends.md             ← W=1 initial condition failure, retracted measurements
     coulomb_escape/
       note.md
 ```
 
 - **Creating a node**: `mkdir research/{path}` + write `note.md` inside
-- **Adding narrative structure**: write `story.md` in the parent folder
-- **Adding constraints**: write `principles.md` in the relevant folder
+- **Recording a dead end**: write `dead_ends.md` in the node folder (or append if it exists)
+- **Adding a directive**: write `directives.md` in the folder where the rule applies (typically project root; only through meetings)
 - **Seeing children**: `ls` the folder (subfolders = children)
 
 ### Context Scoping
 
-**The ancestor chain is PI's context spine.** When the cursor points to a node, PI reads along the path from root to cursor — every folder's note.md, story.md, and principles.md. Sibling branches are not loaded.
+**The ancestor chain is PI's context spine.** When the cursor points to a node, PI reads along the path from root to cursor — every folder's note.md, dead_ends.md (if exists), and directives.md (if exists). Sibling branches are not loaded.
 
 ```
-research/                          ← read note.md + story.md + principles.md
-  └─ lattice_bkt/                  ← read note.md + story.md + principles.md (if exist)
-       └─ coulomb_escape/          ← cursor: read note.md + story.md + principles.md + direct children's note.md
+research/                          ← read note.md + dead_ends.md + directives.md (if exist)
+  └─ lattice_bkt/                  ← read note.md + dead_ends.md + directives.md (if exist)
+       └─ coulomb_escape/          ← cursor: read note.md + dead_ends.md + directives.md + direct children's note.md
   └─ paradox_resolution/           ← NOT loaded (sibling branch)
 ```
 
-"From root to cursor" is **inclusive** — the cursor node's own story.md and principles.md are loaded (story.md describes the cursor's children, which are the working context).
-
-This gives PI everything it needs: thesis and background (root note.md), narrative context (story.md at each level), applicable constraints (principles.md at each level), and the working subtree.
+Directives cascade: a directive at a higher level applies to all descendants. Dead ends at ancestors are also loaded — lessons learned higher in the tree prevent repeating mistakes in subtrees.
 
 | Scope | What PI loads | When |
 |---|---|---|
-| **Ancestor chain** | note.md + story.md + principles.md at each ancestor from root to cursor | Always at session start |
+| **Ancestor chain** | note.md + dead_ends.md + directives.md at each ancestor from root to cursor | Always at session start |
 | **Working context** | Cursor node's note.md + direct children's note.md (depth 1 only) | Always at session start |
-| **Root Story Arc** | `research/story.md` (already in ancestor chain) | Available from session start; revisited when a major subtree completes |
+| **Project directives** | `directives.md` at project root (if exists; outside research/) | Always at session start |
 
 ### Session Cursor (`plan.md`)
 
@@ -107,9 +103,11 @@ plan.md is a lightweight cursor pointing to PI's current position in the tree. I
 
 ### Why This Separation Matters
 
-- **The tree** holds all research structure — from thesis down to individual tasks. Each node is self-contained at its level
-- **story.md** at each level tells PI how children fit together, without overloading note.md
-- **principles.md** scopes constraints to subtrees — global rules at root, local rules where needed
+Files are separated by **accumulation pattern**, not by information type:
+
+- **note.md** (overwrite + curated append): Core context that PI always needs. Current State is rewritten when understanding changes, keeping it concise. Evidence accumulates but is periodically compressed by curator
+- **dead_ends.md** (append-only): Linearly accumulating reference material. Kept separate so note.md stays focused on what IS known, not what was tried and failed
+- **directives.md** (append, immutable): User-imposed rules that PI cannot modify. Separated because they have a different authorship model (meetings only)
 - **plan.md** scopes PI's context via the cursor, preventing breadth-first thrashing
 - **notes/** is curated knowledge, never polluted by work-in-progress
 - **last_session.md** carries volatile operational detail that doesn't belong in the tree
@@ -138,15 +136,14 @@ Retract: remove from notes/, record in notes/dead-ends.md
 
 ```
 research/                 # Research tree (recursive)
-  note.md                 #   Root: thesis, background
-  story.md                #   Paper narrative arc
-  principles.md           #   Cross-cutting approach principles
+  note.md                 #   Root: thesis, background, argument structure
   {branch}/               #   Research direction
-    note.md               #     Research content, evidence, revisions
-    story.md              #     (optional) How children relate
-    principles.md         #     (optional) Subtree-specific constraints
+    note.md               #     Research content, evidence, children decomposition
+    dead_ends.md          #     (optional) Failed approaches and lessons
+    directives.md         #     (optional) Subtree-specific rules from meetings
     {child}/
       note.md
+directives.md             # Project-wide methodology rules from meetings
 plan.md                   # Session cursor: "work here now"
 notes/                    # Established knowledge (Obsidian wiki-linked)
   index.md                #   Map of Content
@@ -176,7 +173,7 @@ meetings/
 
 ### Root Files
 
-**`research/note.md`** — Thesis and background:
+**`research/note.md`** — Thesis, background, and argument structure:
 
 ```markdown
 ---
@@ -191,32 +188,26 @@ last_meeting: "YYYY-MM-DDTHH:MM"
 
 ## Background
 {Key references and prior work}
+
+## Current State
+{High-level understanding. For root, includes paper argument structure:
+what to show, in what order, why that order. Children decomposition.}
 ```
 
-**`research/story.md`** — Paper narrative arc:
+**`directives.md`** (project root, outside `research/`) — Methodology rules:
 
 ```markdown
-# Story Arc
+# Directives
 
-{Each step has what (what to show) and why (why the reader needs this here)}
+## {Topic area}
+- {rule}
+  > [Meeting YYYY-MM-DD] {reason for this rule}
 
-Step 1: **{title}** — {why} [{status}]
-  → [{child_folder}/]({child_folder}/)
-Step 2: ...
+## {Another topic}
+- ...
 ```
 
-The `[{status}]` is a convenience — the source of truth is each child's note.md frontmatter.
-
-**`research/principles.md`** — Approach principles:
-
-```markdown
-# Approach Principles
-
-- {principle}
-  > [Meeting YYYY-MM-DD] {reason}
-```
-
-PI must not change this file unilaterally; changes are decided in meetings.
+Organized by topic, not chronologically. PI must not change this file unilaterally; changes are decided in meetings.
 
 ### Node Content (`note.md`)
 
@@ -230,7 +221,9 @@ status: {status}
 # {description}
 
 ## Current State
-{What is known, confidence level, open angles}
+{What is known, confidence level, open angles.
+For branch nodes, include children decomposition:
+why they exist, how they relate, what each contributes.}
 
 ## Evidence
 - attempt_14: Analytical derivation. critic ACCEPT
@@ -239,21 +232,31 @@ status: {status}
 
 ## Revisions
 - v1 (attempt_5) → retracted (attempt_9) → v2 (attempt_14)
-{append-only — the revision chain is the provenance trail}
+{lightweight version chain only — detailed failure analysis goes to dead_ends.md}
 ```
 
-### Branch Story (`story.md`)
+### Dead Ends (`dead_ends.md`)
 
-Optional. For nodes with children, explains how they relate:
+Optional. For nodes where approaches have been tried and failed. Prevents note.md from accumulating failed-approach details that obscure the current understanding.
 
 ```markdown
-# {branch name}
+# Dead Ends
 
-{Narrative structure: why these children exist, how they build on each other}
-
-- [{child}/]({child}/) — {role in this branch's story}
-- ...
+## {Approach name}
+**Tried**: {what was attempted}
+**Failed because**: {root cause, not just symptoms}
+**Lesson**: {what to avoid or keep in mind}
 ```
+
+Create dead_ends.md when a node has significant failed approaches worth documenting. Minor revisions stay in note.md's Revisions section.
+
+Note: `dead_ends.md` in the research tree records failed approaches during active research. `notes/dead-ends.md` is a separate file that records retracted results previously promoted to established knowledge.
+
+### Directives (`directives.md`)
+
+Optional. Contains rules imposed by the user through meetings. PI cannot create or modify directives unilaterally.
+
+At any level: project root for global rules, subtree folders for scoped rules. Higher-level directives cascade to descendants.
 
 ### Session Cursor (`plan.md`)
 
@@ -279,7 +282,7 @@ Atomic definitions (one term per file). Linked from any file via `[[term]]`. Con
 
 ### Naming Convention
 
-Folder names are **descriptive slugs**: lowercase, `snake_case`, 2–4 words. A new reader should guess what the node is about from its name alone. No sequential numbering — narrative order is defined in the parent's story.md, not in filenames.
+Folder names are **descriptive slugs**: lowercase, `snake_case`, 2–4 words. A new reader should guess what the node is about from its name alone. No sequential numbering — narrative order is described in the parent's note.md, not in filenames.
 
 ### kind (Cognitive Mode)
 
@@ -316,16 +319,17 @@ Update status to `closed`. If the closure is informative, add an entry to `notes
 
 1. Read `plan.md` (the cursor — where the previous session left off)
 2. Read `logs/last_session.md` (if it exists — previous session's operational context)
-3. Read the **ancestor chain** from root to cursor: for each folder in the path, read `note.md`, `story.md` (if exists), and `principles.md` (if exists)
-4. Read the **cursor folder's direct children**: `ls` the folder → read each child's note.md (depth 1 only — not recursive)
-5. Read `notes/index.md` (if it exists; read topic files as needed)
-6. Read `literature/reading_list.md`
+3. Read `directives.md` at project root (if it exists — methodology rules from meetings)
+4. Read the **ancestor chain** from root to cursor: for each folder in the path, read `note.md`, `dead_ends.md` (if exists), and `directives.md` (if exists)
+5. Read the **cursor folder's direct children**: `ls` the folder → read each child's note.md (depth 1 only — not recursive)
+6. Read `notes/index.md` (if it exists; read topic files as needed)
+7. Read `literature/reading_list.md`
 
 **Unread paper principle:** For papers marked `unread` in reading_list.md, PI must not describe their content, claims, methods, or results. Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated (see `.claude/common.md` verification procedures). If there are ★★★ and unread papers, run reader with top priority in the first cycle.
 
 **Feedback processing:**
 - If files contain `> [Meeting ...]` markers: A direction change was decided in a meeting. Read and understand the reason before starting work. Do not revert these changes
-- `research/principles.md` and any subtree's `principles.md`: Follow them throughout the session. PI must not change these unilaterally
+- `directives.md` (project root and any subtree): Follow them throughout the session. PI must not change these unilaterally
 
 **Initial check:**
 - `research/note.md` does not exist → Display "Please set a theme via `/launch`" and stop
@@ -350,13 +354,13 @@ PI works **depth-first within the cursor's subtree**. The general movement: dive
 3. **Dive to a leaf**: If children exist, pick the most important one and descend. Repeat until you reach a node with actionable work
 4. **Work at the leaf**: This is where tasks get dispatched (step 2)
 5. **After leaf work completes** (step 3): apply the float-up protocol (see Result Collection)
-6. **When the cursor's subtree completes**: read `research/story.md` to decide the next direction. Update plan.md cursor to the new focus
+6. **When the cursor's subtree completes**: read root `research/note.md` to decide the next direction. Update plan.md cursor to the new focus
 
 **Zooming out is deliberate, not automatic.** Only read upper nodes when the current subtree's work is exhausted. This keeps PI focused.
 
 #### Thinking flow:
 
-1. **Check the current subtree**: What nodes are open/active? What does the parent's story.md say about what's needed?
+1. **Check the current subtree**: What nodes are open/active? What does the parent's note.md (Current State / children decomposition) say about what's needed?
 2. **Identify the most important gap**: Within the subtree, where does the argument break off?
 3. **Depth check**: Review stable nodes in the subtree. Do they mention unexplored angles? Deepening a stable result can be more valuable than starting the next open node
 4. **Design tasks with kind in mind**: For conjecture → "search for refutation"; for caution → "find problems"; for example → "calculate the concrete case". kind directly becomes the cognitive mode instruction
@@ -426,7 +430,7 @@ Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_
 Dynamic data by agent:
 - **scout**: Search direction instructions
 - **reader**: `Assigned paper: arXiv:{id}` / `Title: {title}`
-- **researcher**: `Target: research/{path}/ — {description}` / `kind: {kind}` / `Context: {role within parent story}` / previous attempt path / PI's critique
+- **researcher**: `Target: research/{path}/ — {description}` / `kind: {kind}` / `Context: {role within parent's children decomposition}` / previous attempt path / PI's critique
 - **critic**: `Target: research/{path}/ — {description}` / `attempt path: {path}` / `kind: {kind}` / `mode: blind` or `mode: contextual`
 - **engine-builder**: `Model definition` / `Computational method` / `Required features` / existing module path. Or `"Refine lib"` for self-directed improvement
 - **simulator**: `Target: research/{path}/` / `Physical setup` / `Mathematical definition of observables` / `Success criteria` / `Deliverable number: {N}` / `simulations/lib/` module list / `Existing scripts in src/: {list}`
@@ -450,14 +454,13 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 
 - **Float-up protocol**: After updating a leaf, check if the parent's work is complete:
   1. `ls` the parent folder — are all children stable or closed?
-  2. If yes, read the parent's note.md. Update its Current State and status
-  3. Update the parent's story.md if the narrative has evolved (update child role descriptions to reflect results; revise narrative if relationships between children changed)
-  4. Continue floating up as long as levels complete
-  5. When the cursor's subtree fully completes: read `research/story.md` to decide the next direction. **Update plan.md cursor** to the new focus
+  2. If yes, read the parent's note.md. Update its Current State (including children decomposition) and status
+  3. Continue floating up as long as levels complete
+  4. When the cursor's subtree fully completes: read root `research/note.md` to decide the next direction. **Update plan.md cursor** to the new focus
 
-- **Story review** (when a Story Arc step — a direct child of root — fully completes, not every cycle):
-  - Read `research/story.md`. Did the results advance the story?
-  - Does the story need revision? Does each step's why still hold?
+- **Direction review** (when a major subtree — a direct child of root — fully completes, not every cycle):
+  - Read root `research/note.md`. Did the results advance the argument?
+  - Does the argument structure need revision? Does each step's why still hold?
   - Should nodes be restructured? (close, reframe, reparent)
 
 - **Update TodoWrite** (required): Check off completed tasks, insert new, reprioritize
@@ -465,7 +468,7 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 **Critic verification mode**:
 
 - **Blind mode**: For mechanical/mathematical checks. Critic reads only the attempt file, without research context. Eliminates expectation bias
-- **Contextual mode**: For logical/value judgments. Critic reads the ancestor chain from root to the **target node being critiqued** (not PI's current cursor) — note.md + story.md + principles.md at each level — plus notes/
+- **Contextual mode**: For logical/value judgments. Critic reads the ancestor chain from root to the **target node being critiqued** (not PI's current cursor) — note.md + dead_ends.md + directives.md at each level — plus notes/
 
 Rule of thumb: "Does the critic need to know the research purpose?" — No → blind, Yes → contextual.
 
