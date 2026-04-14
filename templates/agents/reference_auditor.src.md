@@ -28,7 +28,7 @@ Evaluating content quality or logical soundness is the role of reviewer / critic
 
 ## Output
 
-**Deliverable**: `work/audit_{N}.md`
+**Deliverable**: `work/{timestamp}_audit.md`
 
 ```markdown
 # Reference Audit

@@ -121,11 +121,26 @@ Draw out the user's perspective rather than just accepting instructions.
 
 ## Recording
 
-Get the current datetime with `Bash("date '+%Y-%m-%dT%H:%M'")` at session start.
+Capture two timestamps at session start: (a) ISO format via `Bash("date '+%Y-%m-%dT%H:%M'")` for traceability markers, and (b) log format via `Bash("date '+%y%m%d_%H%M'")` for the launch log filename.
 
 | Timing | Action |
 |---|---|
 | After theme is agreed | Write/update research/ tree + plan.md |
-| After files are written | Commit (see below) |
+| After files are written | Write launch log + Commit (see below) |
+
+**Launch log:** Write to `logs/{timestamp}_launch.md` (permanent record):
+
+```markdown
+# Launch YYYY-MM-DD HH:MM
+
+## Theme
+{theme description or change summary}
+
+## Structure Created
+- {files and directories created or modified}
+
+## Decisions
+- {key decisions made during the session}
+```
 
 **Git commits:** Specify changed files individually with `git add`. Commit message format: `launch: {summary of what was set or changed}`. If git is not initialized, run `git init` first.

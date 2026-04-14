@@ -39,7 +39,7 @@ Severity: critical (undermines reliability) > major (impedes understanding) > mi
 
 ## Output
 
-**Deliverable**: `work/review_{slug}.md`
+**Deliverable**: `work/{timestamp}_review_{slug}.md`
 
 ```markdown
 # Section Review: Section {N}: {title}
