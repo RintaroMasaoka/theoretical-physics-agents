@@ -13,11 +13,13 @@ Draft a single specified section as an academic paper.
 ## Startup Reading
 
 1. `.claude/common.md`
-2. `research/note.md` + `research/story.md` (root — thesis and narrative arc. Understand where the section fits)
-3. Relevant note.md files in research/ tree (check kind, status, and context of related nodes)
-4. `notes/index.md` (+ read topic files from `notes/` relevant to the assigned section)
-5. `manuscript/outline.md` (required)
-6. `manuscript/conventions.md` (required — unified terminology and notation standards)
+2. `.claude/research-tree.md`
+3. `.claude/notes-syntax.md`
+4. `research/note.md` + `research/story.md` (root — thesis and narrative arc. Understand where the section fits)
+5. Relevant note.md files in research/ tree (check kind, status, and context of related nodes)
+6. `notes/index.md` (+ read topic files from `notes/` relevant to the assigned section)
+7. `manuscript/outline.md` (required)
+8. `manuscript/conventions.md` (required — unified terminology and notation standards)
 
 ## Procedure
 

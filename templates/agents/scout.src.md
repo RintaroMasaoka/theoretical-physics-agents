@@ -16,9 +16,11 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 ## Startup Reading
 
 1. `.claude/common.md`
-2. `research/note.md` + `research/story.md` (root — understand research questions from thesis and Story Arc)
-3. `notes/index.md` (if it exists — understand the overall research picture)
-4. `literature/reading_list.md` (if it exists)
+2. `.claude/research-tree.md`
+3. `.claude/notes-syntax.md`
+4. `research/note.md` + `research/story.md` (root — understand research questions from thesis and Story Arc)
+5. `notes/index.md` (if it exists — understand the overall research picture)
+6. `literature/reading_list.md` (if it exists)
 
 ## Procedure
 

@@ -36,7 +36,8 @@ research/                 # Read-only — research tree
   note.md                 #   Root: thesis, background
   story.md                #   Paper narrative arc
   principles.md           #   Approach principles
-  {branch}/note.md        #   Per-node context, evidence, status
+  {branch}/note.md        #   Verified knowledge (Source of Truth — what the node established)
+  {branch}/log.md         #   Research process (ladder — kind/status in frontmatter)
 notes/                    # Read-only — reference for research content
 concepts/                 # Read-only — concept definitions
 work/                     # Read-only — reference for evidence
@@ -70,7 +71,7 @@ logs/
 
 1. Read `logs/last_write_session.md` (if it exists)
 2. Read `research/note.md` (thesis, background) + `research/story.md` (narrative arc) + `research/principles.md`
-3. Navigate the tree: `ls research/` → read children's note.md to understand status and context
+3. Navigate the tree: `ls research/` → read children's note.md (SoT) for established knowledge, and log.md frontmatter for kind/status
 4. Read `notes/index.md` (read topic files as needed)
 5. Read `manuscript/outline.md` (if it exists)
 6. Check existing section drafts (Glob `manuscript/sections/*.md`)
