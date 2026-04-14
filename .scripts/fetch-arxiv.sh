@@ -42,7 +42,19 @@ done
 
 echo "=== Fetching ${#IDS[@]} paper(s): ${IDS[*]} ==="
 
-# ── Phase 1: Try direct download ─────────────────────────────
+# ── Environment detection ────────────────────────────────────
+# Cloud/sandboxed environments (Codex, etc.) set HTTPS_PROXY because
+# direct internet access is blocked. This check is instant (no network).
+
+if [ -n "${HTTPS_PROXY:-}" ] || [ -n "${https_proxy:-}" ]; then
+    CAN_DIRECT=false
+    echo "Network: proxy detected, using GitHub Actions relay"
+else
+    CAN_DIRECT=true
+    echo "Network: direct access"
+fi
+
+# ── Direct download (used when CAN_DIRECT=true) ─────────────
 
 try_direct_download() {
     local id=$1
@@ -94,22 +106,27 @@ try_direct_download() {
 }
 
 DIRECT_OK=()
-DIRECT_FAIL=()
+NEED_RELAY=()
 
+# Skip already-downloaded papers, then route by probe result
 for id in "${IDS[@]}"; do
     if [ -d "$LOCAL_DIR/$id" ] && ls "$LOCAL_DIR/$id"/*.tex &>/dev/null; then
         echo "  ✓ $id (already exists locally)"
         DIRECT_OK+=("$id")
-    elif try_direct_download "$id"; then
-        echo "  ✓ $id (direct download)"
-        DIRECT_OK+=("$id")
+    elif [ "$CAN_DIRECT" = true ]; then
+        if try_direct_download "$id"; then
+            echo "  ✓ $id (direct download)"
+            DIRECT_OK+=("$id")
+        else
+            echo "  ✗ $id (direct download failed, queued for relay)"
+            NEED_RELAY+=("$id")
+        fi
     else
-        echo "  ✗ $id (direct download failed)"
-        DIRECT_FAIL+=("$id")
+        NEED_RELAY+=("$id")
     fi
 done
 
-# ── Phase 2: GitHub Actions relay for failures ───────────────
+# ── GitHub Actions relay (for restricted networks or individual failures) ──
 
 relay_download() {
     local ids=("$@")
@@ -191,10 +208,10 @@ print(json.dumps(data, indent=2))
     done
 }
 
-if [ ${#DIRECT_FAIL[@]} -gt 0 ]; then
+if [ ${#NEED_RELAY[@]} -gt 0 ]; then
     echo ""
-    echo "--- Falling back to GitHub Actions relay for: ${DIRECT_FAIL[*]} ---"
-    relay_download "${DIRECT_FAIL[@]}" || true
+    echo "--- Using GitHub Actions relay for: ${NEED_RELAY[*]} ---"
+    relay_download "${NEED_RELAY[@]}" || true
 fi
 
 # ── Merge BibTeX entries into literature/references.bib ──────
