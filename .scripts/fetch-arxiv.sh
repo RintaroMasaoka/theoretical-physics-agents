@@ -1,25 +1,21 @@
 #!/usr/bin/env bash
-# fetch-arxiv.sh — Fetch arXiv papers via GitHub Actions relay
+# fetch-arxiv.sh — Fetch arXiv papers (auto-detects environment)
 #
 # Usage:
 #   bash .scripts/fetch-arxiv.sh <arxiv_id> [<arxiv_id> ...]
 #
 # Downloads PDF + LaTeX source for each paper.
-# Results are placed in research/papers/{id}/.
+# Results are placed in literature/papers/{id}/.
 #
-# Mechanism:
-#   1. Push request to arxiv-fetch branch (orphan, force-push)
-#   2. GitHub Actions downloads papers from arXiv
-#   3. This script polls until results appear
-#   4. Extracts results to local research/papers/
+# The script automatically chooses the fastest available method:
+#   1. Direct download via curl (works locally, ~10s per paper)
+#   2. GitHub Actions relay (fallback for restricted networks, 1-3 min)
 
 set -euo pipefail
 
 MAX_PAPERS=20
-POLL_INTERVAL=30
-MAX_POLLS=20  # 10 minutes max
 BRANCH="arxiv-fetch"
-LOCAL_DIR="research/papers"
+LOCAL_DIR="literature/papers"
 
 # --- Argument validation ---
 if [ $# -eq 0 ]; then
@@ -46,8 +42,83 @@ done
 
 echo "=== Fetching ${#IDS[@]} paper(s): ${IDS[*]} ==="
 
-# --- Build request.json ---
-REQUEST_JSON=$(python3 -c "
+# ── Phase 1: Try direct download ─────────────────────────────
+
+try_direct_download() {
+    local id=$1
+    local dir="$LOCAL_DIR/$id"
+    mkdir -p "$dir"
+
+    # Download e-print source
+    if ! curl -sL --connect-timeout 10 --max-time 60 \
+         -o "$dir/source" "https://arxiv.org/e-print/$id" 2>/dev/null; then
+        rm -f "$dir/source"
+        return 1
+    fi
+
+    # Verify: non-empty and not an HTML error page
+    if [ ! -s "$dir/source" ]; then
+        rm -f "$dir/source"
+        return 1
+    fi
+    if file -b "$dir/source" | grep -qi "html"; then
+        rm -f "$dir/source"
+        return 1
+    fi
+
+    # Extract based on file type
+    local ftype
+    ftype=$(file -b "$dir/source")
+    case "$ftype" in
+        *gzip*|*tar*)
+            (cd "$dir" && tar xzf source 2>/dev/null) || \
+            (cd "$dir" && gunzip -k source 2>/dev/null) || true
+            ;;
+    esac
+
+    # Download PDF
+    curl -sL --connect-timeout 10 --max-time 120 \
+         -o "$dir/paper.pdf" "https://arxiv.org/pdf/$id" 2>/dev/null || true
+
+    # Download BibTeX citation
+    curl -sL --connect-timeout 10 --max-time 10 \
+         -o "$dir/cite.bib" "https://arxiv.org/bibtex/$id" 2>/dev/null || true
+    # Remove cite.bib if it's empty or HTML
+    if [ -f "$dir/cite.bib" ]; then
+        if [ ! -s "$dir/cite.bib" ] || file -b "$dir/cite.bib" | grep -qi "html"; then
+            rm -f "$dir/cite.bib"
+        fi
+    fi
+
+    return 0
+}
+
+DIRECT_OK=()
+DIRECT_FAIL=()
+
+for id in "${IDS[@]}"; do
+    if [ -d "$LOCAL_DIR/$id" ] && ls "$LOCAL_DIR/$id"/*.tex &>/dev/null; then
+        echo "  ✓ $id (already exists locally)"
+        DIRECT_OK+=("$id")
+    elif try_direct_download "$id"; then
+        echo "  ✓ $id (direct download)"
+        DIRECT_OK+=("$id")
+    else
+        echo "  ✗ $id (direct download failed)"
+        DIRECT_FAIL+=("$id")
+    fi
+done
+
+# ── Phase 2: GitHub Actions relay for failures ───────────────
+
+relay_download() {
+    local ids=("$@")
+    local poll_interval=30
+    local max_polls=20  # 10 minutes max
+
+    # Build request.json
+    local request_json
+    request_json=$(python3 -c "
 import json, sys, datetime
 ids = sys.argv[1:]
 data = {
@@ -55,97 +126,88 @@ data = {
     'requested_at': datetime.datetime.utcnow().isoformat()
 }
 print(json.dumps(data, indent=2))
-" "${IDS[@]}")
+" "${ids[@]}")
 
-# --- Push request via git plumbing (no branch switch needed) ---
-# The orphan commit must include the workflow file, otherwise GitHub Actions
-# won't trigger (push events look for workflows on the pushed branch).
-echo "Pushing request to origin/$BRANCH..."
+    # Push request via git plumbing (no branch switch needed)
+    local workflow_file=".github/workflows/fetch-arxiv.yml"
+    if [ ! -f "$workflow_file" ]; then
+        echo "Error: $workflow_file not found. Cannot use GitHub Actions relay."
+        return 1
+    fi
 
-WORKFLOW_FILE=".github/workflows/fetch-arxiv.yml"
-if [ ! -f "$WORKFLOW_FILE" ]; then
-    echo "Error: $WORKFLOW_FILE not found. Run from the repo root."
-    exit 1
-fi
+    echo "Pushing request to origin/$BRANCH..."
+    local request_blob workflow_blob workflow_tree github_workflows_tree root_tree commit_hash
+    request_blob=$(echo "$request_json" | git hash-object -w --stdin)
+    workflow_blob=$(git hash-object -w "$workflow_file")
+    workflow_tree=$(printf "100644 blob %s\tfetch-arxiv.yml\n" "$workflow_blob" | git mktree)
+    github_workflows_tree=$(printf "040000 tree %s\tworkflows\n" "$workflow_tree" | git mktree)
+    root_tree=$(printf "100644 blob %s\trequest.json\n040000 tree %s\t.github\n" "$request_blob" "$github_workflows_tree" | git mktree)
+    commit_hash=$(git commit-tree "$root_tree" -m "arxiv fetch request: ${ids[*]}")
+    git push -f origin "$commit_hash:refs/heads/$BRANCH" 2>&1
 
-REQUEST_BLOB=$(echo "$REQUEST_JSON" | git hash-object -w --stdin)
-WORKFLOW_BLOB=$(git hash-object -w "$WORKFLOW_FILE")
+    echo "Request pushed. Waiting for GitHub Actions (polling every ${poll_interval}s, max ${max_polls} attempts)..."
 
-# Build tree: request.json + .github/workflows/fetch-arxiv.yml
-WORKFLOW_TREE=$(printf "100644 blob %s\tfetch-arxiv.yml\n" "$WORKFLOW_BLOB" | git mktree)
-GITHUB_WORKFLOWS_TREE=$(printf "040000 tree %s\tworkflows\n" "$WORKFLOW_TREE" | git mktree)
-GITHUB_TREE=$(printf "040000 tree %s\t.github\n" "$GITHUB_WORKFLOWS_TREE" | git mktree)
-ROOT_TREE=$(printf "100644 blob %s\trequest.json\n040000 tree %s\t.github\n" "$REQUEST_BLOB" "$GITHUB_WORKFLOWS_TREE" | git mktree)
+    # Poll for results
+    local fetched=false
+    for i in $(seq 1 "$max_polls"); do
+        sleep "$poll_interval"
+        git fetch origin "$BRANCH" --quiet 2>/dev/null || { echo "  fetch failed, retrying..."; continue; }
 
-COMMIT=$(git commit-tree "$ROOT_TREE" -m "arxiv fetch request: ${IDS[*]}")
-git push -f origin "$COMMIT:refs/heads/$BRANCH" 2>&1
-
-echo "Request pushed. Waiting for GitHub Actions (polling every ${POLL_INTERVAL}s, max ${MAX_POLLS} attempts)..."
-
-# --- Poll for results ---
-FETCHED=false
-for i in $(seq 1 "$MAX_POLLS"); do
-    sleep "$POLL_INTERVAL"
-
-    git fetch origin "$BRANCH" --quiet 2>/dev/null || { echo "  fetch failed, retrying..."; continue; }
-
-    if git show "origin/$BRANCH:result.json" &>/dev/null; then
-        STATUS=$(git show "origin/$BRANCH:result.json" | python3 -c "import json,sys; print(json.load(sys.stdin).get('status',''))" 2>/dev/null) || { echo "  result.json parse error, retrying..."; continue; }
-        if [ "$STATUS" = "complete" ]; then
-            FETCHED=true
-            echo "Fetch complete!"
-            break
+        if git show "origin/$BRANCH:result.json" &>/dev/null; then
+            local status
+            status=$(git show "origin/$BRANCH:result.json" | python3 -c "import json,sys; print(json.load(sys.stdin).get('status',''))" 2>/dev/null) || { echo "  result.json parse error, retrying..."; continue; }
+            if [ "$status" = "complete" ]; then
+                fetched=true
+                echo "Fetch complete!"
+                break
+            fi
         fi
-    fi
-
-    echo "  Waiting... ($i/$MAX_POLLS)"
-done
-
-if [ "$FETCHED" != "true" ]; then
-    echo "Error: Fetch timed out after $((MAX_POLLS * POLL_INTERVAL)) seconds"
-    echo "Check GitHub Actions status manually."
-    exit 1
-fi
-
-# --- Extract results locally ---
-echo "Extracting papers to $LOCAL_DIR/..."
-
-FAIL_COUNT=0
-for ID in "${IDS[@]}"; do
-    mkdir -p "$LOCAL_DIR/$ID"
-
-    # List files for this paper on the remote branch
-    FILES=$(git ls-tree -r --name-only "origin/$BRANCH" -- "$ID/" 2>/dev/null || true)
-
-    if [ -z "$FILES" ]; then
-        echo "  WARNING: No files found for $ID"
-        FAIL_COUNT=$((FAIL_COUNT + 1))
-        continue
-    fi
-
-    echo "$FILES" | while IFS= read -r file; do
-        TARGET="$LOCAL_DIR/$file"
-        mkdir -p "$(dirname "$TARGET")"
-        git show "origin/$BRANCH:$file" > "$TARGET"
+        echo "  Waiting... ($i/$max_polls)"
     done
-done
 
-if [ "$FAIL_COUNT" -eq "${#IDS[@]}" ]; then
-    echo "Error: No papers were fetched successfully."
-    exit 1
+    if [ "$fetched" != "true" ]; then
+        echo "Error: Fetch timed out after $((max_polls * poll_interval)) seconds"
+        echo "Check GitHub Actions status manually."
+        return 1
+    fi
+
+    # Extract results locally
+    echo "Extracting papers to $LOCAL_DIR/..."
+    for id in "${ids[@]}"; do
+        mkdir -p "$LOCAL_DIR/$id"
+        local files
+        files=$(git ls-tree -r --name-only "origin/$BRANCH" -- "$id/" 2>/dev/null || true)
+        if [ -z "$files" ]; then
+            echo "  WARNING: No files found for $id"
+            continue
+        fi
+        echo "$files" | while IFS= read -r file; do
+            local target="$LOCAL_DIR/$file"
+            mkdir -p "$(dirname "$target")"
+            git show "origin/$BRANCH:$file" > "$target"
+        done
+        echo "  ✓ $id (via GitHub Actions)"
+        DIRECT_OK+=("$id")
+    done
+}
+
+if [ ${#DIRECT_FAIL[@]} -gt 0 ]; then
+    echo ""
+    echo "--- Falling back to GitHub Actions relay for: ${DIRECT_FAIL[*]} ---"
+    relay_download "${DIRECT_FAIL[@]}" || true
 fi
 
-# --- Merge BibTeX entries into literature/references.bib ---
+# ── Merge BibTeX entries into literature/references.bib ──────
+
 REFBIB="literature/references.bib"
 touch "$REFBIB"
 BIB_ADDED=0
-for ID in "${IDS[@]}"; do
-    CITE="$LOCAL_DIR/$ID/cite.bib"
-    if [ -f "$CITE" ]; then
-        # Check if this eprint is already in references.bib
-        if ! grep -qF "eprint = {$ID}" "$REFBIB" 2>/dev/null; then
+for id in "${IDS[@]}"; do
+    cite="$LOCAL_DIR/$id/cite.bib"
+    if [ -f "$cite" ]; then
+        if ! grep -qF "eprint = {$id}" "$REFBIB" 2>/dev/null; then
             echo "" >> "$REFBIB"
-            cat "$CITE" >> "$REFBIB"
+            cat "$cite" >> "$REFBIB"
             BIB_ADDED=$((BIB_ADDED + 1))
         fi
     fi
@@ -154,23 +216,24 @@ if [ "$BIB_ADDED" -gt 0 ]; then
     echo "Added $BIB_ADDED BibTeX entry/entries to $REFBIB"
 fi
 
-# --- Report ---
+# ── Report ───────────────────────────────────────────────────
+
 echo ""
 echo "=== Results ==="
-git show "origin/$BRANCH:result.json" | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-for pid, files in data.get('papers', {}).items():
-    print(f'  arXiv:{pid}')
-    for f in files:
-        path = f['path'] if isinstance(f, dict) else f
-        size = f.get('size', 0) if isinstance(f, dict) else 0
-        if size > 0:
-            print(f'    {path}  ({size:,} bytes)')
-        else:
-            print(f'    {path}')
-print()
-"
-
+for id in "${IDS[@]}"; do
+    dir="$LOCAL_DIR/$id"
+    if [ -d "$dir" ] && [ "$(ls -A "$dir" 2>/dev/null)" ]; then
+        echo "  arXiv:$id"
+        for f in "$dir"/*; do
+            [ -f "$f" ] || continue
+            local_name=$(basename "$f")
+            size=$(wc -c < "$f" | tr -d ' ')
+            echo "    $local_name  ($size bytes)"
+        done
+    else
+        echo "  arXiv:$id — FAILED"
+    fi
+done
+echo ""
 echo "Papers saved to $LOCAL_DIR/"
 echo "=== Done ==="

@@ -46,26 +46,27 @@ Do not: use web search as a substitute, complete from training data, repurpose o
 
 ## Paper Acquisition Flow
 
-Confirm the arXiv ID of the assigned paper and check if local data exists in `literature/papers/{id}/`. If not, try acquiring in the following order.
+Confirm the arXiv ID of the assigned paper and check if local data exists in `literature/papers/{id}/`. If not, acquire it:
 
-### Step 1: arXiv Direct (curl)
+### Step 1: Fetch script
 
 ```bash
-mkdir -p literature/papers/{id}
-curl -sL -o literature/papers/{id}/source "https://arxiv.org/e-print/{id}"
+bash .scripts/fetch-arxiv.sh {id}
 ```
 
-On success, use `file` command to determine type and extract (gzip/tar/plain text). The main `.tex` file contains `\documentclass`. Also fetch PDF: `curl -sL -o literature/papers/{id}/paper.pdf "https://arxiv.org/pdf/{id}"`
+The script automatically downloads source + PDF + BibTeX (tries direct download first, falls back to GitHub Actions relay if the network is restricted). If the download contains multiple `.tex` files, the main one is the one containing `\documentclass`.
 
-### Step 2: ar5iv HTML (WebFetch)
+**When to move to Step 2**: If the script exits with non-zero status, or `literature/papers/{id}/` is empty or has no `.tex` files. If only PDF was downloaded (no LaTeX source), also prefer ar5iv over PDF per the reading priority above.
 
-If curl fails (HTTP 403, timeout, empty file, etc.), try ar5iv.
+### Step 2: ar5iv HTML (last resort)
+
+If Step 1 did not produce readable LaTeX source, try ar5iv — an HTML rendering of the arXiv paper that can be read directly in memory.
 
 ```
 WebFetch: https://ar5iv.labs.arxiv.org/html/{id}
 ```
 
-ar5iv is an HTML rendering of the arXiv paper — it is the paper's body text itself.
+Note: ar5iv does not produce local files. When writing the reading note, use the ar5iv URL as the Source field instead of `literature/papers/{id}/`.
 
 ### Step 3: All Methods Failed
 
