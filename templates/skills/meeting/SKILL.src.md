@@ -17,9 +17,9 @@ Arguments: $ARGUMENTS
 
 ```
 Initialization
-    ▼ Data loading: research/note.md + research/story.md
+    ▼ Data loading: research/log.md + research/note.md (if exists) + research/story.md
     ▼ Context-dependent start
-        ├─ No theme set → Tell user to run /launch first
+        ├─ No theme set (research/log.md missing) → Tell user to run /launch first
         └─ Theme already set → Present progress report and open discussion
     ▼ Free discussion with user
     ▼ Reflect decisions as they are made
@@ -27,10 +27,10 @@ Initialization
 
 ### Initialization
 
-Execute the following at session start (→ incremental recording principle).
+Execute the following at session start (→ incremental recording principle). If `research/log.md` does not exist, skip to "When No Theme Is Set."
 
 1. Get the current datetime with `Bash("date '+%Y-%m-%dT%H:%M'")`  (use this value for all timestamps in the session)
-2. Update `research/note.md` frontmatter's `last_meeting` to the obtained datetime
+2. Update `research/log.md` frontmatter's `last_meeting` to the obtained datetime
 3. Create `meetings/YYYY-MM-DD_HHMM.md` using the obtained datetime (header only):
 
 ```markdown
@@ -47,15 +47,15 @@ After initialization, commit with `meeting: init YYYY-MM-DD HH:MM`.
 
 ### When No Theme Is Set
 
-Research theme has not been configured (`research/note.md` does not exist). Tell the user to run `/launch` to set the theme and direction, then end the session.
+Research theme has not been configured (`research/log.md` does not exist). Tell the user to run `/launch` to set the theme and direction, then end the session.
 
 ### When Theme Is Already Set
 
 Review the overall research direction and open discussion.
 
 ```
-Data loading: research/note.md + research/story.md + research/principles.md + notes/index.md + latest meeting minutes
-    ▼ Navigate the tree: ls research/ to see top-level children, read their note.md for status
+Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + notes/index.md + latest meeting minutes
+    ▼ Navigate the tree: ls research/ to see top-level children, read their log.md for status (note.md if exists)
     ▼ If meetings/agenda.md exists (agenda accumulated by PI during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
     ▼ Present progress report
     ▼ If loaded agenda items exist, display and discuss them as well
@@ -66,7 +66,7 @@ Data loading: research/note.md + research/story.md + research/principles.md + no
 
 **Progress report:**
 ```
-Theme: {from research/note.md title}
+Theme: {from research/note.md or research/log.md title}
 Research Tree:
   stable: {N} nodes — {key findings}
   active: {N} nodes — {current focus}
@@ -76,9 +76,10 @@ Key achievements since last meeting: [summary]
 
 **Where to reflect:**
 - Changes to the paper's narrative arc (add/remove/reorder steps) → Edit `research/story.md`. Leave a `> [Meeting YYYY-MM-DD] {reason}` marker
-- Thesis or background changes → Edit `research/note.md`
+- Verified understanding changes → Edit `research/note.md`
+- Background / working state changes → Edit `research/log.md`
 - Cross-step approach principles → Edit `research/principles.md` with a `> [Meeting YYYY-MM-DD]` marker
-- Direction changes scoped to a specific branch → Edit that branch's note.md or story.md
+- Direction changes scoped to a specific branch → Edit that branch's note.md (if exists) or log.md
 - **Significance rewrite**: When the discussion recontextualizes results, rewrite affected note.md files to reflect that synthesis. Meetings produce understanding that won't propagate to documents unless explicitly written. The meeting is the moment of synthesis — capture it in the documents, not just in the minutes
 
 **Principle:** Focus on overall direction, not individual node management. Alignment on "what do we want to say with this research."

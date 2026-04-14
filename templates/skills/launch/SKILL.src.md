@@ -16,7 +16,7 @@ Arguments: $ARGUMENTS
 **Principle: Ask questions first, then load data only as needed.** This skill is real-time dialogue — minimize response delays. Use AskUserQuestion for all questions (text output risks missed responses).
 
 ```
-Check research/note.md
+Check research/log.md
     ├─ Does not exist → New Theme flow
     └─ Exists → Theme Change flow
 If argument is provided → use it as the initial theme description (skip the first AskUserQuestion)
@@ -31,29 +31,15 @@ AskUserQuestion: Ask user to describe the research theme overview in Other
     ▼ AI presents several approach options → Refine direction (2-3 rounds)
     ▼ Present drafted structure and get confirmation before writing
     ▼ Create research/ tree:
-        1. research/note.md (thesis + background)
-        2. research/story.md (narrative arc)
-        3. research/principles.md (approach principles, empty if none)
-        4. research/{step}/note.md for each Story Arc step (child nodes)
-        5. plan.md (session cursor pointing to the first active child)
+        1. research/note.md (project's initial understanding — free-form, no template)
+        2. research/log.md (background, working state — with frontmatter)
+        3. research/story.md (narrative arc)
+        4. research/principles.md (approach principles, empty if none)
+        5. research/{step}/log.md for each Story Arc step (child nodes start with log.md)
+        6. plan.md (session cursor pointing to the first active child)
 ```
 
-**Root note (`research/note.md`):**
-
-```markdown
----
-kind: narrative
-status: active
-last_meeting: ""
----
-# {Title}
-
-## Thesis
-{Core claim of the research}
-
-## Background
-{Key references and prior work}
-```
+File formats (note.md, log.md) are defined in `.claude/research-tree.md`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
 
 **Story arc (`research/story.md`):**
 
@@ -71,19 +57,6 @@ Step 2: ...
 # Approach Principles
 
 {Cross-cutting methodological constraints that apply to the whole project. Leave empty if none yet}
-```
-
-**Child nodes (`research/{step}/note.md`):**
-
-```markdown
----
-kind: {appropriate kind}
-status: open
----
-# {description}
-
-## Current State
-{Initial assessment}
 ```
 
 `plan.md` is a lightweight pointer that tells `/run` where to resume work. `/launch` initializes it; `/run` updates it each session.
@@ -104,15 +77,15 @@ Working on: research/{first_active_child}/
 
 ### Theme Change
 
-Modify the existing research direction. Read `research/note.md` and `research/story.md` first, then present the current state. If the discussion touches specific nodes, navigate the tree and load relevant note.md files before reflecting changes.
+Modify the existing research direction. Read `research/note.md` (if exists), `research/log.md`, and `research/story.md` first, then present the current state. If the discussion touches specific nodes, navigate the tree and load relevant files before reflecting changes.
 
 ```
-Data loading: research/note.md + research/story.md
+Data loading: research/note.md + research/log.md + research/story.md
     ▼ Present current theme summary:
-        Thesis: {thesis, abbreviated}
+        Core understanding: {from note.md, abbreviated}
         Story Arc: {steps overview with status}
     ▼ AskUserQuestion: What aspect to change?
-        - Thesis / research question
+        - Research question / core claims
         - Story Arc structure (add/remove/reorder steps)
         - Scope (narrow or broaden)
         - Other (free-form)
@@ -122,16 +95,17 @@ Data loading: research/note.md + research/story.md
 ```
 
 **Where to reflect:**
-- Thesis / Background → edit `research/note.md`
+- Verified understanding → edit `research/note.md`
+- Background / working state → edit `research/log.md`
 - Narrative arc → edit `research/story.md`
 - Approach principles → edit `research/principles.md`
-- New research directions → create child folders with note.md
+- New research directions → create child folders with log.md
 - Recontextualized results → update affected note.md files in the subtree
 - Full pivot → update all root files, restructure children as needed
 - Session cursor → update `plan.md` if the current focus node was moved, removed, or is no longer the logical next step
 - Leave `> [Launch YYYY-MM-DD] {reason}` markers in affected files at structural changes so `/run` can understand why the tree changed
 
-**Scope of changes:** Match the scale of edits to the scale of the change — a thesis tweak doesn't require restructuring the tree, and a full pivot doesn't preserve stale nodes.
+**Scope of changes:** Match the scale of edits to the scale of the change — a minor refinement doesn't require restructuring the tree, and a full pivot doesn't preserve stale nodes.
 
 ---
 
