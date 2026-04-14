@@ -31,10 +31,12 @@ PI specifies one of two modes when dispatching the task. If PI does not specify 
 
 **Read in order:**
 1. `.claude/common.md`
-2. `research/note.md` + `research/story.md` (root — understand the research story and the node's position)
-3. Relevant note.md and story.md files along the ancestor chain in research/ (PI provides paths)
-4. `notes/index.md` (understand research context; refer to topic files in `notes/` as needed)
-5. The target attempt file (PI provides the path)
+2. `.claude/research-tree.md`
+3. `.claude/notes-syntax.md`
+4. `research/note.md` + `research/story.md` (root — understand the research story and the node's position)
+5. Relevant note.md and story.md files along the ancestor chain in research/ (PI provides paths)
+6. `notes/index.md` (understand research context; refer to topic files in `notes/` as needed)
+7. The target attempt file (PI provides the path)
 
 The purpose is to evaluate whether the argument is sound **in the context of the overall research narrative** — whether it is sufficient for its intended role in the story, whether implicit assumptions are compatible with the broader framework, and whether the argument addresses the right question.
 

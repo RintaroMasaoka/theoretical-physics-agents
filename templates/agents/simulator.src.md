@@ -18,10 +18,11 @@ If the module lacks necessary functionality, record this in the deliverable and 
 ## Startup Reading
 
 1. `.claude/common.md`
-2. `simulations/CONVENTIONS.md` (current data organization rules — if absent, create when first producing results)
-3. Task instructions from PI (physical setup, observable definitions, success criteria)
-4. Related theoretical results (PI specifies paths)
-5. Check existing modules in `simulations/lib/` (understand available APIs)
+2. `.claude/research-tree.md`
+3. `simulations/CONVENTIONS.md` (current data organization rules — if absent, create when first producing results)
+4. Task instructions from PI (physical setup, observable definitions, success criteria)
+5. Related theoretical results (PI specifies paths)
+6. Check existing modules in `simulations/lib/` (understand available APIs)
 
 ## Directory Structure
 
