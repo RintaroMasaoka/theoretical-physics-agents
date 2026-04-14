@@ -28,25 +28,41 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 2. WebFetch the arXiv abs pages of known key papers and discover related papers from References
 3. WebFetch `https://arxiv.org/abs/{id}` for each candidate to obtain title, authors, and abstract
 4. Create/update reading_list.md
+5. Run `bash scripts/fetch-arxiv.sh {id1} {id2} ...` for all newly added papers. This pre-fetches PDF, LaTeX source, and BibTeX so the reader agent can start immediately without acquisition delays. BibTeX entries are auto-merged into `literature/references.bib`
 
 ## Output
 
-**Deliverable**: `literature/reading_list.md`
+### 1. Reading List (`literature/reading_list.md`)
 
 ```markdown
 # Reading List
 
 Last updated: YYYY-MM-DD HH:MM
 
-| # | arXiv ID | Title | Authors | Year | Priority | Status | Extraction File |
-|---|----------|-------|---------|------|----------|--------|-----------------|
-| 1 | XXXX.XXXXX | Paper Title | Author Names | 20XX | ★★★ | unread | |
+| # | arXiv ID | Title | Authors | Year | Status | Extraction File |
+|---|----------|-------|---------|------|--------|-----------------|
+| 1 | XXXX.XXXXX | Paper Title | Author Names | 20XX | unread | |
 
 ## Selection Rationale
 [For each paper: list the search query or citation source, and "directly quote" the relevant part of the abstract]
 ```
 
-Priority: ★★★ directly relevant, ★★☆ important for methods/background, ★☆☆ peripheral
 Status: unread / read / skipped
 
-Priority is determined by whether keywords from the research questions in the narrative structure (research/story.md) appear in the title or abstract. When uncertain, assign ★★☆ and let PI adjust after reader close-reading.
+### 2. Bibliography (`literature/references.bib`)
+
+After step 5, verify that entries for all newly added papers are present in this file. If fetch-arxiv failed for some papers, construct bib entries manually from metadata:
+
+```bibtex
+@article{Moore2008,
+  author = {Joel E. Moore and Ying Ran and Xiao-Gang Wen},
+  title = {Topological surface states in three-dimensional magnetic insulators},
+  year = {2008},
+  eprint = {0804.4527},
+  archiveprefix = {arXiv},
+  primaryclass = {cond-mat.str-el}
+}
+```
+
+- **Citation key**: `{FirstAuthorSurname}{Year}` (e.g., `Moore2008`). If a key already exists, append a lowercase letter (`Moore2008b`)
+- Do not duplicate entries (check by eprint field before appending)

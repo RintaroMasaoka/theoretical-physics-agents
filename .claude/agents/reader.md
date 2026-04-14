@@ -77,7 +77,10 @@ Follow the failure procedure in the "Source Requirement" section and terminate i
 2. Write the extraction results to a file
 3. Update the assigned paper's status in `literature/reading_list.md` to `read` and enter the extraction file path
 4. If related papers are discovered during reading, propose them (record in the output file — to not miss chain discoveries)
-5. For proposed papers not already in `literature/reading_list.md`, add rows to the table (status: `unread`)
+5. For proposed papers not already in `literature/reading_list.md`:
+   - Add rows to the table (status: `unread`)
+   - Run `bash scripts/fetch-arxiv.sh {id1} {id2} ...` to batch-fetch source and BibTeX (auto-merged into `literature/references.bib`). Unlike the Paper Acquisition Flow above (which is for the assigned paper with fallback steps), this is a batch operation for newly discovered papers
+   - If fetch-arxiv fails for some papers, construct bib entries manually from metadata
 
 **Deliverable**: `work/{timestamp}_reading_{id}.md` ({id} is the arXiv ID with dots replaced by hyphens; {timestamp} is captured at session start per common rules)
 

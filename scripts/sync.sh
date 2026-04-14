@@ -19,6 +19,7 @@ FRAMEWORK_FILES=(
   "AGENTS.md"
   "CLAUDE.md"
   ".gitignore"
+  ".github/"
   "scripts/"
   ".claude/config/"
   ".claude/settings.json"

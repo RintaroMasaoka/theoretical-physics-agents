@@ -135,6 +135,25 @@ if [ "$FAIL_COUNT" -eq "${#IDS[@]}" ]; then
     exit 1
 fi
 
+# --- Merge BibTeX entries into literature/references.bib ---
+REFBIB="literature/references.bib"
+touch "$REFBIB"
+BIB_ADDED=0
+for ID in "${IDS[@]}"; do
+    CITE="$LOCAL_DIR/$ID/cite.bib"
+    if [ -f "$CITE" ]; then
+        # Check if this eprint is already in references.bib
+        if ! grep -qF "eprint = {$ID}" "$REFBIB" 2>/dev/null; then
+            echo "" >> "$REFBIB"
+            cat "$CITE" >> "$REFBIB"
+            BIB_ADDED=$((BIB_ADDED + 1))
+        fi
+    fi
+done
+if [ "$BIB_ADDED" -gt 0 ]; then
+    echo "Added $BIB_ADDED BibTeX entry/entries to $REFBIB"
+fi
+
 # --- Report ---
 echo ""
 echo "=== Results ==="

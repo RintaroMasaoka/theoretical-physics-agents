@@ -1,0 +1,167 @@
+name: Fetch arXiv Papers
+
+on:
+  push:
+    branches: [arxiv-fetch]
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: arxiv-fetch
+
+      - name: Check for request
+        id: check
+        run: |
+          if [ -f request.json ]; then
+            echo "has_request=true" >> "$GITHUB_OUTPUT"
+            echo "Request:"
+            cat request.json
+          else
+            echo "has_request=false" >> "$GITHUB_OUTPUT"
+            echo "No request.json found — skipping"
+          fi
+
+      - name: Fetch papers
+        if: steps.check.outputs.has_request == 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/arxiv-output
+
+          IDS=$(python3 -c "import json; print(' '.join(json.load(open('request.json'))['ids']))")
+
+          TOTAL=$(echo "$IDS" | wc -w)
+          COUNT=0
+          for ID in $IDS; do
+            # Rate limit: 3s between requests (arXiv courtesy)
+            if [ $COUNT -gt 0 ]; then sleep 3; fi
+            COUNT=$((COUNT + 1))
+
+            echo "========== Fetching $ID ($COUNT/$TOTAL) =========="
+            DIR="/tmp/arxiv-output/$ID"
+            mkdir -p "$DIR"
+
+            # --- PDF ---
+            HTTP_CODE=$(curl -sL -w "%{http_code}" \
+              -o "$DIR/paper.pdf" \
+              "https://arxiv.org/pdf/$ID" || echo "000")
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "WARNING: PDF download failed for $ID (HTTP $HTTP_CODE)"
+              rm -f "$DIR/paper.pdf"
+            else
+              echo "  PDF: $(du -h "$DIR/paper.pdf" | cut -f1)"
+            fi
+
+            sleep 3  # Rate limit between PDF and source
+
+            # --- LaTeX source ---
+            ARCHIVE="/tmp/source_archive_$ID"
+            HTTP_CODE=$(curl -sL -w "%{http_code}" \
+              -o "$ARCHIVE" \
+              "https://arxiv.org/e-print/$ID" || echo "000")
+
+            if [ "$HTTP_CODE" = "200" ] && [ -s "$ARCHIVE" ]; then
+              FILE_TYPE=$(file -b "$ARCHIVE")
+              echo "  Source type: $FILE_TYPE"
+
+              if echo "$FILE_TYPE" | grep -qi "gzip"; then
+                # Try tar.gz first, fall back to single gzipped file
+                if tar tzf "$ARCHIVE" &>/dev/null; then
+                  tar xzf "$ARCHIVE" -C "$DIR/"
+                else
+                  gzip -d -c "$ARCHIVE" > "$DIR/main.tex" 2>/dev/null || true
+                fi
+              elif echo "$FILE_TYPE" | grep -qi "tar"; then
+                tar xf "$ARCHIVE" -C "$DIR/"
+              elif echo "$FILE_TYPE" | grep -qi "text\|latex\|tex"; then
+                cp "$ARCHIVE" "$DIR/main.tex"
+              else
+                echo "  WARNING: Unknown source format, saving raw"
+                cp "$ARCHIVE" "$DIR/source_raw"
+              fi
+
+              # Keep only TeX-related files
+              find "$DIR" -type f ! \( \
+                -name "*.tex" -o -name "*.bib" -o -name "*.bbl" \
+                -o -name "*.sty" -o -name "*.cls" -o -name "*.bst" \
+                -o -name "*.pdf" \
+              \) -delete 2>/dev/null || true
+              find "$DIR" -type d -empty -delete 2>/dev/null || true
+
+              TEX_COUNT=$(find "$DIR" -name "*.tex" | wc -l)
+              echo "  Extracted: $TEX_COUNT .tex file(s)"
+            else
+              echo "WARNING: Source download failed for $ID (HTTP $HTTP_CODE)"
+            fi
+
+            rm -f "$ARCHIVE"
+
+            # --- BibTeX ---
+            sleep 3  # Rate limit
+            BIB_FILE="$DIR/cite.bib"
+            HTTP_CODE=$(curl -sL -w "%{http_code}" \
+              -o "$BIB_FILE" \
+              "https://arxiv.org/bibtex/$ID" || echo "000")
+            if [ "$HTTP_CODE" = "200" ] && [ -s "$BIB_FILE" ]; then
+              # arxiv returns HTML on error — check for actual BibTeX content
+              if grep -q '^@' "$BIB_FILE"; then
+                echo "  BibTeX: OK"
+              else
+                echo "  WARNING: BibTeX response is not valid for $ID"
+                rm -f "$BIB_FILE"
+              fi
+            else
+              echo "  WARNING: BibTeX download failed for $ID (HTTP $HTTP_CODE)"
+              rm -f "$BIB_FILE"
+            fi
+          done
+
+          # --- Generate result.json ---
+          python3 << 'PYEOF'
+          import json, os, datetime
+          ids = json.load(open("request.json"))["ids"]
+          result = {
+              "status": "complete",
+              "completed_at": datetime.datetime.utcnow().isoformat(),
+              "papers": {}
+          }
+          for arxiv_id in ids:
+              base = f"/tmp/arxiv-output/{arxiv_id}"
+              files = []
+              if os.path.isdir(base):
+                  for root, dirs, fnames in os.walk(base):
+                      for f in fnames:
+                          rel = os.path.relpath(os.path.join(root, f), "/tmp/arxiv-output")
+                          size = os.path.getsize(os.path.join(root, f))
+                          files.append({"path": rel, "size": size})
+              result["papers"][arxiv_id] = files
+          with open("/tmp/arxiv-output/result.json", "w") as f:
+              json.dump(result, f, indent=2)
+          PYEOF
+
+          echo ""
+          echo "========== Result =========="
+          cat /tmp/arxiv-output/result.json
+
+      - name: Push results
+        if: steps.check.outputs.has_request == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create clean orphan branch with only results
+          git checkout --orphan _fresh
+          git rm -rf . 2>/dev/null || true
+          find . -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
+
+          # Copy results
+          cp -r /tmp/arxiv-output/* .
+
+          git add -A
+          git commit -m "arXiv fetch complete"
+          git push -f origin HEAD:refs/heads/arxiv-fetch

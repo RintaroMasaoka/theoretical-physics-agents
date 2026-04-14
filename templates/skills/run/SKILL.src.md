@@ -246,7 +246,7 @@ Update status to `closed`. If the closure is informative, add an entry to the no
 6. Read the **cursor folder's direct children**: `ls` the folder → read each child's note.md (if exists) + log.md (depth 1 only — not recursive)
 7. Read `literature/reading_list.md`
 
-**Unread paper principle:** For papers marked `unread` in reading_list.md, PI must not describe their content, claims, methods, or results. Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated (see `.claude/common.md` verification procedures). If there are ★★★ and unread papers, run reader with top priority in the first cycle.
+**Unread paper principle:** For papers marked `unread` in reading_list.md, PI must not describe their content, claims, methods, or results. Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated (see `.claude/common.md` verification procedures).
 
 **Feedback processing:**
 - If files contain `> [Meeting ...]` markers: A direction change was decided in a meeting. Read and understand the reason before starting work. Do not revert these changes
