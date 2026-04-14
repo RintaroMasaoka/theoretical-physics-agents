@@ -2,10 +2,10 @@
 # sync.sh — framework ファイルを upstream (public repo) と同期するスクリプト
 #
 # 使い方:
-#   bash scripts/sync.sh pull        — upstream の最新を取り込む
-#   bash scripts/sync.sh push        — framework の変更を upstream に送る
-#   bash scripts/sync.sh push --yes  — 確認なしで push
-#   bash scripts/sync.sh status      — upstream との差分を表示する
+#   bash .scripts/sync.sh pull        — upstream の最新を取り込む
+#   bash .scripts/sync.sh push        — framework の変更を upstream に送る
+#   bash .scripts/sync.sh push --yes  — 確認なしで push
+#   bash .scripts/sync.sh status      — upstream との差分を表示する
 #
 # 前提:
 #   - remote "upstream" が設定済み
@@ -20,15 +20,17 @@ FRAMEWORK_FILES=(
   "CLAUDE.md"
   ".gitignore"
   ".github/"
-  "scripts/"
+  ".scripts/"
   ".claude/config/"
   ".claude/settings.json"
-  "templates/"
+  ".templates/"
 )
 
 # push 時に upstream から削除すべき stale ファイル
 STALE_FILES=(
-  "configure.mjs"       # scripts/configure.mjs に移動済み
+  "configure.mjs"       # .scripts/configure.mjs に移動済み
+  "scripts/"            # .scripts/ にリネーム済み
+  "templates/"          # .templates/ にリネーム済み
 )
 
 UPSTREAM_REMOTE="upstream"
@@ -59,7 +61,7 @@ do_pull() {
 
   echo ""
   echo "==> configure.mjs を実行してランタイムファイルを再生成中..."
-  node scripts/configure.mjs
+  node .scripts/configure.mjs
 
   echo ""
   echo "Done! 取り込んだファイルを確認してください:"
@@ -115,7 +117,7 @@ do_push() {
   done
 
   echo "==> configure.mjs を実行してランタイムファイルを再生成中..."
-  (cd "$tmpdir/repo" && node scripts/configure.mjs 2>&1 | sed 's/^/  /')
+  (cd "$tmpdir/repo" && node .scripts/configure.mjs 2>&1 | sed 's/^/  /')
 
   echo ""
   echo "==> upstream クローンでの差分:"

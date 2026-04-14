@@ -2,7 +2,7 @@
 # fetch-arxiv.sh — Fetch arXiv papers via GitHub Actions relay
 #
 # Usage:
-#   bash scripts/fetch-arxiv.sh <arxiv_id> [<arxiv_id> ...]
+#   bash .scripts/fetch-arxiv.sh <arxiv_id> [<arxiv_id> ...]
 #
 # Downloads PDF + LaTeX source for each paper.
 # Results are placed in research/papers/{id}/.

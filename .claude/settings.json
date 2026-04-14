@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node scripts/configure.mjs",
+            "command": "node .scripts/configure.mjs",
             "statusMessage": "Applying config templates..."
           }
         ]
@@ -87,7 +87,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/fix-log-timestamp.sh"
+            "command": "bash .scripts/fix-log-timestamp.sh"
           }
         ]
       }

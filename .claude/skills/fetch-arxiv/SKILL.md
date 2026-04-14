@@ -26,7 +26,7 @@ Arguments: $ARGUMENTS
 Run the fetch script with the arXiv IDs from the arguments:
 
 ```bash
-bash scripts/fetch-arxiv.sh $ARGUMENTS
+bash .scripts/fetch-arxiv.sh $ARGUMENTS
 ```
 
 **Important**: This command takes 1-3 minutes (GitHub Actions execution + polling). The script handles everything automatically: push request, poll for completion, extract results.
@@ -46,7 +46,7 @@ Upper limit: 20 papers per fetch (GitHub Actions artifact size and arXiv rate li
 Sub-agents can invoke the fetch script directly via Bash when direct download (curl/WebFetch) fails due to network restrictions:
 
 ```bash
-bash scripts/fetch-arxiv.sh {arxiv_id}
+bash .scripts/fetch-arxiv.sh {arxiv_id}
 ```
 
 The script manages the `arxiv-fetch` branch internally; callers do not need to switch branches or manage git state.

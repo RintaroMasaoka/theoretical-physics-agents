@@ -3,15 +3,15 @@
  * Render .md files from templates + config.yaml.
  *
  * Usage:
- *   node scripts/configure.mjs              Apply all templates (default)
- *   node scripts/configure.mjs --dry-run    Show what would change without writing files
- *   node scripts/configure.mjs --check      Validate config and templates (no writes)
+ *   node .scripts/configure.mjs              Apply all templates (default)
+ *   node .scripts/configure.mjs --dry-run    Show what would change without writing files
+ *   node .scripts/configure.mjs --check      Validate config and templates (no writes)
  *
  * Source of truth:
  *   Config values:  .claude/config/config.yaml
- *   Prompt content: templates/**\/*.src.md
+ *   Prompt content: .templates/**\/*.src.md
  * Generated (do not edit directly — overwritten on each run):
- *   .claude/**\/*.md  (mirrors templates/ structure, .src infix stripped)
+ *   .claude/**\/*.md  (mirrors .templates/ structure, .src infix stripped)
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "fs";
@@ -20,7 +20,7 @@ import { fileURLToPath } from "url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CONFIG_PATH = join(ROOT, ".claude", "config", "config.yaml");
-const SRC_DIR = join(ROOT, "templates");
+const SRC_DIR = join(ROOT, ".templates");
 const OUT_DIR = join(ROOT, ".claude");
 
 // ── YAML parsing ──────────────────────────────────────────────────────
@@ -105,7 +105,7 @@ function findTemplates(dir) {
 const mode = process.argv[2] || "apply";
 
 if (mode === "--help") {
-  console.log("Usage: node scripts/configure.mjs [--dry-run | --check]");
+  console.log("Usage: node .scripts/configure.mjs [--dry-run | --check]");
   process.exit(0);
 }
 

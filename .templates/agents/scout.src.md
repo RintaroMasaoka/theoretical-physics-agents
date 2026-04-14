@@ -28,7 +28,7 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 2. WebFetch the arXiv abs pages of known key papers and discover related papers from References
 3. WebFetch `https://arxiv.org/abs/{id}` for each candidate to obtain title, authors, and abstract
 4. Create/update reading_list.md
-5. Run `bash scripts/fetch-arxiv.sh {id1} {id2} ...` for all newly added papers. This pre-fetches PDF, LaTeX source, and BibTeX so the reader agent can start immediately without acquisition delays. BibTeX entries are auto-merged into `literature/references.bib`
+5. Run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` for all newly added papers. This pre-fetches PDF, LaTeX source, and BibTeX so the reader agent can start immediately without acquisition delays. BibTeX entries are auto-merged into `literature/references.bib`
 
 ## Output
 

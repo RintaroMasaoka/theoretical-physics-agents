@@ -42,20 +42,20 @@ No argument → AskUserQuestion to clarify intent (3 choices + Other for free-fo
 
 ## Template System
 
-This project uses a template-based generation system. Prompt files are generated from templates — editing generated files directly is incorrect because `scripts/configure.mjs` overwrites them on each run.
+This project uses a template-based generation system. Prompt files are generated from templates — editing generated files directly is incorrect because `.scripts/configure.mjs` overwrites them on each run.
 
 | Layer | Path | Role |
 |---|---|---|
-| **Template (source of truth)** | `templates/**/*.src.md` | Edit these |
-| **Generated (do not edit)** | `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, `.claude/CLAUDE.md`, `.claude/common.md` | Overwritten by `node scripts/configure.mjs` |
+| **Template (source of truth)** | `.templates/**/*.src.md` | Edit these |
+| **Generated (do not edit)** | `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, `.claude/CLAUDE.md`, `.claude/common.md` | Overwritten by `node .scripts/configure.mjs` |
 | **Config values** | `.claude/config/config.yaml` | Variables substituted into templates via `{{ key }}` syntax |
 
 When reading a target for review, read the `.src.md` file. When making changes, edit the `.src.md` file.
 
-**Mapping**: To find the template for a generated file, strip the `.claude/` prefix, prepend `templates/`, and insert `.src` before `.md`:
-- `.claude/agents/researcher.md` → `templates/agents/researcher.src.md`
-- `.claude/skills/run/SKILL.md` → `templates/skills/run/SKILL.src.md`
-- `.claude/common.md` → `templates/common.src.md`
+**Mapping**: To find the template for a generated file, strip the `.claude/` prefix, prepend `.templates/`, and insert `.src` before `.md`:
+- `.claude/agents/researcher.md` → `.templates/agents/researcher.src.md`
+- `.claude/skills/run/SKILL.md` → `.templates/skills/run/SKILL.src.md`
+- `.claude/common.md` → `.templates/common.src.md`
 
 ---
 
@@ -69,11 +69,11 @@ Guidelines for rewriting (see Prompt Design Spec for architecture principles):
 - Describe the correct approach naturally. Instead of "don't do X" (prohibition), write what should be done
 - Write proportionally to the importance of the fix. Don't use a paragraph for a one-line fix
 - Add reasons to instructions. With reasons, AI can judge edge cases. Without reasons, instructions become rigid dogma
-- Preserve `{{ placeholder }}` syntax — these are config variables resolved by `scripts/configure.mjs`
+- Preserve `{{ placeholder }}` syntax — these are config variables resolved by `.scripts/configure.mjs`
 
 ### 2. Regenerate
 
-After writing the `.src.md` file, run `node scripts/configure.mjs` to regenerate all runtime files. Verify the generated output matches expectations.
+After writing the `.src.md` file, run `node .scripts/configure.mjs` to regenerate all runtime files. Verify the generated output matches expectations.
 
 ### 3. Verification Agent
 
@@ -90,7 +90,7 @@ Pay special attention to: {areas changed in this fix}
 
 ### 4. Reflect Verification Results
 
-Report the verification agent's findings to the user, and fix any valid findings. If fixes are made, run `node scripts/configure.mjs` again.
+Report the verification agent's findings to the user, and fix any valid findings. If fixes are made, run `node .scripts/configure.mjs` again.
 
 ### 5. User Confirmation
 
@@ -102,7 +102,7 @@ Get approval from the user via AskUserQuestion before committing.
 
 Architecture principles for prompt files. Check these are satisfied when rewriting.
 
-1. Separation of concerns — Each file covers only its own responsibilities. Common rules go in `templates/common.src.md` once only
+1. Separation of concerns — Each file covers only its own responsibilities. Common rules go in `.templates/common.src.md` once only
 2. Low coupling — Minimize dependencies between files
 3. File-path communication — Instead of loading raw data into prompts, write to files and pass paths (prevents prompt bloat and enables data reuse)
 
@@ -113,4 +113,4 @@ Architecture principles for prompt files. Check these are satisfied when rewriti
 After the user approves, commit and push to upstream in one step:
 
 1. **Git commit**: Add changed `.src.md` files and their corresponding generated `.md` files individually with `git add` (not `git add -A`, to avoid committing unrelated changes). Message format: `improve: {summary of changes}`
-2. **Upstream sync**: Run `bash scripts/sync.sh push --yes` to push framework changes (templates, config, AGENTS.md, scripts/) to the upstream remote — the public repo that other projects pull from. This keeps all downstream projects in sync with the improvement
+2. **Upstream sync**: Run `bash .scripts/sync.sh push --yes` to push framework changes (.templates, config, AGENTS.md, .scripts/) to the upstream remote — the public repo that other projects pull from. This keeps all downstream projects in sync with the improvement
