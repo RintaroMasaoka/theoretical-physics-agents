@@ -33,7 +33,7 @@ PI specifies one of two modes when dispatching the task. If PI does not specify 
 1. `.claude/common.md`
 2. `.claude/research-tree.md`
 3. `.claude/notes-syntax.md`
-4. `research/note.md` + `research/story.md` (root — understand the research story and the node's position)
+4. `research/note.md` + `research/story.md` (root — understand the research narrative and the node's position)
 5. Relevant note.md and story.md files along the ancestor chain in research/ (PI provides paths)
 6. `notes/index.md` (understand research context; refer to topic files in `notes/` as needed)
 7. The target attempt file (PI provides the path)

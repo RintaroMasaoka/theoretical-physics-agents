@@ -18,7 +18,7 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 1. `.claude/common.md`
 2. `.claude/research-tree.md`
 3. `.claude/notes-syntax.md`
-4. `research/note.md` + `research/story.md` (root — understand research questions from thesis and Story Arc)
+4. `research/note.md` + `research/story.md` (root — understand research questions from thesis and narrative structure)
 5. `notes/index.md` (if it exists — understand the overall research picture)
 6. `literature/reading_list.md` (if it exists)
 
@@ -49,4 +49,4 @@ Last updated: YYYY-MM-DD HH:MM
 Priority: ★★★ directly relevant, ★★☆ important for methods/background, ★☆☆ peripheral
 Status: unread / read / skipped
 
-Priority is determined by whether keywords from the research questions in research/story.md appear in the title or abstract. When uncertain, assign ★★☆ and let PI adjust after reader close-reading.
+Priority is determined by whether keywords from the research questions in the narrative structure (research/story.md) appear in the title or abstract. When uncertain, assign ★★☆ and let PI adjust after reader close-reading.

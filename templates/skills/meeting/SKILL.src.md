@@ -75,10 +75,10 @@ Key achievements since last meeting: [summary]
 ```
 
 **Where to reflect:**
-- Changes to the paper's narrative arc (add/remove/reorder steps) → Edit `research/story.md`. Leave a `> [Meeting YYYY-MM-DD] {reason}` marker
+- Changes to the paper's narrative structure (add/remove/reorder steps) → Edit `research/story.md`. Leave a `> [Meeting YYYY-MM-DD] {reason}` marker
 - Verified understanding changes → Edit `research/note.md`
 - Background / working state changes → Edit `research/log.md`
-- Cross-step approach principles → Edit `research/principles.md` with a `> [Meeting YYYY-MM-DD]` marker
+- Cross-cutting constraints → Edit `research/principles.md` with a `> [Meeting YYYY-MM-DD]` marker
 - Direction changes scoped to a specific branch → Edit that branch's note.md (if exists) or log.md
 - **Significance rewrite**: When the discussion recontextualizes results, rewrite affected note.md files to reflect that synthesis. Meetings produce understanding that won't propagate to documents unless explicitly written. The meeting is the moment of synthesis — capture it in the documents, not just in the minutes
 
@@ -90,7 +90,7 @@ Key achievements since last meeting: [summary]
 
 The goal is not AI reporting and ending, but drawing out the user's perspective to co-shape direction. Actively seek the user's judgment in the following situations.
 
-**Turning points in direction:** Get user approval before reflecting structural changes to `research/story.md` (step additions/deletions/reordering). Present the content, reason, and the option to maintain the status quo.
+**Turning points in direction:** Get user approval before reflecting structural changes to the narrative structure in `research/story.md` (step additions/deletions/reordering). Present the content, reason, and the option to maintain the status quo.
 
 **Ambiguous statements:** State AI's interpretation explicitly and confirm. Specify exactly what changes to which files before reflecting.
 
@@ -106,7 +106,7 @@ Users may leave at any natural stopping point. Post-processing that writes every
 |---|---|
 | Session start | Create meeting minutes file + update `last_meeting` (→ see Initialization section) |
 | When a topic arises | Append to "Discussion Items" in minutes via Edit |
-| When a decision is made | Append to "Decisions" + immediately reflect in relevant files. Approach principles go to `research/principles.md` |
+| When a decision is made | Append to "Decisions" + immediately reflect in relevant files. Constraints go to `research/principles.md` |
 | When significance is discussed | Rewrite affected note.md files to reflect the synthesis. Record in "Changes Applied" |
 | When a file is changed | Append to "Changes Applied" in minutes + git commit |
 

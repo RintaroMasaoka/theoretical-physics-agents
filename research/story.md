@@ -1,4 +1,4 @@
-# Story Arc
+# Narrative Structure
 
 Step 1: **Hopf insulatorの基礎理論** — 研究の土台となるHopf写像・不変量・モデル・表面状態を理解する [open]
   → [hopf-basics/](hopf-basics/)

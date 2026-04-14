@@ -33,30 +33,30 @@ AskUserQuestion: Ask user to describe the research theme overview in Other
     ▼ Create research/ tree:
         1. research/note.md (project's initial understanding — free-form, no template)
         2. research/log.md (background, working state — with frontmatter)
-        3. research/story.md (narrative arc)
-        4. research/principles.md (approach principles, empty if none)
-        5. research/{step}/log.md for each Story Arc step (child nodes start with log.md)
+        3. research/story.md (narrative structure)
+        4. research/principles.md (constraints, empty if none)
+        5. research/{step}/log.md for each step in the narrative structure (child nodes start with log.md)
         6. plan.md (session cursor pointing to the first active child)
 ```
 
 File formats (note.md, log.md) are defined in `.claude/research-tree.md`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
 
-**Story arc (`research/story.md`):**
+**Narrative structure (`research/story.md`):**
 
 ```markdown
-# Story Arc
+# Narrative Structure
 
 Step 1: **{title}** — {why the reader needs this here} [open]
   → [{child_folder}/]({child_folder}/)
 Step 2: ...
 ```
 
-**Approach principles (`research/principles.md`):**
+**Constraints (`research/principles.md`):**
 
 ```markdown
-# Approach Principles
+# Constraints
 
-{Cross-cutting methodological constraints that apply to the whole project. Leave empty if none yet}
+{Cross-cutting research constraints that apply to the whole project. Leave empty if none yet}
 ```
 
 `plan.md` is a lightweight pointer that tells `/run` where to resume work. `/launch` initializes it; `/run` updates it each session.
@@ -83,10 +83,10 @@ Modify the existing research direction. Read `research/note.md` (if exists), `re
 Data loading: research/note.md + research/log.md + research/story.md
     ▼ Present current theme summary:
         Core understanding: {from note.md, abbreviated}
-        Story Arc: {steps overview with status}
+        Narrative Structure: {steps overview with status}
     ▼ AskUserQuestion: What aspect to change?
         - Research question / core claims
-        - Story Arc structure (add/remove/reorder steps)
+        - Narrative Structure (add/remove/reorder steps)
         - Scope (narrow or broaden)
         - Other (free-form)
     ▼ Discuss changes (2-3 rounds)
@@ -97,8 +97,8 @@ Data loading: research/note.md + research/log.md + research/story.md
 **Where to reflect:**
 - Verified understanding → edit `research/note.md`
 - Background / working state → edit `research/log.md`
-- Narrative arc → edit `research/story.md`
-- Approach principles → edit `research/principles.md`
+- Narrative Structure → edit `research/story.md`
+- Constraints → edit `research/principles.md`
 - New research directions → create child folders with log.md
 - Recontextualized results → update affected note.md files in the subtree
 - Full pivot → update all root files, restructure children as needed

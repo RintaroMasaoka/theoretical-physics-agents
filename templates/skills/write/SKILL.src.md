@@ -34,8 +34,8 @@ Draft research findings as an academic paper. The responsibility is to shape the
 ```
 research/                 # Read-only — research tree
   note.md                 #   Root: thesis, background
-  story.md                #   Paper narrative arc
-  principles.md           #   Approach principles
+  story.md                #   Paper narrative structure
+  principles.md           #   Constraints
   {branch}/note.md        #   Verified knowledge (Source of Truth — what the node established)
   {branch}/log.md         #   Research process (ladder — kind/status in frontmatter)
 notes/                    # Read-only — reference for research content
@@ -59,7 +59,7 @@ logs/
 
 | Agent | Role |
 |---|---|
-| **outliner** | Design the overall paper structure from the Story Arc and research tree |
+| **outliner** | Design the overall paper structure from the narrative structure and research tree |
 | **writer** | Draft a specified section as an academic paper |
 | **reviewer** | Verify the logical consistency of a section |
 | **finalizer** | Integrate all sections and produce the final version |
@@ -70,7 +70,7 @@ logs/
 ## Session Start
 
 1. Read `logs/last_write_session.md` (if it exists)
-2. Read `research/note.md` (thesis, background) + `research/story.md` (narrative arc) + `research/principles.md`
+2. Read `research/note.md` (thesis, background) + `research/story.md` (narrative structure) + `research/principles.md`
 3. Navigate the tree: `ls research/` → read children's note.md (SoT) for established knowledge, and log.md frontmatter for kind/status
 4. Read `notes/index.md` (read topic files as needed)
 5. Read `manuscript/outline.md` (if it exists)

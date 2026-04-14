@@ -16,7 +16,7 @@ Do not have AI regenerate existing text. Concatenate via Bash, then AI applies o
 1. `.claude/common.md`
 2. `.claude/research-tree.md`
 3. `.claude/notes-syntax.md`
-4. `research/note.md` + `research/story.md` (root — thesis, narrative arc)
+4. `research/note.md` + `research/story.md` (root — thesis, narrative structure)
 5. Navigate research/ tree: read note.md files for context and status
 6. `manuscript/outline.md`
 7. `manuscript/conventions.md`

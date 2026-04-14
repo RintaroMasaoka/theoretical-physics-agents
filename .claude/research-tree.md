@@ -6,8 +6,8 @@ Research information is organized as a **tree** under `research/`. Every node is
 |---|---|---|
 | `note.md` | Destination (SoT) | **Verified knowledge.** Free-form prose — no prescribed sections, no frontmatter. Written when a node has significant established results. Not every node has one |
 | `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). PI's working document |
-| `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative arc |
-| `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting approach principles |
+| `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
+| `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting research constraints |
 
 ## note.md — Source of Truth
 
@@ -55,8 +55,8 @@ Root log.md additionally carries `last_meeting` in frontmatter and a `## Backgro
 research/
   note.md              (project-level verified knowledge — SoT)
   log.md               (background, working state — ladder)
-  story.md             (paper narrative arc)
-  principles.md        (cross-cutting constraints)
+  story.md             (paper narrative structure)
+  principles.md        (cross-cutting research constraints)
   Paradox Resolution/
     note.md            (polished: what the paradox is and how it's resolved)
     log.md             (research process: evidence, revisions)
