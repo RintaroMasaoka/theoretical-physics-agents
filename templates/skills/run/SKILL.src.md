@@ -90,6 +90,7 @@ plan.md is a lightweight cursor pointing to PI's current position in the tree. I
 |---|---|---|
 | **Concept definitions** | `concepts/` | Atomic term definitions (one per file). Wiki-linked from any file via `[[term]]` |
 | **Session handoff** | `logs/last_session.md` | Operational detail, PI's thinking for next session. Overwritten each session |
+| **Session log** | `logs/{timestamp}_run.md` | Permanent record of what this session accomplished. Append-only history |
 
 ### Why This Separation Matters
 
@@ -153,8 +154,9 @@ simulations/              # Numerical computations
   results/archive/        # Retired results
   test/                   # Module tests
   src/archive/            # Retired scripts
-logs/
-  last_session.md         # Session handoff (overwrite each session)
+logs/                     # Unified chronological history
+  {timestamp}_{type}.md   #   All activity: worker, run, write, meeting, launch
+  last_session.md         #   Session handoff (overwrite each session)
 meetings/
   agenda.md
 ```
@@ -450,11 +452,25 @@ No need to rush — the next `/run` resumes from where you left off.
    - Active nodes' operational detail (sizes, seed counts, blockers)
    - PI's thinking for next session
    - Anything useful to future PI that doesn't belong in the tree
-6. Git commit:
+6. **Write session log** to `logs/{timestamp}_run.md` (permanent record — never overwrite):
+   ```markdown
+   # Run YYYY-MM-DD HH:MM
+
+   ## Accomplished
+   - {what was done, key results}
+
+   ## Node Changes
+   - {status changes, new nodes created, nodes closed}
+
+   ## Deliverables
+   - {paths to deliverables produced}
+   ```
+   Get the timestamp with `Bash("date '+%Y%m%d_%H%M'")` at session start and reuse it.
+7. Git commit:
    ```bash
    git add -A && git commit -m "run: {concise summary of achievements}"
    ```
-7. Display the final report to the user:
+8. Display the final report to the user:
    - Work performed and results
    - Deliverable paths
    - Node status changes

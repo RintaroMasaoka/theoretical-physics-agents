@@ -29,9 +29,9 @@ Initialization
 
 Execute the following at session start (→ incremental recording principle). If `research/log.md` does not exist, skip to "When No Theme Is Set."
 
-1. Get the current datetime with `Bash("date '+%Y-%m-%dT%H:%M'")`  (use this value for all timestamps in the session)
+1. Get the current datetime with `Bash("date '+%Y-%m-%dT%H:%M'")`  (use this value for all timestamps in the session). Also derive the log timestamp with `Bash("date '+%Y%m%d_%H%M'")`
 2. Update `research/log.md` frontmatter's `last_meeting` to the obtained datetime
-3. Create `meetings/YYYY-MM-DD_HHMM.md` using the obtained datetime (header only):
+3. Create `logs/{timestamp}_meeting.md` using the log timestamp (header only):
 
 ```markdown
 # Meeting YYYY-MM-DD HH:MM
@@ -54,7 +54,7 @@ Research theme has not been configured (`research/log.md` does not exist). Tell 
 Review the overall research direction and open discussion.
 
 ```
-Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + notes/index.md + latest meeting minutes
+Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + notes/index.md + latest meeting log
     ▼ Navigate the tree: ls research/ to see top-level children, read their log.md for status (note.md if exists)
     ▼ If meetings/agenda.md exists (agenda accumulated by PI during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
     ▼ Present progress report
@@ -104,10 +104,10 @@ Users may leave at any natural stopping point. Post-processing that writes every
 
 | Timing | Action |
 |---|---|
-| Session start | Create meeting minutes file + update `last_meeting` (→ see Initialization section) |
-| When a topic arises | Append to "Discussion Items" in minutes via Edit |
+| Session start | Create meeting log file in `logs/` + update `last_meeting` (→ see Initialization section) |
+| When a topic arises | Append to "Discussion Items" in the meeting log via Edit |
 | When a decision is made | Append to "Decisions" + immediately reflect in relevant files. Constraints go to `research/principles.md` |
 | When significance is discussed | Rewrite affected note.md files to reflect the synthesis. Record in "Changes Applied" |
-| When a file is changed | Append to "Changes Applied" in minutes + git commit |
+| When a file is changed | Append to "Changes Applied" in the meeting log + git commit |
 
 **Git commits:** Specify changed files individually with `git add`, commit in `meeting: {summary of changes}` format.

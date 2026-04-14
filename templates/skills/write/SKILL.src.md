@@ -52,7 +52,8 @@ work/
   review_{slug}.md         # reviewer output
   audit_{N}.md             # reference-auditor output
 logs/
-  last_write_session.md    # Summary of the last /write session
+  {timestamp}_write.md     # Permanent session record
+  last_write_session.md    # Session handoff (overwrite each session)
 ```
 
 ## Agents Used
@@ -137,12 +138,26 @@ Retrieve deliverable paths from task return values and Read as needed:
 1. Write a session summary to `logs/last_write_session.md` (overwrite):
    - Completed sections, review results, remaining tasks
    - What to do in the next session
-2. Confirm that research gaps have been recorded in `meetings/agenda.md` if any
-3. Git commit:
+2. **Write session log** to `logs/{timestamp}_write.md` (permanent record — never overwrite):
+   ```markdown
+   # Write YYYY-MM-DD HH:MM
+
+   ## Accomplished
+   - {sections drafted, reviewed, finalized}
+
+   ## Section Status
+   - {per-section status: not started / drafted / review PASS / FAIL}
+
+   ## Issues
+   - {research gaps reported, blockers}
+   ```
+   Get the timestamp with `Bash("date '+%Y%m%d_%H%M'")` at session start and reuse it.
+3. Confirm that research gaps have been recorded in `meetings/agenda.md` if any
+4. Git commit:
    ```bash
    git add -A && git commit -m "write: {concise summary of achievements}"
    ```
-4. Display the final report to the user:
+5. Display the final report to the user:
    - Writing and review results
    - Per-section status (not started / drafted / review PASS / FAIL)
    - If research gaps exist, report them ("Please resolve the following via /run before running /write again")

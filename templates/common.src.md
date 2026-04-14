@@ -9,7 +9,7 @@ PI provides file paths rather than inline data. Read only the sections you need 
 
 ## Logs (Progress Records for Humans)
 
-Write a work summary to `logs/{agent}_{timestamp}.md` (e.g., `logs/reader_20260413_1530.md`). The deliverable contains your analytical output. The log is a brief narrative summary of what you did, what you found, and any issues encountered — it helps the human researcher audit the research process. Logs are not a decision input for PI.
+Write a work summary to `logs/{timestamp}_{agent}.md` (e.g., `logs/20260413_1530_reader.md`). The deliverable contains your analytical output. The log is a brief narrative summary of what you did, what you found, and any issues encountered — it helps the human researcher audit the research process. Logs are not a decision input for PI.
 
 ## Constraints
 
