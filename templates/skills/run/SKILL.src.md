@@ -39,12 +39,12 @@ Research information forms a **tree** under `research/`. PI navigates this tree 
 
 ### The Research Tree (`research/`)
 
-Every node is a **folder**. Files are separated into two layers: **destination** (polished knowledge) and **ladder** (research process). During `/write`, only destination files are loaded — ladders are excluded to keep the writing context clean.
+Every node is a **folder**. File formats are defined in `.claude/research-tree.md` (the canonical reference). Key points for PI:
 
 | File | Layer | Accumulation | Role |
 |---|---|---|---|
-| `note.md` | Destination | Overwrite | **Source of truth.** Polished, publication-quality knowledge. What this node established |
-| `log.md` | Ladder | Overwrite + Append | **Research process.** Current State (rewritten), Evidence and Revisions (appended). PI's working document |
+| `note.md` | Destination | Overwrite | **Source of truth.** Free-form verified knowledge. No template, no frontmatter |
+| `log.md` | Ladder | Overwrite + Append | **Research process.** Current State (rewritten), Evidence (appended). PI's working document |
 | `dead_ends.md` | Ladder | Append-only | Failed approaches and lessons learned. Prevents log.md bloat |
 | `directives.md` | — | Append (meetings only) | Rules and conventions imposed by the user. PI cannot modify unilaterally |
 
@@ -52,23 +52,7 @@ Children are subfolders. The tree can nest to arbitrary depth.
 
 **Folder names** use **Title Case with spaces** for Obsidian readability (e.g., `Lattice BKT`, `Winding Gap`).
 
-```
-research/
-  note.md                    ← Root: thesis, argument structure (SoT)
-  log.md                     ← Root: background, working state
-  Paradox Resolution/
-    note.md                  ← Polished: what the paradox is and how it's resolved
-    log.md                   ← Process: evidence, revisions
-  Lattice BKT/
-    note.md                  ← Polished knowledge of this direction
-    log.md                   ← Working state, children decomposition
-    dead_ends.md             ← W=1 initial condition failure, retracted measurements
-    Winding Gap/
-      note.md                ← Source of truth: z = 2πκ - 2 derivation
-      log.md                 ← Evidence chain, revision history
-```
-
-- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `note.md` when results are stable enough to state
+- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `note.md` when results are stable enough to state (see research-tree.md for when/how)
 - **Recording a dead end**: write `dead_ends.md` in the node folder (or append if it exists)
 - **Adding a directive**: write `directives.md` in the folder where the rule applies (typically project root; only through meetings)
 - **Seeing children**: `ls` the folder (subfolders = children)
@@ -111,8 +95,8 @@ plan.md is a lightweight cursor pointing to PI's current position in the tree. I
 
 The two-layer model (destination + ladder) separates **what we know** from **how we got there**:
 
-- **note.md** (destination, overwrite): Polished knowledge. What the node established. `/write` loads only these — the ladder is excluded so the writing context stays clean
-- **log.md** (ladder, overwrite + append): PI's working document. Current State is rewritten when understanding changes. Evidence and Revisions accumulate but are periodically compressed by curator
+- **note.md** (destination, overwrite): Free-form verified knowledge. `/write` loads only these — the ladder is excluded so the writing context stays clean
+- **log.md** (ladder, overwrite + append): PI's working document. Current State is rewritten when understanding changes. Evidence accumulates but is periodically compressed by curator
 - **dead_ends.md** (ladder, append-only): Failed approaches. Separated from log.md to keep the working document focused
 - **directives.md** (immutable): User-imposed rules. Different authorship model (meetings only)
 - **plan.md** scopes PI's context via the cursor, preventing breadth-first thrashing
@@ -123,18 +107,16 @@ The two-layer model (destination + ladder) separates **what we know** from **how
 ```
 New node → mkdir + log.md [status: open]
     ↓ investigate
-log.md accumulates evidence, revisions
+log.md accumulates evidence
     ↓ node reaches stable
-Curator distills from log.md → writes note.md (source of truth)
+Curator distills from log.md → writes note.md (free-form, verified knowledge)
     ↓ understanding deepens
 Curator updates note.md. log.md continues accumulating
     ↓ later found wrong
 Update note.md. Record in dead_ends.md
 ```
 
-**note.md creation**: When a node reaches stable and has significant results, curator distills the knowledge into note.md. Not every node gets a note.md — only nodes with results worth stating as source of truth. Leaf nodes doing pure computation may only have log.md.
-
-**Retraction**: If a result is later found wrong, update note.md (or remove it). Record the failure in dead_ends.md.
+note.md creation, retraction, and format are defined in `.claude/research-tree.md`.
 
 **Refresh**: log.md files naturally accumulate text over sessions. Periodically, PI dispatches **curator** to compress them — moving detailed content to note.md where appropriate. The working state in log.md should stay concise enough to read at a glance.
 
@@ -144,10 +126,10 @@ Update note.md. Record in dead_ends.md
 
 ```
 research/                 # Research tree — the single knowledge structure
-  note.md                 #   Root: thesis, argument structure (SoT)
+  note.md                 #   Root: verified knowledge (SoT, free-form)
   log.md                  #   Root: background, working state (ladder)
   {Branch Name}/          #   Research direction (Title Case with spaces)
-    note.md               #     Source of truth (polished knowledge)
+    note.md               #     Verified knowledge (free-form prose)
     log.md                #     Research process (evidence, children decomposition)
     dead_ends.md          #     (optional) Failed approaches and lessons
     directives.md         #     (optional) Subtree-specific rules from meetings
@@ -179,42 +161,11 @@ meetings/
 
 ### Root Files
 
-**`research/note.md`** — Source of truth for the project thesis:
+File formats (note.md, log.md) are defined in `.claude/research-tree.md`. This section covers only files specific to `/run` operations.
 
-```markdown
-# {Title}
+### Directives (`directives.md`)
 
-## Thesis
-{Paper's argument in a few lines}
-
-## Argument Structure
-{What to show, in what order, why that order.
-Each step: → [{Child Name}/]({Child Name}/) [{status}]}
-```
-
-No frontmatter in note.md (SoT files are clean prose).
-
-**`research/log.md`** — Root working state:
-
-```markdown
----
-kind: narrative
-status: active
-last_meeting: "YYYY-MM-DDTHH:MM"
----
-# Working State
-
-## Background
-{Key references and prior work}
-
-## Current State
-{High-level working understanding. Children decomposition.}
-
-## Evidence
-{Append-only}
-```
-
-**`directives.md`** (project root, outside `research/`) — Methodology rules:
+Rules imposed by the user through meetings. PI cannot create or modify directives unilaterally. At any level: project root for global rules, subtree folders for scoped rules. Higher-level directives cascade to descendants.
 
 ```markdown
 # Directives
@@ -222,50 +173,6 @@ last_meeting: "YYYY-MM-DDTHH:MM"
 ## {Topic area}
 - {rule}
   > [Meeting YYYY-MM-DD] {reason for this rule}
-
-## {Another topic}
-- ...
-```
-
-Organized by topic, not chronologically. PI must not change this file unilaterally; changes are decided in meetings.
-
-### Node Content
-
-**`note.md`** — Source of truth (destination). Created when a node has stable, significant results:
-
-```markdown
-# {Topic}
-
-{Polished, publication-quality prose. States what is established,
-with confidence tags and references. No process details.
-For branch nodes, describes the established understanding,
-not the research process that produced it.}
-```
-
-Clean prose, no frontmatter. This is what `/write` reads.
-
-**`log.md`** — Research process (ladder). Every node starts with this:
-
-```markdown
----
-kind: {kind}
-status: {status}
----
-# {description}
-
-## Current State
-{What is known, confidence level, open angles.
-For branch nodes, include children decomposition:
-why they exist, how they relate, what each contributes.}
-
-## Evidence
-- attempt_14: Analytical derivation. critic ACCEPT
-- Sim 25: Multi-parameter numerical verification
-{append-only — never delete evidence entries}
-
-## Revisions
-- v1 (attempt_5) → retracted (attempt_9) → v2 (attempt_14)
-{lightweight version chain only — detailed failure analysis goes to dead_ends.md}
 ```
 
 ### Dead Ends (`dead_ends.md`)
@@ -280,14 +187,6 @@ Optional. For nodes where approaches have been tried and failed. Prevents log.md
 **Failed because**: {root cause, not just symptoms}
 **Lesson**: {what to avoid or keep in mind}
 ```
-
-Create dead_ends.md when a node has significant failed approaches worth documenting.
-
-### Directives (`directives.md`)
-
-Optional. Contains rules imposed by the user through meetings. PI cannot create or modify directives unilaterally.
-
-At any level: project root for global rules, subtree folders for scoped rules. Higher-level directives cascade to descendants.
 
 ### Session Cursor (`plan.md`)
 
