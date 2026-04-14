@@ -10,9 +10,3 @@
 .claude/common.md
 .claude/agents/*.md
 .claude/skills/*/SKILL.md
-
-# Research artifacts (generated at runtime)
-logs/
-papers/
-simulations/
-literature/
