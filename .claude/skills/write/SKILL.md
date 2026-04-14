@@ -69,7 +69,7 @@ logs/
 
 ## Session Start
 
-1. Capture session timestamp: `Bash("date '+%y%m%d_%H%M'")` — reuse this value for the session log filename at session end
+1. Session log filename: use `logs/_DRAFT_write.md` — a system hook auto-renames it with the correct timestamp on write
 2. Read `logs/last_write_session.md` (if it exists)
 3. Read `research/note.md` (thesis, background) + `research/story.md` (narrative structure) + `research/principles.md`
 4. Navigate the tree: `ls research/` → read children's note.md (SoT) for established knowledge, and log.md frontmatter for kind/status

@@ -80,6 +80,17 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/fix-log-timestamp.sh"
+          }
+        ]
+      }
     ]
   }
 }

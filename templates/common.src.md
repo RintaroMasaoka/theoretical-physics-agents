@@ -9,9 +9,7 @@ PI provides file paths rather than inline data. Read only the sections you need 
 
 ## Logs (Progress Records for Humans)
 
-Capture a session timestamp at start: `Bash("date '+%y%m%d_%H%M'")` (e.g., `260413_1530`). Use this for both the log filename and the deliverable filename.
-
-Write a work summary to `logs/{timestamp}_{agent}.md` (e.g., `logs/260413_1530_reader.md`). The deliverable contains your analytical output. The log is a brief narrative summary of what you did, what you found, and any issues encountered — it helps the human researcher audit the research process. Logs are not a decision input for PI.
+Write a work summary to `logs/_DRAFT_{agent}.md` (e.g., `logs/_DRAFT_reader.md`). A system hook automatically renames the file with the correct timestamp (`YYMMDD_HHMM`) after you write it — do not run `date` yourself. The deliverable contains your analytical output. The log is a brief narrative summary of what you did, what you found, and any issues encountered — it helps the human researcher audit the research process. Logs are not a decision input for PI.
 
 ## Constraints
 

@@ -36,7 +36,7 @@ AskUserQuestion: Ask user to describe the research theme overview in Other
         3. research/story.md (narrative structure)
         4. research/principles.md (constraints, empty if none)
         5. research/{step}/log.md for each step in the narrative structure (child nodes start with log.md)
-        6. plan.md (session cursor pointing to the first active child)
+        6. research/plan.md (session cursor pointing to the first active child)
 ```
 
 File formats (note.md, log.md) are defined in `.claude/research-tree.md`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
@@ -59,9 +59,9 @@ Step 2: ...
 {Cross-cutting research constraints that apply to the whole project. Leave empty if none yet}
 ```
 
-`plan.md` is a lightweight pointer that tells `/run` where to resume work. `/launch` initializes it; `/run` updates it each session.
+`research/plan.md` is a lightweight pointer that tells `/run` where to resume work. `/launch` initializes it; `/run` updates it each session.
 
-**Session cursor (`plan.md`):**
+**Session cursor (`research/plan.md`):**
 
 ```markdown
 # Focus
@@ -102,7 +102,7 @@ Data loading: research/note.md + research/log.md + research/story.md
 - New research directions → create child folders with log.md
 - Recontextualized results → update affected note.md files in the subtree
 - Full pivot → update all root files, restructure children as needed
-- Session cursor → update `plan.md` if the current focus node was moved, removed, or is no longer the logical next step
+- Session cursor → update `research/plan.md` if the current focus node was moved, removed, or is no longer the logical next step
 - Leave `> [Launch YYYY-MM-DD] {reason}` markers in affected files at structural changes so `/run` can understand why the tree changed
 
 **Scope of changes:** Match the scale of edits to the scale of the change — a minor refinement doesn't require restructuring the tree, and a full pivot doesn't preserve stale nodes.
@@ -121,11 +121,11 @@ Draw out the user's perspective rather than just accepting instructions.
 
 ## Recording
 
-Capture two timestamps at session start: (a) ISO format via `Bash("date '+%Y-%m-%dT%H:%M'")` for traceability markers, and (b) log format via `Bash("date '+%y%m%d_%H%M'")` for the launch log filename.
+Capture ISO timestamp at session start via `Bash("date '+%Y-%m-%dT%H:%M'")` for traceability markers. For the launch log filename, use `logs/_DRAFT_launch.md` — a system hook auto-renames it with the correct timestamp on write.
 
 | Timing | Action |
 |---|---|
-| After theme is agreed | Write/update research/ tree + plan.md |
+| After theme is agreed | Write/update research/ tree (including plan.md) |
 | After files are written | Write launch log + Commit (see below) |
 
 **Launch log:** Write to `logs/{timestamp}_launch.md` (permanent record):

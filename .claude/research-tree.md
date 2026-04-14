@@ -75,13 +75,13 @@ research/
 | **Research tree — ladder** | `research/**/log.md` | Read-only | Research process: current state, evidence chain, kind/status |
 | **Concept definitions** | `concepts/` | Read-only (concept-checker may create entries) | Atomic term definitions, wiki-linked from any file via `[[term]]` |
 | **Research notes** | `notes/*.md` | Read-only | Distilled understanding, topic-level summaries |
-| **Session cursor** | `plan.md` | Not relevant to workers | PI's current focus position in the tree |
+| **Session cursor** | `research/plan.md` | Not relevant to workers | PI's current focus position in the tree |
 | **Session context** | `logs/last_session.md` | Not relevant to workers | PI's volatile work context for session handoff |
 
 **Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints.
 
 Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status determination is PI's responsibility.
 
-- Only PI writes to the research tree and plan.md
+- Only PI writes to the research tree (including plan.md)
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified
