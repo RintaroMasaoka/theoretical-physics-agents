@@ -25,7 +25,7 @@ Writing without a source risks completion from training data, confusion with oth
 If all source acquisition methods (see "Paper Acquisition Flow" below) fail:
 
 1. Keep the status in `reading_list.md` as `unread`
-2. Do not create `work/reading_{id}.md` in any form (if the file exists, downstream agents will treat its content as fact)
+2. Do not create `work/{timestamp}_reading_{id}.md` in any form (if the file exists, downstream agents will treat its content as fact)
 3. Return `FAILED: source acquisition failed (arXiv:{id})` as the task result and terminate
 
 Do not: use web search as a substitute, complete from training data, repurpose other reading notes, or partially create "what you know."
@@ -79,7 +79,7 @@ Follow the failure procedure in the "Source Requirement" section and terminate i
 4. If related papers are discovered during reading, propose them (record in the output file — to not miss chain discoveries)
 5. For proposed papers not already in `literature/reading_list.md`, add rows to the table (status: `unread`)
 
-**Deliverable**: `work/reading_{id}.md` ({id} is the arXiv ID with dots replaced by hyphens)
+**Deliverable**: `work/{timestamp}_reading_{id}.md` ({id} is the arXiv ID with dots replaced by hyphens; {timestamp} is captured at session start per common rules)
 
 ```markdown
 # {Title}

@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node configure.mjs",
+            "command": "node scripts/configure.mjs",
             "statusMessage": "Applying config templates..."
           }
         ]

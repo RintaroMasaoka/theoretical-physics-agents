@@ -17,10 +17,17 @@ set -euo pipefail
 # これらのファイルだけが upstream と共有される
 FRAMEWORK_FILES=(
   "AGENTS.md"
+  "CLAUDE.md"
+  ".gitignore"
   "scripts/"
-  ".claude/config/config.yaml"
+  ".claude/config/"
+  ".claude/settings.json"
   "templates/"
-  ".agents/"
+)
+
+# push 時に upstream から削除すべき stale ファイル
+STALE_FILES=(
+  "configure.mjs"       # scripts/configure.mjs に移動済み
 )
 
 UPSTREAM_REMOTE="upstream"
@@ -80,6 +87,14 @@ do_push() {
   echo "==> upstream を一時ディレクトリにクローン中..."
   git clone --depth 1 --branch "$UPSTREAM_BRANCH" "$upstream_url" "$tmpdir/repo" 2>&1 | grep -v '^$'
 
+  echo "==> stale ファイルを削除中..."
+  for item in "${STALE_FILES[@]}"; do
+    if [ -e "$tmpdir/repo/$item" ]; then
+      rm -rf "$tmpdir/repo/$item"
+      echo "  ✗ $item (削除 — stale)"
+    fi
+  done
+
   echo "==> framework ファイルをコピー中..."
   for item in "${FRAMEWORK_FILES[@]}"; do
     if [ -e "$item" ]; then
@@ -97,6 +112,9 @@ do_push() {
       echo "  - $item (ローカルに存在しないためスキップ)"
     fi
   done
+
+  echo "==> configure.mjs を実行してランタイムファイルを再生成中..."
+  (cd "$tmpdir/repo" && node scripts/configure.mjs 2>&1 | sed 's/^/  /')
 
   echo ""
   echo "==> upstream クローンでの差分:"

@@ -90,7 +90,7 @@ plan.md is a lightweight cursor pointing to PI's current position in the tree. I
 |---|---|---|
 | **Concept definitions** | `concepts/` | Atomic term definitions (one per file). Wiki-linked from any file via `[[term]]` |
 | **Session handoff** | `logs/last_session.md` | Operational detail, PI's thinking for next session. Overwritten each session |
-| **Session log** | `logs/{timestamp}_run.md` | Permanent record of what this session accomplished. Append-only history |
+| **Session log** | `logs/{timestamp}_run.md` | Permanent per-session record. One file per session, never overwritten |
 
 ### Why This Separation Matters
 
@@ -143,9 +143,9 @@ concepts/                 # Concept definitions (one term per file)
 literature/
   reading_list.md
   papers/{arxiv_id}/
-work/                     # Worker deliverables
-  reading_{arxiv_id}.md
-  attempt_{N}_{topic}.md
+work/                     # Worker deliverables ({timestamp}_{type}_{id}.md)
+  {timestamp}_reading_{arxiv_id}.md
+  {timestamp}_attempt_{slug}.md
 manuscript/               # Paper (managed by /write)
 simulations/              # Numerical computations
   lib/                    # Framework modules (engine-builder)
@@ -157,8 +157,7 @@ simulations/              # Numerical computations
 logs/                     # Unified chronological history
   {timestamp}_{type}.md   #   All activity: worker, run, write, meeting, launch
   last_session.md         #   Session handoff (overwrite each session)
-meetings/
-  agenda.md
+agenda.md                 # Items for next meeting (consumed by /meeting)
 ```
 
 ### Root Files
@@ -239,12 +238,13 @@ Update status to `closed`. If the closure is informative, add an entry to the no
 
 ## Session Start
 
-1. Read `plan.md` (the cursor — where the previous session left off)
-2. Read `logs/last_session.md` (if it exists — previous session's operational context)
-3. Read `directives.md` at project root (if it exists — methodology rules from meetings)
-4. Read the **ancestor chain** from root to cursor (inclusive): for each folder in the path, read `note.md` (if exists), `log.md`, `dead_ends.md` (if exists), and `directives.md` (if exists)
-5. Read the **cursor folder's direct children**: `ls` the folder → read each child's note.md (if exists) + log.md (depth 1 only — not recursive)
-6. Read `literature/reading_list.md`
+1. Capture session timestamp: `Bash("date '+%y%m%d_%H%M'")` — reuse this value for the session log filename at session end
+2. Read `plan.md` (the cursor — where the previous session left off)
+3. Read `logs/last_session.md` (if it exists — previous session's operational context)
+4. Read `directives.md` at project root (if it exists — methodology rules from meetings)
+5. Read the **ancestor chain** from root to cursor (inclusive): for each folder in the path, read `note.md` (if exists), `log.md`, `dead_ends.md` (if exists), and `directives.md` (if exists)
+6. Read the **cursor folder's direct children**: `ls` the folder → read each child's note.md (if exists) + log.md (depth 1 only — not recursive)
+7. Read `literature/reading_list.md`
 
 **Unread paper principle:** For papers marked `unread` in reading_list.md, PI must not describe their content, claims, methods, or results. Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated (see `.claude/common.md` verification procedures). If there are ★★★ and unread papers, run reader with top priority in the first cycle.
 
@@ -427,7 +427,7 @@ No need to rush — the next `/run` resumes from where you left off.
 
 1. **Simulation housekeeping** (if simulator ran): Check `simulations/src/` for superseded scripts. Move to `src/archive/` — never delete. Record moves in `logs/last_session.md`
 2. **Knowledge base coherence** (if log.md files accumulated significant changes): Dispatch **curator** to update note.md (SoT) files where needed, or quick manual check if changes were minor
-3. If there are items to discuss in a meeting, Write to `meetings/agenda.md`:
+3. If there are items to discuss in a meeting, Write to `agenda.md`:
    ```markdown
    # Meeting Agenda
 
@@ -465,7 +465,7 @@ No need to rush — the next `/run` resumes from where you left off.
    ## Deliverables
    - {paths to deliverables produced}
    ```
-   Get the timestamp with `Bash("date '+%Y%m%d_%H%M'")` at session start and reuse it.
+   Use the timestamp captured at session start (step 1).
 7. Git commit:
    ```bash
    git add -A && git commit -m "run: {concise summary of achievements}"
