@@ -8,8 +8,8 @@ The system is organized like a small research lab: a PI agent drives the project
 
 This project is useful now, but the validation level is different for `/run` and `/write`.
 
-- As of 2026-03-25, `/run` is the more battle-tested path. In test research sessions, it has been exercised repeatedly at substantial scale, on the order of roughly 200 cycles in total.
-- As of 2026-03-25, `/write` is still much less validated. It has not yet been used in a real end-to-end project, so the writing workflow should be treated as experimental and expected to need further iteration.
+- As of 2026-04-15, `/run` is the more battle-tested path. In test research sessions, it has been exercised repeatedly at substantial scale, on the order of roughly 200 cycles in total.
+- As of 2026-04-15, `/write` is still much less validated. It has not yet been used in a real end-to-end project, so the writing workflow should be treated as experimental and expected to need further iteration.
 
 If you want the most reliable part of the system today, use `/meeting` and `/run` first, and treat `/write` as an early-stage workflow that still needs practical feedback.
 
@@ -32,7 +32,7 @@ Core operating model:
 
 - A compatible coding-agent environment
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) if you want to use the included `.claude/` configuration directly
-- [Node.js](https://nodejs.org/) for `configure.mjs`
+- [Node.js](https://nodejs.org/) for `.scripts/configure.mjs`
 
 ### Setup
 
@@ -40,7 +40,7 @@ Core operating model:
 2. Optionally edit `.claude/config/config.yaml`
 3. Start your agent session in the project root
 
-If you are using Claude Code, `.claude/settings.json` runs `node configure.mjs` automatically on session start, so generated prompt files stay in sync with the templates and config.
+If you are using Claude Code, `.claude/settings.json` runs `node .scripts/configure.mjs` automatically on session start, so generated prompt files stay in sync with the templates and config.
 
 ### Minimal Workflow
 
@@ -83,18 +83,27 @@ That means the main current value of the repository is autonomous research progr
 AGENTS.md                 # Canonical shared instructions for agent behavior
 CLAUDE.md                 # Thin wrapper that imports AGENTS.md for Claude Code
 README.md                 # Project overview and operational expectations
-configure.mjs             # Renders generated prompt files from config + templates
 
-.agents/
-└── skills/               # Local skill definitions used by the current environment
+.scripts/
+├── configure.mjs         # Renders generated prompt files from config + templates
+├── fetch-arxiv.sh        # Helper for the /fetch-arxiv skill
+├── fix-log-timestamp.sh  # PostToolUse hook that normalizes log timestamps
+└── sync.sh               # Repository sync helper
+
+.templates/               # Prompt templates (source of truth for generated .md files)
+├── CLAUDE.src.md
+├── common.src.md
+├── notes-syntax.src.md
+├── research-tree.src.md
+├── agents/
+└── skills/
 
 .claude/
 ├── config/config.yaml    # Main editable config
 ├── agents/*.md           # Generated agent instructions
 ├── skills/*/SKILL.md     # Generated skills
+├── CLAUDE.md             # Generated top-level Claude Code instructions
 └── settings.json         # Claude Code settings, including SessionStart hook
-
-templates/                # Prompt templates (source of truth for generated .md files)
 ```
 
 ## Runtime Artifacts
@@ -125,14 +134,14 @@ Current supported top-level values include:
 | `cycles.run` | Default cycle count for `/run` |
 | `cycles.write` | Default cycle count for `/write` |
 
-Prompt content lives in `templates/`, and generated files are rebuilt from those templates.
+Prompt content lives in `.templates/`, and generated files are rebuilt from those templates.
 
 Manual commands:
 
 ```bash
-node configure.mjs
-node configure.mjs --dry-run
-node configure.mjs --check
+node .scripts/configure.mjs
+node .scripts/configure.mjs --dry-run
+node .scripts/configure.mjs --check
 ```
 
 ## Design Constraints
