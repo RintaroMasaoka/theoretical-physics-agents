@@ -42,6 +42,7 @@ STALE_FILES=(
 
 UPSTREAM_REMOTE="upstream"
 UPSTREAM_BRANCH="main"
+ORIG_ARGS=("$@")
 
 # ── ヘルパー関数 ──────────────────────────────────────────────
 
@@ -52,12 +53,37 @@ check_upstream() {
     || die "remote '$UPSTREAM_REMOTE' が見つかりません。先に git remote add $UPSTREAM_REMOTE <url> を実行してください"
 }
 
+# ── self-update: pull 時に sync.sh 自身を先に更新 ────────────
+
+self_update() {
+  # 既に再実行済みなら何もしない（無限ループ防止）
+  [ "${_SYNC_SELF_UPDATED:-}" = 1 ] && return 0
+
+  local self_path
+  self_path="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+  local self_rel=".scripts/sync.sh"
+
+  # upstream 版を取得して差分チェック
+  local upstream_content
+  upstream_content=$(git show "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH:$self_rel" 2>/dev/null) || return 0
+
+  if ! echo "$upstream_content" | diff -q - "$self_path" >/dev/null 2>&1; then
+    echo "==> sync.sh 自体が更新されました。新しい版で再実行します..."
+    git checkout "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH" -- "$self_rel"
+    export _SYNC_SELF_UPDATED=1
+    exec bash "$self_path" "${ORIG_ARGS[@]}"
+  fi
+}
+
 # ── pull: upstream → private repo ─────────────────────────────
 
 do_pull() {
   check_upstream
   echo "==> upstream/$UPSTREAM_BRANCH を fetch 中..."
   git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH"
+
+  # sync.sh 自身が変わっていたら新しい版で再実行
+  self_update
 
   echo "==> framework ファイルを upstream から取り込み中..."
   for item in "${FRAMEWORK_FILES[@]}"; do

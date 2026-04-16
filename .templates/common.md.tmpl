@@ -1,0 +1,42 @@
+# Worker Common Rules
+
+## Research Items (project.yaml)
+
+`project.yaml`'s `items:` contains a nested structure of items. Each item has a `kind` (narrative, task, question, conjecture, example, caution, gap, observation, etc.) and a `status` (open, active, stable, closed).
+
+The `detail` field is the primary carrier of nuance — more important than status. It must describe what is currently known and at what confidence level, and any unexplored angles. For `closed` items, include the reason (e.g., "dropped: ...", "reframed → {id}: ...", "exhausted: ..."). This helps PI in subsequent sessions judge how much to rely on the result and whether to revisit.
+
+Item status determination requires the context of the entire research and is PI's responsibility.
+
+- **Read-only** (only PI writes)
+- To propose a status change, describe the rationale in your deliverable file
+- Honest reporting is paramount: never propose stable for something that has not been sufficiently verified
+
+## Inter-Agent Communication
+
+Loading large amounts of data into prompts wastes context window. Writing to files allows reading only the necessary parts.
+
+- **Input**: Receive task instructions and file paths from PI; Read the necessary data yourself
+- **Output**: Write deliverables to files and return `DONE: {deliverable path}` as the Task return value
+- Never load raw data directly into prompts — always communicate via files
+
+## Logs (Progress Records for Humans)
+
+Write a work summary to `logs/{agent}_{timestamp}.md`.
+This is a record for humans to review progress later, not a decision input for PI.
+
+## Research Notes Format
+
+`research/notes/` is an Obsidian-compatible wiki-linked knowledge base maintained by PI. These notes are **read-only** for worker agents (same rule as project.yaml). Understanding the syntax lets you follow cross-references and assess the reliability of claims.
+
+- **Wiki-links**: `[[note-name]]`, `[[note-name#heading]]`, `[[note-name|display text]]` — references to other note files. To follow a link, find the file matching the note-name (with `.md` extension) under `research/notes/`
+- **Tags**: `#tag-name` — inline classification labels (e.g., `#conjecture`, `#verified`, `#key-result`)
+- **Verification status tags**: `[sympy]`, `[numerical]`, `[limiting case]`, `[literature: arXiv:XXXX]`, `[unverified]` — indicate how a claim was verified. Treat `[unverified]` claims with appropriate caution; do not cite them as established results
+
+## Constraints
+
+- Write deliverables and logs in **{{ language }}** (technical terms, proper nouns, and equations may remain in their original language)
+- Write equations in LaTeX notation (inline: `$...$`, display: `$$...$$`). Do not embed raw variable names or expressions in prose — always wrap them in `$...$`. Use `$$` instead of `\(\)`, `\[\]`, or LaTeX environment names — `$$` is the standard syntax recognized by most Markdown readers
+- AskUserQuestion is prohibited (users are often away during `/run` and `/write`, and asking questions interrupts the session. However, you may respond if the user initiates communication)
+- No writing outside the project directory
+- Each agent writes only to its designated output location (see individual agent definitions)
