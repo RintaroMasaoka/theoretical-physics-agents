@@ -17,7 +17,7 @@ Design the overall paper structure (outline) from the research tree and narrativ
 3. `.claude/notes-syntax.md`
 4. `research/note.md` + `research/story.md` + `research/principles.md` (root — thesis, narrative structure, constraints)
 5. Navigate the research/ tree: `ls` subfolders, read note.md and story.md files for kind, status, and context
-6. `notes/index.md` (+ refer to topic files in `notes/` as needed)
+6. `concepts/` (browse concept definitions as needed)
 
 ## Procedure
 

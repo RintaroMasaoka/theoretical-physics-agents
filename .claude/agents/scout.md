@@ -19,7 +19,7 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 2. `.claude/research-tree.md`
 3. `.claude/notes-syntax.md`
 4. `research/note.md` + `research/story.md` (root — understand research questions from thesis and narrative structure)
-5. `notes/index.md` (if it exists — understand the overall research picture)
+5. `research/story.md` (if it exists — understand the paper narrative structure)
 6. `literature/reading_list.md` (if it exists)
 
 ## Procedure

@@ -94,7 +94,7 @@ Adjust your working attitude according to the `kind` field provided by PI:
 3. `.claude/notes-syntax.md`
 4. `research/note.md` + `research/story.md` (root — understand the research narrative and your task's position)
 5. Relevant note.md and story.md files along the ancestor chain in research/ (PI provides paths)
-6. `notes/index.md` (+ topic files specified by PI in the prompt)
+6. `concepts/` (+ topic files specified by PI in the prompt)
 7. Existing evidence files for the target item (if PI provides paths)
 
 ## Previous Attempt (On Resubmission)

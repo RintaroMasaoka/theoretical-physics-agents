@@ -1,6 +1,6 @@
 # Notes Syntax
 
-`notes/` is an Obsidian-compatible wiki-linked knowledge base maintained by PI (read-only for workers). `concepts/` contains atomic concept definitions; concept-checker may create entries, but other workers treat it as read-only. Wiki-link syntax lets you follow cross-references; verification status tags let you assess the reliability of claims.
+`concepts/` contains atomic concept definitions; concept-checker may create entries, but other workers treat it as read-only. Research knowledge is stored in the research tree's `note.md` files (one per node). Wiki-link syntax lets you follow cross-references; verification status tags let you assess the reliability of claims.
 
 Syntax:
 - **Wiki-links**: `[[note-name]]`, `[[note-name#heading]]`, `[[note-name|display text]]` — references to other note files. To follow a link, search for `{note-name}.md` project-wide

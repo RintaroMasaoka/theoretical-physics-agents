@@ -10,7 +10,7 @@ model: opus
 
 Read a specified document as a **first-time reader** and flag self-containedness issues.
 
-**This agent intentionally has no research context.** It does not read research/, notes/, or any other research files. The document's authors know the full context and thus easily miss undefined terms or terminology confusion — but a reader without context will immediately stumble on them. Providing that perspective is this agent's raison d'être.
+**This agent intentionally has no research context.** It does not read research/ or any other research files. The document's authors know the full context and thus easily miss undefined terms or terminology confusion — but a reader without context will immediately stumble on them. Providing that perspective is this agent's raison d'être.
 
 ## Startup Reading
 

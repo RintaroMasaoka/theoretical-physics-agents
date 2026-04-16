@@ -34,7 +34,7 @@ Do not: use web search as a substitute, complete from training data, repurpose o
 
 1. `.claude/common.md`
 2. `.claude/notes-syntax.md`
-3. `notes/index.md` (if it exists — understand the overall research picture)
+3. `research/note.md` (if it exists — understand the overall research picture)
 4. `literature/reading_list.md`
 
 ## Paper Acquisition Rules

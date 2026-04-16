@@ -25,7 +25,7 @@ PI specifies one of two modes when dispatching the task. If PI does not specify 
 1. `.claude/common.md`
 2. The target attempt file (PI provides the path)
 
-**Do NOT read** research/note.md, research/story.md, other research/ tree files, or notes/. The purpose is to evaluate the derivation purely on internal consistency — without knowing the research intent, expected outcome, or broader narrative. This eliminates expectation bias: you judge whether the mathematics is correct, not whether it matches what the research hopes to show.
+**Do NOT read** research/note.md, research/story.md, or other research/ tree files. The purpose is to evaluate the derivation purely on internal consistency — without knowing the research intent, expected outcome, or broader narrative. This eliminates expectation bias: you judge whether the mathematics is correct, not whether it matches what the research hopes to show.
 
 ### Contextual Mode (for logical/value judgments)
 
@@ -35,7 +35,7 @@ PI specifies one of two modes when dispatching the task. If PI does not specify 
 3. `.claude/notes-syntax.md`
 4. `research/note.md` + `research/story.md` (root — understand the research narrative and the node's position)
 5. Relevant note.md and story.md files along the ancestor chain in research/ (PI provides paths)
-6. `notes/index.md` (understand research context; refer to topic files in `notes/` as needed)
+6. `concepts/` (browse concept definitions as needed for term definitions)
 7. The target attempt file (PI provides the path)
 
 The purpose is to evaluate whether the argument is sound **in the context of the overall research narrative** — whether it is sufficient for its intended role in the story, whether implicit assumptions are compatible with the broader framework, and whether the argument addresses the right question.
@@ -65,7 +65,7 @@ Not all claims can be mechanically verified. Claims that cannot be verified mech
 
 **Think for yourself.** Judge whether the attempt's reasoning is sound based on the quality of the reasoning itself, not on agreement with other documents.
 
-PI's notes (`notes/`) are contextual information indicating the current state of research, not a yardstick for measuring the attempt. When the attempt contradicts the notes, evaluate independently which reasoning is more robust. Give equal consideration to the possibility that the attempt is correct.
+PI's notes in the research tree (note.md files) are contextual information indicating the current state of research, not a yardstick for measuring the attempt. When the attempt contradicts the notes, evaluate independently which reasoning is more robust. Give equal consideration to the possibility that the attempt is correct.
 
 ### Verification Criteria
 

@@ -71,7 +71,7 @@ logs/
 2. Read `logs/last_write_session.md` (if it exists)
 3. Read `research/note.md` (thesis, background) + `research/story.md` (narrative structure) + `research/principles.md`
 4. Navigate the tree: `ls research/` → read children's note.md (SoT) for established knowledge, and log.md frontmatter for kind/status
-5. Read `notes/index.md` (read topic files as needed)
+5. Browse `concepts/` for relevant concept definitions as needed
 6. Read `manuscript/outline.md` (if it exists)
 7. Check existing section drafts (Glob `manuscript/sections/*.md`)
 
@@ -114,7 +114,7 @@ Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_
 ```
 
 Dynamic data by agent:
-- **outliner**: (no additional data — reads research/ tree and notes/ on its own)
+- **outliner**: (no additional data — reads research/ tree and concepts/ on its own)
 - **writer**: `Assigned section: #{N} {title} (slug: {slug})` / `Related nodes: {paths}` / `Evidence: {paths}` / For revisions: `Review report: {path}`
 - **reviewer**: `Target section: manuscript/sections/{N}_{slug}.md` / `Related nodes: {paths}`
 - **finalizer**: `Audit report: {path}` (if available)

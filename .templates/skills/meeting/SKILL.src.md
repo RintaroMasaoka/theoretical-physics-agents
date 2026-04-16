@@ -54,7 +54,7 @@ Research theme has not been configured (`research/log.md` does not exist). Tell 
 Review the overall research direction and open discussion.
 
 ```
-Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + research/focus.md + notes/index.md + latest meeting log
+Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + research/focus.md + latest meeting log
     ▼ Navigate the tree: ls research/ to see top-level children, read their log.md for status (note.md if exists)
     ▼ If agenda.md exists (agenda accumulated by PI during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
     ▼ Present progress report

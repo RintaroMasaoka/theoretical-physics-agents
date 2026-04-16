@@ -34,8 +34,7 @@ Read in this order:
 3. `.claude/notes-syntax.md`
 4. `research/note.md` + `research/story.md` + `research/principles.md` — the root
 5. Navigate the research/ tree: `ls` subfolders, read note.md + log.md + story.md files
-6. `notes/index.md` — navigate to topic notes as needed
-7. `concepts/` — scan existing concept notes
+6. `concepts/` — scan existing concept notes
 8. Recent worker deliverables (if PI provides paths)
 
 ---
@@ -61,7 +60,7 @@ For each log.md that needs compression:
    - `Current State`: Rewritten to reflect the present understanding concisely
    - `Evidence`: All entries preserved (per preservation invariant)
    - `Revisions`: All entries preserved (same)
-   - Content already promoted to note.md or notes/: summarize in one line with a link
+   - Content already promoted to note.md: summarize in one line with a link
    - Operational detail from past sessions (old seed counts, superseded measurements): remove if no longer actionable
 
 Git handles version history, so no explicit archive step is needed.
@@ -100,7 +99,7 @@ Scan for claims that no longer match the current research scope, thesis, or find
 - Add `[[...]]` links wherever a note references a concept, method, or result discussed elsewhere
 - Add tags (`#tag-name`) for cross-cutting classification
 - Verify existing wiki-links point to existing targets (note renames break links)
-- Ensure index.md has an entry for every note; reorganize thematic grouping as needed
+- Verify wiki-links point to valid targets in `concepts/` or research tree note.md files
 
 ### Concept note hygiene
 
@@ -116,7 +115,7 @@ After editing, reread each changed note from a first-time reader's perspective. 
 Perform these on every dispatch:
 - Broken `[[...]]` links
 - Terminology consistency across files
-- Orphan notes missing from index.md
+- Orphan concept notes not referenced from any research tree file
 - References to deliverable states that have changed
 - Split notes that have grown to cover multiple distinct topics
 
@@ -128,11 +127,11 @@ Perform these on every dispatch:
 - Nesting structure (folder hierarchy) — PI's responsibility
 - Content of `research/story.md` or `research/principles.md` — changes only through `/meeting`
 
-If a node's description appears inconsistent with the knowledge in notes/, flag it for PI — do not change it.
+If a node's description appears inconsistent with the knowledge in the research tree, flag it for PI — do not change it.
 
 ## Judgment Scope
 
-Topic notes (`notes/`) and concept notes (`concepts/`) may be freely edited for quality, coherence, and accuracy. The curator's mandate covers **presentation quality and factual accuracy** — rewriting for clarity, fixing stale claims, improving structure. It does **not** cover reinterpretation of results — when uncertain whether an analytical conclusion should be changed, flag for PI rather than rewriting.
+Concept notes (`concepts/`) may be freely edited for quality, coherence, and accuracy. The curator's mandate covers **presentation quality and factual accuracy** — rewriting for clarity, fixing stale claims, improving structure. It does **not** cover reinterpretation of results — when uncertain whether an analytical conclusion should be changed, flag for PI rather than rewriting.
 
 ## Output
 

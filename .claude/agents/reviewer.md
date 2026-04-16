@@ -18,7 +18,7 @@ Annotate problem areas with strikethrough `~~...~~` or comments `[* ...]` as wit
 3. `.claude/notes-syntax.md`
 4. `research/note.md` + `research/story.md` (root — check tree structure and status)
 5. Relevant note.md files in research/ tree (for nodes referenced in the section)
-6. `notes/index.md` (+ read topic files from `notes/` relevant to the target section)
+6. `concepts/` (browse concept definitions relevant to the target section)
 7. `manuscript/outline.md`
 8. `manuscript/conventions.md`
 
