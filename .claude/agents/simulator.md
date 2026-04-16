@@ -149,7 +149,7 @@ Write `results/{category}/{slug}/REPORT.md` — a self-contained explanation of 
 
 ## Output
 
-**Deliverable**: `work/{timestamp}_simulation_{slug}.md`
+**Deliverable**: `logs/{timestamp}_simulation_{slug}.md`
 
 Deliverables often serve as the sole record of a simulation campaign, so they must be readable independently. Embed figures inline so the document reads as a complete narrative, not a collection of file references.
 

@@ -95,7 +95,7 @@ Record findings and any resulting changes in the Refinement Report section of th
 
 ### 5. Output
 
-Deliverable: `work/engine_{slug}.md`
+Deliverable: `logs/engine_{slug}.md`
 
 Structure:
 1. **Module Overview**: Provided features and API
@@ -107,5 +107,5 @@ Structure:
 ## Constraints
 
 - Follow common rules in `.claude/common.md`
-- Write only to `simulations/lib/` and `simulations/test/` (deliverables go in `work/`). Exception: updating call sites in `simulations/src/` when refactoring APIs
+- Write only to `simulations/lib/` and `simulations/test/` (deliverables go in `logs/`). Exception: updating call sites in `simulations/src/` when refactoring APIs
 - Do not write task-specific measurement code — that is simulator's job (per the boundary criterion in Module Design Principles)

@@ -5,11 +5,21 @@
 PI provides file paths rather than inline data. Read only the sections you need from those files — this keeps both PI's and your context windows efficient.
 
 - **Input**: Receive task instructions and file paths from PI; Read the necessary data yourself
-- **Output**: Write deliverables to files and return `DONE: {deliverable path}` as the Task return value
+- **Output**: Write deliverables to files and return `DONE: {deliverable path}` as the Task return value. (The log file is written alongside but does not need to be returned.)
 
-## Logs (Progress Records for Humans)
+## Deliverables and Logs
 
-Write a work summary to `logs/_DRAFT_{agent}.md` (e.g., `logs/_DRAFT_reader.md`). A system hook automatically renames the file with the correct timestamp (`YYMMDD_HHMM`) after you write it — do not run `date` yourself. The deliverable contains your analytical output. The log is a brief narrative summary of what you did, what you found, and any issues encountered — it helps the human researcher audit the research process. Logs are not a decision input for PI.
+Worker output goes to `logs/` — all worker output is provisional and stored here until PI promotes verified results to the research tree.
+
+Each worker produces two files:
+
+1. **Deliverable**: Your substantive analytical content — derivations, reading notes, data, simulation results. This is the primary output PI evaluates. Filename: `logs/_DRAFT_{type}_{slug}.md`. Type is one of: `reading`, `attempt`, `simulation`, `review`, `audit`, `engine`. Slug is the arXiv ID for paper-based work (e.g., `0804-4527`), or a short descriptive phrase otherwise (e.g., `surface_qbt`).
+
+2. **Log**: A short process summary — what you attempted, what you found, blockers encountered. This helps the human researcher audit workflow. Filename: `logs/_DRAFT_{agent}.md` (e.g., `logs/_DRAFT_reader.md`).
+
+A system hook automatically renames `_DRAFT_` files with the correct timestamp (`YYMMDD_HHMM`) after you write them — do not run `date` yourself.
+
+Deliverables and logs are provisional. PI independently verifies their content before incorporating results into reports or the research tree (see `.claude/research-tree.md`).
 
 ## Constraints
 

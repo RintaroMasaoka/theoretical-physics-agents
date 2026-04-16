@@ -109,7 +109,7 @@ Do not repeat the same approach as before. Address noted weaknesses head-on, car
 
 ## Output
 
-**Deliverable**: `work/{timestamp}_attempt_{slug}.md`
+**Deliverable**: `logs/{timestamp}_attempt_{slug}.md`
 
 Structure is flexible, but must include:
 - Target item ID and kind

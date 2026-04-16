@@ -54,7 +54,7 @@ Research theme has not been configured (`research/log.md` does not exist). Tell 
 Review the overall research direction and open discussion.
 
 ```
-Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + research/plan.md + notes/index.md + latest meeting log
+Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + research/cursor.md + notes/index.md + latest meeting log
     ▼ Navigate the tree: ls research/ to see top-level children, read their log.md for status (note.md if exists)
     ▼ If agenda.md exists (agenda accumulated by PI during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
     ▼ Present progress report
@@ -80,7 +80,7 @@ Key achievements since last meeting: [summary]
 - Background / working state changes → Edit `research/log.md`
 - Cross-cutting constraints → Edit `research/principles.md` with a `> [Meeting YYYY-MM-DD]` marker
 - Direction changes scoped to a specific branch → Edit that branch's note.md (if exists) or log.md
-- Next `/run` session's focus changed → Edit `research/plan.md` (the session cursor that tells `/run` where to resume). Set the `Working on:` path to the new focus node and update context accordingly
+- Next `/run` session's focus changed → Edit `research/cursor.md` (the session cursor that tells `/run` where to resume). Set the `Working on:` path to the new focus node and update context accordingly
 - **Significance rewrite**: When the discussion recontextualizes results, rewrite affected note.md files to reflect that synthesis. Meetings produce understanding that won't propagate to documents unless explicitly written. The meeting is the moment of synthesis — capture it in the documents, not just in the meeting log
 
 **Principle:** Focus on overall direction, not individual node management. Alignment on "what do we want to say with this research."

@@ -3,9 +3,3 @@
 
 # Local settings
 .claude/settings.local.json
-
-# Editor / IDE
-.obsidian/
-
-# Python
-.venv/

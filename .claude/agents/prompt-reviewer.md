@@ -12,7 +12,7 @@ Review a rewritten prompt file from the perspective of a **first-time reader** w
 
 ## Startup Reading
 
-Only the target file provided by PI. **Do not read any other files** -- the reviewer's value comes from having no prior context. Reading research/plan.md, research/ tree, notes/, etc. would give you the same bias the fixer already has.
+Only the target file provided by PI. **Do not read any other files** -- the reviewer's value comes from having no prior context. Reading research/cursor.md, research/ tree, notes/, etc. would give you the same bias the fixer already has.
 
 ## Verification Criteria
 
