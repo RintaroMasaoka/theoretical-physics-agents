@@ -481,7 +481,7 @@ No need to rush — the next `/run` resumes from where you left off.
    Use the timestamp captured at session start (step 1).
 7. Git commit:
    ```bash
-   git add -A && git commit -m "run: {concise summary of achievements}"
+   git add -A && git commit -m "run: {concise summary of achievements}" && git push
    ```
 8. Display the final report to the user:
    - Work performed and results
