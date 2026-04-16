@@ -1,37 +1,25 @@
 ---
 name: fetch-arxiv
-description: "Fetch arXiv papers (PDF + LaTeX source) via GitHub Actions relay. Usage: /fetch-arxiv 2301.00001 [2301.00002 ...]"
+description: "Fetch arXiv papers (PDF + LaTeX source). Usage: /fetch-arxiv 2301.00001 [2301.00002 ...]"
 user-invocable: true
 argument-hint: "ARXIV_ID [ARXIV_ID ...]"
 ---
 
 # fetch-arxiv — arXiv Paper Fetcher
 
-Fetches arXiv papers by relaying the download through GitHub Actions, bypassing cloud environment network restrictions.
+Fetches arXiv papers (PDF, LaTeX source, BibTeX). The script tries direct download first (~10s per paper) and falls back to a GitHub Actions relay (1-3 min) when direct network access to arXiv is blocked. The fallback triggers a GitHub Actions workflow that downloads the paper from GitHub's infrastructure, pushes the result to a temporary branch (`arxiv-fetch`), and the script pulls it locally. This is fully automatic — callers do not need to know which method is used.
 
 Arguments: $ARGUMENTS
 
-## Mechanism
-
-```
-[This environment]                    [GitHub Actions]              [arXiv]
-   push request.json       ──>       trigger workflow     ──>     download PDF + source
-   to arxiv-fetch branch              extract LaTeX
-                                      push results        ──>     orphan branch
-   poll & extract           <──       (force-push)
-```
-
 ## Execution
-
-Run the fetch script with the arXiv IDs from the arguments:
 
 ```bash
 bash .scripts/fetch-arxiv.sh $ARGUMENTS
 ```
 
-**Important**: This command takes 1-3 minutes (GitHub Actions execution + polling). The script handles everything automatically: push request, poll for completion, extract results.
+The script handles download, extraction, and BibTeX merge into `literature/references.bib`. Sub-agents can invoke the same command. Before fetching, check if `literature/papers/{id}/` already exists to avoid redundant downloads. After fetching, the main `.tex` file is the one containing `\documentclass`.
 
-Upper limit: 20 papers per fetch (GitHub Actions artifact size and arXiv rate limits). If more are needed, split into multiple fetches.
+Upper limit: 20 papers per fetch (arXiv rate limits and GitHub Actions job duration). The script will reject more than 20 IDs. If more are needed, split into multiple fetches.
 
 ## After Fetch
 
@@ -39,24 +27,13 @@ Upper limit: 20 papers per fetch (GitHub Actions artifact size and arXiv rate li
 2. Papers are placed in `literature/papers/{id}/`:
    - `paper.pdf` — PDF file
    - `*.tex`, `*.bib`, `*.sty`, etc. — LaTeX source files
-3. The main `.tex` file is the one containing `\documentclass`
 
-## For Sub-agents
+## Error Handling
 
-Sub-agents can invoke the fetch script directly via Bash when direct download (curl/WebFetch) fails due to network restrictions:
-
-```bash
-bash .scripts/fetch-arxiv.sh {arxiv_id}
-```
-
-The script manages the `arxiv-fetch` branch internally; callers do not need to switch branches or manage git state.
-
-## Error Cases
-
-- **Timeout**: If the script times out, suggest the user check GitHub Actions status
-- **Paper not found**: If the arXiv ID is invalid, the result will show no files for that ID
-- **Network failure**: The script retries git fetch on failure. If persistent, retry the whole command
+- **Timeout**: Record the failure in the session output and continue. The user can review GitHub Actions status during `/meeting` if needed
+- **Paper not found**: The result will show no files for that ID
+- **Network failure**: The script retries automatically. If all retries fail, record the failure and move on rather than blocking execution
 
 ## Cleanup
 
-The remote `arxiv-fetch` branch is ephemeral and requires no manual cleanup. Local files in `literature/papers/` can be deleted freely when no longer needed.
+The remote `arxiv-fetch` branch is ephemeral and force-pushed on each run. No manual cleanup is needed.

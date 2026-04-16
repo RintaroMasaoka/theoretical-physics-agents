@@ -31,13 +31,6 @@ STALE_FILES=(
   "configure.mjs"       # .scripts/configure.mjs に移動済み
   "scripts/"            # .scripts/ にリネーム済み
   "templates/"          # .templates/ にリネーム済み
-  ".agents/"            # .claude/skills/ に移動済み
-  "concepts/"           # プロジェクト固有
-  "literature/"         # プロジェクト固有
-  "logs/"               # プロジェクト固有
-  "meetings/"           # プロジェクト固有
-  "research/"           # プロジェクト固有
-  "work/"               # プロジェクト固有
 )
 
 UPSTREAM_REMOTE="upstream"
