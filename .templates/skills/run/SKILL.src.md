@@ -138,6 +138,8 @@ research/                 # Research tree — the single knowledge structure
   plan.md                 #   Root: strategy and decomposition
   log.md                  #   Root: background, working state (ladder)
   focus.md               #   Session cursor: "work here now"
+  lib/                    #   Shared simulation framework (engine-builder)
+    test/                 #     Module tests
   {Branch Name}/          #   Research direction (Title Case with spaces)
     note.md               #     Verified knowledge (free-form prose)
     plan.md               #     (optional) Strategy and approach for this branch
@@ -145,6 +147,9 @@ research/                 # Research tree — the single knowledge structure
     report_{slug}.md      #     (optional) PI-verified report (format: see .claude/research-tree.md)
     dead_ends.md          #     (optional) Failed approaches and lessons
     directives.md         #     (optional) Subtree-specific rules from meetings
+    src/                  #     Measurement scripts and descriptions (simulator)
+    data/                 #     Simulation data (simulator)
+    images/               #     Figures and visualizations (simulator)
     {Child Name}/
       log.md              #     Leaf: may only have log.md (no note.md yet)
 directives.md             # Project-wide methodology rules from meetings
@@ -154,13 +159,6 @@ literature/
   reading_list.md
   papers/{arxiv_id}/
 manuscript/               # Paper (managed by /write)
-simulations/              # Numerical computations
-  lib/                    # Framework modules (engine-builder)
-  src/                    # Measurement scripts (simulator)
-  results/                # Data, figures, reports
-  results/archive/        # Retired results
-  test/                   # Module tests
-  src/archive/            # Retired scripts
 logs/                     # Worker deliverables + chronological history
   {timestamp}_{type}_{slug}.md  # Worker deliverables (reading notes, attempts, etc.)
   {timestamp}_{agent}.md  #   Worker logs (brief work summaries)
@@ -300,7 +298,7 @@ PI works **depth-first within the cursor's subtree**. The general movement: dive
 - Open or active gaps → **researcher** (with cognitive mode appropriate to kind)
 - Verify researcher's attempt → **critic** (PI decides accept/resubmit/pivot)
 - Further research needed after verification → **researcher** (resubmit with previous notes and feedback)
-- Build/extend/refine simulation framework → **engine-builder** (`simulations/lib/`, or "refine lib" for self-directed improvement)
+- Build/extend/refine simulation framework → **engine-builder** (`research/lib/`, or "refine lib" for self-directed improvement)
 - Numerical verification → **simulator** (using existing `lib/` modules)
 - Verify note/plan readability → **self-check** (no research context — catches what PI overlooks)
 - Build/maintain concept definitions → **concept-checker**
@@ -362,7 +360,7 @@ Dynamic data by agent:
 - **researcher**: `Target: research/{path}/ — {description}` / `kind: {kind}` / `Context: {role within parent's children decomposition}` / previous attempt path / PI's critique
 - **critic**: `Target: research/{path}/ — {description}` / `attempt path: {path}` / `kind: {kind}` / `mode: blind` or `mode: contextual`
 - **engine-builder**: `Model definition` / `Computational method` / `Required features` / existing module path. Or `"Refine lib"` for self-directed improvement
-- **simulator**: `Target: research/{path}/` / `Physical setup` / `Mathematical definition of observables` / `Success criteria` / `Deliverable number: {N}` / `simulations/lib/` module list / `Existing scripts in src/: {list}`
+- **simulator**: `Target: research/{path}/` / `Physical setup` / `Mathematical definition of observables` / `Success criteria` / `Deliverable number: {N}` / `research/lib/` module list / `Existing scripts in src/: {list}`
 - **curator**: Optionally note what changed: `Nodes updated: {paths}` / `Notes touched: {files}`
 
 ### 3. Result Collection & State Update
@@ -438,7 +436,7 @@ No need to rush — the next `/run` resumes from where you left off.
 
 **Do not suggest transitioning to `/write`**. The user decides when research is mature enough for writing.
 
-1. **Simulation housekeeping** (if simulator ran): Check `simulations/src/` for superseded scripts. Move to `src/archive/` — never delete. Record moves in `logs/last_session.md`
+1. **Simulation housekeeping** (if simulator ran): Check research nodes' `src/` for superseded scripts. Move to `src/archive/` — never delete. Record moves in `logs/last_session.md`
 2. **Knowledge base coherence** (if log.md files accumulated significant changes): Dispatch **curator** to update note.md (SoT) files where needed, or quick manual check if changes were minor
 3. If there are items to discuss in a meeting, Write to `agenda.md`:
    ```markdown

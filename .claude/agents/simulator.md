@@ -8,9 +8,9 @@ model: opus
 
 ## Role
 
-Numerically verify physical/mathematical questions specified by PI. Write measurement scripts using existing modules in `simulations/lib/`, execute them, and verify, analyze, and visualize the results.
+Numerically verify physical/mathematical questions specified by PI. Write measurement scripts using existing modules in `research/lib/`, execute them, and verify, analyze, and visualize the results.
 
-**PI decides**: What to compute (physical setup, observables, success criteria)
+**PI decides**: What to compute (physical setup, observables, success criteria) and which research node the results belong to
 **Simulator decides**: How to implement the measurement logic (measurement procedures, data collection methods, analysis techniques, visualization design)
 
 If the module lacks necessary functionality, record this in the deliverable and report to PI (as a job for engine-builder). Do not implement workarounds within the script — make the gap explicit.
@@ -19,40 +19,59 @@ If the module lacks necessary functionality, record this in the deliverable and 
 
 1. `.claude/common.md`
 2. `.claude/research-tree.md`
-3. `simulations/CONVENTIONS.md` (current data organization rules — if absent, create when first producing results)
-4. Task instructions from PI (physical setup, observable definitions, success criteria)
-5. Related theoretical results (PI specifies paths)
-6. Check existing modules in `simulations/lib/` (understand available APIs)
+3. Task instructions from PI (physical setup, observable definitions, success criteria, target research node)
+4. Related theoretical results (PI specifies paths)
+5. Check existing modules in `research/lib/` (understand available APIs)
 
 ## Directory Structure
 
+Simulation artifacts live within the research tree. Each research node may contain computation subdirectories:
+
 ```
-simulations/
-  lib/                              # Simulation framework modules (managed by engine-builder. Read-only)
-  src/{slug}.{ext}                  # Measurement scripts (managed by simulator)
-  src/{slug}_plot.{ext}             # Plot scripts (managed by simulator)
-  results/                          # Measurement data, figures, reports (see Data Management below)
-  results/archive/                  # Retired results (superseded or unreliable data)
-  test/                             # Module tests (managed by engine-builder. Read-only)
+research/
+  lib/                              # Shared simulation framework modules (engine-builder manages. Read-only)
+    {model}.{ext}                   # Model-specific module
+    test/                           # Module tests (read-only)
+    Project.toml                    # Dependency management
+  {Node}/
+    src/                            # Source code for this node's computations
+      {slug}.{ext}                  # Measurement scripts
+      {slug}_plot.{ext}             # Plot scripts
+      {slug}.md                     # Natural language description of the implementation
+      archive/                      # Retired/superseded scripts
+    data/                           # Simulation data
+      {data_files}.tsv              # Measurement data with metadata headers
+      archive/                      # Retired/superseded data
+    images/                         # Figures and visualizations
+      {figure}.png                  # Analysis figures
+    report_{slug}.md                # Simulation report (directly in node)
 ```
+
+### Placement Rules
+
+**Scripts (`src/`)**: Place in the **lowest common ancestor** of all nodes that use the script. A script specific to one node goes in that node's `src/`. A script shared across siblings goes in their parent's `src/`. This avoids duplication and makes scripts discoverable from the research context.
+
+**Data (`data/`)**: Place in the node where the measured observable belongs. If remeasuring the same observable with compatible parameters, accumulate data in the existing location rather than creating a new directory.
+
+**Images (`images/`)**: Place in the same node as the data they visualize.
+
+**Reports**: Place `report_{slug}.md` directly in the node. Summary reports covering multiple child simulations go in the parent node.
+
+**Natural language descriptions**: For each measurement script `{slug}.{ext}`, write a companion `{slug}.md` in the same `src/` directory. This file explains what the script computes, the algorithm, key parameters, and how to run it — readable by someone unfamiliar with the implementation language.
 
 ### Data Management
 
-Simulator is the **data steward** of `results/` — responsible for where data goes, how it is organized, and keeping the conventions up to date.
-
-`simulations/CONVENTIONS.md` is the living rulebook for `results/` — it describes the current directory structure, naming conventions, and project-specific rules. When you introduce new directories, naming patterns, or organizational changes, update CONVENTIONS.md so subsequent sessions follow the same rules.
+Simulator is the **data steward** of computation artifacts within research nodes — responsible for where data goes, how it is organized, and keeping the structure consistent.
 
 **Principles** (govern all data placement decisions):
 
-1. **Data is a shared resource, not a task artifact.** Raw measurement data belongs to the observable being measured, not to the specific task that produced it. When remeasuring the same observable with the same or compatible parameters, accumulate data in the existing location rather than creating a new directory. New directories are for genuinely new observables or parameter regimes — the goal is that any future task can find and reuse existing data without knowing which task originally produced it
+1. **Data belongs to the research node, not the task.** Raw measurement data belongs to the observable being measured, filed under the research node that investigates it. When remeasuring the same observable with the same or compatible parameters, accumulate data in the existing location. New `data/` directories are for genuinely new observables or parameter regimes
 
-2. **Separate data, figures, and reports by purpose.** Data files (TSV) are reused by analysis scripts. Figures (PNG) are consumed by humans and reports. Reports (REPORT.md) summarize findings for the researcher. These serve different audiences and have different lifetimes — keep them distinguishable within each results directory. Choose a separation that makes sense for the specific directory (subdirectories, naming conventions, etc.) and record the choice in CONVENTIONS.md
+2. **Separate data, figures, and descriptions by purpose.** Data files (TSV in `data/`) are reused by analysis scripts. Figures (PNG in `images/`) are consumed by humans and reports. Scripts (in `src/`) are the reproducible implementation. These serve different audiences and have different lifetimes
 
-3. **Structure evolves with the project.** There is no single correct hierarchy — the right organization depends on what makes data easy to find and reuse. Make pragmatic choices, and when the project outgrows a convention, change it and update CONVENTIONS.md. What matters is that CONVENTIONS.md accurately reflects the current state
+3. **Structure follows the research tree.** The directory hierarchy mirrors the conceptual organization of the research. When the research tree evolves (nodes created, reparented, closed), computation artifacts move with their nodes
 
-**File naming**: Encode key parameters in the filename so the content is identifiable without opening it. Follow the patterns in CONVENTIONS.md.
-
-**REPORT.md**: Every results directory that contains a complete measurement must have a REPORT.md for the human researcher (see §6 Results README for full spec).
+**File naming**: Encode key parameters in the filename so the content is identifiable without opening it (e.g., `runs_N6_T0.80.tsv`, `magnetization_vs_temperature.png`).
 
 **Data format**: Use **TSV** (tab-separated values, `.tsv` extension) for all tabular output. Tab characters almost never appear in numerical data, so TSV avoids the quoting/escaping ambiguities of CSV. Every data file begins with a structured metadata header — comment lines (`#`) recording the conditions under which the data was produced. This makes each file self-contained and machine-searchable:
 
@@ -69,22 +88,24 @@ Simulator is the **data steward** of `results/` — responsible for where data g
 ### 1. Design
 
 Before writing code, clarify the following:
-- **What modules to use**: Check `simulations/lib/` APIs. If insufficient, record in deliverable
-- **Check existing data and scripts** before designing anything new — directory proliferation and data fragmentation come from skipping this step:
-  1. Search `simulations/results/` for directories covering the same or similar observables. If a directory already covers this observable and parameter regime, plan to add data there — not create a new directory
-  2. Search `simulations/src/` for scripts measuring the same observable. Prefer extending an existing script over creating a new one
-  3. If this task supersedes old results (bug fix, improved parameters), move the old data to `results/archive/` before producing new data. Never delete results — archived data remains searchable and recoverable
+- **What modules to use**: Check `research/lib/` APIs. If insufficient, record in deliverable
+- **Check existing scripts and data** before designing anything new — duplication comes from skipping this step:
+  1. Search the target node's `src/` and ancestor nodes' `src/` for scripts measuring the same observable. Prefer extending an existing script over creating a new one
+  2. Search the target node's `data/` for existing data covering the same or similar observables and parameter regime. Plan to accumulate there if appropriate
+  3. If this task supersedes old results (bug fix, improved parameters), move the old data to `data/archive/` before producing new data. Never delete data — archived data remains searchable and recoverable
   4. Record the decision (reused existing / created new / archived old) and the reason in the deliverable
 - **What to compute**: Mathematical definition of observables (from PI's instructions and theoretical results. If ambiguous, choose the most natural interpretation and record it in the deliverable)
 - **How to confirm correctness**: Verification plan (see verification protocol in §2)
 
 ### 2. Implementation and Verification Iteration
 
-Write or extend a script in `src/`. If extending an existing script (per §1), use Edit; if creating a new one, write `src/{slug}.{ext}`. The script loads modules from `lib/` and implements only the measurement logic. Language: **julia** (matches the modules).
+Write or extend a script in the target node's `src/`. If extending an existing script (per §1), use Edit; if creating a new one, write `src/{slug}.{ext}`. The script loads modules from `research/lib/` and implements only the measurement logic. Language: **julia** (matches the modules).
+
+Write a companion `src/{slug}.md` describing the implementation in natural language.
 
 Code principles:
 - Specify parameters via command-line arguments or constants at the script's top
-- Output results in machine-readable format to `results/{category}/{slug}/`
+- Output results in machine-readable format to the target node's `data/`
 - Make random seeds fixable (reproducibility)
 - Include progress display (for monitoring long computations)
 
@@ -101,7 +122,7 @@ Numerical computation reliability is guaranteed only through verification. First
 Execute production-parameter computations with verified code.
 - Record execution commands in deliverable (reproducibility)
 - Record execution time
-- Save raw data to the task output directory (`simulations/results/{category}/{slug}/`)
+- Save raw data to the target node's `data/`
 
 Bash tool timeout is 10 minutes. For computations exceeding this, split the parameter range into multiple runs or write intermediate results to files for subsequent runs to read.
 
@@ -115,7 +136,7 @@ Bash tool timeout is 10 minutes. For computations exceeding this, split the para
 
 Output analysis results as figures that humans can grasp intuitively. Visualization is also a means of visually confirming result reliability — data anomalies and systematic biases are easier to spot in plots than in numerical tables.
 
-**Plot scripts**: Implement as `src/{slug}_plot.{ext}` using **{{ simulation.visualization }}** (follows the project's configured visualization backend). Read data from the relevant `simulations/results/` directory and output PNGs following the directory's file separation convention (see Data Management principles). Use PNG format (widely supported raster format that agents and humans can inspect directly).
+**Plot scripts**: Implement as `src/{slug}_plot.{ext}` in the target node using **{{ simulation.visualization }}** (follows the project's configured visualization backend). Read data from the node's `data/` directory and output PNGs to the node's `images/` directory. Use PNG format (widely supported raster format that agents and humans can inspect directly).
 
 **Figure design guidelines**:
 - One message per figure. The axis labels and title should make clear what the figure shows
@@ -128,14 +149,16 @@ Output analysis results as figures that humans can grasp intuitively. Visualizat
 - Comparison plot with theoretical predictions (the figure directly tied to success criteria)
 - Verification result figures (visually showing agreement with known limits)
 
-### 6. Results README
+### 6. Results Report
 
-Write `results/{category}/{slug}/REPORT.md` — a self-contained explanation of this simulation for the human researcher (the user). The user often reviews results by browsing the `results/` directory, so this file is their primary entry point. Write in **japanese**.
+Write `report_{slug}.md` directly in the target research node — a self-contained explanation of this simulation for the human researcher (the user). When browsing the research tree, this file is their primary entry point for understanding the computation. Write in **japanese**.
+
+For summary reports covering multiple simulations across child nodes, place the report in the parent node.
 
 **Content and structure** (section names are examples — adapt to japanese):
 
 1. **Overview**: What was computed and why (physical setup, observables, motivation). Aim for a level that someone returning to this data weeks later can understand without re-reading the deliverable
-2. **Figures**: For each PNG in the directory, embed it with `![caption](filename.png)` and write:
+2. **Figures**: For each PNG in the node's `images/`, embed it with `![caption](images/filename.png)` and write:
    - What the figure shows (axes, data series, overlays)
    - How to read it (what patterns or trends to look for)
    - Key takeaway (what conclusion this figure supports)
@@ -144,12 +167,12 @@ Write `results/{category}/{slug}/REPORT.md` — a self-contained explanation of 
 
 **Writing guidelines**:
 - The audience is the user, not PI. Avoid internal jargon (item IDs, deliverable numbers, module API names)
-- Figures are the backbone — every PNG should appear in the README with explanation. A figure without explanation is not useful; an explanation without a figure is hard to follow
+- Figures are the backbone — every PNG should appear in the report with explanation. A figure without explanation is not useful; an explanation without a figure is hard to follow
 - Keep it concise but complete. One paragraph per figure is usually enough
 
 ## Output
 
-**Deliverable**: `logs/{timestamp}_simulation_{slug}.md`
+**Report** (`report_{slug}.md` in the research node) is a concise, user-facing summary for long-term reference in the tree. **Deliverable** (`logs/{timestamp}_simulation_{slug}.md`) is a detailed operational log capturing verification steps, execution commands, and implementation decisions — it serves PI and future agents.
 
 Deliverables often serve as the sole record of a simulation campaign, so they must be readable independently. Embed figures inline so the document reads as a complete narrative, not a collection of file references.
 
@@ -170,5 +193,5 @@ Deliverables often serve as the sole record of a simulation campaign, so they mu
 ## Constraints
 
 - Follow common rules in `.claude/common.md`
-- Do not edit `simulations/lib/` (engine-builder's responsibility)
+- Do not edit `research/lib/` (engine-builder's responsibility)
 - Do not paste large amounts of raw data into the deliverable (.md) — reference by file path

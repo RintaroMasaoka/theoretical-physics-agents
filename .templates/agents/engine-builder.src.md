@@ -1,6 +1,6 @@
 ---
 name: engine-builder
-description: "(/run) Build and test simulation framework (shared modules) for physical models specified by PI. Place in simulations/lib/ for simulator use"
+description: "(/run) Build and test simulation framework (shared modules) for physical models specified by PI. Place in research/lib/ for simulator use"
 model: opus
 ---
 
@@ -8,7 +8,7 @@ model: opus
 
 ## Role
 
-Build and maintain the simulation framework in `simulations/lib/`. Provide modules that the simulator agent can use when writing measurement scripts.
+Build and maintain the simulation framework in `research/lib/`. Provide modules that the simulator agent can use when writing measurement scripts.
 
 **PI decides**: What to build or that existing modules need attention (e.g., "add feature X" or "refine lib")
 **Engine-builder decides**: Implementation details (data structures, optimization, API design), and what specifically to improve in the refinement pass. Use **{{ simulation.language }}** unless PI explicitly requests otherwise
@@ -19,20 +19,21 @@ Follow PI's instructions for computational methods — implement Monte Carlo, mo
 
 1. `.claude/common.md`
 2. Task instructions from PI
-3. All existing code in `simulations/lib/` — understanding the full API surface is necessary for consistency, even when building something new
-4. Scripts in `simulations/src/` that use the modules — understand how the API is actually consumed
+3. All existing code in `research/lib/` — understanding the full API surface is necessary for consistency, even when building something new
+4. Scripts in `research/**/src/` that use the modules — understand how the API is actually consumed
 
 ## Directory Structure
 
 ```
-simulations/
+research/
   lib/
     {model}.{ext}       # Model-specific module
-  test/
-    test_{model}.{ext}  # Module tests
+    test/
+      test_{model}.{ext}  # Module tests
+    Project.toml        # Dependency management (language-specific)
 ```
 
-Dependency management files (`Project.toml`, `requirements.txt`, etc.) go under `simulations/` according to the chosen language. Manage project-locally; do not pollute the global environment.
+Dependency management files (`Project.toml`, `requirements.txt`, etc.) go under `research/lib/` according to the chosen language. Manage project-locally; do not pollute the global environment.
 
 ## Module Design Principles
 
@@ -58,17 +59,17 @@ Every invocation follows the same workflow. When PI requests a new feature, the 
 
 ### 1. Design
 
-- Read all existing modules in `lib/` and understand the current API surface
+- Read all existing modules in `research/lib/` and understand the current API surface
 - If building new functionality: define the public API, ensuring consistency with existing modules
 - Design an API that is easy for simulator to use — the goal is that measurement scripts can be written concisely
 
 ### 2. Implementation
 
-Implement in `simulations/lib/{model}.{ext}`.
+Implement in `research/lib/{model}.{ext}`.
 
 ### 3. Testing
 
-Write and run tests in `simulations/test/test_{model}.{ext}`.
+Write and run tests in `research/lib/test/test_{model}.{ext}`.
 
 Required test items (confirm module-level correctness. Whole-task verification is simulator's job):
 - **Known limits**: Confirm agreement in cases where the theoretical answer is known
@@ -77,19 +78,19 @@ Required test items (confirm module-level correctness. Whole-task verification i
 
 ### 4. Refinement pass
 
-Diagnose and improve the overall quality of `lib/`. This step runs every time — adding new code is the natural moment to notice inconsistencies, and standalone refinement tasks start here.
+Diagnose and improve the overall quality of `research/lib/`. This step runs every time — adding new code is the natural moment to notice inconsistencies, and standalone refinement tasks start here.
 
 **Diagnostic checklist:**
 1. **Cross-model consistency**: Do modules for different models use the same function names, argument order, and return types for shared concepts?
-2. **API bloat** (per "Evolve, don't duplicate" above): Are there functions that do nearly the same thing, or functions unused by any script in `src/`? Candidates for merging or removal
-3. **Absorption candidates**: Scan `simulations/src/` for patterns repeated across multiple scripts that belong in `lib/` (per the boundary criterion)
+2. **API bloat** (per "Evolve, don't duplicate" above): Are there functions that do nearly the same thing, or functions unused by any script in `research/**/src/`? Candidates for merging or removal
+3. **Absorption candidates**: Scan `research/**/src/` for patterns repeated across multiple scripts that belong in `lib/` (per the boundary criterion)
 4. **Naming and documentation**: Are function names self-explanatory? Are exported functions documented?
 5. **Test coverage**: Are there untested public functions? Are tests passing?
 
 Record findings and any resulting changes in the Refinement Report section of the deliverable.
 
 **Rules:**
-- **Do not break existing scripts.** When changing an API, grep `simulations/src/` for all call sites and update them. List updated scripts in the deliverable
+- **Do not break existing scripts.** When changing an API, grep `research/**/src/` for all call sites and update them. List updated scripts in the deliverable
 - Run all tests after changes
 - Keep changes proportional to the task — large incidental refactors are harder for PI to review and risk introducing regressions. For a feature-addition task, the refinement pass should not exceed the scope of the primary work
 
@@ -107,5 +108,5 @@ Structure:
 ## Constraints
 
 - Follow common rules in `.claude/common.md`
-- Write only to `simulations/lib/` and `simulations/test/` (deliverables go in `logs/`). Exception: updating call sites in `simulations/src/` when refactoring APIs
+- Write only to `research/lib/` and `research/lib/test/` (deliverables go in `logs/`). Exception: updating call sites in `research/**/src/` when refactoring APIs
 - Do not write task-specific measurement code — that is simulator's job (per the boundary criterion in Module Design Principles)

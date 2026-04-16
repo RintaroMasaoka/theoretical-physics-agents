@@ -10,6 +10,22 @@ Research information is organized as a **tree** under `research/`. Every node is
 | `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). PI's working document |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
 | `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting research constraints |
+| `src/` | Computation | Source code and natural language descriptions of implementations |
+| `data/` | Computation | Simulation data (TSV format with metadata headers) |
+| `images/` | Computation | Figures and visualizations |
+| `lib/` | Computation (root only) | Shared simulation framework modules (managed by engine-builder) |
+
+## Computation Artifacts
+
+Research nodes may contain computation subdirectories alongside their text files:
+
+- **`src/`**: Measurement scripts and their natural language descriptions. Each script `{slug}.{ext}` has a companion `{slug}.md` explaining the implementation. Placement rule: **lowest common ancestor** of all nodes that use the script — a script specific to one node goes in that node's `src/`, a script shared across siblings goes in their parent's `src/`
+- **`data/`**: Simulation data in TSV format with structured metadata headers. Placement rule: the node that **owns the investigation** — data belongs to the node where the measured observable is studied
+- **`images/`**: Figures and visualizations. Placement rule: same node as the data they visualize
+
+At the root (`research/`), **`lib/`** contains shared simulation framework modules managed by engine-builder. `lib/test/` contains module tests.
+
+These directories are managed by the simulator agent (see simulator agent definition for conventions). Other agents treat them as read-only context.
 
 ## note.md — Source of Truth
 
@@ -89,6 +105,10 @@ research/
   focus.md            (session cursor: "work here now")
   story.md             (paper narrative structure)
   principles.md        (cross-cutting research constraints)
+  lib/                 (shared simulation framework — engine-builder manages)
+    ClockModel.jl
+    XYModel.jl
+    test/
   Paradox Resolution/
     note.md            (polished: what the paradox is and how it's resolved)
     plan.md            (approach strategy)
@@ -98,8 +118,15 @@ research/
     note.md            (polished knowledge of this direction)
     plan.md            (children decomposition and strategy)
     log.md             (working state, evidence trail)
+    src/               (scripts relevant to this branch)
+      winding_decay.jl
+      winding_decay.md
     Coulomb Escape/
       log.md           (leaf: may only have log.md, no note.md yet)
+      src/             (scripts specific to this leaf)
+      data/            (simulation data for this investigation)
+      images/          (figures generated from this data)
+      report_escape_rate.md
 ```
 
 ## Data Layers Summary
@@ -111,6 +138,10 @@ research/
 | **Research tree — plan** | `research/**/plan.md` | Read-only | Strategy: decomposition rationale, approach decisions, children's roles |
 | **Research tree — log** | `research/**/log.md` | Read-only | Process: current state, evidence chain, kind/status |
 | **Concept definitions** | `concepts/` | Read-only (concept-checker may create entries) | Atomic term definitions, wiki-linked from any file via `[[term]]` |
+| **Computation — framework** | `research/lib/` | Read-only (engine-builder writes) | Shared simulation modules |
+| **Computation — source** | `research/**/src/` | Write (simulator) | Measurement scripts and implementation descriptions |
+| **Computation — data** | `research/**/data/` | Write (simulator) | Simulation data (TSV with metadata headers) |
+| **Computation — figures** | `research/**/images/` | Write (simulator) | Visualizations |
 | **Research notebooks** | `logs/*_{type}_*.md` | Write (own deliverables only) | Worker deliverables: reading notes, attempts, simulations |
 | **Session cursor** | `research/focus.md` | Not relevant to workers | PI's current focus position in the tree |
 | **Session context** | `logs/last_session.md` | Not relevant to workers | PI's volatile work context for session handoff |
