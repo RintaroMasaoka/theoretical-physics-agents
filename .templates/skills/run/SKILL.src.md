@@ -35,7 +35,7 @@ You decide the research direction, delegate work to workers, and drive the proje
 
 ## Information Architecture
 
-Research information forms a **tree** under `research/`. PI navigates this tree depth-first, with `research/cursor.md` as a session cursor that scopes the working context.
+Research information forms a **tree** under `research/`. PI navigates this tree depth-first, with `research/focus.md` as a session cursor that scopes the working context.
 
 ### The Research Tree (`research/`)
 
@@ -78,9 +78,9 @@ Directives cascade: a directive at a higher level applies to all descendants. De
 | **Project directives** | `directives.md` at project root (if exists; outside research/) | Always at session start |
 | **Writing context** | note.md only at each node (ladder files excluded) | /write |
 
-### Session Cursor (`research/cursor.md`)
+### Session Cursor (`research/focus.md`)
 
-research/cursor.md is a lightweight cursor pointing to PI's current position in the tree. It carries:
+research/focus.md is a lightweight cursor pointing to PI's current position in the tree. It carries:
 - Current focus path
 - Short-term context (blockers, immediate next steps)
 - Rewritten at every session end. See Session End for the template
@@ -103,7 +103,7 @@ The three-layer model separates **what we know**, **how we'll proceed**, and **w
 - **log.md** (ladder, overwrite + append): PI's working document. Current State is rewritten when understanding changes. Evidence accumulates but is periodically compressed by curator
 - **dead_ends.md** (ladder, append-only): Failed approaches. Separated from log.md to keep the working document focused
 - **directives.md** (immutable): User-imposed rules. Different authorship model (meetings only)
-- **research/cursor.md** is a singleton (one file for the entire tree) that tracks PI's session position — unlike the per-node files above, it prevents breadth-first thrashing by scoping the working context
+- **research/focus.md** is a singleton (one file for the entire tree) that tracks PI's session position — unlike the per-node files above, it prevents breadth-first thrashing by scoping the working context
 - **last_session.md** carries volatile operational detail that doesn't belong in the tree
 
 ### Knowledge Lifecycle
@@ -137,7 +137,7 @@ research/                 # Research tree — the single knowledge structure
   note.md                 #   Root: verified knowledge (SoT, free-form)
   plan.md                 #   Root: strategy and decomposition
   log.md                  #   Root: background, working state (ladder)
-  cursor.md               #   Session cursor: "work here now"
+  focus.md               #   Session cursor: "work here now"
   {Branch Name}/          #   Research direction (Title Case with spaces)
     note.md               #     Verified knowledge (free-form prose)
     plan.md               #     (optional) Strategy and approach for this branch
@@ -198,7 +198,7 @@ Optional. For nodes where approaches have been tried and failed. Prevents log.md
 **Lesson**: {what to avoid or keep in mind}
 ```
 
-### Session Cursor (`research/cursor.md`)
+### Session Cursor (`research/focus.md`)
 
 A ~10–20 line file. No frontmatter. Overwritten at each session end (see Session End for the template). Points to the current focus node and carries short-term context only.
 
@@ -248,7 +248,7 @@ Update status to `closed`. If the closure is informative, add an entry to the no
 ## Session Start
 
 1. Session log filename: use `logs/_DRAFT_run.md` — a system hook auto-renames it with the correct timestamp on write
-2. Read `research/cursor.md` (the session cursor — where the previous session left off)
+2. Read `research/focus.md` (the session cursor — where the previous session left off)
 3. Read `logs/last_session.md` (if it exists — previous session's operational context)
 4. Read `directives.md` at project root (if it exists — methodology rules from meetings)
 5. Read the **ancestor chain** from root to cursor (inclusive): for each folder in the path, read `note.md` (if exists), `plan.md` (if exists), `log.md`, `dead_ends.md` (if exists), and `directives.md` (if exists)
@@ -263,7 +263,7 @@ Update status to `closed`. If the closure is informative, add an entry to the no
 
 **Initial check:**
 - `research/log.md` does not exist → Display "Please set a theme via `/launch`" and stop
-- `research/cursor.md` does not exist → Read the full tree. Create research/cursor.md pointing to the first active node
+- `research/focus.md` does not exist → Read the full tree. Create research/focus.md pointing to the first active node
 - `concepts/` does not exist → Create `concepts/` and write initial concept notes for core terms
 
 ---
@@ -278,12 +278,12 @@ PI works **depth-first within the cursor's subtree**. The general movement: dive
 
 #### Tree traversal:
 
-1. **Read the cursor**: research/cursor.md tells you where you are. Start there
+1. **Read the cursor**: research/focus.md tells you where you are. Start there
 2. **Check the current node**: Read its log.md and plan.md (if exists) and note.md (if exists). Is there work to do? Are there open/active children to dive into?
 3. **Dive to a leaf**: If children exist, pick the most important one and descend. Repeat until you reach a node with actionable work
 4. **Work at the leaf**: This is where tasks get dispatched (step 2)
 5. **After leaf work completes** (step 3): apply the float-up protocol (see Result Collection)
-6. **When the cursor's subtree completes**: read root `research/note.md` to decide the next direction. Update research/cursor.md to the new focus
+6. **When the cursor's subtree completes**: read root `research/note.md` to decide the next direction. Update research/focus.md to the new focus
 
 **Zooming out is deliberate, not automatic.** Only read upper nodes when the current subtree's work is exhausted. This keeps PI focused.
 
@@ -389,7 +389,7 @@ Retrieve deliverable paths from task return values and Read deliverables directl
   1. `ls` the parent folder — are all children stable or closed?
   2. If yes, read the parent's log.md and plan.md. Update Current State in log.md (including children summary) and status. Update plan.md if the parent's strategy needs revision
   3. Continue floating up as long as levels complete
-  4. When the cursor's subtree fully completes: read root `research/note.md` to decide the next direction. **Update research/cursor.md** to the new focus
+  4. When the cursor's subtree fully completes: read root `research/note.md` to decide the next direction. **Update research/focus.md** to the new focus
 
 - **Direction review** (when a major subtree — a direct child of root — fully completes, not every cycle):
   - Read root `research/note.md`. Did the results advance the argument?
@@ -448,7 +448,7 @@ No need to rush — the next `/run` resumes from where you left off.
    - [agenda item 2]
    ```
    Write each item **self-contained**. Clearly state **what about** and **what decision is needed**. Don't use internal paths or jargon. Overwrite if file exists
-4. **Update research/cursor.md** (overwrite — the session cursor for next session):
+4. **Update research/focus.md** (overwrite — the session cursor for next session):
    ```markdown
    # Focus
 

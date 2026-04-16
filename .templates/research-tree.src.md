@@ -86,7 +86,7 @@ research/
   note.md              (project-level verified knowledge — SoT)
   plan.md              (root-level strategy and decomposition)
   log.md               (background, working state — ladder)
-  cursor.md            (session cursor: "work here now")
+  focus.md            (session cursor: "work here now")
   story.md             (paper narrative structure)
   principles.md        (cross-cutting research constraints)
   Paradox Resolution/
@@ -112,13 +112,13 @@ research/
 | **Research tree — log** | `research/**/log.md` | Read-only | Process: current state, evidence chain, kind/status |
 | **Concept definitions** | `concepts/` | Read-only (concept-checker may create entries) | Atomic term definitions, wiki-linked from any file via `[[term]]` |
 | **Research notebooks** | `logs/*_{type}_*.md` | Write (own deliverables only) | Worker deliverables: reading notes, attempts, simulations |
-| **Session cursor** | `research/cursor.md` | Not relevant to workers | PI's current focus position in the tree |
+| **Session cursor** | `research/focus.md` | Not relevant to workers | PI's current focus position in the tree |
 | **Session context** | `logs/last_session.md` | Not relevant to workers | PI's volatile work context for session handoff |
 
 **Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `report_*.md` for PI-verified analyses, `plan.md` for strategy and decomposition, `log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints.
 
 Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status determination is PI's responsibility.
 
-- Only PI writes to the research tree (including plan.md and cursor.md)
+- Only PI writes to the research tree (including plan.md and focus.md)
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified

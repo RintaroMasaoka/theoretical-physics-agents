@@ -36,7 +36,7 @@ AskUserQuestion: Ask user to describe the research theme overview in Other
         3. research/story.md (narrative structure)
         4. research/principles.md (constraints, empty if none)
         5. research/{step}/log.md for each step in the narrative structure (child nodes start with log.md)
-        6. research/cursor.md (session cursor pointing to the first active child)
+        6. research/focus.md (session cursor pointing to the first active child)
 ```
 
 File formats (note.md, log.md) are defined in `.claude/research-tree.md`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
@@ -59,9 +59,9 @@ Step 2: ...
 {Cross-cutting research constraints that apply to the whole project. Leave empty if none yet}
 ```
 
-`research/cursor.md` is a lightweight pointer that tells `/run` where to resume work. `/launch` initializes it; `/run` updates it each session.
+`research/focus.md` is a lightweight pointer that tells `/run` where to resume work. `/launch` initializes it; `/run` updates it each session.
 
-**Session cursor (`research/cursor.md`):**
+**Session cursor (`research/focus.md`):**
 
 ```markdown
 # Focus
@@ -102,7 +102,7 @@ Data loading: research/note.md + research/log.md + research/story.md
 - New research directions → create child folders with log.md
 - Recontextualized results → update affected note.md files in the subtree
 - Full pivot → update all root files, restructure children as needed
-- Session cursor → update `research/cursor.md` if the current focus node was moved, removed, or is no longer the logical next step
+- Session cursor → update `research/focus.md` if the current focus node was moved, removed, or is no longer the logical next step
 - Leave `> [Launch YYYY-MM-DD] {reason}` markers in affected files at structural changes so `/run` can understand why the tree changed
 
 **Scope of changes:** Match the scale of edits to the scale of the change — a minor refinement doesn't require restructuring the tree, and a full pivot doesn't preserve stale nodes.
@@ -125,7 +125,7 @@ Capture ISO timestamp at session start via `Bash("date '+%Y-%m-%dT%H:%M'")` for 
 
 | Timing | Action |
 |---|---|
-| After theme is agreed | Write/update research/ tree (including cursor.md) |
+| After theme is agreed | Write/update research/ tree (including focus.md) |
 | After files are written | Write launch log + Commit (see below) |
 
 **Launch log:** Write to `logs/{timestamp}_launch.md` (permanent record):
