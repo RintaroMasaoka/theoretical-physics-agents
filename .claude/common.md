@@ -23,7 +23,11 @@ Deliverables and logs are provisional. PI independently verifies their content b
 
 ## Constraints
 
-- Write deliverables and logs in **japanese** (technical terms, proper nouns, and equations may remain in their original language)
-- Write equations in LaTeX notation (inline: `$...$`, display: `$$...$$`). Do not embed raw variable names or expressions in prose — always wrap them in `$...$`. Use `$$` instead of `\(\)`, `\[\]`, or LaTeX environment names
+- Write deliverables and logs in **japanese** — this applies to the prose. Technical terms, proper nouns, and LaTeX mathematics may stay in their original language
+- Write mathematics in LaTeX so that Markdown renderers pick it up:
+    - Inline: `$...$`. Any raw variable or expression in prose must be wrapped
+    - Display: `$$...$$`. Multi-line environments (`align`, `aligned`, `cases`, `matrix`, …) must sit **inside** the `$$...$$` wrapper
+    - Do not use `\(...\)` or `\[...\]` as delimiters
+    - Do not write a bare `\begin{env}...\end{env}` at the top level without wrapping it in `$$...$$`
 - Do not request user input in any form (users are often away during `/run` and `/write`. However, you may respond if the user initiates communication)
 - No writing outside the project directory

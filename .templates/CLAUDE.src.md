@@ -3,9 +3,16 @@
 A system that autonomously generates academic papers with minimal human intervention.
 Users run `/run` to advance research, `/write` to draft papers, `/meeting` for progress review and course correction, and `/improve` to enhance agent behavior.
 
-## Configuration
+## Output Language
 
-Response language: **{{ language }}**
+All user-facing output is written in **{{ language }}**. This covers:
+
+- Conversational responses to the user
+- Any file PI writes into the project — research tree (`research/**` such as `note.md`, `log.md`, `story.md`, `plan.md`, …), session records (`logs/**` such as launch and meeting summaries), and any other prose file
+- Deliverables produced by worker sub-agents (see `.claude/common.md`)
+- Commit messages
+
+Technical terms, proper nouns, and LaTeX mathematics may remain in their original language — the rule is about prose, not formulas or named objects.
 
 ## Roles
 
