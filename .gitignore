@@ -3,3 +3,6 @@
 
 # Local settings
 .claude/settings.local.json
+
+# /run resume beacon — ephemeral state for mid-session interruption recovery
+logs/.run-active

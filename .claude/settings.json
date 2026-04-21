@@ -77,6 +77,11 @@
             "type": "command",
             "command": "node .scripts/configure.mjs",
             "statusMessage": "Applying config templates..."
+          },
+          {
+            "type": "command",
+            "command": "bash .scripts/check-run-resume.sh",
+            "statusMessage": "Checking /run resume beacon..."
           }
         ]
       }
