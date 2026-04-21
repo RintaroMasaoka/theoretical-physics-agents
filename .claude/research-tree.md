@@ -15,6 +15,14 @@ Research information is organized as a **tree** under `research/`. Every node is
 | `images/` | Computation | Figures and visualizations |
 | `lib/` | Computation (root only) | Shared simulation framework modules (managed by engine-builder) |
 
+## Folder Names
+
+Every node is a folder, and the folder name is the only thing a reader sees when browsing the tree. Use a semantic slug describing what the node is about on its own — **Title Case with spaces** is the house style (e.g., `Topic Name`, `Subtopic Name`).
+
+The folder path must be stable under reorderings of the narrative. This rules out any slug that depends on where the node sits in the current story — positional prefixes, sequence indices, phase labels, and similar ordering markers all go stale the moment the story is rewritten. Narrative order lives in the parent's `story.md` or `plan.md`, not in the path.
+
+A reader who sees only the folder name should be able to guess the node's content. If the name only makes sense given the current story, it is the wrong name.
+
 ## Computation Artifacts
 
 Research nodes may contain computation subdirectories alongside their text files:

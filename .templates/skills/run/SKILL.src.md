@@ -51,9 +51,7 @@ Every node is a **folder**. File formats are defined in `.claude/research-tree.m
 
 Children are subfolders. The tree can nest to arbitrary depth.
 
-**Folder names** use **Title Case with spaces** for Obsidian readability (e.g., `Lattice BKT`, `Winding Gap`).
-
-- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice). Write `note.md` when results are stable enough to state (see research-tree.md for when/how)
+- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice). Write `note.md` when results are stable enough to state (see research-tree.md for when/how and for folder-name conventions)
 - **Recording a dead end**: write `dead_ends.md` in the node folder (or append if it exists)
 - **Adding a directive**: write `directives.md` in the folder where the rule applies (typically project root; only through meetings)
 - **Seeing children**: `ls` the folder (subfolders = children)
@@ -210,7 +208,7 @@ Atomic definitions (one term per file). Linked from any file via `[[term]]`. Con
 
 ### Naming Convention
 
-Folder names use **Title Case with spaces** (e.g., `Winding Gap`, `Lattice BKT`). A new reader should guess what the node is about from its name alone. No sequential numbering — narrative order is described in the parent's plan.md, not in filenames.
+See `.claude/research-tree.md` § Folder Names for the canonical rule (Title Case with spaces, semantic slugs, no ordering-encoded paths).
 
 ### kind (Cognitive Mode)
 

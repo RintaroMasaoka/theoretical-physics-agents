@@ -3,3 +3,6 @@
 
 # Local settings
 .claude/settings.local.json
+
+# Legacy / misplaced papers cache (canonical location is literature/papers/)
+research/papers/
