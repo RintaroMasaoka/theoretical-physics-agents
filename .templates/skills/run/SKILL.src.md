@@ -391,7 +391,13 @@ Dynamic data by agent:
 - **critic**: `Target: research/{path}/ — {description}` / `attempt path: {path}` / `kind: {kind}` / `mode: blind` or `mode: contextual`
 - **engine-builder**: `Model definition` / `Computational method` / `Required features` / existing module path. Or `"Refine lib"` for self-directed improvement
 - **simulator**: `Target: research/{path}/` / `Physical setup` / `Mathematical definition of observables` / `Success criteria` / `Deliverable number: {N}` / `research/lib/` module list / `Existing scripts in src/: {list}`
-- **curator**: Optionally note what changed: `Nodes updated: {paths}` / `Notes touched: {files}`
+- **curator**: Pass a concrete checklist so curator can judge without re-scanning the whole tree. PI's role is to enumerate raw **candidates**; filtering/judgment is curator's (per curator's own default-create rule in `.claude/agents/curator.md` § note.md Maintenance):
+  - `Subnodes without note.md: {paths}` (PI lists every subnode missing note.md; curator applies its default-create rule — create when CONFIRMED facts exist in the log.md, skip for pure-computation leaves)
+  - `log.md files exceeding ~150 lines: {paths}` (compression candidates; curator decides per its own signs — current-state paragraph density, evidence age, etc.)
+  - `Recent CONFIRMED additions: {log.md path — brief descriptions}` (promotion candidates — critic-ACCEPTed items since the last curator dispatch)
+  - `Recently retracted / revised: {paths}` (staleness candidates — claims that were demoted or reversed)
+  - `Nodes updated this session: {paths}` (general context)
+  These are pointers, not constraints — curator reads the tree holistically. But providing them reduces scan cost and ensures the dispatch does not silently miss obvious candidates. If curator declines a candidate (e.g., note.md not yet warranted), that is a legitimate outcome — PI's list is input, not prescription
 
 ### 3. Result Collection & State Update
 
@@ -467,7 +473,7 @@ No need to rush — the next `/run` resumes from where you left off.
 **Do not suggest transitioning to `/write`**. The user decides when research is mature enough for writing.
 
 1. **Simulation housekeeping** (if simulator ran): Check research nodes' `src/` for superseded scripts. Move to `src/archive/` — never delete. Record moves in `logs/last_session.md`
-2. **Knowledge base coherence** (if log.md files accumulated significant changes): Dispatch **curator** to update note.md (SoT) files where needed, or quick manual check if changes were minor
+2. **Knowledge base coherence** (mandatory at session end — not optional, not skippable on the grounds that changes "felt minor"): Dispatch **curator** to sweep the tree. Before dispatching, scan the tree yourself and include in the curator's prompt the concrete checklist described under `curator` in the agent-specific dynamic data of § Task Execution — subnodes without note.md, log.md files over ~150 lines, CONFIRMED claims added since the last curator dispatch, and recently retracted/revised claims. A bare "review the tree" dispatch is not enough: without those pointers, curator's default (note.md creation when CONFIRMED facts exist) cannot be reliably triggered. The rationale is that note.md promotion consistently falls off PI's attention during research cycles — synthesis and research compete for the same cognitive budget and research wins, so the maintenance channel must be guaranteed at session boundaries. Curator's work, once complete, is reviewed via `git diff` before commit
 3. If there are items to discuss in a meeting, Write to `agenda.md`:
    ```markdown
    # Meeting Agenda

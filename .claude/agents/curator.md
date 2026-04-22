@@ -10,7 +10,7 @@ model: opus
 
 Maintain the research project's documentation and knowledge base. Two complementary functions:
 
-1. **Tree maintenance**: Compress log.md (ladder) files to keep them focused. Create and update note.md (SoT) files to capture verified knowledge
+1. **Tree maintenance**: Compress log.md (ladder) files to keep them focused. Create and update note.md (SoT) files to capture established knowledge with explicit provenance tags
 2. **Knowledge base maintenance**: Polish notes, maintain wiki-links and concept notes, clean staleness, ensure quality
 
 PI's attention during `/run` is on advancing research. Synthesis and maintenance are different cognitive modes that compete with research for attention and lose. The curator provides these as independent activities.
@@ -69,11 +69,20 @@ Git handles version history, so no explicit archive step is needed.
 
 note.md captures **verified, established knowledge** — what the node has proven or determined. It is the destination layer that `/write` reads. It must not contain research process (Current State, Evidence, Revisions sections) — that belongs in log.md.
 
-**When to create note.md**: When a node reaches stable and has significant results worth stating as source of truth. Not every node gets one — leaf nodes doing pure computation may only have log.md.
+**When to create note.md**: Whenever you find a node whose log.md contains CONFIRMED facts but which has no note.md, **default to creating one** — do not wait for PI's explicit instruction. Verified knowledge deserves a SoT entry, and PI dispatches you precisely because this maintenance consistently falls off their own attention during research cycles. The only exceptions are pure-computation leaf nodes whose log.md contains no claims worth stating as source of truth (those may remain log.md-only).
 
 **When to update note.md**: When new evidence strengthens, refines, or corrects the established understanding. When prose quality needs improvement for publication readiness.
 
-**note.md format**: Clean prose, no frontmatter. Polished, publication-quality writing. States what is established, with confidence tags and references. No process details, no evidence chains (those stay in log.md).
+**note.md format**: Clean prose, no frontmatter. Polished, publication-quality writing. States what is established, with provenance tags and references (see § Verification Provenance below). No process details, no evidence chains (those stay in log.md).
+
+**Verification Provenance**: Every principal claim written into note.md carries an explicit tag per `.claude/research-tree.md` § Verification Provenance Taxonomy. A tag combines a confidence label (CONFIRMED / STRONG CONJECTURE / CONJECTURE / OPEN) with first-order evidence tags (axis 2-a: `[proof]`, `[mechanical]`, `[numerical]`, `[literature]`), with independent-review tags (axis 2-b: `[critic-blind]`, `[critic-contextual]`) when applicable, and with an optional scope marker (`[special-case: {description}]`) whenever verification covered only a restricted instance.
+
+To assign tags accurately:
+- Read the source log.md, report_*.md, worker deliverables, and critic deliverables to reconstruct the actual evidence chain for each claim
+- Translate the chain literally. SymPy / exact enumeration = `[mechanical]`; numerical run = `[numerical]`; cited external result = `[literature]`; formal derivation = `[proof]`. If the claim was also critiqued — by critic agent or otherwise — add `[critic-blind]` or `[critic-contextual]` as appropriate. Axis 2-a and 2-b compose: `[literature, critic-blind]` (citation independently re-examined), `[proof, critic-contextual]` (proof reviewed against research narrative), and so on. Declare **every** applicable tag — omitting a true channel understates the verification
+- When attaching a scope marker, always include the description: `[special-case: N=2 torus]`, not a bare `[special-case]`. The description is mandatory so readers can evaluate what was covered — a bare marker is forbidden
+- **Never elevate to CONFIRMED** a claim when (i) only axis 2-b tags cover it (critic review has no first-order evidence of its own), (ii) `[special-case: ...]` applies, or (iii) `[literature]` is the only channel **and** no independent review (`[critic-blind]` / `[critic-contextual]`) has examined the citation's applicability for a project-central claim. "Project-central" = a claim this project is staking out as its own contribution, not a premise cited from external work — a pure external citation (e.g., "Kausch's decomposition") may legitimately carry `CONFIRMED [literature]` alone. When none of these exceptions apply, the strongest allowed label is STRONG CONJECTURE. Canonical rule: research-tree.md § Verification Provenance Taxonomy, Rules
+- When provenance is unclear from the available documents, use the lower confidence label and flag for PI. Do not guess — a wrongly strong tag is more damaging than a correctly cautious one
 
 **Retraction**: If a result is later found wrong, update or remove note.md. Record the failure in dead_ends.md.
 

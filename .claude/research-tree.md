@@ -6,8 +6,8 @@ Research information is organized as a **tree** under `research/`. Every node is
 
 | File | Layer | Role |
 |---|---|---|
-| `note.md` | Destination (SoT) | **Verified knowledge.** Free-form prose — no prescribed sections, no frontmatter. Written when a node has significant established results. Not every node has one |
-| `report_{slug}.md` | Report (verified) | **PI-verified report.** Self-contained analysis promoted from worker deliverables and verified through independent review. Belongs to the node, not to the timeline. See below |
+| `note.md` | Destination (SoT) | **Established knowledge with explicit provenance.** Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries a verification tag (see Verification Provenance Taxonomy). Written when a node has significant established results. Not every node has one |
+| `report_{slug}.md` | Report (with provenance) | **PI-promoted report with explicit provenance tags.** Self-contained analysis promoted from worker deliverables after independent review. Belongs to the node, not to the timeline. See below |
 | `plan.md` | Ladder (strategy) | **Strategy and approach.** How to attack this node — decomposition rationale, approach decisions, children's roles. Rewritten as strategy evolves |
 | `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). PI's working document |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
@@ -53,7 +53,7 @@ Agents that are not simulator, researcher, or engine-builder treat all of `src/`
 
 ## note.md — Source of Truth
 
-Verified, publication-quality knowledge in free-form prose. What this node established as fact through critical verification.
+Publication-quality knowledge in free-form prose, with every principal claim carrying an explicit provenance tag. "Source of Truth" means **the authoritative record of what is known and at what confidence level**, not "only CONFIRMED claims" — STRONG CONJECTURE, CONJECTURE, and OPEN claims belong in note.md too when they are the node's established state, provided each carries its provenance tag.
 
 **No template.** The content and structure emerge from the research itself. A node studying a mathematical structure will naturally differ from one resolving a paradox or surveying a field. Prescribed sections constrain the researcher's thinking — the prose should take whatever form best captures the established knowledge.
 
@@ -61,13 +61,82 @@ Verified, publication-quality knowledge in free-form prose. What this node estab
 - No frontmatter (SoT files are clean prose)
 - No process artifacts (Current State, Evidence, task lists — those belong in log.md or plan.md)
 - Publication-quality: a collaborator unfamiliar with the research process can follow the argument
-- Only verified claims. Speculation and open questions belong in plan.md or log.md
+- Every principal claim carries an explicit verification tag per the Verification Provenance Taxonomy below (confidence label + method tags + optional scope marker). Bare unannotated CONFIRMED is forbidden. Speculation without supporting tags and open questions belong in plan.md or log.md rather than note.md
 
 **Root note.md** captures the project's overall established understanding — its core claims, scope, and what has been shown. As research progresses, this evolves from a research question into an established account of the project's central findings and how they connect.
 
 **Child note.md** captures what that specific investigation established.
 
 **When to create**: When a node reaches stable and has results worth stating as source of truth. Leaf nodes doing pure computation may never get one.
+
+## Verification Provenance Taxonomy
+
+Claims in note.md (and report_{slug}.md) carry an explicit verification tag so readers can assess **how** each fact was established, **whether it has been independently reviewed**, and **at what scope**. The tag decomposes into orthogonal axes. The purpose is to prevent a single "verified" label from collapsing distinct kinds of evidence (symbolic computation, literature citation, independent critique, small-instance checks) into one opaque stamp.
+
+### Axis 1 — Confidence
+
+| Tag | Meaning |
+|---|---|
+| `CONFIRMED` | Verified with no known counterexamples. Publishable as stated |
+| `STRONG CONJECTURE` | Substantial partial evidence; holds in principal cases but full scope is not closed |
+| `CONJECTURE` | Motivated and locally supported, but not sufficiently verified |
+| `OPEN` | Unresolved |
+
+### Axis 2-a — First-order evidence (how the claim was actually established; one or more)
+
+These describe the **evidence chain itself**. A claim may rest on more than one when multiple derivations agree.
+
+| Tag | Meaning |
+|---|---|
+| `[proof]` | Formal mathematical proof — hand-checked or machine-checked derivation closing the claim at its declared scope |
+| `[mechanical]` | Symbolic / exact computation (SymPy, SageMath, exact enumeration). Computer output is unaffected by LLM reasoning biases |
+| `[numerical]` | Finite-tolerance numerical check with stated convergence criteria |
+| `[literature]` | Established in cited external literature. Being cited as a premise — not yet independently re-derived in this project |
+
+### Axis 2-b — Independent review (orthogonal to 2-a; whether the evidence has been adversarially critiqued)
+
+These describe **who checked the evidence**. Independent review **composes with** first-order evidence — it does not substitute for it. `[critic-*]` alone cannot support CONFIRMED (see Rules). A claim with both `[proof]` and `[critic-blind]` is strictly stronger than either alone, because the proof has been subjected to adversarial scrutiny by an independent channel. Likewise `[literature, critic-blind]` records that a cited result was not just taken on faith but was re-examined by an independent critic for whether it actually supports the use being made of it.
+
+| Tag | Meaning |
+|---|---|
+| `[critic-blind]` | Independent adversarial critique by the critic agent in **blind mode** (no research context loaded). Removes expectation bias. The strongest review tier when the claim is mechanical or self-contained |
+| `[critic-contextual]` | Critic agent in **contextual mode** (ancestor chain loaded). Used when soundness genuinely depends on the claim's role in the overall narrative — e.g., "does this argument suffice for its intended position in the story?" |
+
+When critic runs its own SymPy/numerical computation during review, that adds a first-order tag too — e.g., `[mechanical, critic-blind]`. A standalone `[critic-*]` tag (no axis 2-a) is rare — it indicates the critic's evidence was purely logical (just a soundness review of the researcher's argument structure) — and per the rules below such a standalone tag can attach only to labels at or below STRONG CONJECTURE.
+
+### Axis 3 — Scope marker (optional; restricts the verified region)
+
+By default the claim is taken to be verified over its **full declared scope**. When that is not the case, attach an explicit scope marker — never leave scope implicit. A bare `[special-case]` without description is forbidden because readers cannot otherwise evaluate what was covered.
+
+| Marker | Meaning |
+|---|---|
+| `[special-case: {description}]` | Verified only on a restricted instance. The description must identify the instance — e.g., `[special-case: N=2 torus]`, `[special-case: triangle+pendant graph]`, `[special-case: 9 specific bonds]` |
+
+### Rules
+
+- Every `CONFIRMED` must carry at least one axis 2-a tag. Bare "CONFIRMED" with no first-order evidence is forbidden because readers cannot then evaluate the claim. An axis 2-b tag alone does not count as first-order evidence
+- Axis 2-a and 2-b tags compose freely when both apply (e.g., `[proof, critic-blind]`, `[literature, critic-contextual]`, `[mechanical, numerical, critic-blind]`). Always declare every applicable tag — omitting a true channel understates the verification chain
+- A claim tagged with `[special-case: ...]` **cannot** be elevated to CONFIRMED — the strongest allowed label is `STRONG CONJECTURE`, because full-scope verification is missing by definition
+- `[literature]` alone (no independent review, no local re-derivation) does not suffice for **project-central claims** — meaning a claim this project is staking out as its own contribution, as opposed to a premise cited from external work. (A citation-only `CONFIRMED [literature]` is fine when the claim is explicitly framed as the external result itself, e.g., "Kausch's decomposition holds" — no project contribution is being attested.) To reach CONFIRMED on a project-central claim, pair `[literature]` with an independent channel: either a first-order re-derivation (`[proof]`, `[mechanical]`, `[numerical]`) or an independent review (`[critic-blind]` / `[critic-contextual]`) that examined the citation's applicability to the specific use being made of it
+- If provenance is unclear from the available documents, use the lower confidence label and flag for PI rather than guessing
+
+### Strength guide (informal)
+
+Strength grows monotonically along two directions: (i) more axis 2-a tags when independent channels agree, (ii) addition of axis 2-b review on top of axis 2-a. Rough ordering of individual contributions — `[proof]` is the strongest single first-order tag; `[mechanical]` and `[critic-blind]` are comparably strong second tiers; `[numerical]` below those; `[literature]` alone is weakest as first-order support for project claims. `[critic-contextual]` adds a soundness check but does not by itself close a mechanical question. Any `[special-case: ...]` marker weakens the combined label by restricting the verified region.
+
+### Examples (applied to this project)
+
+| Claim | Label |
+|---|---|
+| Generic algebraic identity with a hand proof that a critic then verified by running an independent SymPy script in blind mode | `CONFIRMED [proof, mechanical, critic-blind]` (the critic's own SymPy contributes `[mechanical]`; the hand proof contributes `[proof]`; the review channel contributes `[critic-blind]`) |
+| Dimension of the Jacobson radical via Artin–Wedderburn | `CONFIRMED [proof, critic-contextual]` (proof plus soundness check by critic reading the algebraic context) |
+| Explicit 8×8 $R_{2\pi} = \mathbb{1}_8 - 4\pi L_{\eta\zeta}$ — researcher's SymPy verification plus critic's independent blind re-verification | `CONFIRMED [mechanical, critic-blind]` |
+| Kausch's internal statement that $Z[\mathcal{C}_2]$ decomposes into 4 terms, cited but not re-derived | `CONFIRMED [literature]` (Kausch's own result — not a project-central claim, so the CONFIRMED rule on `[literature]` alone does not bite; were the project claiming this decomposition as its own contribution, the strongest allowed label would be STRONG CONJECTURE until re-derived or independently reviewed) |
+| Correspondence between those 4 terms and this project's 4 anyon sectors (dictionary) | `STRONG CONJECTURE [literature, critic-contextual]` (literature is the premise; critic has reviewed the dictionary's coherence but full re-derivation is pending) |
+| TGSD = 4 on the $N=2$ torus via bond-CAR identities | `STRONG CONJECTURE [mechanical, special-case: N=2]` |
+| Parity-sector separation tested on one small graph | `STRONG CONJECTURE [mechanical, special-case: triangle+pendant graph]` |
+| ED-computed ground-state count for $N=3$ torus agreeing with prediction | hypothetical `STRONG CONJECTURE [numerical, critic-blind, special-case: N=3]` |
+| TGSD = $4^g$ on the actual 2D lattice at general $N \ge 3$ | `OPEN` |
 
 ## report_{slug}.md — PI-Verified Reports
 
