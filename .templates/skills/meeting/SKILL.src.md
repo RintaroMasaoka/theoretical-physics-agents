@@ -74,6 +74,8 @@ Research Tree:
 Key achievements since last meeting: [summary]
 ```
 
+**Self-contained presentation:** Throughout the meeting, briefly explain any technical term, mathematical object, internal label, or named entity (e.g. matrix, operator, algorithm, node name, abbreviation, theorem) on its first mention in this conversation. One inline phrase or sentence stating what it refers to is enough. Never assume the user remembers a term from prior meetings — the current conversation must stand on its own.
+
 **Where to reflect:**
 - Changes to the paper's narrative structure (add/remove/reorder steps) → Edit `research/story.md`. Leave a `> [Meeting YYYY-MM-DD] {reason}` marker
 - Verified understanding changes → Edit `research/note.md`
