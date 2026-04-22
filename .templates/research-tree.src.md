@@ -6,7 +6,7 @@ Research information is organized as a **tree** under `research/`. Every node is
 
 | File | Layer | Role |
 |---|---|---|
-| `note.md` | Destination (SoT) | **Established knowledge with explicit provenance.** Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries a verification tag (see Verification Provenance Taxonomy). Written when a node has significant established results. Not every node has one |
+| `note.md` | Destination (SoT) | **Established knowledge with explicit provenance. Curator-authored** — PI dispatches curator to write and update; PI does not author the prose directly (see § note.md — Ownership below). Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries a verification tag (see Verification Provenance Taxonomy). Written when a node has significant established results. Not every node has one |
 | `report_{slug}.md` | Report (with provenance) | **PI-promoted report with explicit provenance tags.** Self-contained analysis promoted from worker deliverables after independent review. Belongs to the node, not to the timeline. See below |
 | `plan.md` | Ladder (strategy) | **Strategy and approach.** How to attack this node — decomposition rationale, approach decisions, children's roles. Rewritten as strategy evolves |
 | `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). PI's working document |
@@ -68,6 +68,24 @@ Publication-quality knowledge in free-form prose, with every principal claim car
 **Child note.md** captures what that specific investigation established.
 
 **When to create**: When a node reaches stable and has results worth stating as source of truth. Leaf nodes doing pure computation may never get one.
+
+**Ownership — note.md is curator-authored.** This is the one file in the tree whose prose is written by curator rather than PI. The split exists because note.md demands cognitive modes that compete with PI's research work:
+
+- **Separation of concerns**: PI's attention during `/run` is on advancing research — dispatching workers, reading attempts, making directional decisions. Synthesis of verified evidence into publication-ready prose is a different cognitive mode. When PI tries to hold both, research wins and synthesis drops — empirically, a session with ten cycles of active research typically produces zero updates to note.md if the same agent owns both channels. Giving note.md a dedicated author prevents that drop
+- **Second-reader quality**: The agent who produced a result is anchored by the deliverable they wrote and is a poor judge of whether the prose reads cleanly to someone unfamiliar with the research process. note.md's promise is exactly that it reads cleanly to such a reader, so the author should be a second reader — curator, coming to the evidence fresh
+- **Cross-tree coherence**: note.md at one node must harmonize with note.md at sibling and ancestor nodes (consistent terminology, valid `[[wiki-links]]`, referenced concept notes). This requires reading the tree holistically, which PI does not do during cycles — PI's reading scope is the ancestor spine plus direct children. Curator reads the whole tree by design
+- **Provenance tag assignment**: Every principal claim in note.md carries axis 1 + axis 2-a + axis 2-b + (optional) axis 3 tags. Assigning these correctly requires re-reading the underlying worker deliverables and critic reports to reconstruct the evidence chain. This is exactly curator's core task
+
+PI's role with respect to note.md is therefore: write evidence into log.md, promote verified results into report_{slug}.md when warranted, and **dispatch curator** to distill these into note.md. PI does not directly write substantive note.md prose during `/run` cycles.
+
+Two narrow exceptions to the curator-only rule:
+
+1. **Trivial mechanical fixes.** Typo corrections, fixing a broken `[[wiki-link]]`, renaming a term after a concept note is renamed. The rule of thumb: if the replacement is uniquely determined — any competent reader would produce the same correction, with no judgment about phrasing or structure — the edit is mechanical. If there is any judgment about wording, ordering, or what claim to state, it is not mechanical and must go through curator
+2. **User-present collaborative rewrites (`/meeting`, `/launch`).** When the user is actively collaborating — during a meeting discussion, or during the initial project launch — PI and user may rewrite note.md together to reflect synthesis produced in the conversation. These skills explicitly treat note.md as the destination for human-in-the-loop narrative decisions. The user acts as the second reader in real time, which is what curator otherwise provides; so the curator-only rule does not bind
+
+Anything beyond these two categories — adding a section, rewording a claim, updating a provenance tag, restructuring prose, inserting a "status update" block — goes through curator. A PI-authored substantive edit that was made by mistake (e.g., during a fast-paced cycle) is legitimate input to the tree, but curator will rewrite it on the next dispatch to restore SoT quality; PI should not defend such edits as final.
+
+This rule has a failure mode to watch for: note.md drifting into a log-like chronicle with time-stamped "Status update YYYY-MM-DD" sections stacked on top of each other. That shape is the footprint of PI-direct appending and signals that curator dispatches have been skipped; the next curator run should consolidate such stacks into a single, present-tense statement of the node's established knowledge.
 
 ## Verification Provenance Taxonomy
 
@@ -248,6 +266,6 @@ research/
 
 Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status determination is PI's responsibility.
 
-- Only PI writes to the research tree (including plan.md and focus.md)
+- Writes to the research tree flow through PI's authority: PI writes `log.md`, `plan.md`, `dead_ends.md`, `report_*.md`, `focus.md`, `story.md`, and `principles.md` directly; curator writes `note.md` on PI's dispatch (see § note.md — Ownership); simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified

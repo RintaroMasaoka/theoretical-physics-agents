@@ -65,7 +65,7 @@ Every node is a **folder**. File formats are defined in `.claude/research-tree.m
 
 Children are subfolders. The tree can nest to arbitrary depth.
 
-- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice). Write `note.md` when results are stable enough to state (see research-tree.md for when/how and for folder-name conventions)
+- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice). When results stabilize, **dispatch curator** to create `note.md` — PI does not author note.md prose directly (see research-tree.md § note.md — Ownership, and the Knowledge Lifecycle diagram above)
 - **Recording a dead end**: write `dead_ends.md` in the node folder (or append if it exists)
 - **Adding a directive**: write `directives.md` in the folder where the rule applies (typically project root; only through meetings)
 - **Seeing children**: `ls` the folder (subfolders = children)
@@ -123,20 +123,24 @@ The three-layer model separates **what we know**, **how we'll proceed**, and **w
 ```
 New node → mkdir + log.md [status: open]
     ↓ plan approach
-Write plan.md (decomposition, strategy) if non-trivial
+PI writes plan.md (decomposition, strategy) if non-trivial
     ↓ investigate
 Workers produce deliverables in logs/ (research notebooks)
     ↓ PI verifies via critic
 PI promotes verified results → report_{slug}.md in the node (self-contained)
-    ↓ node reaches stable
+    ↓ node reaches stable — PI dispatches curator
 Curator distills from reports + log.md → writes note.md (verified knowledge)
-    ↓ understanding deepens
+    ↓ understanding deepens — PI dispatches curator again
 Curator updates note.md. log.md continues accumulating
     ↓ later found wrong
-Update note.md. Record in dead_ends.md
+PI writes retraction evidence into log.md + dead_ends.md → dispatches curator to update note.md
 ```
 
-note.md creation, retraction, and format are defined in `.claude/research-tree.md`.
+**note.md is curator-authored, not PI-authored.** The diagram above is not a convention — it is the ownership rule. PI's tree-editing authority covers log.md (every cycle), plan.md (when strategy changes), dead_ends.md (when approaches fail), and report_{slug}.md (when promoting a verified result). note.md is the one file PI does not write substantively: its prose comes from curator, dispatched by PI. The reasons — separation of concerns, second-reader quality, cross-tree coherence, provenance tagging — are stated in `.claude/research-tree.md` § note.md under **Ownership**, which is the canonical rule.
+
+Two narrow carve-outs preserve the above without friction: (i) trivial mechanical fixes to note.md (typo, broken wiki-link rename) may be made directly by PI since they change no semantics; (ii) user-present collaborative rewrites under `/meeting` or `/launch` are authoritative (the user serves as second reader in real time). Everything else — adding a section, rewording a claim, inserting a "status update" block, updating a provenance tag — goes through a curator dispatch.
+
+note.md creation, retraction, format, and ownership are defined canonically in `.claude/research-tree.md`.
 
 **Refresh**: log.md files naturally accumulate text over sessions. Periodically, PI dispatches **curator** to compress them — moving detailed content to note.md where appropriate. The working state in log.md should stay concise enough to read at a glance.
 
@@ -413,11 +417,11 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 
 - **Promote to report** (when appropriate): If a worker deliverable (in `logs/`) contains a verified, significant result, PI creates a self-contained `report_{slug}.md` in the relevant research tree node. Reports are critic-verified, self-contained documents — like a student's report submitted to PI. They belong to the tree node, not to the timeline. Not every deliverable gets promoted — only results worth preserving as structured knowledge
 
-- **Create/update note.md** (when appropriate): Reports feed into note.md — the typical progression is: deliverable (logs/) → report (tree node) → note.md (tree node). If a stable result is significant, dispatch curator to distill the polished knowledge into note.md (drawing from reports and log.md). Not every stable node gets a note.md — only results worth stating as source of truth
+- **Feed note.md through curator, do not write it directly**: note.md is curator-owned (see `.claude/research-tree.md` § note.md — Ownership, and the Knowledge Lifecycle diagram above). The progression is deliverable (logs/) → report_{slug}.md (tree node, PI-authored) → note.md (tree node, **curator-authored**). When a result reaches stable and warrants a SoT entry, PI's cycle-level action is to (a) ensure evidence is written into log.md and (b) **dispatch curator** to distill into note.md — not to write note.md prose directly. This holds for updates to existing note.md as well as first creation. Only two edits may bypass curator: trivial mechanical fixes (typo, broken wiki-link) and `/meeting`-scope collaborative rewrites. If you catch yourself opening Edit against a note.md for a prose-substantive change during a cycle, stop and dispatch curator instead. Per-cycle dispatches are not required — the Session End mandatory curator sweep (see Session End step 2 below) guarantees note.md is brought up to date at least once per session, so in-cycle dispatches are at PI's discretion based on whether the update is urgent enough to not wait
 
 - **Contribution assessment**: Review the researcher's self-assessment. Write PI's independent judgment in the relevant log.md. When referencing papers not marked `read`, note "provisional judgment as {paper} is unread"
 
-- **Retraction**: Update or remove note.md. Record the failure in dead_ends.md. Update log.md
+- **Retraction**: When a previously CONFIRMED claim is falsified, write the retraction evidence into log.md and the lesson into dead_ends.md (both PI-authored). The note.md update — removing or downgrading the claim — goes through curator, dispatched by PI at the next convenient point (or at Session End at the latest)
 
 - **Float-up protocol**: After updating a leaf, check if the parent's work is complete:
   1. `ls` the parent folder — are all children stable or closed?
