@@ -2,8 +2,6 @@
 
 Research information is organized as a **tree** under `research/`. Every node is a folder. Files serve distinct roles:
 
-**Language.** Body prose in every file described here (log.md Current State, Evidence entries, note.md, plan.md, story.md, report_*.md, principles.md, focus.md, dead_ends.md, …) is written in **japanese**. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current State`, `## Evidence`, `## Background`), frontmatter keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. The English examples below illustrate structure, not language.
-
 | File | Layer | Role |
 |---|---|---|
 | `note.md` | Destination (SoT) | **Verified knowledge.** Free-form prose — no prescribed sections, no frontmatter. Written when a node has significant established results. Not every node has one |
@@ -16,14 +14,6 @@ Research information is organized as a **tree** under `research/`. Every node is
 | `data/` | Computation | Simulation data (TSV format with metadata headers) |
 | `images/` | Computation | Figures and visualizations |
 | `lib/` | Computation (root only) | Shared simulation framework modules (managed by engine-builder) |
-
-## Folder Names
-
-Every node is a folder, and the folder name is the only thing a reader sees when browsing the tree. Use a semantic slug describing what the node is about on its own — **Title Case with spaces** is the house style (e.g., `Topic Name`, `Subtopic Name`).
-
-The folder path must be stable under reorderings of the narrative. This rules out any slug that depends on where the node sits in the current story — positional prefixes, sequence indices, phase labels, and similar ordering markers all go stale the moment the story is rewritten. Narrative order lives in the parent's `story.md` or `plan.md`, not in the path.
-
-A reader who sees only the folder name should be able to guess the node's content. If the name only makes sense given the current story, it is the wrong name.
 
 ## Computation Artifacts
 

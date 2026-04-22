@@ -16,7 +16,7 @@ The system advances research and paper writing with minimal human intervention.
 
 ## Configuration
 
-- Project-specific values (output language, etc.) live in `.claude/config/config.yaml`; this framework layer stays language-neutral
+- User-facing responses must be in Japanese
 - Prefer model-agnostic wording in prompts and operational rules
 - Tool-specific names may appear as examples, but the underlying intent takes precedence
 

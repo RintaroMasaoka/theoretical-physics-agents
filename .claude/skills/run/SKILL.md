@@ -11,25 +11,11 @@ You decide the research direction, delegate work to workers, and drive the proje
 
 ## Constraints
 
-- **Write all prose in japanese.** This applies to every file PI writes during `/run` — research tree files (`research/**/log.md`, `note.md`, `plan.md`, `story.md`, `principles.md`, `focus.md`, `dead_ends.md`, `report_*.md`, …), session records (`logs/**`), `agenda.md`, and the final report. Reason: downstream readers (the user, future PI sessions, workers, `/write`) expect a single configured language; mixing drifts the project's voice. Exceptions: technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings shown in English throughout this SKILL and in `.claude/research-tree.md` (`## Current State`, `## Evidence`, `## Background`, `## Next Session`, `## Blockers`, `## Accomplished`, `## Node Changes`, `## Deliverables`, etc. — the full set is whatever appears as an English `##` heading in those two documents) may stay in their original form. The rule is about body prose, not structural tokens. When reading an English example template here, treat it as a structural illustration, not as a directive to copy the language
 - `AskUserQuestion` is prohibited. Users are often away during `/run`, and asking questions interrupts the session and wastes time. Text output is limited to the final report only. Work silently
 - **However, you may respond if the user initiates communication** (confirmed that the user is present). If you receive correction instructions for TodoWrite, direction changes, etc., follow them and continue the session
 - Full paper text is acquired only from arXiv
 - **`Bash("sleep ...")` is prohibited. Polling via file existence checks is prohibited.** Repeated Bash command execution wastes context window. For waiting on agent completion, use only Pattern A / B from the task execution section
 - **Paper writing is NOT the responsibility of `/run`.** Writing is handled by the `/write` skill. `/run` focuses on research (investigation, analysis, verification)
-
-## Turn-Yielding Discipline — Why This Matters
-
-This extends the Constraints bullet "Text output is limited to the final report only. Work silently" with a concrete anti-pattern diagnosis.
-
-`/run` is an autonomous loop: the user is not present between cycles, and a "closing-tone" assistant message mid-run will cause the model to stall waiting for input that never arrives. The failure mode observed in practice: after context compaction or a transient interruption, the model wraps up with "I've completed cycles 1–N of N, awaiting next instruction" and the run halts with cycles still on the budget.
-
-- Between cycles, **never end a turn with a user-facing progress report**. Dispatch the next agent or move to the next step instead. If a progress summary is genuinely needed, write it to `logs/{timestamp}_run.md` — that is a file write, not a yielded turn
-- The **only** closing message is the final Session End report (see bottom of this file), emitted when `MAX_CYCLES` is exhausted or PI judges completion
-- Compaction / reconnect / crash do not terminate a run. Two mechanisms jointly ensure the next session resumes cleanly:
-  1. **SKILL-level resume protocol**: Session Start step 0 below + `logs/.run-active` state file. Applies when the SKILL instructions are still in context (post-reconnect without compaction)
-  2. **Hook-level re-injection**: `.scripts/check-run-resume.sh` is registered as a `SessionStart` hook in `.claude/settings.json`. The `SessionStart` event fires with matcher `compact` after auto/manual compaction (per Claude Code hooks spec), so the hook runs even when the SKILL content was evicted. If the beacon is present and valid, the hook emits `additionalContext` instructing the new session to call `Skill(skill="run")` to reload the full instructions, then hand off to mechanism (1). **Fallback**: if the `Skill` tool errors or the `run` skill is unavailable, read `.claude/skills/run/SKILL.md` directly with the `Read` tool and follow its Session Start step 0. This is the compaction-survival path
-- **Stall signature to watch for**: if you catch yourself drafting a message like "I have finished {X} so far; let me know if you want me to continue" or "Cycle N of M complete — proceeding with cycle N+1?", that is the stall. Replace the message with the actual next tool call
 
 ## Arguments
 
@@ -65,7 +51,9 @@ Every node is a **folder**. File formats are defined in `.claude/research-tree.m
 
 Children are subfolders. The tree can nest to arbitrary depth.
 
-- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice). Write `note.md` when results are stable enough to state (see research-tree.md for when/how and for folder-name conventions)
+**Folder names** use **Title Case with spaces** for Obsidian readability (e.g., `Lattice BKT`, `Winding Gap`).
+
+- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice). Write `note.md` when results are stable enough to state (see research-tree.md for when/how)
 - **Recording a dead end**: write `dead_ends.md` in the node folder (or append if it exists)
 - **Adding a directive**: write `directives.md` in the folder where the rule applies (typically project root; only through meetings)
 - **Seeing children**: `ls` the folder (subfolders = children)
@@ -222,7 +210,7 @@ Atomic definitions (one term per file). Linked from any file via `[[term]]`. Con
 
 ### Naming Convention
 
-See `.claude/research-tree.md` § Folder Names for the canonical rule (Title Case with spaces, semantic slugs, no ordering-encoded paths).
+Folder names use **Title Case with spaces** (e.g., `Winding Gap`, `Lattice BKT`). A new reader should guess what the node is about from its name alone. No sequential numbering — narrative order is described in the parent's plan.md, not in filenames.
 
 ### kind (Cognitive Mode)
 
@@ -257,14 +245,6 @@ Update status to `closed`. If the closure is informative, add an entry to the no
 
 ## Session Start
 
-0. **Resume check** — read `logs/.run-active` if it exists. Precedence rules:
-   - **If the user invoked `/run {N}` with an explicit argument, that argument always wins** — treat this as a fresh session regardless of the beacon. Delete a stale beacon if present. (Explicit invocation signals new intent from the user)
-   - If `/run` was invoked without an explicit argument (so `MAX_CYCLES` defaults to `5`), consult the beacon:
-     - File exists, `remaining > 0`, and **not stale** → this is a resume after an interruption (context compaction, crash, reconnect). Treat `MAX_CYCLES` as the `remaining` value from the file, skip the initial TodoWrite planning step, and proceed directly to step 1. Do not emit a greeting or recap — just resume work
-     - File exists with `remaining <= 0` → prior session ended cleanly between cycle and Session End; delete it, normal fresh start
-     - File exists but is **stale** — defined as either (i) file mtime older than 24 hours, or (ii) a newer `logs/*_run.md` exists → the prior session is not truly in flight; delete the beacon and treat as fresh start
-     - File does not exist → normal fresh start
-   - Note: the beacon is written at the start of every cycle (Cycles step 0 below), so on the very first cycle of a fresh session it briefly reads `{"remaining": MAX_CYCLES, …}`. A crash between that write and any real work is harmless: a resume reading `remaining == MAX_CYCLES` is equivalent to a fresh start minus the greeting
 1. Session log filename: use `logs/_DRAFT_run.md` — a system hook auto-renames it with the correct timestamp on write
 2. Read `research/focus.md` (the session cursor — where the previous session left off)
 3. Read `logs/last_session.md` (if it exists — previous session's operational context)
@@ -289,16 +269,6 @@ Update status to `closed`. If the closure is informative, add an entry to the no
 ## Cycles (Repeat up to MAX_CYCLES times)
 
 **Treat TodoWrite as hypotheses.** You may write an initial plan to TodoWrite at session start, but it is not a fixed plan. Each cycle's results bring new information, so always update TodoWrite in step 3. Do not continue just "because it was decided at the start."
-
-### 0. Cycle Bookkeeping (every cycle start)
-
-Overwrite `logs/.run-active` with a one-line JSON snapshot of the remaining budget:
-
-```json
-{"remaining": <MAX_CYCLES - cycles_done>, "max_cycles": <MAX_CYCLES>}
-```
-
-This file is the resume beacon read at Session Start step 0. Writing it every cycle (not just at session start) means that after a mid-cycle compaction, `remaining` still reflects exactly what is owed. The file is gitignored (see `.gitignore`) and deleted at Session End step 7.
 
 ### 1. Research Judgment
 
@@ -371,6 +341,8 @@ PI: Continue own work (Read, Edit, etc.)
 ← System notification
 TaskOutput(task_id="task_id_1", block=true)
 ```
+
+**When a background task exceeds session scope** (e.g. a multi-hour HPC campaign that will not finish before MAX_CYCLES): do not wait, and do not end the session. Pick up independent work — sibling branches of the cursor, deepening of stable nodes, curator passes, deferred items. Record the running task in `logs/last_session.md` as a handoff for next-session integration. The session's productivity is measured in PI cycles completed, not in completion of any single background task.
 
 **Prompt template:**
 
@@ -461,8 +433,9 @@ After log.md files accumulate changes, dispatch **curator** for note.md polishin
 
 ## Session End
 
-End the session when MAX_CYCLES is reached or PI judges completion.
-No need to rush — the next `/run` resumes from where you left off.
+**Default: run until MAX_CYCLES is reached.** Returning a turn to the user means stopping research, because the user is generally away during `/run` (this is why `AskUserQuestion` is prohibited and the final report is the only text output). The user allocated N cycles because they wanted N cycles of progress — "cycles left" and "ended early" should be treated as incompatible states. Do not return the turn just because the current subtree looks resolved; float up, deepen stable nodes, dispatch curator, or pick up a deferred independent branch. A background task that will not complete within the session is **not** a reason to end — see Pattern B.
+
+As MAX_CYCLES approaches, do not distort research to manufacture a conclusion; the next `/run` resumes from where you left off, so there is no need to rush. This "no need to rush" rule protects research integrity near the cycle limit — it is not a license to end early because "nothing obvious to do." Ending early is warranted only when you have genuinely exhausted the alternatives listed above, which is almost never the case.
 
 **Do not suggest transitioning to `/write`**. The user decides when research is mature enough for writing.
 
@@ -507,14 +480,10 @@ No need to rush — the next `/run` resumes from where you left off.
    - {paths to deliverables produced}
    ```
    Use the timestamp captured at session start (step 1).
-7. Clean up the resume beacon and commit:
+7. Git commit:
    ```bash
-   rm -f logs/.run-active
    git add -A && git commit -m "run: {concise summary of achievements}" && git push
    ```
-   Removing `logs/.run-active` marks the session as cleanly ended, so the next `/run` invocation starts fresh (Session Start step 0 sees no file and proceeds normally).
-
-   **Prerequisite**: `logs/.run-active` must be listed in `.gitignore`. If you notice it is missing from `.gitignore`, add it before committing so that a crash-left beacon never accidentally ends up in the repo via `git add -A`.
 8. Display the final report to the user:
    - Work performed and results
    - Deliverable paths

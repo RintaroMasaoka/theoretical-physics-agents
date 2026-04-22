@@ -5,13 +5,13 @@
 #   bash .scripts/fetch-arxiv.sh <arxiv_id> [<arxiv_id> ...]
 #
 # Downloads PDF + LaTeX source for each paper.
-# Results are placed in literature/papers/{id}/.
+# Results are placed in research/papers/{id}/.
 #
 # Mechanism:
 #   1. Push request to arxiv-fetch branch (orphan, force-push)
 #   2. GitHub Actions downloads papers from arXiv
 #   3. This script polls until results appear
-#   4. Extracts results to local literature/papers/
+#   4. Extracts results to local research/papers/
 
 set -euo pipefail
 
@@ -19,7 +19,7 @@ MAX_PAPERS=20
 POLL_INTERVAL=30
 MAX_POLLS=20  # 10 minutes max
 BRANCH="arxiv-fetch"
-LOCAL_DIR="literature/papers"
+LOCAL_DIR="research/papers"
 
 # --- Argument validation ---
 if [ $# -eq 0 ]; then

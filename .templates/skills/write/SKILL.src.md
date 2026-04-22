@@ -10,7 +10,6 @@ Draft research findings as an academic paper. The responsibility is to shape the
 
 ## Constraints
 
-- **Write PI-authored prose in {{ language }}.** Scope: session records (`logs/{timestamp}_write.md`, `logs/last_write_session.md`), `agenda.md`, and the final report. `/write` does not modify `research/`. The manuscript (`manuscript/**`) is out of scope of this rule — it follows the paper's publication language as realised by outliner/writer (whatever language those agents emit in `manuscript/outline.md` and `manuscript/sections/*.md` is the manuscript's language; PI matches it rather than translating). Reason: `{{ language }}` is for internal project communication; the paper is an external artifact with its own audience. Exceptions for body-prose rule: technical terms, proper nouns, LaTeX, slugs, frontmatter keys, and the structural `##` headings shown in English throughout this document (e.g., `## Accomplished`, `## Section Status`, `## Issues`) may stay English. Treat English example templates in this SKILL as structural illustrations, not language directives
 - `AskUserQuestion` is prohibited. Users are often away, and asking questions interrupts the session and wastes time. Text output is limited to the final report only. Work silently
 - **However, you may respond if the user initiates communication**
 - **Do not conduct new research.** If a research gap is discovered during writing, record it in `agenda.md` and leave it to `/run`. Do not launch researcher or scout yourself
