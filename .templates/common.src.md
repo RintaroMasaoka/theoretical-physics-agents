@@ -21,9 +21,25 @@ A system hook automatically renames `_DRAFT_` files with the correct timestamp (
 
 Deliverables and logs are provisional. PI independently verifies their content before incorporating results into reports or the research tree (see `.claude/research-tree.md`).
 
+## Heartbeat — Preventing Stream Idle Timeout
+
+Long investigations sometimes hang at the streaming layer when the agent goes silent for minutes between tool calls. Prevent this by keeping a light narration flowing, without bloating the deliverable:
+
+- **Before a heavy tool call, emit one short sentence in the assistant message** (the text returned to PI, **not** the markdown written via `Write` into the deliverable file) explaining what you are about to do. Heavy = `Agent` dispatches, `Read` of a long file, any `Bash` command you have no reason to expect will return instantly, or a batch of multiple searches. Example: "Reading §4 of `literature/papers/2511.16496/QBTCFT.tex` to check the $-4\pi|0\rangle$ coefficient."
+- **After the call returns, summarise the result in one line before moving on.** Example: "§4 confirms the coefficient; next I need to verify the sign against §5.2."
+- For a **parallel batch** (e.g. 3 `Agent` or `Read` calls sent together in one assistant message), one narration line covering the whole batch is enough — not one per call.
+- The narration is prose that follows the project output language rule (`{{ language }}`), same as the deliverable body. Technical terms, LaTeX, paths stay as-is.
+- Do not pad with filler. One concrete sentence per non-trivial step is enough. The purpose is to keep tokens flowing and let PI audit your thinking, not to describe trivialities.
+
+Rationale: idle timeouts fire on silent gaps in the output stream, not on total output volume. A cheap one-line narration between non-trivial tool calls costs almost nothing in quality but decisively cuts timeout risk in long-running agents (researcher, critic, writer, simulator in particular).
+
 ## Constraints
 
-- Write deliverables and logs in **{{ language }}** (technical terms, proper nouns, and equations may remain in their original language)
-- Write equations in LaTeX notation (inline: `$...$`, display: `$$...$$`). Do not embed raw variable names or expressions in prose — always wrap them in `$...$`. Use `$$` instead of `\(\)`, `\[\]`, or LaTeX environment names
+- Write deliverables and logs in **{{ language }}** — this applies to the prose. Technical terms, proper nouns, and LaTeX mathematics may stay in their original language
+- Write mathematics in LaTeX so that Markdown renderers pick it up:
+    - Inline: `$...$`. Any raw variable or expression in prose must be wrapped
+    - Display: `$$...$$`. Multi-line environments (`align`, `aligned`, `cases`, `matrix`, …) must sit **inside** the `$$...$$` wrapper
+    - Do not use `\(...\)` or `\[...\]` as delimiters
+    - Do not write a bare `\begin{env}...\end{env}` at the top level without wrapping it in `$$...$$`
 - Do not request user input in any form (users are often away during `/run` and `/write`. However, you may respond if the user initiates communication)
 - No writing outside the project directory

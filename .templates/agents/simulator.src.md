@@ -25,7 +25,7 @@ If the module lacks necessary functionality, record this in the deliverable and 
 
 ## Directory Structure
 
-Simulation artifacts live within the research tree. Each research node may contain computation subdirectories:
+Simulation artifacts live within the research tree. **The canonical rules for `src/` — placement, companion `{slug}.md`, archival, hygiene — are defined in `.claude/research-tree.md` § Computation Artifacts; read that file and follow it.** When this prompt paraphrases those rules inline for readability, the canonical spec wins in any conflict. The layout diagram below shows simulator's typical artifacts on top of that shared spec; the "Simulator-Specific Placement" subsection covers what is unique to simulator (data, images, reports, what goes in a measurement script's companion `.md`).
 
 ```
 research/
@@ -33,7 +33,7 @@ research/
     {model}.{ext}                   # Model-specific module
     test/                           # Module tests (read-only)
     Project.toml                    # Dependency management
-  {Node}/
+  {Node}/                           # For src/: the lowest common ancestor of all nodes using the script (may be the task's node, or higher). For data/images: the node owning the observable.
     src/                            # Source code for this node's computations
       {slug}.{ext}                  # Measurement scripts
       {slug}_plot.{ext}             # Plot scripts
@@ -47,17 +47,17 @@ research/
     report_{slug}.md                # Simulation report (directly in node)
 ```
 
-### Placement Rules
+### Simulator-Specific Placement (Data, Images, Reports)
 
-**Scripts (`src/`)**: Place in the **lowest common ancestor** of all nodes that use the script. A script specific to one node goes in that node's `src/`. A script shared across siblings goes in their parent's `src/`. This avoids duplication and makes scripts discoverable from the research context.
+The general `src/` rules (placement at lowest common ancestor, companion `{slug}.md`, archival under `src/archive/`, no bytecode commits) are defined canonically in `.claude/research-tree.md` § Computation Artifacts. This subsection covers only the points specific to simulator — where data and images go, where reports go, and what a measurement script's companion `.md` must contain.
 
 **Data (`data/`)**: Place in the node where the measured observable belongs. If remeasuring the same observable with compatible parameters, accumulate data in the existing location rather than creating a new directory.
 
 **Images (`images/`)**: Place in the same node as the data they visualize.
 
-**Reports**: Place `report_{slug}.md` directly in the node. Summary reports covering multiple child simulations go in the parent node.
+**Reports**: Place `report_{slug}.md` directly at the node root (it is a narrative file, not source code). Summary reports covering multiple child simulations go in the parent node.
 
-**Natural language descriptions**: For each measurement script `{slug}.{ext}`, write a companion `{slug}.md` in the same `src/` directory. This file explains what the script computes, the algorithm, key parameters, and how to run it — readable by someone unfamiliar with the implementation language.
+**Companion `.md` content for measurement scripts**: A measurement script is a long-lived artifact, so its companion `{slug}.md` must explain the algorithm, key parameters, and how to run it — at a level readable by someone unfamiliar with the implementation language. This is a stricter standard than the canonical-spec baseline (a short blurb), because the script is intended to be re-run and extended over the lifetime of the node.
 
 ### Data Management
 
@@ -90,7 +90,7 @@ Simulator is the **data steward** of computation artifacts within research nodes
 Before writing code, clarify the following:
 - **What modules to use**: Check `research/lib/` APIs. If insufficient, record in deliverable
 - **Check existing scripts and data** before designing anything new — duplication comes from skipping this step:
-  1. Search the target node's `src/` and ancestor nodes' `src/` for scripts measuring the same observable. Prefer extending an existing script over creating a new one
+  1. Search the target node's `src/` and ancestor nodes' `src/` for scripts measuring the same observable — under the canonical lowest-common-ancestor rule (see `.claude/research-tree.md` § Computation Artifacts), a shared measurement script may live several levels up. Prefer extending an existing script over creating a new one
   2. Search the target node's `data/` for existing data covering the same or similar observables and parameter regime. Plan to accumulate there if appropriate
   3. If this task supersedes old results (bug fix, improved parameters), move the old data to `data/archive/` before producing new data. Never delete data — archived data remains searchable and recoverable
   4. Record the decision (reused existing / created new / archived old) and the reason in the deliverable
@@ -99,9 +99,9 @@ Before writing code, clarify the following:
 
 ### 2. Implementation and Verification Iteration
 
-Write or extend a script in the target node's `src/`. If extending an existing script (per §1), use Edit; if creating a new one, write `src/{slug}.{ext}`. The script loads modules from `research/lib/` and implements only the measurement logic. Language: **{{ simulation.language }}** (matches the modules).
+Write or extend a script under the correct `src/` per the canonical placement rule (usually the target node; higher up if the script is shared — see `.claude/research-tree.md` § Computation Artifacts). If extending an existing script (per §1), use Edit; if creating a new one, write `{slug}.{ext}` in that `src/`. The script loads modules from `research/lib/` and implements only the measurement logic. Language: **{{ simulation.language }}** (matches the modules).
 
-Write a companion `src/{slug}.md` describing the implementation in natural language.
+Write a companion `{slug}.md` alongside the script (same `src/` directory). For its content, see "Companion `.md` content for measurement scripts" in the Simulator-Specific Placement subsection above.
 
 Code principles:
 - Specify parameters via command-line arguments or constants at the script's top

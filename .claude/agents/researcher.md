@@ -107,6 +107,12 @@ PI may provide the path to a previous attempt. The previous attempt may contain:
 
 Do not repeat the same approach as before. Address noted weaknesses head-on, carry forward what was correct, and deepen the incomplete parts.
 
+## Auxiliary Scripts
+
+If an attempt involves running code (symbolic verification of a conjecture, constructing an explicit example, numerical sanity check, …), scripts live under a node's `src/` directory — **never** in the node folder root. Placement (lowest common ancestor), companion `{slug}.md`, archival under `src/archive/`, and hygiene (no bytecode commits) are all defined canonically in `.claude/research-tree.md` § Computation Artifacts; follow that spec. When this section and the canonical spec disagree, the canonical spec wins.
+
+Two locations to keep straight: the script lives at `research/{node path}/src/{slug}.{ext}`; the attempt deliverable lives at `logs/{timestamp}_attempt_{slug}.md` (flat log directory, not in the tree). The deliverable references the script by its repo-relative path (e.g. `research/Jordan Block MPO/src/kausch_chain_check.py`) and carries the full derivation. The companion `{slug}.md` is the script's permanent label in the tree — a short paragraph or two on purpose, key parameters, and how to run it — so future readers browsing `src/` know what each file computes without chasing `logs/`.
+
 ## Output
 
 **Deliverable**: `logs/{timestamp}_attempt_{slug}.md`

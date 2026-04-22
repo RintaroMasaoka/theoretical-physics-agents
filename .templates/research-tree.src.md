@@ -2,6 +2,8 @@
 
 Research information is organized as a **tree** under `research/`. Every node is a folder. Files serve distinct roles:
 
+**Language.** Body prose in every file described here (log.md Current State, Evidence entries, note.md, plan.md, story.md, report_*.md, principles.md, focus.md, dead_ends.md, …) is written in **{{ language }}**. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current State`, `## Evidence`, `## Background`), frontmatter keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. The English examples below illustrate structure, not language.
+
 | File | Layer | Role |
 |---|---|---|
 | `note.md` | Destination (SoT) | **Verified knowledge.** Free-form prose — no prescribed sections, no frontmatter. Written when a node has significant established results. Not every node has one |
@@ -10,22 +12,44 @@ Research information is organized as a **tree** under `research/`. Every node is
 | `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). PI's working document |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
 | `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting research constraints |
-| `src/` | Computation | Source code and natural language descriptions of implementations |
+| `src/` | Computation | Source code tied to a node (measurement, analysis, plot, or verification scripts), each with a companion `{slug}.md` |
 | `data/` | Computation | Simulation data (TSV format with metadata headers) |
 | `images/` | Computation | Figures and visualizations |
 | `lib/` | Computation (root only) | Shared simulation framework modules (managed by engine-builder) |
 
+## Folder Names
+
+Every node is a folder, and the folder name is the only thing a reader sees when browsing the tree. Use a semantic slug describing what the node is about on its own — **Title Case with spaces** is the house style (e.g., `Topic Name`, `Subtopic Name`).
+
+The folder path must be stable under reorderings of the narrative. This rules out any slug that depends on where the node sits in the current story — positional prefixes, sequence indices, phase labels, and similar ordering markers all go stale the moment the story is rewritten. Narrative order lives in the parent's `story.md` or `plan.md`, not in the path.
+
+A reader who sees only the folder name should be able to guess the node's content. If the name only makes sense given the current story, it is the wrong name.
+
 ## Computation Artifacts
 
-Research nodes may contain computation subdirectories alongside their text files:
+Research nodes may contain computation subdirectories alongside their text files. This section is the canonical spec — agents that write here (simulator, researcher) follow these rules and cite this section rather than restating them.
 
-- **`src/`**: Measurement scripts and their natural language descriptions. Each script `{slug}.{ext}` has a companion `{slug}.md` explaining the implementation. Placement rule: **lowest common ancestor** of all nodes that use the script — a script specific to one node goes in that node's `src/`, a script shared across siblings goes in their parent's `src/`
-- **`data/`**: Simulation data in TSV format with structured metadata headers. Placement rule: the node that **owns the investigation** — data belongs to the node where the measured observable is studied
-- **`images/`**: Figures and visualizations. Placement rule: same node as the data they visualize
+### `src/` — Source code tied to a node
 
-At the root (`research/`), **`lib/`** contains shared simulation framework modules managed by engine-builder. `lib/test/` contains module tests.
+Any source code tied to a node lives in `src/`: simulator's measurement / analysis / plot scripts, and researcher's ad-hoc verification scripts for conjectures and examples. Both writers follow the same rules below.
 
-These directories are managed by the simulator agent (see simulator agent definition for conventions). Other agents treat them as read-only context.
+**Node-root prohibition.** Never place source files (`.py`, `.jl`, …) directly in the node folder. Node roots are reserved for narrative files (`log.md`, `plan.md`, `note.md`, `report_*.md`, `story.md`, `principles.md`). Loose scripts in node roots break the tree's legibility and bypass the `src/` reuse rule, so creating `src/` (even for a single script) is mandatory.
+
+**Placement — lowest common ancestor.** Place a script at the lowest node that is an ancestor of every node that uses it. Common cases: a script used only in node `X` lives in `X/src/`; a script shared across siblings of a parent `P` lives in `P/src/`; if two cousins share a script, it lives in their nearest common ancestor's `src/`. This avoids duplication and makes scripts discoverable from the research context.
+
+**Companion `{slug}.md` required.** Every script `{slug}.{ext}` carries a companion `{slug}.md` in the same `src/` directory — this is the script's permanent label in the tree, so a reader browsing `src/` knows what each file computes without opening the code or grepping `logs/`. Minimum content: what the script computes, key parameters, and how to run it. For simulator's long-lived measurement scripts the companion expands into a full implementation description (see simulator agent). For researcher's one-off attempt scripts a short blurb (a paragraph or two) is enough — the full derivation and numerical results live in the attempt deliverable at `logs/{timestamp}_attempt_{slug}.md`, which links the script by its repo-relative path.
+
+**Retirement.** Superseded scripts move to `src/archive/` rather than being deleted, so the reasoning history stays searchable.
+
+**Hygiene.** Do not commit `__pycache__/`, `.ipynb_checkpoints/`, or any per-machine bytecode generated by running scripts.
+
+### `data/`, `images/`, and root `lib/`
+
+- **`data/`**: Simulation data in TSV format with structured metadata headers. Placement: the node that **owns the investigation** — data belongs to the node where the measured observable is studied. Managed by simulator (see simulator agent for TSV metadata-header format and archival rules)
+- **`images/`**: Figures and visualizations. Placement: same node as the data they visualize. Managed by simulator
+- **`research/lib/`** (root only): Shared simulation framework modules managed by engine-builder. `lib/test/` contains module tests
+
+Agents that are not simulator, researcher, or engine-builder treat all of `src/`, `data/`, `images/`, and `lib/` as read-only context.
 
 ## note.md — Source of Truth
 
@@ -119,11 +143,16 @@ research/
     plan.md            (children decomposition and strategy)
     log.md             (working state, evidence trail)
     src/               (scripts relevant to this branch)
-      winding_decay.jl
-      winding_decay.md
+      winding_decay.jl           (simulator's long-lived measurement script)
+      winding_decay.md           (companion: algorithm + params + how to run)
+      archive/                   (superseded scripts kept for history)
     Coulomb Escape/
       log.md           (leaf: may only have log.md, no note.md yet)
       src/             (scripts specific to this leaf)
+        escape_rate.jl           (simulator's measurement)
+        escape_rate.md
+        check_sign_convention.py (researcher's one-off verification)
+        check_sign_convention.md (short blurb; full derivation in logs/)
       data/            (simulation data for this investigation)
       images/          (figures generated from this data)
       report_escape_rate.md
@@ -139,7 +168,7 @@ research/
 | **Research tree — log** | `research/**/log.md` | Read-only | Process: current state, evidence chain, kind/status |
 | **Concept definitions** | `concepts/` | Read-only (concept-checker may create entries) | Atomic term definitions, wiki-linked from any file via `[[term]]` |
 | **Computation — framework** | `research/lib/` | Read-only (engine-builder writes) | Shared simulation modules |
-| **Computation — source** | `research/**/src/` | Write (simulator) | Measurement scripts and implementation descriptions |
+| **Computation — source** | `research/**/src/` | Write (simulator, researcher) | Source code tied to a node: measurement / analysis / plot / verification scripts, each with a companion `{slug}.md` |
 | **Computation — data** | `research/**/data/` | Write (simulator) | Simulation data (TSV with metadata headers) |
 | **Computation — figures** | `research/**/images/` | Write (simulator) | Visualizations |
 | **Research notebooks** | `logs/*_{type}_*.md` | Write (own deliverables only) | Worker deliverables: reading notes, attempts, simulations |

@@ -3,8 +3,10 @@
     "deny": [
       "Bash(sudo:*)",
       "Bash(su:*)",
+
       "Bash(brew:*)",
       "Bash(port:*)",
+
       "Bash(pip install:*)",
       "Bash(pip3 install:*)",
       "Bash(pip uninstall:*)",
@@ -16,12 +18,17 @@
       "Bash(go install:*)",
       "Bash(conda:*)",
       "Bash(pipx:*)",
+
       "Bash(nvm:*)",
       "Bash(pyenv:*)",
       "Bash(rbenv:*)",
       "Bash(rustup:*)",
+
+      "Bash(kill:*)",
+      "Bash(killall:*)",
       "Bash(shutdown:*)",
       "Bash(reboot:*)",
+
       "Bash(launchctl:*)",
       "Bash(osascript:*)",
       "Bash(defaults:*)",
@@ -36,14 +43,59 @@
       "Bash(spctl:*)",
       "Bash(dscl:*)",
       "Bash(security:*)",
+
       "Bash(crontab:*)",
       "Bash(mount:*)",
       "Bash(umount:*)",
       "Bash(dd:*)",
       "Bash(mkfs:*)",
       "Bash(fdisk:*)",
-      "Bash(git config --global:*)",
-      "Bash(git config --system:*)"
+
+      "Bash(docker:*)",
+      "Bash(kubectl:*)",
+      "Bash(terraform:*)",
+      "Bash(vagrant:*)",
+      "Bash(ansible:*)",
+
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(sftp:*)",
+      "Bash(nmap:*)",
+      "Bash(nc:*)",
+      "Bash(netcat:*)",
+
+      "Bash(chmod:*)",
+      "Bash(chown:*)",
+      "Bash(chflags:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .scripts/configure.mjs",
+            "statusMessage": "Applying config templates..."
+          },
+          {
+            "type": "command",
+            "command": "bash .scripts/check-run-resume.sh",
+            "statusMessage": "Checking /run resume beacon..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .scripts/fix-log-timestamp.sh"
+          }
+        ]
+      }
     ]
   }
 }
