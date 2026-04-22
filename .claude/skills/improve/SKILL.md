@@ -15,6 +15,8 @@ Arguments: $ARGUMENTS
 
 ## Flow
 
+Precondition: run `bash .scripts/sync.sh pull` before reading or editing any file, so edits land on the current upstream templates (see Commit & Upstream Sync for the sync model).
+
 ```
 Argument provided → Treat as complaint → Confirm nuances → Execute fix
 No argument → AskUserQuestion to clarify intent (3 choices + Other for free-form complaint)
