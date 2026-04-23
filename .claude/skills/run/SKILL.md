@@ -57,7 +57,7 @@ Every node is a **folder**. File formats are defined in `.claude/research-tree.m
 
 | File | Layer | Accumulation | Role |
 |---|---|---|---|
-| `note.md` | Destination | Overwrite | **Source of truth.** Free-form verified knowledge. No template, no frontmatter |
+| `note.md` | Destination | Overwrite | **Source of truth.** Derivation-bearing paper-quality prose — each principal claim carries its derivation (inline or cited) plus a provenance tag. No template, no frontmatter. Canonical spec: `.claude/research-tree.md` § note.md |
 | `plan.md` | Ladder | Overwrite | **Strategy and approach.** Decomposition rationale, approach decisions, children's roles. Rewritten as strategy evolves |
 | `log.md` | Ladder | Overwrite + Append | **Research process.** Current State (rewritten), Evidence (appended). PI's working document |
 | `dead_ends.md` | Ladder | Append-only | Failed approaches and lessons learned. Prevents log.md bloat |
@@ -125,18 +125,19 @@ New node → mkdir + log.md [status: open]
     ↓ plan approach
 PI writes plan.md (decomposition, strategy) if non-trivial
     ↓ investigate
-Workers produce deliverables in logs/ (research notebooks)
-    ↓ PI verifies via critic
-PI promotes verified results → report_{slug}.md in the node (self-contained)
+Workers produce deliverables in logs/ (research notebooks with derivations)
+    ↓ PI verifies via critic (Target A — attempt file)
+PI promotes verified results → report_{slug}.md in the node (self-contained, derivation preserved)
     ↓ node reaches stable — PI dispatches curator
-Curator distills from reports + log.md → writes note.md (verified knowledge)
+Curator lifts derivations (not just claims) from reports + log.md → writes note.md
+Curator then dispatches critic (Target B — note.md) to verify the lifted derivation
     ↓ understanding deepens — PI dispatches curator again
-Curator updates note.md. log.md continues accumulating
+Curator updates note.md with new derivations; re-dispatches critic on touched sections
     ↓ later found wrong
 PI writes retraction evidence into log.md + dead_ends.md → dispatches curator to update note.md
 ```
 
-**note.md is curator-authored, not PI-authored.** The diagram above is not a convention — it is the ownership rule. PI's tree-editing authority covers log.md (every cycle), plan.md (when strategy changes), dead_ends.md (when approaches fail), and report_{slug}.md (when promoting a verified result). note.md is the one file PI does not write substantively: its prose comes from curator, dispatched by PI. The reasons — separation of concerns, second-reader quality, cross-tree coherence, provenance tagging — are stated in `.claude/research-tree.md` § note.md under **Ownership**, which is the canonical rule.
+**note.md is curator-authored, not PI-authored, and carries the derivation — not just the claim.** The diagram above is not a convention — it is the ownership rule and the substance rule combined. PI's tree-editing authority covers log.md (every cycle), plan.md (when strategy changes), dead_ends.md (when approaches fail), and report_{slug}.md (when promoting a verified result). note.md is the one file PI does not write substantively: its prose comes from curator, dispatched by PI, with each principal claim accompanied by its derivation (inline or cited) and its provenance tag. The reasons — separation of concerns, second-reader quality, cross-tree coherence, derivation lifting, tag assignment — are stated in `.claude/research-tree.md` § note.md under **Ownership**, which is the canonical rule.
 
 Two narrow carve-outs preserve the above without friction: (i) trivial mechanical fixes to note.md (typo, broken wiki-link rename) may be made directly by PI since they change no semantics; (ii) user-present collaborative rewrites under `/meeting` or `/launch` are authoritative (the user serves as second reader in real time). Everything else — adding a section, rewording a claim, inserting a "status update" block, updating a provenance tag — goes through a curator dispatch.
 
@@ -330,7 +331,7 @@ PI works **depth-first within the cursor's subtree**. The general movement: dive
 #### Agent selection guidelines (not rigid priorities):
 - Early research / insufficient literature → **scout** / **reader**
 - Open or active gaps → **researcher** (with cognitive mode appropriate to kind)
-- Verify researcher's attempt → **critic** (PI decides accept/resubmit/pivot)
+- Verify researcher's attempt → **critic** with **Target A** (the attempt file in `logs/` — the only critic mode PI ever dispatches; PI decides accept/resubmit/pivot). Critic's Target B (note.md review) is a curator-internal step, not PI-dispatched — see "Critic verification mode" in step 3 for details
 - Further research needed after verification → **researcher** (resubmit with previous notes and feedback)
 - Build/extend/refine simulation framework → **engine-builder** (`research/lib/`, or "refine lib" for self-directed improvement)
 - Numerical verification → **simulator** (using existing `lib/` modules)
@@ -448,12 +449,14 @@ Retrieve deliverable paths from task return values and Read deliverables directl
 
 - **Update TodoWrite** (required): Check off completed tasks, insert new, reprioritize
 
-**Critic verification mode**:
+**Critic verification mode** (PI dispatches critic with Target A — the attempt file):
 
 - **Blind mode**: For mechanical/mathematical checks. Critic reads only the attempt file, without research context. Eliminates expectation bias
 - **Contextual mode**: For logical/value judgments. Critic reads the ancestor chain from root to the **target node being critiqued** (not PI's current cursor) — note.md + plan.md + log.md + dead_ends.md + directives.md at each level
 
 Rule of thumb: "Does the critic need to know the research purpose?" — No → blind, Yes → contextual.
+
+*Critic on note.md (Target B) is curator's internal step, not PI's.* Curator dispatches critic on lifted note.md derivations as part of its own maintenance workflow (see `.claude/agents/curator.md` § note.md critic layering). PI's `/run` cycles do not dispatch critic on note.md directly — that second-order dispatch is nested inside the curator dispatch PI already issues.
 
 **Researcher resubmission**: Every researcher attempt must go through critic before PI adopts its results into the research tree. Worker deliverables are single-pass outputs that may contain errors or off-target framing — critic provides independent verification that PI cannot perform alone (because PI is anchored by reading the attempt). If PI decides to close the node without adopting results, critic is not required. Critic annotates the attempt (strikethrough + comments + Critique section). PI decides:
 - **ACCEPT**: Update log.md evidence (with verification basis). Dispatch curator to update note.md if warranted

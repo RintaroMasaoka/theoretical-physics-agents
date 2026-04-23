@@ -6,7 +6,7 @@ Research information is organized as a **tree** under `research/`. Every node is
 
 | File | Layer | Role |
 |---|---|---|
-| `note.md` | Destination (SoT) | **Established knowledge with explicit provenance. Curator-authored** — PI dispatches curator to write and update; PI does not author the prose directly (see § note.md — Ownership below). Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries a verification tag (see Verification Provenance Taxonomy). Written when a node has significant established results. Not every node has one |
+| `note.md` | Destination (SoT) | **Derivation-bearing paper-quality knowledge. Curator-authored** — PI dispatches curator to write and update; PI does not author the prose directly (see § note.md — Ownership below). Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries **both** a derivation (inline or cited, see Scope of derivation) and a verification tag (see Verification Provenance Taxonomy). Written when a node has significant established results. Not every node has one |
 | `report_{slug}.md` | Report (with provenance) | **PI-promoted report with explicit provenance tags.** Self-contained analysis promoted from worker deliverables after independent review. Belongs to the node, not to the timeline. See below |
 | `plan.md` | Ladder (strategy) | **Strategy and approach.** How to attack this node — decomposition rationale, approach decisions, children's roles. Rewritten as strategy evolves |
 | `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). PI's working document |
@@ -53,43 +53,53 @@ Agents that are not simulator, researcher, or engine-builder treat all of `src/`
 
 ## note.md — Source of Truth
 
-Publication-quality knowledge in free-form prose, with every principal claim carrying an explicit provenance tag. "Source of Truth" means **the authoritative record of what is known and at what confidence level**, not "only CONFIRMED claims" — STRONG CONJECTURE, CONJECTURE, and OPEN claims belong in note.md too when they are the node's established state, provided each carries its provenance tag.
+**What note.md is.** The paper's substantive content *in situ* — for each principal claim the node has established, the claim **together with the derivation that establishes it** (proof sketch, symbolic computation, argument, or cited external result) written to paper quality. Stacking the note.md files of the tree in narrative order should yield the body of the paper. An abstract-level registry of claims (each line a sentence plus a provenance tag, with the actual derivation kept elsewhere) is **not** note.md; it is a table of contents mistakenly labelled SoT.
 
-**Audience — the context-free reader.** note.md is the one file in the tree written **for a reader who knows nothing about the research process**: no memory of attempts, critic verdicts, revision rounds, or session history; no access to `logs/`, `plan.md`, or `log.md`; no prior exposure to this project's internal vocabulary. The reader is presumed to be a working researcher in a neighbouring field, so standard terminology of that field can be used — but anything project-specific (internal IDs, attempt labels, working-group jargon) must be introduced before use, or linked to a concept note / sibling note.md via `[[...]]`. The test: if reading note.md leaves the reader needing to open any other file in this repository to understand what the node has established, note.md has failed. Wiki-links are the acceptable form of "other file" — following a link to a concept definition is part of normal reading, but forcing the reader into `log.md` or `logs/` is not.
+**"Source of Truth" means derivation-bearing.** A reader who accepts a claim in note.md must be able to check *why* within note.md itself — because the derivation is present. Provenance tags are a navigation and confidence summary accompanying each claim; they are **not** a substitute for the derivation. A CONFIRMED claim accompanied only by a tag gives the reader a stamp and nothing to check, which forces the reader into `logs/` and defeats note.md's purpose. The dividing line between note.md as a paper seed and note.md as an index is exactly this: derivations live in the note, not behind the tag.
 
-This audience is the single strongest constraint on the file, and it is the one the curator actively enforces. The prose must read cleanly **in isolation** — not merely "in principle understandable given enough context."
+**Scope of "derivation".** What counts satisfies one of:
+- *Inline derivation* — a proof sketch, symbolic / numerical computation with its setup and conclusion, or worked-out argument. Full textbook detail is not required; what is required is that a reader in a neighbouring field can follow the logical chain from premises to conclusion without leaving note.md (modulo `[[wiki-links]]` to concept notes or sibling nodes that supply definitions, referenced lemmas, or derivations covered at another node).
+- *Cited external result* — when the claim is a result from external literature used as a premise, cite the source (with section / theorem number where reasonable) in the note itself. The citation *is* the derivation pointer, and the tag set will then include `[literature]`. This route is acceptable for results the project *uses*; it is **not** acceptable for project-central claims (those this project is staking as its own contribution) — project-central claims must carry an inline derivation.
 
-**No template.** The content and structure emerge from the research itself. A node studying a mathematical structure will naturally differ from one resolving a paradox or surveying a field. Prescribed sections constrain the researcher's thinking — the prose should take whatever form best captures the established knowledge.
+**All confidence levels carry derivation, not only CONFIRMED.** STRONG CONJECTURE, CONJECTURE, and OPEN claims that appear in note.md carry the partial argument, special-case verification, or motivating evidence that *is* available — with explicit scope — rather than being stated as bare tagged sentences. An OPEN claim appears in note.md only when its formulation is itself established knowledge (i.e., the node knows *what* the question is and *why* it is the right question); the answer being unknown is stated, but the framing is substance.
+
+**Audience — the context-free reader.** note.md is the one file in the tree written **for a reader who knows nothing about the research process**: no memory of attempts, critic verdicts, revision rounds, or session history; no access to `logs/`, `plan.md`, or `log.md`; no prior exposure to this project's internal vocabulary. The reader is presumed to be a working researcher in a neighbouring field, so standard terminology of that field can be used — but anything project-specific (internal IDs, attempt labels, working-group jargon) must be introduced before use, or linked to a concept note / sibling note.md via `[[...]]`. The test: if reading note.md leaves the reader needing to open any other file in this repository — whether to understand *what* the node has established or to check *why* it holds — note.md has failed. Wiki-links are the acceptable form of "other file" — following a link to a concept definition or a sibling node's derivation is part of normal reading; forcing the reader into `log.md` or `logs/` is not.
+
+This audience, combined with the derivation-bearing requirement, is the file's strongest constraint. The prose must read cleanly **in isolation** — not merely "in principle understandable given enough context."
+
+**Paper-skeleton test (run after any substantive edit).** Ask: *can a reader assemble this node's contribution into the paper body from note.md alone?* If the only way to reconstruct the derivation of a claim is by reading `logs/`, the note.md is still an abstract, not a paper section — it fails. The correct response is to either (i) lift the derivation into note.md at paper-quality detail, (ii) replace the bare claim with an honest lower-confidence formulation together with the partial derivation that is available, or (iii) remove the claim from note.md pending more work. A bare tagged claim whose derivation lives only in `logs/` is **never** the correct end state.
+
+**No template.** The content and structure emerge from the research itself. A node studying a mathematical structure will naturally differ from one resolving a paradox or surveying a field. Prescribed sections constrain the researcher's thinking — the prose should take whatever form best captures the established knowledge together with its derivation.
 
 **Content rules (enforced on every curator dispatch):**
 
 1. *No frontmatter* — SoT files are clean prose.
-2. *No process artifacts* — Current State sections, Evidence blocks, and task lists describe the research *process*, not established knowledge; they belong in log.md or plan.md.
-3. *No process-status language* — phrases describing the state of the investigation rather than what has been established (e.g., shapes naming cycles/rounds, review-state markers, or resubmission workflow words). These decay the moment the next cycle runs. If a claim is not yet strong enough to state without such qualifiers, either lower its provenance tag (STRONG CONJECTURE → CONJECTURE → OPEN) or leave it out of note.md entirely. The provenance tag carries the confidence information that operational-status phrases try to convey; let the tag do that work.
-4. *No undefined project-internal labels* — ad-hoc identifiers that index items in a working list but have no stable definition elsewhere (e.g., open-question IDs, informal candidate/hypothesis tags, attempt slugs, cycle references) may appear only if they are either (a) introduced with a one-sentence explanation where first used, or (b) replaced by a self-contained description. Preferably just describe the thing in plain prose. A reader should never have to grep the repo to learn what an internal label means.
-5. *Every non-common technical term is gated* — for each term that a reader in a neighbouring field would not immediately recognise, use one of two gates:
+2. *Derivation or citation for every principal claim* — per "Scope of derivation" above. A claim stated with a provenance tag but without an inline derivation or a cited source is incomplete and must be completed or demoted before the dispatch closes.
+3. *Provenance tag alongside every principal claim* — per the Verification Provenance Taxonomy below. The tag summarises the verification chain; it does not replace the derivation required by rule 2.
+4. *No chronology, no process-status phrasing.* The rule excludes **session history** from note.md, not **substance**. A proof, a symbolic computation with its setup and conclusion, or a worked-out argument is the content of a claim; rule 2 requires it to be there. What rule 4 rules out is the state of the investigation — dated status blocks (`Status update YYYY-MM-DD`, `Progress 2026-…`), Current-State / Evidence sections copied from log.md, cycle references (`r2`, `r3 stage`, `latest cycle`), review-state markers (`critic pending`, `REVISE minor`, `awaiting resubmission`), and workflow words (`resubmission`, `previous attempt`). These decay on the next cycle; the confidence information they try to convey is exactly what the provenance tag encodes. Write the derivation in timeless prose and let the tag carry confidence. Conflating substance with session history — treating a derivation as a "process artifact" and stripping it — produces the failure mode this whole section is written to prevent.
+5. *No undefined project-internal labels* — ad-hoc identifiers that index items in a working list but have no stable definition elsewhere (e.g., open-question IDs, informal candidate/hypothesis tags, attempt slugs, cycle references) may appear only if they are either (a) introduced with a one-sentence explanation where first used, or (b) replaced by a self-contained description. Preferably just describe the thing in plain prose. A reader should never have to grep the repo to learn what an internal label means.
+6. *Every non-common technical term is gated* — for each term that a reader in a neighbouring field would not immediately recognise, use one of two gates:
    - *Wiki-link*: `[[concept-name]]` or `[[Node Name]]` pointing to a concept note in `concepts/` or a sibling/ancestor node's note.md. Follow the link to verify it resolves.
    - *Inline definition*: one sentence introducing the term before it is used.
    
    When in doubt, link; create a concept note in `concepts/` if one does not yet exist (see the curator agent's Knowledge Base Maintenance section).
-6. *Every principal claim carries an explicit verification tag* per the Verification Provenance Taxonomy below. Speculation without supporting tags and open questions belong in plan.md or log.md rather than note.md.
 
-*How rules 4 and 5 divide the work*: rule 4 targets *labels* (no stable definition exists to link to, so the cleanest fix is to describe the thing in prose); rule 5 targets *technical vocabulary* (a stable definition exists or should exist, so the cleanest fix is to link to a concept note).
+*How rules 5 and 6 divide the work*: rule 5 targets *labels* (no stable definition exists to link to, so the cleanest fix is to describe the thing in prose); rule 6 targets *technical vocabulary* (a stable definition exists or should exist, so the cleanest fix is to link to a concept note).
 
-**Root note.md** captures the project's overall established understanding — its core claims, scope, and what has been shown. As research progresses, this evolves from a research question into an established account of the project's central findings and how they connect.
+**Root note.md** captures the project's overall established understanding — the core claims, their derivations (or citations), scope, and how they connect. As research progresses, this evolves from a research question into a derivation-bearing account of the project's central findings.
 
-**Child note.md** captures what that specific investigation established.
+**Child note.md** captures what that specific investigation established, with derivations.
 
-**When to create**: When a node reaches stable and has results worth stating as source of truth. Leaf nodes doing pure computation may never get one.
+**When to create**: When a node reaches stable and has derivation-bearing results worth stating as source of truth. Leaf nodes doing pure computation may never get one.
 
 **Ownership — note.md is curator-authored.** This is the one file in the tree whose prose is written by curator rather than PI. The split exists because note.md demands cognitive modes that compete with PI's research work:
 
-- **Separation of concerns**: PI's attention during `/run` is on advancing research — dispatching workers, reading attempts, making directional decisions. Synthesis of verified evidence into publication-ready prose is a different cognitive mode. When PI tries to hold both, research wins and synthesis drops — empirically, a session with ten cycles of active research typically produces zero updates to note.md if the same agent owns both channels. Giving note.md a dedicated author prevents that drop
-- **Second-reader quality**: The agent who produced a result is anchored by the deliverable they wrote and is a poor judge of whether the prose reads cleanly to someone unfamiliar with the research process. note.md's promise is exactly that it reads cleanly to such a reader, so the author should be a second reader — curator, coming to the evidence fresh
-- **Cross-tree coherence**: note.md at one node must harmonize with note.md at sibling and ancestor nodes (consistent terminology, valid `[[wiki-links]]`, referenced concept notes). This requires reading the tree holistically, which PI does not do during cycles — PI's reading scope is the ancestor spine plus direct children. Curator reads the whole tree by design
-- **Provenance tag assignment**: Every principal claim in note.md carries axis 1 + axis 2-a + axis 2-b + (optional) axis 3 tags. Assigning these correctly requires re-reading the underlying worker deliverables and critic reports to reconstruct the evidence chain. This is exactly curator's core task
+- **Derivation lifting and tag assignment (curator's core task)**: each principal claim in note.md carries its derivation *and* an axis 1 + axis 2-a + axis 2-b + (optional) axis 3 tag. Lifting the derivation into paper-quality prose and then assigning the tag correctly both require re-reading the underlying worker deliverables, report_*.md, and critic reports to reconstruct what was actually shown — including identifying the right level of detail to preserve in note.md vs. defer to `[[wiki-link]]`. Tag assignment alone — attaching stamps to bare claim sentences — is the degenerate form § note.md — Source of Truth rules out; curator's mandate is the harder lift of writing the derivation into the note
+- **Separation of concerns**: PI's attention during `/run` is on advancing research — dispatching workers, reading attempts, making directional decisions. Lifting verified evidence *with its derivation* into publication-quality prose is a different cognitive mode. When PI tries to hold both, research wins and synthesis drops — empirically, a session with ten cycles of active research typically produces zero updates to note.md if the same agent owns both channels. Giving note.md a dedicated author prevents that drop
+- **Second-reader quality**: The agent who produced a result is anchored by the deliverable they wrote and is a poor judge of whether the prose reads cleanly to someone unfamiliar with the research process. note.md's promise is exactly that it reads cleanly to such a reader, with the derivation checkable in isolation, so the author should be a second reader — curator, coming to the evidence fresh
+- **Cross-tree coherence**: note.md at one node must harmonize with note.md at sibling and ancestor nodes (consistent terminology, valid `[[wiki-links]]`, referenced concept notes, derivations that compose across node boundaries). This requires reading the tree holistically, which PI does not do during cycles — PI's reading scope is the ancestor spine plus direct children. Curator reads the whole tree by design
 
-PI's role with respect to note.md is therefore: write evidence into log.md, promote verified results into report_{slug}.md when warranted, and **dispatch curator** to distill these into note.md. PI does not directly write substantive note.md prose during `/run` cycles.
+PI's role with respect to note.md is therefore: write evidence into log.md, promote verified results into report_{slug}.md when warranted (which already carry derivations), and **dispatch curator** to lift these — *derivations intact* — into note.md. PI does not directly write substantive note.md prose during `/run` cycles.
 
 Two narrow exceptions to the curator-only rule:
 
@@ -100,9 +110,28 @@ Anything beyond these two categories — adding a section, rewording a claim, up
 
 This rule has a failure mode to watch for: note.md drifting into a log-like chronicle with time-stamped "Status update YYYY-MM-DD" sections stacked on top of each other. That shape is the footprint of PI-direct appending and signals that curator dispatches have been skipped; the next curator run should consolidate such stacks into a single, present-tense statement of the node's established knowledge.
 
+### Critic layering on note.md
+
+The derivations written into note.md are the substance the paper will carry. They must pass independent scrutiny **as they appear in note.md**, not merely inherit the scrutiny of the upstream attempt in `logs/`. Curator's distillation can introduce new failure modes that the attempt-level critic never saw — simplifications that glossed a gap, notational drift, a step that was obvious to the researcher being compressed past legibility, a composed argument spanning several attempts whose joint soundness was never checked.
+
+The maintenance chain is therefore:
+
+1. Researcher produces an attempt in `logs/` with full working-note derivation
+2. Critic reviews the attempt (blind or contextual) — the existing first-layer review
+3. Curator lifts the derivation into note.md at paper quality, consolidating across attempts as needed
+4. **Curator dispatches critic on the note.md derivation itself** as a separate pass, targeting the derivations touched in this dispatch. Mode is contextual by default (the critic needs the surrounding note.md + ancestor chain to judge whether the lifted derivation suffices for its role in the narrative); blind mode may be chosen when the derivation is purely mechanical
+5. Curator applies the critic's findings (fixing the note.md prose, not annotating it in place — note.md is publication-quality prose, so critic writes findings to a separate file that curator consumes; see the critic and curator agents)
+6. Over repeated maintenance cycles, this layers multiple critic passes over the same note.md section. That accretion is the mechanism by which note.md earns its property of surviving many critic eyes
+
+Curator composes each such review into the affected claims' provenance tags (adding `[critic-blind]` or `[critic-contextual]` when appropriate). A claim whose **note.md-level** derivation has been critic-reviewed carries a tag that reflects *this* review layer, distinct from whatever review the upstream attempt already had. Over time this produces note.md prose whose derivations have been re-examined in their published form, which is exactly what a paper seed requires.
+
+This layering is not optional decoration — when a note.md carries substantive new derivations (not just prose polish on an already-reviewed derivation), a note.md-level critic pass is part of closing the dispatch. Skipping it reproduces the failure mode the whole "derivation-bearing SoT" design is meant to prevent.
+
 ## Verification Provenance Taxonomy
 
 Claims in note.md (and report_{slug}.md) carry an explicit verification tag so readers can assess **how** each fact was established, **whether it has been independently reviewed**, and **at what scope**. The tag decomposes into orthogonal axes. The purpose is to prevent a single "verified" label from collapsing distinct kinds of evidence (symbolic computation, literature citation, independent critique, small-instance checks) into one opaque stamp.
+
+**Tags accompany, not replace, the derivation.** Every claim carrying a tag in note.md must also carry the derivation that supports it (inline or cited — see § note.md — Source of Truth, "Scope of derivation"). The tag summarises the verification chain so a reader can decide how much trust to invest; the derivation is what the reader actually checks. A tagged claim without an accompanying derivation is the failure mode the whole § note.md — Source of Truth is written to prevent, and no refinement of the tag set repairs it.
 
 ### Axis 1 — Confidence
 
@@ -236,12 +265,12 @@ research/
     XYModel.jl
     test/
   Paradox Resolution/
-    note.md            (polished: what the paradox is and how it's resolved)
+    note.md            (derivation-bearing: the paradox stated, and the derivation resolving it)
     plan.md            (approach strategy)
     log.md             (research process: current state, evidence)
     report_symmetry_analysis.md  (PI-verified report on symmetry constraints)
   Lattice BKT/
-    note.md            (polished knowledge of this direction)
+    note.md            (derivation-bearing knowledge of this direction)
     plan.md            (children decomposition and strategy)
     log.md             (working state, evidence trail)
     src/               (scripts relevant to this branch)
@@ -264,7 +293,7 @@ research/
 
 | Layer | Location | Worker access | What it contains |
 |---|---|---|---|
-| **Research tree — SoT** | `research/**/note.md` | Read-only | Verified knowledge, free-form polished prose |
+| **Research tree — SoT** | `research/**/note.md` | Read-only | Derivation-bearing verified knowledge — claim + derivation + provenance tag, free-form prose written to paper quality (the paper's substance) |
 | **Research tree — reports** | `research/**/report_*.md` | Read-only | PI-verified self-contained analyses |
 | **Research tree — plan** | `research/**/plan.md` | Read-only | Strategy: decomposition rationale, approach decisions, children's roles |
 | **Research tree — log** | `research/**/log.md` | Read-only | Process: current state, evidence chain, kind/status |
