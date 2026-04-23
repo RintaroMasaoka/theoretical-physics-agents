@@ -48,15 +48,29 @@ When reading a target for review, read the `.src.md`. When making changes, edit 
 
 ---
 
-## Prerequisite: Sync Upstream
+## Prerequisite: Sync Upstream (per-target)
 
-Because templates are shared via the upstream remote, your local `.src.md` may be behind. Before reading or editing any `.src.md`, run:
+Templates live in `.templates/` and are shared via the upstream remote, so your local `.src.md` may be behind. Before reading or editing any `.src.md`, pull **only the path(s) you will touch** — not the whole framework:
 
 ```bash
-bash .scripts/sync.sh pull
+bash .scripts/sync.sh pull <.src.md path>...
 ```
 
-Do not read or edit `.src.md`, do not run `configure.mjs` until this completes. Reading a stale template risks designing a fix against outdated content; editing and then pushing would overwrite upstream improvements others have already contributed. Paired with the push in "Commit & Upstream Sync", this pull completes the round-trip: pull → edit → push.
+Example: `bash .scripts/sync.sh pull .templates/skills/improve/SKILL.src.md .templates/common.src.md`
+
+**Why per-path, not bulk.** A bulk pull overwrites every tracked `.src.md` in the working tree with upstream's version. If a concurrent `/improve` session is mid-edit on another file, bulk pull destroys those uncommitted edits; and a later bulk push would revert that session's already-published changes, because bulk push ships the entire local framework as a snapshot. Path-scoped sync touches only what you name, so sessions working on disjoint files stay isolated.
+
+**When to run the pull** — aligned to the Flow's entry-point fork (see next section):
+
+- **Specific target known** — pull that path now, before reading.
+- **Complaint without named target** — defer until step 1 identifies the target(s), then pull before reading.
+- **Whole-system review** — run `sync.sh pull` with no arguments (bulk is the correct tool here, because the working set really is the whole framework and — by definition of this branch — you are not delegating any file to a concurrent session).
+
+If you discover additional targets mid-rewrite, pull each before touching it.
+
+**Residual risk (flagged as a fallback after climbing stopped here).** This protocol is convention-based: safety depends on every concurrent session also using path-scoped sync. A peer session that bulk-pulls or bulk-pushes can still clobber your in-flight work; commit often and inspect `git log upstream/main` before relying on local state when peers may have run. A stronger fix (lock file, dirty-path refusal in `sync.sh`, session registry) is deferred.
+
+Paired with the path-scoped push in "Commit & Upstream Sync", this completes a per-file round-trip: pull → edit → push.
 
 ---
 
@@ -156,4 +170,4 @@ The agent's verification criteria live in its own prompt. It will report quoted 
 After approval:
 
 1. **Commit**: add changed `.src.md` files and their corresponding generated `.md` files individually with `git add` (not `git add -A`, to avoid committing unrelated changes). Message format: `improve: {summary}`.
-2. **Push upstream**: `bash .scripts/sync.sh push --yes`. This is the other half of the pull in Prerequisite — it shares your improvement with other downstream projects.
+2. **Push upstream (path-scoped)**: `bash .scripts/sync.sh push <changed .src.md path>... --yes`. Pass only the `.src.md` paths you edited — symmetric with the path-scoped pull in Prerequisite, for the same concurrency-isolation reason.

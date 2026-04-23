@@ -2,10 +2,20 @@
 # sync.sh — framework ファイルを upstream (public repo) と同期するスクリプト
 #
 # 使い方:
-#   bash .scripts/sync.sh pull        — upstream の最新を取り込む
-#   bash .scripts/sync.sh push        — framework の変更を upstream に送る
-#   bash .scripts/sync.sh push --yes  — 確認なしで push
-#   bash .scripts/sync.sh status      — upstream との差分を表示する
+#   bash .scripts/sync.sh pull                    — upstream の最新 framework 全体を取り込む
+#   bash .scripts/sync.sh pull <path>...          — 指定パスのみ upstream から取り込む
+#   bash .scripts/sync.sh push [--yes]            — framework 全体を upstream に送る
+#   bash .scripts/sync.sh push <path>... [--yes]  — 指定パスのみ upstream に送る
+#   bash .scripts/sync.sh status                  — upstream との差分を表示する
+#
+# <path> は FRAMEWORK_FILES 配下のファイル/ディレクトリ
+# (例: .templates/skills/improve/SKILL.src.md, .scripts/configure.mjs)
+#
+# 並列作業 (複数の /improve セッション等) では path 指定運用を推奨:
+#   - 他セッションが in-flight で触っているファイルを巻き込まずに済む
+#   - bulk pull は未コミット編集を silently 上書きする; bulk push は他セッションの
+#     published 変更を revert しうる。path 指定ならどちらも起こらない
+#   - path を省略した場合は従来通り framework 全体が対象 (後方互換)
 #
 # 前提:
 #   - remote "upstream" が設定済み
@@ -14,7 +24,7 @@
 set -euo pipefail
 
 # ── 同期対象ファイル（framework ファイル）──────────────────────
-# これらのファイルだけが upstream と共有される
+# これらのファイル/ディレクトリ配下だけが upstream と共有される
 FRAMEWORK_FILES=(
   "AGENTS.md"
   "CLAUDE.md"
@@ -26,7 +36,7 @@ FRAMEWORK_FILES=(
   ".templates/"
 )
 
-# push 時に upstream から削除すべき stale ファイル
+# push 時 (bulk) に upstream から削除すべき stale ファイル
 STALE_FILES=(
   "configure.mjs"       # .scripts/configure.mjs に移動済み
   "scripts/"            # .scripts/ にリネーム済み
@@ -51,6 +61,57 @@ die() { echo "Error: $*" >&2; exit 1; }
 check_upstream() {
   git remote get-url "$UPSTREAM_REMOTE" >/dev/null 2>&1 \
     || die "remote '$UPSTREAM_REMOTE' が見つかりません。先に git remote add $UPSTREAM_REMOTE <url> を実行してください"
+}
+
+# 与えられた相対パスが FRAMEWORK_FILES の範囲内にあるか判定
+is_framework_path() {
+  local path="$1"
+  local item
+  for item in "${FRAMEWORK_FILES[@]}"; do
+    # ファイル完全一致
+    if [ "$path" = "$item" ]; then
+      return 0
+    fi
+    # ディレクトリ (末尾 /) の前方一致
+    if [[ "$item" == */ ]]; then
+      if [[ "$path" == "$item"* ]] || [ "$path" = "${item%/}" ]; then
+        return 0
+      fi
+    fi
+  done
+  return 1
+}
+
+# 与えられたパス配列すべてが framework 範囲内か検証
+validate_paths() {
+  local path
+  for path in "$@"; do
+    is_framework_path "$path" \
+      || die "'$path' は framework パス外です (FRAMEWORK_FILES を参照)"
+  done
+}
+
+# upstream clone (tmpdir) にローカルのパスをコピー
+# ディレクトリは一旦消してから再帰コピー (古いファイルの残留を防ぐ)
+copy_to_upstream_clone() {
+  local item="$1"
+  local dest_root="$2"
+  local item_clean="${item%/}"  # 末尾 / を除去
+
+  if [ ! -e "$item_clean" ]; then
+    echo "  - $item_clean (ローカルに存在しないためスキップ)"
+    return 0
+  fi
+
+  if [ -d "$item_clean" ]; then
+    rm -rf "$dest_root/$item_clean"
+    mkdir -p "$dest_root/$item_clean"
+    cp -R "$item_clean"/* "$dest_root/$item_clean/" 2>/dev/null || true
+  else
+    mkdir -p "$dest_root/$(dirname "$item_clean")"
+    cp "$item_clean" "$dest_root/$item_clean"
+  fi
+  echo "  ✓ $item_clean"
 }
 
 # ── self-update: pull 時に sync.sh 自身を先に更新 ────────────
@@ -85,8 +146,18 @@ do_pull() {
   # sync.sh 自身が変わっていたら新しい版で再実行
   self_update
 
-  echo "==> framework ファイルを upstream から取り込み中..."
-  for item in "${FRAMEWORK_FILES[@]}"; do
+  local -a targets
+  if [ ${#PATH_ARGS[@]} -eq 0 ]; then
+    echo "==> framework 全体を upstream から取り込み中..."
+    targets=("${FRAMEWORK_FILES[@]}")
+  else
+    validate_paths "${PATH_ARGS[@]}"
+    echo "==> 指定された framework パスを upstream から取り込み中..."
+    targets=("${PATH_ARGS[@]}")
+  fi
+
+  local item
+  for item in "${targets[@]}"; do
     git checkout "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH" -- "$item" 2>/dev/null && \
       echo "  ✓ $item" || \
       echo "  - $item (upstream に存在しないためスキップ)"
@@ -123,30 +194,28 @@ do_push() {
   echo "==> upstream を一時ディレクトリにクローン中..."
   git clone --depth 1 --branch "$UPSTREAM_BRANCH" "$upstream_url" "$tmpdir/repo" 2>&1 | grep -v '^$'
 
-  echo "==> stale ファイルを削除中..."
-  for item in "${STALE_FILES[@]}"; do
-    if [ -e "$tmpdir/repo/$item" ]; then
-      rm -rf "$tmpdir/repo/$item"
-      echo "  ✗ $item (削除 — stale)"
-    fi
-  done
-
-  echo "==> framework ファイルをコピー中..."
-  for item in "${FRAMEWORK_FILES[@]}"; do
-    if [ -e "$item" ]; then
-      # ディレクトリの場合はクリアしてから再帰コピー（古いファイルが残るのを防ぐ）
-      if [ -d "$item" ]; then
+  local -a targets
+  local is_bulk=false
+  if [ ${#PATH_ARGS[@]} -eq 0 ]; then
+    is_bulk=true
+    echo "==> stale ファイルを削除中..."
+    for item in "${STALE_FILES[@]}"; do
+      if [ -e "$tmpdir/repo/$item" ]; then
         rm -rf "$tmpdir/repo/$item"
-        mkdir -p "$tmpdir/repo/$item"
-        cp -R "$item"/* "$tmpdir/repo/$item/" 2>/dev/null || true
-      else
-        mkdir -p "$tmpdir/repo/$(dirname "$item")"
-        cp "$item" "$tmpdir/repo/$item"
+        echo "  ✗ $item (削除 — stale)"
       fi
-      echo "  ✓ $item"
-    else
-      echo "  - $item (ローカルに存在しないためスキップ)"
-    fi
+    done
+    echo "==> framework 全体をコピー中..."
+    targets=("${FRAMEWORK_FILES[@]}")
+  else
+    validate_paths "${PATH_ARGS[@]}"
+    echo "==> 指定された framework パスをコピー中..."
+    targets=("${PATH_ARGS[@]}")
+  fi
+
+  local item
+  for item in "${targets[@]}"; do
+    copy_to_upstream_clone "$item" "$tmpdir/repo"
   done
 
   echo "==> configure.mjs を実行してランタイムファイルを再生成中..."
@@ -163,7 +232,11 @@ do_push() {
   fi
 
   echo ""
-  echo "上記の変更を upstream に push します。"
+  if [ "$is_bulk" = true ]; then
+    echo "上記の変更を upstream に push します (bulk)。"
+  else
+    echo "上記の変更を upstream に push します (path-scoped: ${PATH_ARGS[*]})。"
+  fi
   if [ "${AUTO_YES:-false}" = true ]; then
     confirm="y"
   else
@@ -222,7 +295,7 @@ do_status() {
 
 # ── メイン ────────────────────────────────────────────────────
 
-# --yes フラグの処理
+# --yes フラグと位置引数を分離
 AUTO_YES=false
 args=()
 for arg in "$@"; do
@@ -232,16 +305,27 @@ for arg in "$@"; do
   esac
 done
 
-case "${args[0]:-}" in
+# サブコマンドと path 引数を分離
+subcmd="${args[0]:-}"
+PATH_ARGS=()
+if [ ${#args[@]} -gt 1 ]; then
+  PATH_ARGS=("${args[@]:1}")
+fi
+
+case "$subcmd" in
   pull)   do_pull ;;
   push)   do_push ;;
   status) do_status ;;
   *)
-    echo "使い方: $0 {pull|push|status}"
+    echo "使い方: $0 {pull|push|status} [path...]"
     echo ""
-    echo "  pull   — upstream の最新 framework ファイルを取り込む"
-    echo "  push   — ローカルの framework 変更を upstream に送る"
-    echo "  status — upstream との差分を確認する"
+    echo "  pull              — upstream の最新 framework 全体を取り込む"
+    echo "  pull <path>...    — 指定パスのみ取り込む (並列作業向け)"
+    echo "  push [--yes]      — ローカルの framework 全体を upstream に送る"
+    echo "  push <path>...    — 指定パスのみ送る (並列作業向け)"
+    echo "  status            — upstream との差分を確認する"
+    echo ""
+    echo "<path> は FRAMEWORK_FILES 配下 (.templates/, .scripts/, ... など) である必要があります。"
     exit 1
     ;;
 esac
