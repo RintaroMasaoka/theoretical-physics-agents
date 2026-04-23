@@ -77,19 +77,48 @@ note.md captures **verified, established knowledge** — what the node has prove
 2. **Prose polish**: the writing has quality issues for publication readiness — unclear transitions, jargon that should be linked to a concept note, claims stated without their verification tag
 3. **Reabsorption of PI direct edits**: note.md has been edited directly by PI between dispatches — typically dated accretion blocks (headings like "Status update 2026-04-22", "Progress YYYY-MM-DD", or any appended paragraph that reads like a session-log entry rather than present-tense established knowledge). These are the footprint of skipped curator dispatches (see research-tree.md § note.md — Ownership, loaded at startup)
 
-**How to reabsorb (trigger 3)**: treat the PI-authored block as evidence to be reabsorbed, not as final prose. Preserve the factual content — PI saw results and wanted them recorded — but repair the shape: consolidate dated accretions into a single present-tense statement of the node's established knowledge, reattach the appropriate provenance tags per the taxonomy, and merge any new claims into the existing prose structure rather than leaving them as a stacked appendix. If PI's block asserts something stronger or narrower than the prior note.md, carry that semantic change forward in the consolidated version (with tags) — do not flatten back to the pre-edit text, which would destroy PI's contribution.
+**How to reabsorb (trigger 3)**: treat the PI-authored block as evidence to be reabsorbed, not as final prose. Preserve the factual content — PI saw results and wanted them recorded — but repair the shape: consolidate dated accretions into a single present-tense statement of the node's established knowledge, reattach the appropriate provenance tags per the taxonomy, and merge any new claims into the existing prose structure rather than leaving them as a stacked appendix. If PI's block asserts something stronger or narrower than the prior note.md, carry that semantic change forward in the consolidated version (with tags) — do not flatten back to the pre-edit text, which would destroy PI's contribution. PI-authored blocks are typically the highest-risk source of process-status language and undefined project-internal labels, because PI wrote them mid-cycle using the vocabulary of the investigation in progress.
+
+**Any edit under triggers 1–3 must then pass the self-containment and wiki-link audits below before the dispatch is closed.** The audits are universal; they do not skip for edits that feel light-touch.
 
 **Carve-outs (do not reabsorb)**: two kinds of PI-direct edits are legitimate and must be left alone. (i) **Trivial mechanical fixes** — typo corrections, fixing a broken `[[wiki-link]]`, renaming after a concept-note rename — edits where the replacement is uniquely determined (any competent reader would produce the same text). (ii) **User-present collaborative rewrites (`/meeting`, `/launch`)** — edits authored with the user present during a meeting or the initial project launch. The session log will usually mark these; when in doubt, check `logs/{timestamp}_meeting.md` or `logs/{timestamp}_launch.md` for a Changes Applied entry naming the note.md. These rewrites are authoritative (the user was the second reader in real time) and must not be rewritten back. The reabsorption trigger targets time-stamped *accretion* of new content — status blocks, appended session summaries, mid-section insertions of new findings — not these carve-outs.
 
 **note.md format**: Clean prose, no frontmatter. Polished, publication-quality writing. States what is established, with provenance tags and references (see § Verification Provenance below). No process details, no evidence chains (those stay in log.md).
+
+**Audience is the context-free reader** (canonical definition: `.claude/research-tree.md` § note.md → Audience). Operational summary: the reader has only this note.md plus the files its `[[wiki-links]]` resolve to; no `logs/`, no `plan.md`, no `log.md`, and no project-internal vocabulary. The practical failure mode the curator must actively prevent is note.md drifting into prose that reads fluently to someone who just reread the logs but is opaque to anyone else — a note.md that fails this gate is not merely lower-quality, it is unusable by its intended audience.
+
+### note.md self-containment audit (mandatory before closing a note.md edit)
+
+After writing or rewriting a note.md, perform this audit as a distinct pass — do not skip. Reread the file pretending you have never seen this project before. Scan for the patterns below; each match must be fixed, not defended.
+
+1. **Process-status language** — phrases describing the state of the investigation rather than the state of what has been established. Examples of the shape to look for: cycle references (`r3 stage`, `latest cycle`, `at this stage`), review-state markers (`blind critic pending`, `critic REVISE minor`, `pending review`), workflow references (`resubmission`, `previous attempt`). These decay the moment the next cycle runs. Fix: delete the operational phrasing and let the provenance tag carry the confidence signal. If the claim needs hedging the tag cannot express, lower the tag or move the claim to log.md / plan.md.
+
+2. **Undefined project-internal labels** — open-question IDs (shape `OQ-X.Y`), informal candidate/hypothesis tags (shape `candidate (a)`, `hypothesis C`, `Layer A vs Layer B`), attempt slugs (hyphenated short identifiers that name a specific attempt rather than a concept — these appear in `logs/{timestamp}_attempt_{slug}.md` filenames), session or cycle references (shape `r2`, `r3 stage`, `Step 2 r2`). Fix: either (a) introduce the label with a one-sentence definition the first time it appears in the file, (b) replace the label with a self-contained description, or (c) if the label names a concept that is already defined in a concept note or sibling/ancestor note.md, wrap it as `[[...]]`. Preferences: for open-question IDs and cycle references, prefer (b) — these name investigation states, not persistent concepts, so there is usually nothing to link to; for candidate/hypothesis tags that persist as recognised objects in the research, (c) via a concept note is the cleanest gate. Unlike the recurring technical terms handled in rule 3 below, project-internal labels mostly should not become `concepts/` entries — they are investigation scaffolding, not vocabulary. A reader must never be reduced to grepping the repo to learn what an internal label means.
+
+3. **Unlinked non-common technical terms** — for each term that a working researcher in a neighbouring field would not immediately recognise, check there is a gate: either a `[[wiki-link]]` to a concept note or sibling/ancestor node, or a one-sentence inline definition before first use. What "non-common" means in practice: the first time you met the term in this project's materials you had to look it up, or it names a specific technical object/construction/operation rather than a standard word. Standard field vocabulary (terms any graduate textbook in the neighbouring field would take as given) is exempt. When a term recurs across nodes and has no concept note, **create the concept note** — a short definition file in `concepts/` is cheap and saves every note.md using the term from redefining it inline.
+
+4. **References into other work data** — phrases of the shape "see attempt_{slug}", "per the r3 deliverable", "as checked in logs/...", or bare external filenames (e.g., `{some_file}.tex l.912`). The first three point the reader out of the tree into `logs/`, which defeats note.md's purpose; rewrite them to cite the evidence content in prose form, with a provenance tag. External file citations are acceptable **if** the external file is identified as such (e.g., "the companion paper `arXiv:{id}` at §4") — but a bare filename with no identification is jargon of the worst kind, because even the reader who follows every wiki-link has no way to find it.
+
+If any of (1)–(4) survive the audit, the note.md is not done — rewrite. It is normal for a first draft to fail the audit; the audit exists because curator's own familiarity with the evidence chain hides these patterns in the first reading.
+
+### note.md wiki-link audit (mandatory on every dispatch that touches a note.md)
+
+Separate from the self-containment audit, perform a link-completeness pass:
+
+1. `ls concepts/` — the resulting filename list (minus `.md`) is the reference set for step 2. For efficiency, grep each touched note.md for these filenames rather than re-reading the prose hunting for matches, since scanning by eye in a project with dozens of concept notes is O(N × M) and reliably misses terms.
+2. For each touched note.md, every surface-form match against the reference set that is not already inside a `[[...]]` must either be linked or be an inline definition by design. Near-synonyms also count — translated forms of a term (a localised spelling pointing to the same concept slug), common abbreviations, and morphological variants still match against the concept name and still need gating. The grep in step 1 will not catch these by itself; a second pass per touched note.md looking for translated/abbreviated forms of each concept name is needed.
+3. Scan for references to sibling or ancestor node names. Any mention of another node (e.g., "see the {sibling node name} step") must use the `[[Node Name]]` form, not bare prose, so the reader can navigate.
+4. Verify every existing `[[...]]` in the file still resolves — concept note renames and tree reorganisations break links silently.
+
+A useful sanity check: if a note.md touched this dispatch has fewer wiki-links than the number of non-trivial concepts it uses, it is under-linked. The patchy-linking failure mode (some notes linking well, others linking nothing) is the tell-tale: it means the agent linked what it noticed and missed the rest. Run the audit explicitly, not by vibe.
 
 **Verification Provenance**: Every principal claim written into note.md carries an explicit tag per `.claude/research-tree.md` § Verification Provenance Taxonomy. A tag combines a confidence label (CONFIRMED / STRONG CONJECTURE / CONJECTURE / OPEN) with first-order evidence tags (axis 2-a: `[proof]`, `[mechanical]`, `[numerical]`, `[literature]`), with independent-review tags (axis 2-b: `[critic-blind]`, `[critic-contextual]`) when applicable, and with an optional scope marker (`[special-case: {description}]`) whenever verification covered only a restricted instance.
 
 To assign tags accurately:
 - Read the source log.md, report_*.md, worker deliverables, and critic deliverables to reconstruct the actual evidence chain for each claim
 - Translate the chain literally. SymPy / exact enumeration = `[mechanical]`; numerical run = `[numerical]`; cited external result = `[literature]`; formal derivation = `[proof]`. If the claim was also critiqued — by critic agent or otherwise — add `[critic-blind]` or `[critic-contextual]` as appropriate. Axis 2-a and 2-b compose: `[literature, critic-blind]` (citation independently re-examined), `[proof, critic-contextual]` (proof reviewed against research narrative), and so on. Declare **every** applicable tag — omitting a true channel understates the verification
-- When attaching a scope marker, always include the description: `[special-case: N=2 torus]`, not a bare `[special-case]`. The description is mandatory so readers can evaluate what was covered — a bare marker is forbidden
-- **Never elevate to CONFIRMED** a claim when (i) only axis 2-b tags cover it (critic review has no first-order evidence of its own), (ii) `[special-case: ...]` applies, or (iii) `[literature]` is the only channel **and** no independent review (`[critic-blind]` / `[critic-contextual]`) has examined the citation's applicability for a project-central claim. "Project-central" = a claim this project is staking out as its own contribution, not a premise cited from external work — a pure external citation (e.g., "Kausch's decomposition") may legitimately carry `CONFIRMED [literature]` alone. When none of these exceptions apply, the strongest allowed label is STRONG CONJECTURE. Canonical rule: research-tree.md § Verification Provenance Taxonomy, Rules
+- When attaching a scope marker, always include the description: `[special-case: {concrete instance}]`, not a bare `[special-case]`. The description is mandatory so readers can evaluate what was covered — a bare marker is forbidden
+- **Never elevate to CONFIRMED** a claim when (i) only axis 2-b tags cover it (critic review has no first-order evidence of its own), (ii) `[special-case: ...]` applies, or (iii) `[literature]` is the only channel **and** no independent review (`[critic-blind]` / `[critic-contextual]`) has examined the citation's applicability for a project-central claim. "Project-central" = a claim this project is staking out as its own contribution, not a premise cited from external work — a pure external citation framed as such (e.g., "Theorem X of {Author et al.} holds") may legitimately carry `CONFIRMED [literature]` alone. When none of these exceptions apply, the strongest allowed label is STRONG CONJECTURE. Canonical rule: research-tree.md § Verification Provenance Taxonomy, Rules
 - When provenance is unclear from the available documents, use the lower confidence label and flag for PI. Do not guess — a wrongly strong tag is more damaging than a correctly cautious one
 
 **Retraction**: If a result is later found wrong, update or remove note.md. Record the failure in dead_ends.md.
@@ -98,40 +127,21 @@ To assign tags accurately:
 
 ## Knowledge Base Maintenance
 
-### Note quality
-
-For each note that has changed recently, verify three criteria:
-1. **Paper-draft material**: Prose, equations, and citations at a level usable in a paper draft
-2. **Collaborator-readable**: A co-researcher unfamiliar with session history can follow the argument
-3. **Pedagogically clear**: Core concepts are introduced with enough context for a physicist outside the immediate subfield
-
-Concretely check: motivation stated, key terms linked via `[[...]]`, claims carry verification status tags, equations contextualized, the note reads as a coherent mini-document rather than a collection of bullet points.
+The note.md audits above (self-containment + wiki-link) cover the bulk of per-note quality enforcement on every dispatch. The items below cover the *tree-wide* maintenance that those per-note audits do not reach.
 
 ### Staleness cleanup
 
 Scan for claims that no longer match the current research scope, thesis, or findings. Fix or delete stale content.
 
-### Wiki-link and tag maintenance
+### Tags and concept-note hygiene
 
-- Add `[[...]]` links wherever a note references a concept, method, or result discussed elsewhere
-- Add tags (`#tag-name`) for cross-cutting classification
-- Verify existing wiki-links point to existing targets (note renames break links)
-- Verify wiki-links point to valid targets in `concepts/` or research tree note.md files
-
-### Concept note hygiene
-
-- Verify non-trivial terms have concept notes in `concepts/`; create missing ones
-- Check for definition drift — update concept notes whose definitions no longer match usage
-
-### Readability review
-
-After editing, reread each changed note from a first-time reader's perspective. Flag and fix undefined jargon, missing motivation, reasoning leaps, and terminology confusion.
+- Add `#tag-name` style tags for cross-cutting classification where useful
+- Check concept notes in `concepts/` for **definition drift** — update those whose definitions no longer match current usage in the tree. (Creation of missing concept notes is handled by self-containment audit rule 3; this bullet is only for maintenance of existing ones)
 
 ### Cross-file coherence checks
 
 Perform these on every dispatch:
-- Broken `[[...]]` links
-- Terminology consistency across files
+- Terminology consistency across files (the same concept called by the same name everywhere)
 - Orphan concept notes not referenced from any research tree file
 - References to deliverable states that have changed
 - Split notes that have grown to cover multiple distinct topics

@@ -55,13 +55,26 @@ Agents that are not simulator, researcher, or engine-builder treat all of `src/`
 
 Publication-quality knowledge in free-form prose, with every principal claim carrying an explicit provenance tag. "Source of Truth" means **the authoritative record of what is known and at what confidence level**, not "only CONFIRMED claims" — STRONG CONJECTURE, CONJECTURE, and OPEN claims belong in note.md too when they are the node's established state, provided each carries its provenance tag.
 
+**Audience — the context-free reader.** note.md is the one file in the tree written **for a reader who knows nothing about the research process**: no memory of attempts, critic verdicts, revision rounds, or session history; no access to `logs/`, `plan.md`, or `log.md`; no prior exposure to this project's internal vocabulary. The reader is presumed to be a working researcher in a neighbouring field, so standard terminology of that field can be used — but anything project-specific (internal IDs, attempt labels, working-group jargon) must be introduced before use, or linked to a concept note / sibling note.md via `[[...]]`. The test: if reading note.md leaves the reader needing to open any other file in this repository to understand what the node has established, note.md has failed. Wiki-links are the acceptable form of "other file" — following a link to a concept definition is part of normal reading, but forcing the reader into `log.md` or `logs/` is not.
+
+This audience is the single strongest constraint on the file, and it is the one the curator actively enforces. The prose must read cleanly **in isolation** — not merely "in principle understandable given enough context."
+
 **No template.** The content and structure emerge from the research itself. A node studying a mathematical structure will naturally differ from one resolving a paradox or surveying a field. Prescribed sections constrain the researcher's thinking — the prose should take whatever form best captures the established knowledge.
 
-**Constraints (not on content, but on quality):**
-- No frontmatter (SoT files are clean prose)
-- No process artifacts (Current State, Evidence, task lists — those belong in log.md or plan.md)
-- Publication-quality: a collaborator unfamiliar with the research process can follow the argument
-- Every principal claim carries an explicit verification tag per the Verification Provenance Taxonomy below (confidence label + method tags + optional scope marker). Bare unannotated CONFIRMED is forbidden. Speculation without supporting tags and open questions belong in plan.md or log.md rather than note.md
+**Content rules (enforced on every curator dispatch):**
+
+1. *No frontmatter* — SoT files are clean prose.
+2. *No process artifacts* — Current State sections, Evidence blocks, and task lists describe the research *process*, not established knowledge; they belong in log.md or plan.md.
+3. *No process-status language* — phrases describing the state of the investigation rather than what has been established (e.g., shapes naming cycles/rounds, review-state markers, or resubmission workflow words). These decay the moment the next cycle runs. If a claim is not yet strong enough to state without such qualifiers, either lower its provenance tag (STRONG CONJECTURE → CONJECTURE → OPEN) or leave it out of note.md entirely. The provenance tag carries the confidence information that operational-status phrases try to convey; let the tag do that work.
+4. *No undefined project-internal labels* — ad-hoc identifiers that index items in a working list but have no stable definition elsewhere (e.g., open-question IDs, informal candidate/hypothesis tags, attempt slugs, cycle references) may appear only if they are either (a) introduced with a one-sentence explanation where first used, or (b) replaced by a self-contained description. Preferably just describe the thing in plain prose. A reader should never have to grep the repo to learn what an internal label means.
+5. *Every non-common technical term is gated* — for each term that a reader in a neighbouring field would not immediately recognise, use one of two gates:
+   - *Wiki-link*: `[[concept-name]]` or `[[Node Name]]` pointing to a concept note in `concepts/` or a sibling/ancestor node's note.md. Follow the link to verify it resolves.
+   - *Inline definition*: one sentence introducing the term before it is used.
+   
+   When in doubt, link; create a concept note in `concepts/` if one does not yet exist (see the curator agent's Knowledge Base Maintenance section).
+6. *Every principal claim carries an explicit verification tag* per the Verification Provenance Taxonomy below. Speculation without supporting tags and open questions belong in plan.md or log.md rather than note.md.
+
+*How rules 4 and 5 divide the work*: rule 4 targets *labels* (no stable definition exists to link to, so the cleanest fix is to describe the thing in prose); rule 5 targets *technical vocabulary* (a stable definition exists or should exist, so the cleanest fix is to link to a concept note).
 
 **Root note.md** captures the project's overall established understanding — its core claims, scope, and what has been shown. As research progresses, this evolves from a research question into an established account of the project's central findings and how they connect.
 
@@ -128,33 +141,35 @@ By default the claim is taken to be verified over its **full declared scope**. W
 
 | Marker | Meaning |
 |---|---|
-| `[special-case: {description}]` | Verified only on a restricted instance. The description must identify the instance — e.g., `[special-case: N=2 torus]`, `[special-case: triangle+pendant graph]`, `[special-case: 9 specific bonds]` |
+| `[special-case: {description}]` | Verified only on a restricted instance. The description must identify the instance — e.g., `[special-case: smallest parameter value]`, `[special-case: one concrete example]`, `[special-case: a specific boundary condition]` |
 
 ### Rules
 
 - Every `CONFIRMED` must carry at least one axis 2-a tag. Bare "CONFIRMED" with no first-order evidence is forbidden because readers cannot then evaluate the claim. An axis 2-b tag alone does not count as first-order evidence
 - Axis 2-a and 2-b tags compose freely when both apply (e.g., `[proof, critic-blind]`, `[literature, critic-contextual]`, `[mechanical, numerical, critic-blind]`). Always declare every applicable tag — omitting a true channel understates the verification chain
 - A claim tagged with `[special-case: ...]` **cannot** be elevated to CONFIRMED — the strongest allowed label is `STRONG CONJECTURE`, because full-scope verification is missing by definition
-- `[literature]` alone (no independent review, no local re-derivation) does not suffice for **project-central claims** — meaning a claim this project is staking out as its own contribution, as opposed to a premise cited from external work. (A citation-only `CONFIRMED [literature]` is fine when the claim is explicitly framed as the external result itself, e.g., "Kausch's decomposition holds" — no project contribution is being attested.) To reach CONFIRMED on a project-central claim, pair `[literature]` with an independent channel: either a first-order re-derivation (`[proof]`, `[mechanical]`, `[numerical]`) or an independent review (`[critic-blind]` / `[critic-contextual]`) that examined the citation's applicability to the specific use being made of it
+- `[literature]` alone (no independent review, no local re-derivation) does not suffice for **project-central claims** — meaning a claim this project is staking out as its own contribution, as opposed to a premise cited from external work. (A citation-only `CONFIRMED [literature]` is fine when the claim is explicitly framed as the external result itself — e.g., "Theorem X of {Author et al.} holds" — and no project contribution is being attested.) To reach CONFIRMED on a project-central claim, pair `[literature]` with an independent channel: either a first-order re-derivation (`[proof]`, `[mechanical]`, `[numerical]`) or an independent review (`[critic-blind]` / `[critic-contextual]`) that examined the citation's applicability to the specific use being made of it
 - If provenance is unclear from the available documents, use the lower confidence label and flag for PI rather than guessing
 
 ### Strength guide (informal)
 
 Strength grows monotonically along two directions: (i) more axis 2-a tags when independent channels agree, (ii) addition of axis 2-b review on top of axis 2-a. Rough ordering of individual contributions — `[proof]` is the strongest single first-order tag; `[mechanical]` and `[critic-blind]` are comparably strong second tiers; `[numerical]` below those; `[literature]` alone is weakest as first-order support for project claims. `[critic-contextual]` adds a soundness check but does not by itself close a mechanical question. Any `[special-case: ...]` marker weakens the combined label by restricting the verified region.
 
-### Examples (applied to this project)
+### Examples (illustrative shapes)
 
-| Claim | Label |
+These are shape-examples showing how the tag slots compose; the specific claims are illustrative, not tied to any particular project.
+
+| Claim shape | Label |
 |---|---|
-| Generic algebraic identity with a hand proof that a critic then verified by running an independent SymPy script in blind mode | `CONFIRMED [proof, mechanical, critic-blind]` (the critic's own SymPy contributes `[mechanical]`; the hand proof contributes `[proof]`; the review channel contributes `[critic-blind]`) |
-| Dimension of the Jacobson radical via Artin–Wedderburn | `CONFIRMED [proof, critic-contextual]` (proof plus soundness check by critic reading the algebraic context) |
-| Explicit 8×8 $R_{2\pi} = \mathbb{1}_8 - 4\pi L_{\eta\zeta}$ — researcher's SymPy verification plus critic's independent blind re-verification | `CONFIRMED [mechanical, critic-blind]` |
-| Kausch's internal statement that $Z[\mathcal{C}_2]$ decomposes into 4 terms, cited but not re-derived | `CONFIRMED [literature]` (Kausch's own result — not a project-central claim, so the CONFIRMED rule on `[literature]` alone does not bite; were the project claiming this decomposition as its own contribution, the strongest allowed label would be STRONG CONJECTURE until re-derived or independently reviewed) |
-| Correspondence between those 4 terms and this project's 4 anyon sectors (dictionary) | `STRONG CONJECTURE [literature, critic-contextual]` (literature is the premise; critic has reviewed the dictionary's coherence but full re-derivation is pending) |
-| TGSD = 4 on the $N=2$ torus via bond-CAR identities | `STRONG CONJECTURE [mechanical, special-case: N=2]` |
-| Parity-sector separation tested on one small graph | `STRONG CONJECTURE [mechanical, special-case: triangle+pendant graph]` |
-| ED-computed ground-state count for $N=3$ torus agreeing with prediction | hypothetical `STRONG CONJECTURE [numerical, critic-blind, special-case: N=3]` |
-| TGSD = $4^g$ on the actual 2D lattice at general $N \ge 3$ | `OPEN` |
+| A project-central algebraic identity with a hand proof that a critic then re-verified by running an independent symbolic script in blind mode | `CONFIRMED [proof, mechanical, critic-blind]` (the critic's own symbolic run contributes `[mechanical]`; the hand proof contributes `[proof]`; the review channel contributes `[critic-blind]`) |
+| A structural lemma derived by hand and independently read by critic with ancestor context loaded | `CONFIRMED [proof, critic-contextual]` (proof plus soundness check by critic reading the surrounding argument) |
+| An explicit matrix or closed-form expression checked by the researcher's symbolic script and re-verified by the critic's independent blind symbolic script | `CONFIRMED [mechanical, critic-blind]` |
+| A cited external theorem used as-is, not re-derived here — framed as citing the external result itself, not as a project contribution | `CONFIRMED [literature]` (the `[literature]`-alone rule does not bite for non-project-central citations; if the same statement were being staked as this project's own contribution, the strongest allowed label would be STRONG CONJECTURE until independently reviewed or re-derived) |
+| A dictionary/identification between an external result and this project's own objects, where critic has reviewed coherence but full re-derivation is pending | `STRONG CONJECTURE [literature, critic-contextual]` |
+| A counting/dimension claim established symbolically only on the smallest parameter instance | `STRONG CONJECTURE [mechanical, special-case: {smallest instance description}]` |
+| A structural separation tested on one small concrete example | `STRONG CONJECTURE [mechanical, special-case: {concrete example description}]` |
+| A numerical agreement with prediction on a specific parameter choice, checked by critic in blind mode | `STRONG CONJECTURE [numerical, critic-blind, special-case: {parameter choice}]` |
+| The same claim extended to the full declared scope, not yet verified | `OPEN` |
 
 ## report_{slug}.md — PI-Verified Reports
 

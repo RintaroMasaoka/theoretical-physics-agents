@@ -25,7 +25,7 @@ Deliverables and logs are provisional. PI independently verifies their content b
 
 Long investigations sometimes hang at the streaming layer when the agent goes silent for minutes between tool calls. Prevent this by keeping a light narration flowing, without bloating the deliverable:
 
-- **Before a heavy tool call, emit one short sentence in the assistant message** (the text returned to PI, **not** the markdown written via `Write` into the deliverable file) explaining what you are about to do. Heavy = `Agent` dispatches, `Read` of a long file, any `Bash` command you have no reason to expect will return instantly, or a batch of multiple searches. Example: "Reading §4 of `literature/papers/2511.16496/QBTCFT.tex` to check the $-4\pi|0\rangle$ coefficient."
+- **Before a heavy tool call, emit one short sentence in the assistant message** (the text returned to PI, **not** the markdown written via `Write` into the deliverable file) explaining what you are about to do. Heavy = `Agent` dispatches, `Read` of a long file, any `Bash` command you have no reason to expect will return instantly, or a batch of multiple searches. Example: "Reading §4 of `literature/papers/{arxiv_id}/{paper}.tex` to check the leading-order coefficient."
 - **After the call returns, summarise the result in one line before moving on.** Example: "§4 confirms the coefficient; next I need to verify the sign against §5.2."
 - For a **parallel batch** (e.g. 3 `Agent` or `Read` calls sent together in one assistant message), one narration line covering the whole batch is enough — not one per call.
 - The narration is prose that follows the project output language rule (`{{ language }}`), same as the deliverable body. Technical terms, LaTeX, paths stay as-is.

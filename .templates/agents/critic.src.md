@@ -145,7 +145,7 @@ For ACCEPT verdicts, propose a verification tag for each principal claim using t
 
 | Claim | Proposed label |
 |---|---|
-| [principal claim] | e.g., `CONFIRMED [mechanical, critic-blind]` or `STRONG CONJECTURE [literature, critic-contextual, special-case: N=2 torus]` |
+| [principal claim] | e.g., `CONFIRMED [mechanical, critic-blind]` or `STRONG CONJECTURE [literature, critic-contextual, special-case: {concrete instance}]` |
 
 Guidance:
 - Axis 2-b tag from your own review: `[critic-blind]` when dispatched in blind mode, `[critic-contextual]` when dispatched in contextual mode. Always add exactly one of these
@@ -153,7 +153,7 @@ Guidance:
 - Preserve the attempt's axis 2-a tags when they survive your review (`[proof]`, `[literature]`, …)
 - **Declare every applicable tag.** If the attempt stands on `[mechanical]` plus `[literature]` and you add `[critic-blind]`, record all three — omitting any true channel understates the verification chain and misleads downstream readers
 - Attach `[special-case: {description}]` whenever the attempt verifies only a subset of its declared scope. The `{description}` is mandatory — a bare `[special-case]` (no description) is forbidden because readers cannot then evaluate what was covered
-- **Elevation to CONFIRMED is forbidden** when (a) `[special-case: ...]` applies — the strongest allowed label is STRONG CONJECTURE because full-scope verification is missing by definition — or (b) `[literature]` is the only channel **and** no independent review has examined the citation's applicability. Note the escape hatch: adding your own `[critic-blind]` / `[critic-contextual]` review of whether the cited result actually supports the use this project makes of it **does** compose with `[literature]` to clear the CONFIRMED threshold (see research-tree.md § Verification Provenance Taxonomy, Rules). "Project-central claim" in this rule = a claim this project is staking out as its own contribution; pure external citations (e.g., "Kausch's decomposition") are not project-central and can carry `CONFIRMED [literature]` standalone
+- **Elevation to CONFIRMED is forbidden** when (a) `[special-case: ...]` applies — the strongest allowed label is STRONG CONJECTURE because full-scope verification is missing by definition — or (b) `[literature]` is the only channel **and** no independent review has examined the citation's applicability. Note the escape hatch: adding your own `[critic-blind]` / `[critic-contextual]` review of whether the cited result actually supports the use this project makes of it **does** compose with `[literature]` to clear the CONFIRMED threshold (see research-tree.md § Verification Provenance Taxonomy, Rules). "Project-central claim" in this rule = a claim this project is staking out as its own contribution; pure external citations framed as such (e.g., "Theorem X of {Author et al.} holds") are not project-central and can carry `CONFIRMED [literature]` standalone
 
 PI uses these proposed tags as the starting point for what curator eventually writes into note.md.
 
