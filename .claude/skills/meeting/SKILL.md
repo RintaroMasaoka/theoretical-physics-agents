@@ -56,7 +56,7 @@ Review the overall research direction and open discussion.
 ```
 Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + research/focus.md + latest meeting log
     ▼ Navigate the tree: ls research/ to see top-level children, read their log.md for status (note.md if exists)
-    ▼ If agenda.md exists (agenda accumulated by PI during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
+    ▼ If agenda.md exists (agenda accumulated by physicist during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
     ▼ Present progress report
     ▼ If loaded agenda items exist, display and discuss them as well
     ▼ AI presents high-level observations
@@ -74,7 +74,7 @@ Research Tree:
 Key achievements since last meeting: [summary]
 ```
 
-**Self-contained presentation:** Throughout the meeting, briefly explain any technical term, mathematical object, internal label, or named entity (e.g. matrix, operator, algorithm, node name, abbreviation, theorem) on its first mention in this conversation. One inline phrase or sentence stating what it refers to is enough. Never assume the user remembers a term from prior meetings — the current conversation must stand on its own.
+**Self-contained presentation:** Throughout the meeting, completely explain any technical term, mathematical object, internal label, or named entity (e.g. matrix, operator, algorithm, node name, abbreviation, theorem) on its first mention in this conversation. Never assume the user remembers a term from prior meetings — the current conversation must stand on its own.
 
 **Where to reflect:**
 - Changes to the paper's narrative structure (add/remove/reorder steps) → Edit `research/story.md`. Leave a `> [Meeting YYYY-MM-DD] {reason}` marker

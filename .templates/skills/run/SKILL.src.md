@@ -4,116 +4,183 @@ description: "Autonomously execute research cycles. Specify the cycle limit as a
 user-invocable: true
 ---
 
-# Principal Investigator
+# /run — Research Cycle Scheduler
 
-You are the **PI (Principal Investigator)** of this research project.
-You decide the research direction, delegate work to workers, and drive the project forward.
+`/run` is the **thin scheduler** that drives research forward. It owns no scientific judgment of its own. Each cycle, it dispatches the agent team in a fixed sequence; every substantive decision (what to investigate, what to record, what to verify) is delegated.
 
-This SKILL file holds only the orchestration spine — Constraints, Turn-Yielding Discipline, the phase index, and the cycle-level workflow. **Detail handbooks for each phase live in `phases/*.md` and are Read on demand.** Do not try to hold all details in context at once; Read a phase file when its step is reached.
+The team and who owns what:
+
+| Role | Agent | Owns |
+|---|---|---|
+| **Direction** | `physicist` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives |
+| **Record** | `curator` | All tree writes — log.md (Evidence + Current State), plan.md, node creation / status / close / reframe, `report_{slug}.md` promotion, retraction, `dead_ends.md`, note.md (SoT) |
+| **Verification** | `critic` | Independent review of every worker deliverable and of curator's note.md lifts |
+| **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing deliverables in `logs/` |
+| **Session finalisation** | `session-wrap-up` | Mechanical transcription of `logs/_DRAFT_wrap-up-input.md` into session log / focus / last_session / agenda; commit + push |
+
+`/run` itself owns only: the cycle loop, the resume beacon, parallel worker dispatch, auto-attaching critic to each worker, dispatching curator once per cycle with the right inputs, and handing session end to `session-wrap-up`.
 
 ## Constraints
 
-- **Write all prose in {{ language }}.** This applies to every file PI writes during `/run` — research tree files (`research/**/log.md`, `note.md`, `plan.md`, `story.md`, `principles.md`, `focus.md`, `dead_ends.md`, `report_*.md`, …), session records (`logs/**`), `agenda.md`, and the final report. Reason: downstream readers (the user, future PI sessions, workers, `/write`) expect a single configured language; mixing drifts the project's voice. Exceptions: technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings shown in English throughout this SKILL and in `.claude/research-tree.md` (`## Current State`, `## Evidence`, `## Background`, `## Next Session`, `## Blockers`, `## Accomplished`, `## Node Changes`, `## Deliverables`, etc. — the full set is whatever appears as an English `##` heading in those two documents) may stay in their original form. The rule is about body prose, not structural tokens. When reading an English example template here or in a phase file, treat it as a structural illustration, not as a directive to copy the language
-- `AskUserQuestion` is prohibited. Users are often away during `/run`, and asking questions interrupts the session and wastes time. Text output is limited to the final report only. Work silently
-- **However, you may respond if the user initiates communication** (confirmed that the user is present). If you receive correction instructions for TodoWrite, direction changes, etc., follow them and continue the session
-- Full paper text is acquired only from arXiv
-- **`Bash("sleep ...")` is prohibited. Polling via file existence checks is prohibited.** Repeated Bash command execution wastes context window. For waiting on agent completion, use only Pattern A / B from `phases/cycle-dispatch.md`
-- **Paper writing is NOT the responsibility of `/run`.** Writing is handled by the `/write` skill. `/run` focuses on research (investigation, analysis, verification)
+- **Write all prose in {{ language }}.** Applies to `research/focus.md`, `logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `.claude/research-tree.md` and here may stay in English. The rule is about body prose, not structural tokens.
+- `AskUserQuestion` and all other user-input solicitations are prohibited. Users are often away during `/run`; asking blocks the session. Text output to the user is limited to the final report emitted at Session End.
+- If the user initiates communication mid-session, respond and continue. Corrections from the user take precedence over scheduled dispatches.
+- **`Bash("sleep ...")` is prohibited; polling via `Bash("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
+- Full paper text is acquired only from arXiv.
+- **Paper writing is NOT `/run`'s responsibility.** Writing is handled by the `/write` skill. `/run` drives research only.
 
-## Turn-Yielding Discipline — Why This Matters
+## Turn-Yielding Discipline
 
-This extends the Constraints bullet "Text output is limited to the final report only. Work silently" with a concrete anti-pattern diagnosis.
+`/run` is an autonomous loop: the user is not present between cycles, and a closing-tone message mid-run stalls the run waiting for input that never arrives. The failure mode seen in practice: after a compaction or transient interruption, the model wraps up with "cycles 1–N complete, awaiting next instruction" and the run halts with cycles on the budget.
 
-`/run` is an autonomous loop: the user is not present between cycles, and a "closing-tone" assistant message mid-run will cause the model to stall waiting for input that never arrives. The failure mode observed in practice: after context compaction or a transient interruption, the model wraps up with "I've completed cycles 1–N of N, awaiting next instruction" and the run halts with cycles still on the budget.
-
-- Between cycles, **never end a turn with a user-facing progress report**. Dispatch the next agent or move to the next step instead. If a progress summary is genuinely needed, write it to `logs/{timestamp}_run.md` — that is a file write, not a yielded turn
-- The **only** closing message is the final Session End report (see `phases/session-end.md`), emitted when `MAX_CYCLES` is exhausted or PI judges completion
-- Compaction / reconnect / crash do not terminate a run. Two mechanisms jointly ensure the next session resumes cleanly:
-  1. **SKILL-level resume protocol**: Session Start step 0 (see `phases/session-start.md`) + `logs/.run-active` state file. Applies when the SKILL instructions are still in context (post-reconnect without compaction)
-  2. **Hook-level re-injection**: `.scripts/check-run-resume.sh` is registered as a `SessionStart` hook in `.claude/settings.json`. The `SessionStart` event fires with matcher `compact` after auto/manual compaction (per Claude Code hooks spec), so the hook runs even when the SKILL content was evicted. If the beacon is present and valid, the hook emits `additionalContext` instructing the new session to call `Skill(skill="run")` to reload the full instructions, then hand off to mechanism (1). **Fallback**: if the `Skill` tool errors or the `run` skill is unavailable, read `.claude/skills/run/SKILL.md` directly with the `Read` tool and follow its Session Start step 0. This is the compaction-survival path
-- **Stall signature to watch for**: if you catch yourself drafting a message like "I have finished {X} so far; let me know if you want me to continue" or "Cycle N of M complete — proceeding with cycle N+1?", that is the stall. Replace the message with the actual next tool call
+- **Never end a turn mid-run with a user-facing progress report.** Between cycles, the next action is a tool call — the next physicist dispatch, the next worker batch, or Session End. If you are tempted to draft "I have finished cycle N of M; continuing with cycle N+1?", that is the stall — replace it with the actual next dispatch.
+- The **only** user-facing closing message is the final Session End report, emitted when `MAX_CYCLES` is exhausted or physicist returns `Status: session_complete`.
+- Compaction / reconnect / crash do not terminate a run. The `logs/.run-active` beacon (written at the start of every cycle) and the `SessionStart` hook jointly ensure the next session resumes the loop without a greeting. See `phases/session-lifecycle.md` § Resume for the mechanics and the fallback.
+- Progress summaries that genuinely belong somewhere go into `logs/{timestamp}_run.md` (session log, written by `session-wrap-up` from physicist's wrap-up input) or `research/focus.md § Context` (physicist's next-cycle direction). Neither is a yielded turn.
 
 ## Arguments
 
-`/run {N}` — Set the cycle limit to N (default: {{ cycles.run }}). Hereafter referred to as `MAX_CYCLES`.
+`/run {N}` — cycle limit. Default: {{ cycles.run }}. Hereafter `MAX_CYCLES`.
 
 ## Terminology
 
-| Term | Definition |
+| Term | Meaning |
 |---|---|
-| **Session** | An entire `/run` execution. From start to final report |
-| **Cycle** | One iteration of PI judgment → task execution → result collection |
-| **Task** | A single agent invocation (one Agent tool call) |
+| **Session** | One `/run` execution — from start to final report |
+| **Cycle** | One iteration of the scheduler loop (physicist → workers → critic → curator) |
+| **Task** | One `Agent` tool call |
 
-1 session = up to MAX_CYCLES cycles. Multiple tasks can run in parallel within a single cycle.
+One session = up to `MAX_CYCLES` cycles. Multiple tasks can run in parallel within a cycle.
 
 ---
 
 ## Phase Index
 
-Detail is split across the following files under `.claude/skills/run/phases/`. Read the relevant file when you reach its step. Do not load all phase files at session start — each one has a natural entry point noted in the workflow below.
+Detail lives in two phase files; read on demand, not all at once.
 
 | File | Loaded when | Purpose |
 |---|---|---|
-| `architecture.md` | Session Start (concept reference — usually enough to read once per session) | The research-tree model (note.md / plan.md / log.md / dead_ends.md / directives.md roles, context scoping, knowledge lifecycle, curator-owned note.md rule) |
-| `directory.md` | Session Start (layout reference) | Directory structure, `/run`-specific file formats (directives.md, dead_ends.md, focus.md, concepts/) |
-| `nodes.md` | When creating, changing status of, or closing a node | Naming convention, `kind` table (cognitive modes), `status` table, closing mechanics |
-| `session-start.md` | Session Start (step-by-step) | Resume check, ancestor-chain read sequence, unread-paper rule, initial sanity check |
-| `cycle-judgment.md` | Cycle step 1 | Tree traversal, thinking flow, agent selection guidelines, close decision |
-| `cycle-dispatch.md` | Cycle step 2 | Pattern A / B launch methods, prompt template, per-agent dynamic data |
-| `cycle-collection.md` | Cycle step 3 | FAILED handling, log.md updates, node-creation triggers, plan.md updates, stable check, report promotion, note-through-curator rule, retraction, float-up, direction review, critic modes, researcher/simulator resubmission, note capture, knowledge-base maintenance |
-| `session-end.md` | Session End | PI-owned steps (simulation housekeeping, mandatory curator sweep), wrap-up input assembly, `session-wrap-up` dispatch, final report |
+| `phases/dispatch.md` | When launching workers or critic | Pattern A / B launch methods, prompt template, auto-critic rule, per-agent dynamic data |
+| `phases/session-lifecycle.md` | Session Start and Session End | Resume check, initial sanity check, scheduler-owned session-end mechanical steps (simulation housekeeping, final sweeps), wrap-up input handoff |
+
+The research information model (tree structure, file roles, context scoping, provenance taxonomy) is canonical in `.claude/research-tree.md` — physicist and curator Read it at every dispatch. `/run` itself does not need it in working memory; `/run` reads `research/focus.md` (the dispatch-spec file — treat it as the scheduler's interface with physicist, not as "tree content") only to extract the fields it dispatches on. `/run` never reads node-level files — `log.md`, `plan.md`, `note.md`, `dead_ends.md`, `report_*.md` are exclusively for physicist (read) and curator (read/write).
 
 ---
 
 ## Session Start
 
-Read `phases/session-start.md` and execute steps 0–7 in order. Key outcomes:
+Read `phases/session-lifecycle.md` § Session Start. Key outcomes:
 
-- Beacon-based resume decision (fresh vs. resume)
-- Session-log filename `logs/_DRAFT_run.md` reserved
-- Ancestor-chain context loaded (all files from root to cursor)
-- Cursor's direct children loaded (depth 1)
-- Unread-paper principle active for this session
+- Beacon-based resume decision (fresh vs. resume mid-cycle)
+- Initial sanity gates: `research/log.md` must exist (else "Please /launch first" and stop); `concepts/` exists; `.gitignore` covers `logs/.run-active`
+- `research/focus.md` existence check (if missing, the first physicist dispatch initialises it — see session-lifecycle)
 
-If `research/log.md` is missing, display "Please set a theme via `/launch`" and stop. If `research/focus.md` or `concepts/` is missing, initialize per the file's Initial Check section.
-
-At session start, also Read `phases/architecture.md` and `phases/directory.md` once — these are concept/layout references used across all cycles, and holding them in working memory avoids re-reading on every cycle.
+`/run` does **not** read node-level tree files at session start. The ancestor-chain read is physicist's responsibility and happens at the start of every cycle (so physicist's context always reflects the post-cycle state, not a stale session-start snapshot).
 
 ---
 
-## Cycles (Repeat up to MAX_CYCLES times)
+## Cycle Loop
 
-**Treat TodoWrite as hypotheses.** You may write an initial plan to TodoWrite at session start, but it is not a fixed plan. Each cycle's results bring new information, so always update TodoWrite in step 3. Do not continue just "because it was decided at the start."
+Repeat up to `MAX_CYCLES`. At each iteration:
 
-### 0. Cycle Bookkeeping (every cycle start)
+### 0. Beacon
 
-Overwrite `logs/.run-active` with a one-line JSON snapshot of the remaining budget:
+Overwrite `logs/.run-active` with:
 
 ```json
 {"remaining": <MAX_CYCLES - cycles_done>, "max_cycles": <MAX_CYCLES>}
 ```
 
-This file is the resume beacon read at Session Start step 0. Writing it every cycle (not just at session start) means that after a mid-cycle compaction, `remaining` still reflects exactly what is owed. On the very first cycle of a fresh session, the beacon briefly reads `remaining == MAX_CYCLES`; `phases/session-start.md` step 0 treats that state as equivalent to "fresh start minus the greeting" if a resume fires from it — see that file for the precedence rules. The file is gitignored (see `.gitignore`) and deleted at Session End by the `session-wrap-up` agent.
+This is the resume beacon read at Session Start (see `phases/session-lifecycle.md`). Writing it every cycle (not just at session start) means that after a mid-cycle compaction, `remaining` reflects what is owed.
 
-### 1. Research Judgment
+### 1. Physicist Dispatch — Direction
 
-Read `phases/cycle-judgment.md` (unless its content is already in your working memory from earlier in this session). Outcome: a concrete list of tasks to dispatch next, with agent selections and cognitive modes decided, and TodoWrite updated.
+```
+Agent(subagent_type="physicist", prompt="""
+## Task
+Update research/focus.md for the next cycle.
 
-### 2. Task Execution
+## Recent Deliverables
+{paths to worker deliverables produced in the previous cycle, if any}
 
-Read `phases/cycle-dispatch.md`. Launch tasks via Pattern A (foreground parallel) or Pattern B (background + PI parallel work). Maximize parallelization — if independent tasks exist, launch them together in one message.
+## Critic Verdicts
+{paths to critic outputs from the previous cycle, if any}
 
-### 3. Result Collection & State Update
+## Curator Sweep
+{path to curator's output from the previous cycle, if any}
+""")
+```
 
-Read `phases/cycle-collection.md`. Cover all applicable items: FAILED handling, log.md evidence updates, **node-creation triggers applied in every cycle**, plan.md updates on strategy change, stable check, report promotion, note.md dispatched through curator, retraction, float-up, critic verdict processing (ACCEPT / REVISE / REJECT), simulator verification, note capture. End with TodoWrite update.
+On the very first cycle of a session, `Recent Deliverables` / `Critic Verdicts` / `Curator Sweep` are empty (no previous cycle); the physicist initialises from `research/focus.md` and the tree. If `research/focus.md` does not yet exist, include a note in the prompt: `focus.md missing — initialise at research/ root`.
 
-### 4. Next Cycle
+Physicist returns `DONE: research/focus.md`. If it returns `FAILED:`, re-dispatch once with the failure message appended to the prompt. If the second attempt also fails, exit to Session End with a partial report — deciding *why* a failure is recoverable is research judgment, so the scheduler bounds the loop mechanically rather than classifying the failure.
 
-Return to step 0 if `cycles_done < MAX_CYCLES` and PI has not judged completion. Otherwise proceed to Session End.
+### 2. Parse `research/focus.md`
+
+Read `research/focus.md`. Extract:
+
+- **Cursor** — the path into the tree (for context when forming worker prompts)
+- **Status** — `active` or `session_complete`
+- **Worker Dispatches** — list of `{agent}: {task}` entries
+- **Tree Directives** — list of directives for curator
+- **Blockers** — informational
+
+If `Status: session_complete` → proceed to Session End (skip remaining cycles).
+
+### 3. Worker Dispatch — Parallel
+
+If `Worker Dispatches` is non-empty, launch all workers in parallel per `phases/dispatch.md` (Pattern A by default).
+
+Each worker's prompt follows the template in `phases/dispatch.md` § Prompt Template — the scheduler fills in task-specific fields from the physicist's dispatch entries, plus the cursor path for context.
+
+If `Worker Dispatches` is empty, skip this step. A structural-review cycle (only Tree Directives) is legitimate.
+
+### 4. Critic — Auto-Attach
+
+For every worker deliverable returned in step 3, dispatch a critic (Target A — attempt inline annotation) per `phases/dispatch.md` § Auto-Critic Rule. Critic runs in blind mode by default for deliverables that are mechanical/mathematical (researcher attempts, simulator runs), contextual mode when the deliverable's soundness depends on the research narrative (reader summaries, scout surveys). The rule for mode selection is in `phases/dispatch.md`.
+
+Worker deliverables skipped from critic: none by default. Physicist may in rare cases mark a dispatch as "no-critic" in `### Worker Dispatches` (e.g., an engine-builder refactor with no substantive claim to verify); honour such markings.
+
+Critic writes its verdict inline into the worker's deliverable file (Target A). Collect the set of annotated deliverable paths for step 5.
+
+### 5. Curator Dispatch — Execute Tree Changes
+
+Dispatch curator once per cycle with:
+
+```
+Agent(subagent_type="curator", prompt="""
+## Task
+Execute the tree directives below and absorb the new evidence (worker deliverables + critic verdicts) into the tree per your own operating rules.
+
+## Tree Directives (from physicist, this cycle)
+{verbatim copy of focus.md § Tree Directives}
+
+## New Evidence This Cycle
+- {worker deliverable path} — critic verdict: {ACCEPT / REVISE / REJECT}, critic file: {same path, end section}
+- ...
+
+## Context
+Cursor: {cursor path from focus.md}
+Session cycle: {cycle_number} of {MAX_CYCLES}
+""")
+```
+
+Curator reads the deliverables, critic verdicts, and tree state; executes the directives; updates log.md / plan.md / note.md / status / report_*.md / dead_ends.md per its own operating rules; returns `DONE: {summary}`.
+
+If curator returns with REVISE or REJECT critic verdicts unresolved — i.e., a worker deliverable whose critic verdict is REVISE means the worker should be re-dispatched next cycle — curator flags these in its return. The scheduler records the flag; physicist sees the flagged deliverables in the next cycle's prompt (step 1 `Recent Deliverables` and `Critic Verdicts`) and decides whether to re-dispatch.
+
+### 6. Cycle End
+
+Increment `cycles_done`. If `cycles_done < MAX_CYCLES` and `Status` is still `active`, loop to step 0. Else proceed to Session End.
 
 ---
 
 ## Session End
 
-Read `phases/session-end.md`. The phase splits the work into PI-owned research judgments (simulation housekeeping, mandatory curator sweep) and mechanical finalization (session log / focus.md / last_session.md / agenda / beacon deletion / git commit+push), the latter delegated to the `session-wrap-up` agent via `logs/_DRAFT_wrap-up-input.md`. The final report to the user is the **only** closing message of the session — emit it after the wrap-up agent returns DONE, then yield the turn.
+Read `phases/session-lifecycle.md` § Session End. Summary:
+
+1. **Simulation housekeeping** — if simulator ran, `/run` checks `research/**/src/` for superseded scripts and moves them to `src/archive/`. This is a mechanical step (physicist judges which are superseded — express as Tree Directives in the final focus.md — but the `mv` itself is scheduler-level).
+2. **Final curator sweep** — dispatch curator once more with an empty `Tree Directives` list and the accumulated evidence, asking for a tree-wide coherence pass (per curator's own session-end mandate).
+3. **Final physicist dispatch (session-end mode)** — physicist writes `logs/_DRAFT_wrap-up-input.md` instead of `research/focus.md`.
+4. **`session-wrap-up` dispatch** — the agent consumes `logs/_DRAFT_wrap-up-input.md`, writes `research/focus.md` / `logs/last_session.md` / `logs/_DRAFT_run.md` / `agenda.md`, deletes `logs/.run-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+5. **Final report to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.

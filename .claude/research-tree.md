@@ -6,10 +6,10 @@ Research information is organized as a **tree** under `research/`. Every node is
 
 | File | Layer | Role |
 |---|---|---|
-| `note.md` | Destination (SoT) | **Derivation-bearing paper-quality knowledge. Curator-authored** — PI dispatches curator to write and update; PI does not author the prose directly (see § note.md — Ownership below). Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries **both** a derivation (inline or cited, see Scope of derivation) and a verification tag (see Verification Provenance Taxonomy). Written when a node has significant established results. Not every node has one |
-| `report_{slug}.md` | Report (with provenance) | **PI-promoted report with explicit provenance tags.** Self-contained analysis promoted from worker deliverables after independent review. Belongs to the node, not to the timeline. See below |
-| `plan.md` | Ladder (strategy) | **Strategy and approach.** How to attack this node — decomposition rationale, approach decisions, children's roles. Rewritten as strategy evolves |
-| `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). PI's working document |
+| `note.md` | Destination (SoT) | **Derivation-bearing paper-quality knowledge. Curator-authored** — see § note.md — Ownership below. Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries **both** a derivation (inline or cited, see Scope of derivation) and a verification tag (see Verification Provenance Taxonomy). Written when a node has significant established results. Not every node has one |
+| `report_{slug}.md` | Report (with provenance) | **Verified report with explicit provenance tags.** Self-contained analysis promoted from worker deliverables after independent critic review. Curator creates when physicist directs promotion. Belongs to the node, not to the timeline. See below |
+| `plan.md` | Ladder (strategy) | **Strategy and approach.** How to attack this node — decomposition rationale, approach decisions, children's roles. Rewritten by curator as strategy evolves (physicist directs the change via `research/focus.md § Tree Directives`) |
+| `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). Curator writes: every worker deliverable becomes an Evidence entry, every shift in understanding updates Current State |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
 | `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting research constraints |
 | `src/` | Computation | Source code tied to a node (measurement, analysis, plot, or verification scripts), each with a companion `{slug}.md` |
@@ -92,23 +92,23 @@ This audience, combined with the derivation-bearing requirement, is the file's s
 
 **When to create**: When a node reaches stable and has derivation-bearing results worth stating as source of truth. Leaf nodes doing pure computation may never get one.
 
-**Ownership — note.md is curator-authored.** This is the one file in the tree whose prose is written by curator rather than PI. The split exists because note.md demands cognitive modes that compete with PI's research work:
+**Ownership — note.md is curator-authored.** This is the one file in the tree whose prose is written by curator. In the `/run` model, research judgment is split across three agents — physicist (direction, owns `research/focus.md`), curator (tree writes, owns every file under `research/**` except focus.md), critic (auto-attached review). note.md is curator's deepest responsibility: the split exists because note.md demands cognitive modes that would otherwise compete with active research for attention:
 
 - **Derivation lifting and tag assignment (curator's core task)**: each principal claim in note.md carries its derivation *and* an axis 1 + axis 2-a + axis 2-b + (optional) axis 3 tag. Lifting the derivation into paper-quality prose and then assigning the tag correctly both require re-reading the underlying worker deliverables, report_*.md, and critic reports to reconstruct what was actually shown — including identifying the right level of detail to preserve in note.md vs. defer to `[[wiki-link]]`. Tag assignment alone — attaching stamps to bare claim sentences — is the degenerate form § note.md — Source of Truth rules out; curator's mandate is the harder lift of writing the derivation into the note
-- **Separation of concerns**: PI's attention during `/run` is on advancing research — dispatching workers, reading attempts, making directional decisions. Lifting verified evidence *with its derivation* into publication-quality prose is a different cognitive mode. When PI tries to hold both, research wins and synthesis drops — empirically, a session with ten cycles of active research typically produces zero updates to note.md if the same agent owns both channels. Giving note.md a dedicated author prevents that drop
+- **Separation of concerns**: physicist's attention during `/run` is on direction — what question matters next, whether the story holds together. Lifting verified evidence *with its derivation* into publication-quality prose is a different cognitive mode; combining it with direction-setting reliably starves synthesis under research load. Giving note.md a dedicated author (curator, auto-dispatched every cycle) prevents that drop
 - **Second-reader quality**: The agent who produced a result is anchored by the deliverable they wrote and is a poor judge of whether the prose reads cleanly to someone unfamiliar with the research process. note.md's promise is exactly that it reads cleanly to such a reader, with the derivation checkable in isolation, so the author should be a second reader — curator, coming to the evidence fresh
-- **Cross-tree coherence**: note.md at one node must harmonize with note.md at sibling and ancestor nodes (consistent terminology, valid `[[wiki-links]]`, referenced concept notes, derivations that compose across node boundaries). This requires reading the tree holistically, which PI does not do during cycles — PI's reading scope is the ancestor spine plus direct children. Curator reads the whole tree by design
+- **Cross-tree coherence**: note.md at one node must harmonize with note.md at sibling and ancestor nodes (consistent terminology, valid `[[wiki-links]]`, referenced concept notes, derivations that compose across node boundaries). This requires reading the tree holistically, which physicist does not do during cycles — physicist's reading scope is the ancestor spine plus direct children. Curator reads the whole tree by design
 
-PI's role with respect to note.md is therefore: write evidence into log.md, promote verified results into report_{slug}.md when warranted (which already carry derivations), and **dispatch curator** to lift these — *derivations intact* — into note.md. PI does not directly write substantive note.md prose during `/run` cycles.
+Curator's role with respect to note.md: every cycle, read worker deliverables and their critic verdicts together with physicist's tree directives, append Evidence to log.md, promote verified results into `report_{slug}.md` when physicist directs, and — when a node accumulates CONFIRMED / STRONG CONJECTURE claims with derivations — lift those derivations (not just claims) into note.md at paper quality. Physicist never writes note.md directly; physicist's directives live in `research/focus.md § Tree Directives` and curator executes them.
 
-Two narrow exceptions to the curator-only rule:
+Two narrow exceptions to the curator-only rule (for any agent, not only curator's):
 
 1. **Trivial mechanical fixes.** Typo corrections, fixing a broken `[[wiki-link]]`, renaming a term after a concept note is renamed. The rule of thumb: if the replacement is uniquely determined — any competent reader would produce the same correction, with no judgment about phrasing or structure — the edit is mechanical. If there is any judgment about wording, ordering, or what claim to state, it is not mechanical and must go through curator
-2. **User-present collaborative rewrites (`/meeting`, `/launch`).** When the user is actively collaborating — during a meeting discussion, or during the initial project launch — PI and user may rewrite note.md together to reflect synthesis produced in the conversation. These skills explicitly treat note.md as the destination for human-in-the-loop narrative decisions. The user acts as the second reader in real time, which is what curator otherwise provides; so the curator-only rule does not bind
+2. **User-present collaborative rewrites (`/meeting`, `/launch`).** When the user is actively collaborating — during a meeting discussion, or during the initial project launch — the main agent and user may rewrite note.md together to reflect synthesis produced in the conversation. These skills explicitly treat note.md as the destination for human-in-the-loop narrative decisions. The user acts as the second reader in real time, which is what curator otherwise provides; so the curator-only rule does not bind
 
-Anything beyond these two categories — adding a section, rewording a claim, updating a provenance tag, restructuring prose, inserting a "status update" block — goes through curator. A PI-authored substantive edit that was made by mistake (e.g., during a fast-paced cycle) is legitimate input to the tree, but curator will rewrite it on the next dispatch to restore SoT quality; PI should not defend such edits as final.
+Anything beyond these two categories — adding a section, rewording a claim, updating a provenance tag, restructuring prose, inserting a "status update" block — goes through curator. A note.md edit written by another channel (e.g., a mistaken direct edit during a fast-paced cycle, or a legacy accretion from an earlier process model) is legitimate input to the tree, but curator will rewrite it on the next dispatch to restore SoT quality.
 
-This rule has a failure mode to watch for: note.md drifting into a log-like chronicle with time-stamped "Status update YYYY-MM-DD" sections stacked on top of each other. That shape is the footprint of PI-direct appending and signals that curator dispatches have been skipped; the next curator run should consolidate such stacks into a single, present-tense statement of the node's established knowledge.
+This rule has a failure mode to watch for: note.md drifting into a log-like chronicle with time-stamped "Status update YYYY-MM-DD" sections stacked on top of each other. That shape is the footprint of non-curator appending and signals that curator dispatches have been skipped; the next curator run should consolidate such stacks into a single, present-tense statement of the node's established knowledge.
 
 ### Critic layering on note.md
 
@@ -178,7 +178,7 @@ By default the claim is taken to be verified over its **full declared scope**. W
 - Axis 2-a and 2-b tags compose freely when both apply (e.g., `[proof, critic-blind]`, `[literature, critic-contextual]`, `[mechanical, numerical, critic-blind]`). Always declare every applicable tag — omitting a true channel understates the verification chain
 - A claim tagged with `[special-case: ...]` **cannot** be elevated to CONFIRMED — the strongest allowed label is `STRONG CONJECTURE`, because full-scope verification is missing by definition
 - `[literature]` alone (no independent review, no local re-derivation) does not suffice for **project-central claims** — meaning a claim this project is staking out as its own contribution, as opposed to a premise cited from external work. (A citation-only `CONFIRMED [literature]` is fine when the claim is explicitly framed as the external result itself — e.g., "Theorem X of {Author et al.} holds" — and no project contribution is being attested.) To reach CONFIRMED on a project-central claim, pair `[literature]` with an independent channel: either a first-order re-derivation (`[proof]`, `[mechanical]`, `[numerical]`) or an independent review (`[critic-blind]` / `[critic-contextual]`) that examined the citation's applicability to the specific use being made of it
-- If provenance is unclear from the available documents, use the lower confidence label and flag for PI rather than guessing
+- If provenance is unclear from the available documents, use the lower confidence label and flag back to physicist rather than guessing
 
 ### Strength guide (informal)
 
@@ -200,22 +200,22 @@ These are shape-examples showing how the tag slots compose; the specific claims 
 | A numerical agreement with prediction on a specific parameter choice, checked by critic in blind mode | `STRONG CONJECTURE [numerical, critic-blind, special-case: {parameter choice}]` |
 | The same claim extended to the full declared scope, not yet verified | `OPEN` |
 
-## report_{slug}.md — PI-Verified Reports
+## report_{slug}.md — Promoted Verified Reports
 
-Self-contained analyses that PI has verified (through independent review by the critic sub-agent) and promoted from worker deliverables in `logs/` (a flat directory for raw research notebooks, outside the tree). Think of these as a student's report submitted to PI — structured, verified, and complete enough to stand on their own.
+Self-contained analyses that have been independently reviewed by the critic agent (auto-attached when the source deliverable was produced) and promoted from worker deliverables in `logs/` (a flat directory for raw research notebooks, outside the tree). Think of these as a student's report submitted for the record — structured, verified, and complete enough to stand on their own.
 
 **Relationship to other files:**
 - Worker deliverables in `logs/` are research notebooks (raw work). Reports are the verified, promoted subset
 - `note.md` is the node's integrated knowledge. Reports are individual analyses that note.md may draw from
 - Not every deliverable becomes a report. Not every node has reports
 
-**When to create**: When a worker deliverable contains a significant, verified result that PI wants to preserve as structured knowledge in the tree node. PI creates the report after independent review.
+**When to create**: When a worker deliverable contains a significant, verified result worth preserving as structured knowledge in the tree. Physicist directs promotion via `research/focus.md § Tree Directives`; curator creates the report.
 
 **Naming**: `report_{slug}.md` where `{slug}` is a descriptive identifier (e.g., `report_surface_dispersion.md`, `report_magnetic_c4t.md`).
 
 ## plan.md — Strategy and Approach
 
-PI's strategic document for a node. Captures how to attack the problem — decomposition into children, approach choices, and their rationale. Rewritten as strategy evolves.
+A node's strategic document — decomposition into children, approach choices, and their rationale. Curator-maintained: physicist directs strategy changes via `research/focus.md § Tree Directives`, and curator rewrites plan.md accordingly. Rewritten (not appended) when strategy evolves.
 
 ```markdown
 {Free-form strategy notes. No prescribed sections.
@@ -231,7 +231,7 @@ approach decisions and alternatives considered, strategic priorities.}
 
 ## log.md — Research Process
 
-PI's working document. Every node starts with log.md. plan.md is added when strategic decisions need recording. note.md comes last, when results are stable.
+The node's research-process log — current state and evidence chain. Curator-maintained: every cycle, curator appends an Evidence entry for each new worker deliverable (with its critic verdict) and rewrites Current State when understanding shifts. Every node starts with log.md. plan.md is added when strategic decisions need recording. note.md comes last, when results are stable.
 
 ```markdown
 ---
@@ -268,7 +268,7 @@ research/
     note.md            (derivation-bearing: the paradox stated, and the derivation resolving it)
     plan.md            (approach strategy)
     log.md             (research process: current state, evidence)
-    report_symmetry_analysis.md  (PI-verified report on symmetry constraints)
+    report_symmetry_analysis.md  (curator-promoted verified report on symmetry constraints)
   Lattice BKT/
     note.md            (derivation-bearing knowledge of this direction)
     plan.md            (children decomposition and strategy)
@@ -294,7 +294,7 @@ research/
 | Layer | Location | Worker access | What it contains |
 |---|---|---|---|
 | **Research tree — SoT** | `research/**/note.md` | Read-only | Derivation-bearing verified knowledge — claim + derivation + provenance tag, free-form prose written to paper quality (the paper's substance) |
-| **Research tree — reports** | `research/**/report_*.md` | Read-only | PI-verified self-contained analyses |
+| **Research tree — reports** | `research/**/report_*.md` | Read-only | Self-contained analyses promoted from the tree after critic acceptance |
 | **Research tree — plan** | `research/**/plan.md` | Read-only | Strategy: decomposition rationale, approach decisions, children's roles |
 | **Research tree — log** | `research/**/log.md` | Read-only | Process: current state, evidence chain, kind/status |
 | **Concept definitions** | `concepts/` | Read-only (concept-checker may create entries) | Atomic term definitions, wiki-linked from any file via `[[term]]` |
@@ -303,13 +303,13 @@ research/
 | **Computation — data** | `research/**/data/` | Write (simulator) | Simulation data (TSV with metadata headers) |
 | **Computation — figures** | `research/**/images/` | Write (simulator) | Visualizations |
 | **Research notebooks** | `logs/*_{type}_*.md` | Write (own deliverables only) | Worker deliverables: reading notes, attempts, simulations |
-| **Session cursor** | `research/focus.md` | Not relevant to workers | PI's current focus position in the tree |
-| **Session context** | `logs/last_session.md` | Not relevant to workers | PI's volatile work context for session handoff |
+| **Session cursor** | `research/focus.md` | Not relevant to workers | Physicist's current focus position in the tree |
+| **Session context** | `logs/last_session.md` | Not relevant to workers | Volatile work context for session handoff, written by session-wrap-up |
 
-**Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `report_*.md` for PI-verified analyses, `plan.md` for strategy and decomposition, `log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints.
+**Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `report_*.md` for verified analyses, `plan.md` for strategy and decomposition, `log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints.
 
-Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status determination is PI's responsibility.
+Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status is set by curator, based on physicist's Tree Directives and evidence accumulated in log.md (see `.claude/agents/curator.md` and `.claude/agents/physicist.md`).
 
-- Writes to the research tree flow through PI's authority: PI writes `log.md`, `plan.md`, `dead_ends.md`, `report_*.md`, `focus.md`, `story.md`, and `principles.md` directly; curator writes `note.md` on PI's dispatch (see § note.md — Ownership); simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
+- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — `log.md`, `plan.md`, `dead_ends.md`, `report_*.md`, `note.md`, `story.md`, and `principles.md` — executing physicist's directives plus its own default operating rules (see § note.md — Ownership); simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified
