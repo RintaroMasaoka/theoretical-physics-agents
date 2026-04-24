@@ -117,15 +117,36 @@ Physicist returns `DONE: research/focus.md`. If it returns `FAILED:`, re-dispatc
 
 ### 2. Parse `research/focus.md`
 
-Read `research/focus.md`. Extract:
+Before overwriting, remember the **previous cursor** (the `Cursor:` line in the focus.md that physicist just replaced). The scheduler reads focus.md twice in the cycle: once before the physicist dispatch (step 1) to capture the previous cursor, and once after to parse the new directives.
+
+Read the new `research/focus.md`. Extract:
 
 - **Cursor** — the path into the tree (for context when forming worker prompts)
+- **Previous cursor** — carried from the pre-dispatch read above
 - **Status** — `active` or `session_complete`
+- **Retrospect** — `auto`, `skip — {reason}`, or absent
 - **Worker Dispatches** — list of `{agent}: {task}` entries
 - **Tree Directives** — list of directives for curator
 - **Blockers** — informational
 
 If `Status: session_complete` → proceed to Session End (skip remaining cycles).
+
+**Ascent detection.** Compare the new cursor to the previous cursor:
+
+- New cursor is the previous cursor's **immediate parent** (exactly one edge shorter) → **ascent**.
+- Otherwise (same, descended into a child, sibling jump, multi-edge upward jump, initial cycle with no previous, or physicist-FAILED recovery that reset cursor to root) → **not ascent**.
+
+The stricter "immediate parent" rule (rather than any proper-prefix) is deliberate. Retrospect reads the new cursor's direct children, so dispatching it after a multi-edge upward jump would have it read children irrelevant to the cycle's subject, and dispatching it after a cursor-reset-to-root recovery (physicist.md § Return Value's FAILED fallback) would have it retrospect at a node physicist did not reach by scientific judgment. Both cases are non-ascents by design; retrospect does not fire. A multi-edge jump additionally violates physicist's one-edge rule — that is a physicist-level problem, not something the scheduler auto-remediates.
+
+### 2.5. Retrospect Auto-Attach on Ascent
+
+If step 2 flagged **ascent** and the `Retrospect` field is `auto` (or absent — default is auto on ascent), dispatch the `retrospect` agent per `phases/dispatch.md` § Retrospect Auto-Attach. Retrospect runs at the new (parent) cursor and writes `logs/_DRAFT_retrospect_{node-slug}.md`. The scheduler adds this path to the curator input's `## New Evidence This Cycle` list in step 5 (it is evidence for the subtree's meaning, in the same way a worker deliverable is evidence for a claim).
+
+If `Retrospect: skip — {reason}` is set, honour the skip: no retrospect dispatch this cycle. The scheduler does not enforce what counts as a valid reason — that check is physicist's in the next cycle's review of its own focus.md.
+
+If not ascent, skip this step entirely.
+
+Retrospect runs in **parallel** with the worker dispatch in step 3 whenever both are non-empty — retrospect reads the tree only, worker dispatches produce new claims, neither blocks the other. Use a single-message multi-tool call.
 
 ### 3. Worker Dispatch — Parallel
 
@@ -181,6 +202,7 @@ Read `phases/session-lifecycle.md` § Session End. Summary:
 
 1. **Simulation housekeeping** — if simulator ran, `/run` checks `research/**/src/` for superseded scripts and moves them to `src/archive/`. This is a mechanical step (physicist judges which are superseded — express as Tree Directives in the final focus.md — but the `mv` itself is scheduler-level).
 2. **Final curator sweep** — dispatch curator once more with an empty `Tree Directives` list and the accumulated evidence, asking for a tree-wide coherence pass (per curator's own session-end mandate).
-3. **Final physicist dispatch (session-end mode)** — physicist writes `logs/_DRAFT_wrap-up-input.md` instead of `research/focus.md`.
-4. **`session-wrap-up` dispatch** — the agent consumes `logs/_DRAFT_wrap-up-input.md`, writes `research/focus.md` / `logs/last_session.md` / `logs/_DRAFT_run.md` / `agenda.md`, deletes `logs/.run-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
-5. **Final report to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.
+3. **Pivot-review dispatch** — dispatch the `pivot-review` agent once. Reads the whole tree and this session's logs; writes `logs/_DRAFT_pivot-review.md` with a 5-slot forcing artifact (direction restatement, wandering candidates, direction dependencies, adjacent pivots, flag for PI). Mandatory — not skippable on "nothing felt interesting this session" grounds. Its output feeds step 4 as evidence.
+4. **Final physicist dispatch (session-end mode)** — physicist writes `logs/_DRAFT_wrap-up-input.md`, consulting the pivot-review output when shaping the next session's Focus and any `## Agenda` items.
+5. **`session-wrap-up` dispatch** — the agent consumes `logs/_DRAFT_wrap-up-input.md`, writes `research/focus.md` / `logs/last_session.md` / `logs/_DRAFT_run.md` / `agenda.md`, deletes `logs/.run-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+6. **Final report to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.

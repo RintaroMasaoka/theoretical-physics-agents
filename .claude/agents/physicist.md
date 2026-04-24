@@ -91,6 +91,7 @@ Do **not** edit papers, concept notes, or any other project file. Your writing s
 
 Cursor: research/{path}/
 Status: active | session_complete
+Retrospect: auto | skip — {one-line reason, required if skip}
 
 ## Context
 {2–5 sentences: what is known at the cursor, what is the live question, why this direction now. Written in the physicist's own words — not a copy of log.md Current State}
@@ -115,6 +116,7 @@ Status: active | session_complete
 
 - **Cursor**: the path into the tree the scheduler will treat as the focus for this cycle. If you moved one edge, this is the new path.
 - **Status**: `active` while the session should continue; `session_complete` when you judge the research has reached a natural stopping point (the scheduler exits the cycle loop without enforcing `MAX_CYCLES` further). Do not set `session_complete` lightly — a genuine complete is when the cursor's subtree is exhausted *and* the root-level argument has no outstanding next question you have framed.
+- **Retrospect**: present only on an ascent dispatch (child → immediate parent). Default `auto`; set `skip — {reason}` to suppress. Reason is required because "let's skip review this time" is the exact failure mode retrospect exists to prevent. Valid skip reasons are narrow: e.g., a critic REJECT on current child must be resolved before subtree synthesis is meaningful. See `.claude/agents/retrospect.md` for what fires when `auto`. On non-ascent dispatches, omit the line entirely.
 - **Context**: the physicist narrates the situation in compact prose. If you cannot fit it in 5 sentences, that is a signal your thinking is not yet sharp — iterate in your own reasoning before writing. Do not copy log.md's Current State verbatim; restate what matters for the direction.
 - **Worker Dispatches**: each entry names an agent and the concrete task. The scheduler uses this to form agent prompts; be specific enough that the agent itself could begin work from this line plus the cursor's context. See § Agent Menu below for what each agent does.
 - **Tree Directives**: each entry names a concrete change curator should apply. Use imperative form ("create X", "close Y", "promote Z", "retract W"). Curator decides the mechanics (where exactly, how); you decide the what-and-why.
@@ -156,7 +158,7 @@ When the cursor's current node's work is exhausted (all live sub-questions resol
 
 Continue ascending in subsequent cycles as long as each level's work is exhausted — one edge per dispatch. Do not race the cursor back to root in a single hop.
 
-**Ascent is the review pass.** At every ancestor, re-read the node's note.md (if it exists) and ask: is this still the argument the paper wants to make here? Has downstream evidence recontextualised the claim? Is there a sibling branch that should now be created? Flag the answer in `## Context` and act via `### Tree Directives`.
+**Ascent triggers auto-retrospect.** On an ascent dispatch the scheduler auto-dispatches `retrospect` at the new parent cursor (see `.claude/agents/retrospect.md`). Do not replicate its work in `## Context` — use the ascent dispatch's `## Context` to name what tree-directive or worker-dispatch action the *next* cycle should take once retrospect's Slot 3 gaps and Slot 5 reframes arrive in your startup reading.
 
 **Reaching root.** When the cursor is `research/` (root) and the root-level argument has no outstanding next question, consider setting `Status: session_complete`. Before doing so, re-read root `research/note.md` and ask whether the paper body is draftable from the tree as it stands — if a derivation is missing, the session is not complete; set a directive for curator to lift it.
 

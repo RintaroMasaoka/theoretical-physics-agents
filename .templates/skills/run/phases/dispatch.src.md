@@ -62,6 +62,8 @@ The physicist's focus.md entries are written concretely enough that these fields
 
 ## Auto-Critic Rule
 
+"Worker" here means the execution-tier agents listed in the Worker row of `AGENTS.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Synthesis agents (`retrospect`, `pivot-review`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no auto-critic — their forcing-artifact format (synthesis agents) or scheduler-owned role (curator/wrap-up) is the integrity mechanism.
+
 Every worker deliverable returned from step 3 is critiqued by a critic dispatch in step 4 — this is automatic, not something physicist requests. The rule is fixed:
 
 - **Target**: A (attempt file inline annotation) — the critic annotates the worker's deliverable file directly.
@@ -88,6 +90,42 @@ The scheduler does not read critic's output before proceeding to curator — cri
 ## Critic on note.md (Target B) — NOT scheduler-dispatched
 
 The scheduler never dispatches critic on a note.md directly. That second-order dispatch is curator's internal step: after lifting a derivation into note.md, curator dispatches critic with Target B (separate critique file, not inline annotation). See `.claude/agents/curator.md` § note.md critic layering.
+
+## Retrospect Auto-Attach on Ascent
+
+When SKILL § Cycle step 2 detects an ascent (new cursor is a proper prefix of the previous cursor) and the focus.md `Retrospect` field is `auto` or absent, dispatch `retrospect` in step 2.5 alongside the worker dispatch in step 3 (same message, Pattern A).
+
+```
+Agent(subagent_type="retrospect", prompt="""
+## Task
+Write the 5-slot retrospect forcing artifact at the new parent cursor. See your agent definition for the 5 slots and the required output path.
+
+## Context
+Previous cursor: research/{prev path}/
+New cursor (parent): research/{new path}/
+Session cycle: {n} of {N}
+""")
+```
+
+Retrospect returns `DONE: logs/_DRAFT_retrospect_{node-slug}.md`. The scheduler adds this path to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
+
+```
+## New Evidence This Cycle
+- {worker deliverable} — critic: ACCEPT
+- logs/_DRAFT_retrospect_{slug}.md — retrospect (no critic; forcing-artifact, not a claim)
+```
+
+Retrospect is a synthesis pass, not a claim; it receives no critic (its "verdict" would be whether each slot honestly reflects the tree, which is exactly what retrospect itself is asserting via the forcing-artifact format). Curator reads the retrospect slots as input to note.md / plan.md updates and as one piece of evidence shaping whether the parent's question should be reframed (retrospect's Slot 5 names reframe proposals explicitly).
+
+If `Retrospect: skip — {reason}` is set, skip the dispatch. The scheduler logs the skip reason into curator's input so curator knows retrospect was deliberately deferred this cycle:
+
+```
+## New Evidence This Cycle
+- {worker deliverable} — critic: ACCEPT
+- retrospect: skipped — {reason copied verbatim from focus.md}
+```
+
+If not ascent, no retrospect line appears in curator's input; the cycle is ordinary.
 
 ## Curator Dispatch Input
 

@@ -87,6 +87,34 @@ The sweep is **not optional** and **not skippable** on the grounds that "nothing
 
 Curator returns `DONE: {summary}`. If it returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so the next session picks it up; do not block Session End on a curator failure.
 
+### 2.5. Pivot-Review Dispatch — Mandatory
+
+Dispatch the `pivot-review` agent once, after the final curator sweep and before the final physicist dispatch:
+
+```
+Agent(subagent_type="pivot-review", prompt="""
+## Task
+Session-end direction audit. Read the whole research tree and this session's logs, then write the 5-slot pivot-review forcing artifact at logs/_DRAFT_pivot-review.md.
+
+## This Session's Evidence
+- Deliverables: {list of paths produced this session}
+- Critic verdicts: {list of critic files or inline-annotated paths}
+- Curator sweeps: {list of curator deliverables / summaries}
+- Retrospect outputs: {list of logs/_DRAFT_retrospect_*.md from this session, if any}
+- Node changes: {new nodes, closes, status changes, report promotions — enumerate}
+
+## Context
+Final cursor: {cursor from research/focus.md}
+Session cycle: {n} of {N}
+""")
+```
+
+The dispatch is **mandatory** and **not skippable** on the grounds that "no pivot feels needed". Its rationale is the session-scale horizontal complement to retrospect's node-scale vertical synthesis: lost-pivot and trivial-convergence failure modes are only visible at the whole-tree + whole-session granularity. An empty pivot-review (all slots `(none)`) is itself a signal — either the research is at a healthy narrow-down stage or it has grown excessively narrow; `pivot-review` surfaces the observation so physicist and user can judge.
+
+Pivot-review returns `DONE: logs/_DRAFT_pivot-review.md`. Its output path is included in step 3's physicist prompt as one of the session's evidence items.
+
+If pivot-review returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so physicist's next session reads it; do not block Session End on a pivot-review failure.
+
 ### 3. Final Physicist Dispatch (Session-End Mode)
 
 ```
@@ -100,6 +128,8 @@ Write logs/_DRAFT_wrap-up-input.md per the session-end-mode format in your agent
 - Deliverables: {list of paths produced this session}
 - Critic verdicts: {list of critic files or inline-annotated paths}
 - Curator sweeps: {list of curator deliverables / summaries}
+- Retrospect outputs: {list of logs/_DRAFT_retrospect_*.md from this session, if any}
+- Pivot-review output: logs/_DRAFT_pivot-review.md (Slot 5 flag translation rules in `.claude/agents/pivot-review.md`)
 - Node changes: {new nodes, closes, status changes, report promotions — enumerate}
 - Simulation-script archives: {moves from step 1, if any}
 """)
