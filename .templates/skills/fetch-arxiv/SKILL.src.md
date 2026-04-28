@@ -1,6 +1,6 @@
 ---
 name: fetch-arxiv
-description: "Fetch arXiv papers (PDF + LaTeX source) via GitHub Actions relay. Usage: /fetch-arxiv 2301.00001 [2301.00002 ...]"
+description: "Fetch arXiv papers (PDF + LaTeX source) via GitHub Actions relay. Usage: /fetch-arxiv 2301.00001 [cond-mat/9905027 ...]"
 user-invocable: true
 argument-hint: "ARXIV_ID [ARXIV_ID ...]"
 ---
@@ -10,6 +10,13 @@ argument-hint: "ARXIV_ID [ARXIV_ID ...]"
 Fetches arXiv papers by relaying the download through GitHub Actions, bypassing cloud environment network restrictions.
 
 Arguments: $ARGUMENTS
+
+## Accepted ID Formats
+
+- **New format**: `YYMM.NNNNN[vN]` — e.g., `2301.00001`, `2301.00001v2`
+- **Legacy format**: `archive[.SUBJ]/YYMMNNN[vN]` — e.g., `cond-mat/9905027`, `hep-th/0506213`, `math.AG/0506213`
+
+Legacy-ID papers are saved under `literature/papers/{archive}/{YYMMNNN}/` (the `/` in the ID becomes a directory separator).
 
 ## Mechanism
 

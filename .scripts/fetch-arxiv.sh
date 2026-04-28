@@ -36,10 +36,16 @@ fi
 IDS=("$@")
 
 # --- Validate arXiv ID format ---
+# Accepts both:
+#   - new format:    YYMM.NNNNN[vN]              (e.g., 2301.00001, 2301.00001v2)
+#   - legacy format: archive[.SUBJ]/YYMMNNN[vN]  (e.g., cond-mat/9905027, math.AG/0506213)
+NEW_ID_RE='^[0-9]{4}\.[0-9]{4,5}(v[0-9]+)?$'
+LEGACY_ID_RE='^[a-z][a-z-]*(\.[A-Z]{2,})?/[0-9]{7}(v[0-9]+)?$'
 for id in "${IDS[@]}"; do
-    if ! [[ "$id" =~ ^[0-9]{4}\.[0-9]{4,5}(v[0-9]+)?$ ]]; then
+    if ! [[ "$id" =~ $NEW_ID_RE ]] && ! [[ "$id" =~ $LEGACY_ID_RE ]]; then
         echo "Error: Invalid arXiv ID format: $id"
-        echo "  Expected format: YYMM.NNNNN (e.g., 2301.00001)"
+        echo "  Expected: YYMM.NNNNN (e.g., 2301.00001)"
+        echo "         or archive/YYMMNNN (e.g., cond-mat/9905027, math.AG/0506213)"
         exit 1
     fi
 done
