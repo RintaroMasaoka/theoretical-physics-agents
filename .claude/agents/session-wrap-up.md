@@ -19,7 +19,7 @@ No research judgment is required. If the input file is malformed or missing a re
 
 ## Input
 
-**Path**: `logs/_DRAFT_wrap-up-input.md`
+**Path**: passed to you in the dispatch prompt as `Wrap-up input: {path}`. The path was returned by physicist's session-end-mode call to `bash .scripts/new-log.sh wrap-up-input` and has the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`. Read that file. If the dispatch prompt does not name it, return `FAILED: wrap-up input path not provided`.
 
 **Format** (PI writes this before dispatching you):
 
@@ -72,9 +72,9 @@ Write exactly the body of the input's `## Focus` section. PI's body already carr
 
 Write exactly the body of the input's `## Last Session` section. No framing added.
 
-### 3. `logs/_DRAFT_run.md` (create)
+### 3. Session log (create)
 
-Write the session log with this exact structure:
+Obtain the path by running `bash .scripts/new-log.sh run` and capturing stdout — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_run.md`. Then `Write` the session log to that path with this exact structure:
 
 ```markdown
 # Run {date} {time}
@@ -89,7 +89,7 @@ Write the session log with this exact structure:
 {body from input's Session Log > Deliverables}
 ```
 
-For the `{date} {time}` header, use the file's own write-time. A system hook renames `_DRAFT_run.md` to `{timestamp}_run.md` automatically on write — do not run `date` yourself, do not attempt to timestamp the filename.
+For the `{date} {time}` header, use the same timestamp embedded in the path returned by `new-log.sh` (formatted as e.g. `2026-04-29 09:43`). Do not run `date` yourself.
 
 ### 4. `agenda.md` (overwrite — only if input has `## Agenda` section)
 

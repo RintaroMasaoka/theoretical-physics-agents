@@ -78,11 +78,11 @@ You do **not** read sibling branches outside the ancestor chain — that scoping
 
 **Exactly one file: `research/focus.md`** (overwrite).
 
-At session end, you are dispatched once more in "wrap-up mode" to write `logs/_DRAFT_wrap-up-input.md` — see § Session-End Mode below.
+At session end, you are dispatched once more in "wrap-up mode" to write a wrap-up-input file — see § Session-End Mode below for path creation.
 
 Do **not** write anything into `research/**` other than `focus.md`, do **not** create node folders or any ladder files, do **not** edit note.md, plan.md, log.md, dead_ends.md, or report_*.md. Tree writes are exclusively curator's. If you decide a tree change is needed, express it as a directive in `focus.md § Tree Directives` — curator executes.
 
-Do **not** edit papers, concept notes, or any other project file. Your writing surface is `research/focus.md` (and, in session-end mode, `logs/_DRAFT_wrap-up-input.md`) — period.
+Do **not** edit papers, concept notes, or any other project file. Your writing surface is `research/focus.md` (and, in session-end mode, the wrap-up-input file — see § Session-End Mode) — period.
 
 ## `research/focus.md` Format
 
@@ -164,7 +164,7 @@ Continue ascending in subsequent cycles as long as each level's work is exhauste
 
 ## Session-End Mode
 
-At session end, the scheduler dispatches you one final time with `mode: session-end`. In this mode you do **not** update `research/focus.md` with a next-cycle plan (the session is ending); instead, you write `logs/_DRAFT_wrap-up-input.md` for the `session-wrap-up` agent to consume.
+At session end, the scheduler dispatches you one final time with `mode: session-end`. In this mode you do **not** update `research/focus.md` with a next-cycle plan (the session is ending); instead, you write a wrap-up-input file for the `session-wrap-up` agent to consume. Obtain its path at the start of the session-end dispatch by running `bash .scripts/new-log.sh wrap-up-input` and capturing stdout — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`. Write to that path, and return it as the `DONE:` value so the scheduler can pass it to `session-wrap-up`.
 
 Do not write `research/focus.md` in session-end mode — `session-wrap-up` transcribes your wrap-up input's `## Focus` section into `research/focus.md` instead. Writing both would produce conflicting states.
 
@@ -200,13 +200,13 @@ Assembling the wrap-up input is a **final thinking pass**, not a clerical collat
 
 ## Return Value
 
-Your deliverable is the updated `research/focus.md` (or in session-end mode, `logs/_DRAFT_wrap-up-input.md`). Return `DONE: {path}` as the Task return value.
+Your deliverable is the updated `research/focus.md` (or in session-end mode, the wrap-up-input file — see § Session-End Mode). Return `DONE: {path}` as the Task return value.
 
 If the cursor target does not exist (deleted or moved since the last session), return `FAILED: cursor target {path} missing — scheduler must reinitialise focus.md`. The scheduler will fall back to initialising the cursor at root. The subsequent root-level reinitialisation is a scheduler-level recovery — it is *not* a physicist-initiated cursor move, so it does not violate the one-edge rule. The one-edge rule governs your own direction-setting moves, not recovery from missing-cursor failures.
 
 ## What NOT to Do
 
-- Do not write to any file other than `research/focus.md` (or `logs/_DRAFT_wrap-up-input.md` in session-end mode)
+- Do not write to any file other than `research/focus.md` (or in session-end mode, the wrap-up-input file — see § Session-End Mode)
 - Do not dispatch any agent; your single output is the updated focus.md
 - Do not execute tree changes yourself — express them as Tree Directives for curator
 - Do not write provenance tags, compose evidence entries, or edit note.md — curator owns that layer

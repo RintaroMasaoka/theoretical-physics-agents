@@ -34,7 +34,7 @@ The beacon is gitignored (see `.gitignore`) and deleted at Session End by `sessi
 
 ### 2. Session Log Filename
 
-The session log will be written by `session-wrap-up` at Session End as `logs/_DRAFT_run.md`; a system hook auto-renames it with the correct timestamp on write. The scheduler does not manage the filename directly.
+The session log is created at Session End by `session-wrap-up`, which calls `bash .scripts/new-log.sh run` to obtain a timestamped path of the form `logs/{YYMMDD_HHMM}_run.md`. The scheduler does not manage the filename directly.
 
 ### 3. Directives Load (informational)
 
@@ -94,13 +94,13 @@ Dispatch the `pivot-review` agent once, after the final curator sweep and before
 ```
 Agent(subagent_type="pivot-review", prompt="""
 ## Task
-Session-end direction audit. Read the whole research tree and this session's logs, then write the 5-slot pivot-review forcing artifact at logs/_DRAFT_pivot-review.md.
+Session-end direction audit. Read the whole research tree and this session's logs, then write the 5-slot pivot-review forcing artifact (path obtained via `bash .scripts/new-log.sh pivot-review` per your agent definition).
 
 ## This Session's Evidence
 - Deliverables: {list of paths produced this session}
 - Critic verdicts: {list of critic files or inline-annotated paths}
 - Curator sweeps: {list of curator deliverables / summaries}
-- Retrospect outputs: {list of logs/_DRAFT_retrospect_*.md from this session, if any}
+- Retrospect outputs: {list of timestamped retrospect paths captured from retrospect's DONE returns this session, if any}
 - Node changes: {new nodes, closes, status changes, report promotions — enumerate}
 
 ## Context
@@ -111,7 +111,7 @@ Session cycle: {n} of {N}
 
 The dispatch is **mandatory** and **not skippable** on the grounds that "no pivot feels needed". Its rationale is the session-scale horizontal complement to retrospect's node-scale vertical synthesis: lost-pivot and trivial-convergence failure modes are only visible at the whole-tree + whole-session granularity. An empty pivot-review (all slots `(none)`) is itself a signal — either the research is at a healthy narrow-down stage or it has grown excessively narrow; `pivot-review` surfaces the observation so physicist and user can judge.
 
-Pivot-review returns `DONE: logs/_DRAFT_pivot-review.md`. Its output path is included in step 3's physicist prompt as one of the session's evidence items.
+Pivot-review returns `DONE: {path}` where `{path}` is the timestamped pivot-review file it created. Capture this path; it is included in step 3's physicist prompt as one of the session's evidence items.
 
 If pivot-review returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so physicist's next session reads it; do not block Session End on a pivot-review failure.
 
@@ -122,30 +122,30 @@ Agent(subagent_type="physicist", prompt="""
 ## Task
 mode: session-end
 
-Write logs/_DRAFT_wrap-up-input.md per the session-end-mode format in your agent definition.
+Obtain a wrap-up-input path via `bash .scripts/new-log.sh wrap-up-input` and write to it per the session-end-mode format in your agent definition. Return the path as `DONE: {path}`.
 
 ## This Session's Evidence (summary)
 - Deliverables: {list of paths produced this session}
 - Critic verdicts: {list of critic files or inline-annotated paths}
 - Curator sweeps: {list of curator deliverables / summaries}
-- Retrospect outputs: {list of logs/_DRAFT_retrospect_*.md from this session, if any}
-- Pivot-review output: logs/_DRAFT_pivot-review.md (Slot 5 flag translation rules in `.claude/agents/pivot-review.md`)
+- Retrospect outputs: {list of timestamped retrospect paths captured from retrospect's DONE returns this session, if any}
+- Pivot-review output: {timestamped pivot-review path captured from step 2.5} (Slot 5 flag translation rules in `.claude/agents/pivot-review.md`)
 - Node changes: {new nodes, closes, status changes, report promotions — enumerate}
 - Simulation-script archives: {moves from step 1, if any}
 """)
 ```
 
-Physicist writes the wrap-up input file and returns `DONE: logs/_DRAFT_wrap-up-input.md`. Do not write `research/focus.md` yourself; `session-wrap-up` transcribes the `## Focus` section into it.
+Physicist writes the wrap-up input file and returns `DONE: {path}` where `{path}` is the timestamped wrap-up-input file it created. Capture this path for step 4. Do not write `research/focus.md` yourself; `session-wrap-up` transcribes the `## Focus` section into it.
 
 If physicist returns `FAILED:`, the scheduler writes a minimal wrap-up input itself (cursor preserved as-is, `## Last Session` noting "physicist wrap-up failed: {reason}", commit message `run: session ended (physicist wrap-up failed)`) and continues to step 4. This avoids leaving the session uncommitted.
 
 ### 4. Dispatch `session-wrap-up`
 
 ```
-Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session. Read logs/_DRAFT_wrap-up-input.md and execute per its own specification.")
+Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {wrap-up-input path captured from step 3}\n\nExecute per your own specification.")
 ```
 
-The agent: writes `research/focus.md` / `logs/last_session.md` / `logs/_DRAFT_run.md` / `agenda.md` (if the input had an Agenda section), deletes `logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (physicist-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `logs/last_session.md` / a session log file (created via `bash .scripts/new-log.sh run`) / `agenda.md` (if the input had an Agenda section), deletes `logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (physicist-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 
 If `git push` fails (network, auth, non-fast-forward), the commit is preserved locally; the final report (step 5) notes the push failure so the user can retry.
 

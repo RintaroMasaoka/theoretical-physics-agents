@@ -96,7 +96,7 @@ Record findings and any resulting changes in the Refinement Report section of th
 
 ### 5. Output
 
-Deliverable: `logs/engine_{slug}.md`
+Deliverable: type `engine`, slug = short module identifier. Obtain the path via `bash .scripts/new-log.sh engine {slug}` per `common.md` § Deliverables and Logs.
 
 Structure:
 1. **Module Overview**: Provided features and API

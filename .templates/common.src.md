@@ -15,11 +15,11 @@ Worker output goes to `logs/` — all worker output is provisional and stored th
 
 Each worker produces two files:
 
-1. **Deliverable**: Your substantive analytical content — derivations, reading notes, data, simulation results. This is the primary output the critic (in `/run`) or PI (in `/write`) evaluates. Filename: `logs/_DRAFT_{type}_{slug}.md`. Type is one of: `reading`, `attempt`, `simulation`, `review`, `audit`, `engine`. Slug is the arXiv ID for paper-based work (e.g., `0804-4527`), or a short descriptive phrase otherwise (e.g., `surface_qbt`).
+1. **Deliverable**: Your substantive analytical content — derivations, reading notes, data, simulation results. This is the primary output the critic (in `/run`) or PI (in `/write`) evaluates. Type is one of: `reading`, `attempt`, `simulation`, `review`, `audit`, `engine`. Slug is the arXiv ID for paper-based work (e.g., `0804-4527`), or a short descriptive phrase otherwise (e.g., `surface_qbt`).
 
-2. **Log**: A short process summary — what you attempted, what you found, blockers encountered. This helps the human researcher audit workflow. Filename: `logs/_DRAFT_{agent}.md` (e.g., `logs/_DRAFT_reader.md`).
+2. **Log**: A short process summary — what you attempted, what you found, blockers encountered. This helps the human researcher audit workflow. Type is the agent name (`reader`, `researcher`, etc.); no slug.
 
-A system hook automatically renames `_DRAFT_` files with the correct timestamp (`YYMMDD_HHMM`) after you write them — do not run `date` yourself.
+**Filename creation.** Run `bash .scripts/new-log.sh <type> [<slug>]` and capture stdout — it returns an absolute path of the form `logs/{YYMMDD_HHMM}_{type}[_{slug}].md`. Then `Write` your content to that path. Do not run `date` yourself; do not pre-name the file. The timestamp is fixed at the moment of the script call, so naming is authoritative from creation — there is no downstream rename step that can fail and leave an orphan file behind.
 
 Deliverables and logs are provisional. In `/run`, the scheduler auto-dispatches a critic on every deliverable, and curator then absorbs the verified evidence into the research tree (see `.claude/research-tree.md`). In `/write`, PI independently verifies deliverables before integrating them into the paper.
 

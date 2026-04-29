@@ -201,7 +201,7 @@ Target A only: curator reads the proposed tags (together with the attempt and cr
 
 Do **not** edit note.md itself. note.md is publication-quality prose for the context-free reader — inserting strikethrough / comment markers would corrupt the very property that makes note.md a Source of Truth. Instead, write all findings to a separate file.
 
-**Deliverable path**: `logs/{timestamp}_critic_note_{node-slug}.md`, where `{node-slug}` is a short identifier for the target node (e.g., `jordan-block-mpo`, `torus-ground-state-multiplicity`). The dispatcher (curator) reads this file and applies fixes to note.md.
+**Deliverable path**: obtain via `bash .scripts/new-log.sh critic_note {node-slug}` where `{node-slug}` is a short identifier for the target node (e.g., `jordan-block-mpo`, `torus-ground-state-multiplicity`). The script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_critic_note_{node-slug}.md`. The dispatcher (curator) reads this file and applies fixes to note.md.
 
 **File format**:
 

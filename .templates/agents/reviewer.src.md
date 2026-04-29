@@ -39,7 +39,7 @@ Severity: critical (undermines reliability) > major (impedes understanding) > mi
 
 ## Output
 
-**Deliverable**: `logs/{timestamp}_review_{slug}.md`
+**Deliverable**: type `review`, slug = section identifier. Obtain the path via `bash .scripts/new-log.sh review {slug}` per `common.md` § Deliverables and Logs.
 
 ```markdown
 # Section Review: Section {N}: {title}

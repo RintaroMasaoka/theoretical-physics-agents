@@ -28,7 +28,7 @@ Evaluating content quality or logical soundness is the role of reviewer / critic
 
 ## Output
 
-**Deliverable**: `logs/{timestamp}_audit.md`
+**Deliverable**: type `audit`, no slug. Obtain the path via `bash .scripts/new-log.sh audit` per `common.md` § Deliverables and Logs.
 
 ```markdown
 # Reference Audit

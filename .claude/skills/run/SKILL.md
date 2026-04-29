@@ -16,7 +16,7 @@ The team and who owns what:
 | **Record** | `curator` | All tree writes — log.md (Evidence + Current State), plan.md, node creation / status / close / reframe, `report_{slug}.md` promotion, retraction, `dead_ends.md`, note.md (SoT) |
 | **Verification** | `critic` | Independent review of every worker deliverable and of curator's note.md lifts |
 | **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing deliverables in `logs/` |
-| **Session finalisation** | `session-wrap-up` | Mechanical transcription of `logs/_DRAFT_wrap-up-input.md` into session log / focus / last_session / agenda; commit + push |
+| **Session finalisation** | `session-wrap-up` | Mechanical transcription of physicist's wrap-up-input file into session log / focus / last_session / agenda; commit + push |
 
 `/run` itself owns only: the cycle loop, the resume beacon, parallel worker dispatch, auto-attaching critic to each worker, dispatching curator once per cycle with the right inputs, and handing session end to `session-wrap-up`.
 
@@ -140,7 +140,7 @@ The stricter "immediate parent" rule (rather than any proper-prefix) is delibera
 
 ### 2.5. Retrospect Auto-Attach on Ascent
 
-If step 2 flagged **ascent** and the `Retrospect` field is `auto` (or absent — default is auto on ascent), dispatch the `retrospect` agent per `phases/dispatch.md` § Retrospect Auto-Attach. Retrospect runs at the new (parent) cursor and writes `logs/_DRAFT_retrospect_{node-slug}.md`. The scheduler adds this path to the curator input's `## New Evidence This Cycle` list in step 5 (it is evidence for the subtree's meaning, in the same way a worker deliverable is evidence for a claim).
+If step 2 flagged **ascent** and the `Retrospect` field is `auto` (or absent — default is auto on ascent), dispatch the `retrospect` agent per `phases/dispatch.md` § Retrospect Auto-Attach. Retrospect runs at the new (parent) cursor and returns `DONE: {path}` where `{path}` is `logs/{YYMMDD_HHMM}_retrospect_{node-slug}.md` (obtained by retrospect via `bash .scripts/new-log.sh retrospect {node-slug}` at its start). The scheduler captures the path from the return value and adds it to the curator input's `## New Evidence This Cycle` list in step 5 (it is evidence for the subtree's meaning, in the same way a worker deliverable is evidence for a claim).
 
 If `Retrospect: skip — {reason}` is set, honour the skip: no retrospect dispatch this cycle. The scheduler does not enforce what counts as a valid reason — that check is physicist's in the next cycle's review of its own focus.md.
 
@@ -202,7 +202,7 @@ Read `phases/session-lifecycle.md` § Session End. Summary:
 
 1. **Simulation housekeeping** — if simulator ran, `/run` checks `research/**/src/` for superseded scripts and moves them to `src/archive/`. This is a mechanical step (physicist judges which are superseded — express as Tree Directives in the final focus.md — but the `mv` itself is scheduler-level).
 2. **Final curator sweep** — dispatch curator once more with an empty `Tree Directives` list and the accumulated evidence, asking for a tree-wide coherence pass (per curator's own session-end mandate).
-3. **Pivot-review dispatch** — dispatch the `pivot-review` agent once. Reads the whole tree and this session's logs; writes `logs/_DRAFT_pivot-review.md` with a 5-slot forcing artifact (direction restatement, wandering candidates, direction dependencies, adjacent pivots, flag for PI). Mandatory — not skippable on "nothing felt interesting this session" grounds. Its output feeds step 4 as evidence.
-4. **Final physicist dispatch (session-end mode)** — physicist writes `logs/_DRAFT_wrap-up-input.md`, consulting the pivot-review output when shaping the next session's Focus and any `## Agenda` items.
-5. **`session-wrap-up` dispatch** — the agent consumes `logs/_DRAFT_wrap-up-input.md`, writes `research/focus.md` / `logs/last_session.md` / `logs/_DRAFT_run.md` / `agenda.md`, deletes `logs/.run-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+3. **Pivot-review dispatch** — dispatch the `pivot-review` agent once. Reads the whole tree and this session's logs; writes a 5-slot forcing artifact (direction restatement, wandering candidates, direction dependencies, adjacent pivots, flag for PI) to a path it obtained via `bash .scripts/new-log.sh pivot-review` and returned as `DONE: {path}`. Mandatory — not skippable on "nothing felt interesting this session" grounds. Capture the returned path and pass it to step 4 as evidence.
+4. **Final physicist dispatch (session-end mode)** — physicist writes the wrap-up-input file (path obtained via `bash .scripts/new-log.sh wrap-up-input` and returned as `DONE: {path}`), consulting the pivot-review output when shaping the next session's Focus and any `## Agenda` items. Capture the returned path for step 5.
+5. **`session-wrap-up` dispatch** — the agent consumes the wrap-up-input file (path passed in the dispatch prompt), writes `research/focus.md` / `logs/last_session.md` / a session log file (path obtained via `bash .scripts/new-log.sh run`) / `agenda.md`, deletes `logs/.run-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 6. **Final report to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.

@@ -25,7 +25,7 @@ Writing without a source risks completion from training data, confusion with oth
 If all source acquisition methods (see "Paper Acquisition Flow" below) fail:
 
 1. Keep the status in `reading_list.md` as `unread`
-2. Do not create `logs/{timestamp}_reading_{id}.md` in any form (if the file exists, downstream agents will treat its content as fact)
+2. Do not call `new-log.sh reading {id}` and do not write any reading deliverable file (if the file exists, downstream agents will treat its content as fact)
 3. Return `FAILED: source acquisition failed (arXiv:{id})` as the task result and terminate
 
 Do not: use web search as a substitute, complete from training data, repurpose other reading notes, or partially create "what you know."
@@ -82,7 +82,7 @@ Follow the failure procedure in the "Source Requirement" section and terminate i
    - Run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` to batch-fetch source and BibTeX (auto-merged into `literature/references.bib`). Unlike the Paper Acquisition Flow above (which is for the assigned paper with fallback steps), this is a batch operation for newly discovered papers
    - If fetch-arxiv fails for some papers, construct bib entries manually from metadata
 
-**Deliverable**: `logs/{timestamp}_reading_{id}.md` ({id} is the arXiv ID with dots replaced by hyphens; {timestamp} is captured at session start per common rules)
+**Deliverable**: type `reading`, slug = arXiv ID with dots replaced by hyphens (e.g., `0804-4527`). Obtain the path via `bash .scripts/new-log.sh reading {id}` per `common.md` § Deliverables and Logs.
 
 ```markdown
 # {Title}

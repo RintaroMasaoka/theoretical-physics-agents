@@ -31,7 +31,7 @@ Execute the following at session start (→ incremental recording principle). If
 
 1. Capture ISO timestamp: `Bash("date '+%Y-%m-%dT%H:%M'")`
 2. Update `research/log.md` frontmatter's `last_meeting` to the ISO timestamp
-3. Create `logs/_DRAFT_meeting.md` (header only — system hook auto-renames with correct timestamp):
+3. Obtain a meeting log path via `bash .scripts/new-log.sh meeting`, then write the file (header only) to that path:
 
 ```markdown
 # Meeting YYYY-MM-DD HH:MM

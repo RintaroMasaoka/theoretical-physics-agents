@@ -107,12 +107,12 @@ Session cycle: {n} of {N}
 """)
 ```
 
-Retrospect returns `DONE: logs/_DRAFT_retrospect_{node-slug}.md`. The scheduler adds this path to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
+Retrospect returns `DONE: {path}` where `{path}` is `logs/{YYMMDD_HHMM}_retrospect_{node-slug}.md` (obtained via `bash .scripts/new-log.sh retrospect {node-slug}` at retrospect's start). The scheduler captures the returned path and adds it to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
 
 ```
 ## New Evidence This Cycle
 - {worker deliverable} — critic: ACCEPT
-- logs/_DRAFT_retrospect_{slug}.md — retrospect (no critic; forcing-artifact, not a claim)
+- {timestamped retrospect path captured from retrospect's DONE return} — retrospect (no critic; forcing-artifact, not a claim)
 ```
 
 Retrospect is a synthesis pass, not a claim; it receives no critic (its "verdict" would be whether each slot honestly reflects the tree, which is exactly what retrospect itself is asserting via the forcing-artifact format). Curator reads the retrospect slots as input to note.md / plan.md updates and as one piece of evidence shaping whether the parent's question should be reframed (retrospect's Slot 5 names reframe proposals explicitly).

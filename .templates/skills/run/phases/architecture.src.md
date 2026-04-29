@@ -52,7 +52,7 @@ Directives cascade: a directive at a higher level applies to all descendants. De
 research/focus.md is a lightweight cursor pointing to PI's current position in the tree. It carries:
 - Current focus path
 - Short-term context (blockers, immediate next steps)
-- Rewritten at every session end. See `session-end.md` step 3 for the template — PI writes the focus body into `logs/_DRAFT_wrap-up-input.md` under `## Focus`; the `session-wrap-up` agent transcribes it into `research/focus.md`
+- Rewritten by physicist at the start of every cycle (regular dispatch) and at session end (transcribed by `session-wrap-up` from the wrap-up-input file's `## Focus` section). See `session-lifecycle.md § Session End` for the wrap-up-input path-creation step.
 
 ## Supporting Layers
 
