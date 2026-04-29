@@ -26,7 +26,6 @@ set -euo pipefail
 # ── 同期対象ファイル（framework ファイル）──────────────────────
 # これらのファイル/ディレクトリ配下だけが upstream と共有される
 FRAMEWORK_FILES=(
-  "AGENTS.md"
   "CLAUDE.md"
   ".gitignore"
   ".github/"
@@ -38,6 +37,7 @@ FRAMEWORK_FILES=(
 
 # push 時 (bulk) に upstream から削除すべき stale ファイル
 STALE_FILES=(
+  "AGENTS.md"           # CLAUDE.md に統合済み
   "configure.mjs"       # .scripts/configure.mjs に移動済み
   "scripts/"            # .scripts/ にリネーム済み
   "templates/"          # .templates/ にリネーム済み

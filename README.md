@@ -2,7 +2,7 @@
 
 Autonomous research and paper-writing system for theoretical physics projects.
 
-The system is organized like a small research lab: a PI agent drives the project, specialized worker agents handle bounded tasks, and the human user steers direction through meetings. The repository is tool-agnostic at the instruction level, with shared rules in `AGENTS.md`, and currently includes Claude Code-specific configuration under `.claude/`.
+The system is organized like a small research lab: a PI agent drives the project, specialized worker agents handle bounded tasks, and the human user steers direction through meetings. The repository is tool-agnostic at the instruction level, with shared rules in `CLAUDE.md`, and currently includes Claude Code-specific configuration under `.claude/`.
 
 ## Current Status
 
@@ -80,8 +80,7 @@ That means the main current value of the repository is autonomous research progr
 ## Repository Layout
 
 ```text
-AGENTS.md                 # Canonical shared instructions for agent behavior
-CLAUDE.md                 # Thin wrapper that imports AGENTS.md for Claude Code
+CLAUDE.md                 # Canonical shared instructions for agent behavior
 README.md                 # Project overview and operational expectations
 configure.mjs             # Renders generated prompt files from config + templates
 
@@ -145,7 +144,7 @@ The system is intentionally opinionated.
 - Prefer file-based state and handoff over large prompt-only context
 - Track progress honestly; unresolved work should not be marked resolved
 
-These rules are defined canonically in `AGENTS.md`.
+These rules are defined canonically in `CLAUDE.md`.
 
 ## License
 

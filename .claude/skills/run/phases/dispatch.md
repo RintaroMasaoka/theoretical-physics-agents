@@ -62,7 +62,7 @@ The physicist's focus.md entries are written concretely enough that these fields
 
 ## Auto-Critic Rule
 
-"Worker" here means the execution-tier agents listed in the Worker row of `AGENTS.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Synthesis agents (`retrospect`, `pivot-review`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no auto-critic — their forcing-artifact format (synthesis agents) or scheduler-owned role (curator/wrap-up) is the integrity mechanism.
+"Worker" here means the execution-tier agents listed in the Worker row of `CLAUDE.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Synthesis agents (`retrospect`, `pivot-review`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no auto-critic — their forcing-artifact format (synthesis agents) or scheduler-owned role (curator/wrap-up) is the integrity mechanism.
 
 Every worker deliverable returned from step 3 is critiqued by a critic dispatch in step 4 — this is automatic, not something physicist requests. The rule is fixed:
 
