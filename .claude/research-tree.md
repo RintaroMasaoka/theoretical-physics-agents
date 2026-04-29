@@ -12,6 +12,8 @@ Research information is organized as a **tree** under `research/`. Every node is
 | `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). Curator writes: every worker deliverable becomes an Evidence entry, every shift in understanding updates Current State |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
 | `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting research constraints |
+| `dead_ends.md` | Off-SoT register | **Rejected-direction register (optional).** Approaches shown wrong, with the reason and the evidence (counterexample, falsifying computation, or critic-rejected derivation). Free-form prose. Pairs with `asides.md` — together they form the two off-SoT registers (rejected vs parked). At root by default; a node may carry its own when the rejection is clearly subtree-local |
+| `asides.md` | Off-SoT register | **Parked off-thread items (optional).** Items not committed to the active thread but worth not forgetting — spare-capacity questions, side curiosities, loose details left unpinned, items of unclear project scope. Free-form prose, no derivation requirement. At root by default; a node may carry its own when the items are clearly subtree-local. Three exits: promoted into a node's note.md (becomes load-bearing), moved to `dead_ends.md` (shown wrong), or stays parked indefinitely. Capture path: workers surface candidate items in their deliverables; curator absorbs them. The user may also append directly during `/meeting`, mirroring the user-collaborative exception for `note.md` (the file is informal, so the second-reader rationale that locks `note.md` to curator does not bind here) |
 | `src/` | Computation | Source code tied to a node (measurement, analysis, plot, or verification scripts), each with a companion `{slug}.md` |
 | `data/` | Computation | Simulation data (TSV format with metadata headers) |
 | `images/` | Computation | Figures and visualizations |
@@ -260,6 +262,8 @@ research/
   focus.md            (session cursor: "work here now")
   story.md             (paper narrative structure)
   principles.md        (cross-cutting research constraints)
+  dead_ends.md         (rejected-direction register — off-SoT)
+  asides.md            (parked off-thread items — off-SoT)
   lib/                 (shared simulation framework — engine-builder manages)
     ClockModel.jl
     XYModel.jl
@@ -310,6 +314,6 @@ research/
 
 Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status is set by curator, based on physicist's Tree Directives and evidence accumulated in log.md (see `.claude/agents/curator.md` and `.claude/agents/physicist.md`).
 
-- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — `log.md`, `plan.md`, `dead_ends.md`, `report_*.md`, `note.md`, `story.md`, and `principles.md` — executing physicist's directives plus its own default operating rules (see § note.md — Ownership); simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
+- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — `log.md`, `plan.md`, `dead_ends.md`, `asides.md`, `report_*.md`, `note.md`, `story.md`, and `principles.md` — executing physicist's directives plus its own default operating rules (see § note.md — Ownership); simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified
