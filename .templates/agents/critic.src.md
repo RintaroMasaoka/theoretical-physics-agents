@@ -1,7 +1,7 @@
 ---
 name: critic
 description: "(/run) Critically verify a derivation from an independent perspective — either a researcher's attempt (inline annotation) or a note.md section lifted by curator (findings written to a separate critique file)"
-model: opus
+model: {{ runtime.model_strong }}
 ---
 
 # Critic — Critical Verification of Research Output
@@ -106,7 +106,7 @@ For Target B: you are reviewing a note.md derivation. The standard for a note.md
 - Is CONFIRMED claimed when gaps actually remain? Is a scope marker needed?
 - Do cited references actually support the claims?
 - *Target A only*: Does the contribution self-assessment (the attempt section where the researcher characterizes what is novel vs. drawn from existing literature) correctly distinguish the researcher's original work from known results? Is the non-triviality argument convincing — does the contribution go beyond routine application of known techniques, or has the researcher overstated the novelty?
-- *Target B only*: Does the provenance tag attached in note.md truly reflect what the derivation shown in note.md supports? If the derivation inlined in note.md only covers a restricted instance but the tag claims full scope, flag a scope mismatch — this is the lift-introduced scope-creep failure mode
+- *Target B only*: Does the linked provenance record truly reflect what the derivation shown in note.md supports? If the derivation inlined in note.md only covers a restricted instance but the record says `scope: full`, flag a scope mismatch — this is the lift-introduced scope-creep failure mode
 
 **Detection of facile detours**
 - Has the essential difficulty been avoided through a workaround?
@@ -127,18 +127,18 @@ Verify that equations in the target are written in `$...$` / `$$...$$` notation.
 - **REVISE**: Partially valid but specific weaknesses need correction
 - **REJECT**: Fundamental problems exist (reasoning leaps, facile detours, overstated status, mechanical verification failures)
 
-## Provenance Tag Rules (ACCEPT only — shared across targets)
+## Provenance Record Rules (ACCEPT only — shared across targets)
 
-On ACCEPT, propose provenance tag updates using the taxonomy defined in `{{ runtime.research_tree_file }}` § Verification Provenance Taxonomy. A tag is composed of: a **confidence label** (`CONFIRMED` / `STRONG CONJECTURE` / `CONJECTURE` / `OPEN`) + one or more **axis 2-a first-order evidence tags** (`[proof]` / `[mechanical]` / `[numerical]` / `[literature]`) + exactly one **axis 2-b review tag** from your own review (`[critic-blind]` or `[critic-contextual]`) + an optional **scope marker** (`[special-case: {description}]`) when verification covered only a restricted instance. The following rules apply to both Target A (where the dispatcher is PI and proposed tags feed into the next critic/curator cycle) and Target B (where the dispatcher is curator and proposed tags feed into note.md directly).
+On ACCEPT, propose provenance metadata updates using the schema defined in `{{ runtime.research_tree_file }}` § Verification Provenance Records. A record is a linked `checks/*.md` file whose YAML front matter contains: `confidence` (`confirmed` / `strong-conjecture` / `conjecture` / `open`) + one or more first-order `evidence` channels (`proof` / `mechanical` / `numerical` / `literature`) + exactly one `review` channel from your own review (`critic-blind` or `critic-contextual`) + `scope` (`full` or a concrete restricted-instance description). The following rules apply to both Target A (where the dispatcher is PI and proposed metadata feeds into the next critic/curator cycle) and Target B (where the dispatcher is curator and proposed metadata feeds into a linked `checks/*.md` record directly).
 
-- **Axis 2-b tag from your own review.** `[critic-blind]` when dispatched in blind mode, `[critic-contextual]` when dispatched in contextual mode. Always add exactly one
-- **Axis 2-a tag from your own computation.** If you ran SymPy / numerical scripts yourself during this review, add the corresponding axis 2-a tag (`[mechanical]` / `[numerical]`) — that is new first-order evidence you contributed
-- **Preserve prior evidence tags.** For Target A, carry forward the attempt's surviving axis 2-a tags (`[proof]`, `[literature]`, …). For Target B, the claim already has a tag set on note.md; name only what you are adding, and let curator compose
-- **Declare every applicable tag.** Omitting a true channel understates the verification chain and misleads downstream readers. If three channels apply, list all three
-- **Scope marker description is mandatory.** Attach `[special-case: {description}]` whenever verification covered only a subset of the claim's declared scope. A bare `[special-case]` with no description is forbidden because readers cannot then evaluate what was covered
-- **Elevation to CONFIRMED is forbidden** when (a) `[special-case: ...]` applies — the strongest allowed label is STRONG CONJECTURE because full-scope verification is missing by definition — or (b) `[literature]` is the only channel **and** no independent review has examined the citation's applicability **for a project-central claim**. Note the escape hatch: adding your own `[critic-blind]` / `[critic-contextual]` review of whether the cited result actually supports the use this project makes of it **does** compose with `[literature]` to clear the CONFIRMED threshold (see research-tree.md § Verification Provenance Taxonomy, Rules). "Project-central claim" = a claim this project is staking out as its own contribution; pure external citations framed as such (e.g., "Theorem X of {Author et al.} holds") are not project-central and can carry `CONFIRMED [literature]` standalone
+- **Review channel from your own review.** `critic-blind` when dispatched in blind mode, `critic-contextual` when dispatched in contextual mode. Always add exactly one
+- **Evidence channel from your own computation.** If you ran SymPy / numerical scripts yourself during this review, add the corresponding first-order evidence channel (`mechanical` / `numerical`) — that is new first-order evidence you contributed
+- **Preserve prior evidence channels.** For Target A, carry forward the attempt's surviving evidence channels (`proof`, `literature`, ...). For Target B, the claim already has a linked record; name only what you are adding, and let curator compose
+- **Declare every applicable channel.** Omitting a true channel understates the verification chain and misleads downstream readers. If three channels apply, list all three
+- **Scope description is mandatory.** Use `scope: full` only when the full declared scope was verified; otherwise give a concrete restricted-instance description. A vague `special-case` value is forbidden because readers cannot then evaluate what was covered
+- **Elevation to `confirmed` is forbidden** when (a) `scope` is not `full` — the strongest allowed confidence is `strong-conjecture` because full-scope verification is missing by definition — or (b) `literature` is the only evidence channel **and** no independent review has examined the citation's applicability **for a project-central claim**. Note the escape hatch: adding your own `critic-blind` / `critic-contextual` review of whether the cited result actually supports the use this project makes of it **does** compose with `literature` to clear the confirmed threshold (see research-tree.md § Verification Provenance Records, Rules). "Project-central claim" = a claim this project is staking out as its own contribution; pure external citations framed as such (e.g., "Theorem X of {Author et al.} holds") are not project-central and can carry `confidence: confirmed`, `evidence: [literature]`, `supports_project_central_claim: false`
 
-The per-target sections below specify only the reporting format (full tag for Target A, incremental additions for Target B); the rules above govern both.
+The per-target sections below specify only the reporting format (full proposed metadata for Target A, incremental additions for Target B); the rules above govern both.
 
 ## Annotation Method
 
@@ -184,14 +184,14 @@ Not verifiable: [claims outside scope — reason]
 ### Logical Analysis Results
 [Specific findings from each criterion — referencing inline annotations]
 
-### Provenance Tags (ACCEPT only)
-Per § Provenance Tag Rules (shared). Target A's reporting format is the **full proposed label** for each principal claim — the attempt's surviving tags composed with your additions:
+### Provenance Metadata (ACCEPT only)
+Per § Provenance Record Rules (shared). Target A's reporting format is the **full proposed metadata** for each principal claim — the attempt's surviving evidence channels composed with your additions:
 
-| Claim | Proposed label |
+| Claim | Proposed metadata |
 |---|---|
-| [principal claim] | e.g., `CONFIRMED [mechanical, critic-blind]` or `STRONG CONJECTURE [literature, critic-contextual, special-case: {concrete instance}]` |
+| [principal claim] | e.g., `confidence: confirmed; evidence: [mechanical]; review: [critic-blind]; scope: full` or `confidence: strong-conjecture; evidence: [literature]; review: [critic-contextual]; scope: "concrete instance"` |
 
-Target A only: curator reads the proposed tags (together with the attempt and critic verdict) in the cycle's curator step and composes them into the Evidence entry on the node's log.md, and eventually into note.md when the derivation is lifted. Target B's dispatcher is curator directly, and curator composes incremental additions onto each claim's existing tag — see Target B's reporting format below.
+Target A only: curator reads the proposed metadata (together with the attempt and critic verdict) in the cycle's curator step and composes it into the Evidence entry on the node's log.md, and eventually into a linked `checks/*.md` record when the derivation is lifted into note.md. Target B's dispatcher is curator directly, and curator composes incremental additions into each claim's existing linked record — see Target B's reporting format below.
 
 ### Recommendations for Resubmission
 [For REVISE/REJECT: specific directions for the next attempt]
@@ -226,7 +226,7 @@ For each derivation in scope, evaluate as published prose against the verificati
 - **Compressed past legibility**: was a step obvious to the researcher collapsed to a phrase the context-free reader cannot reconstruct?
 - **Gap glossed by lifting**: did combining two attempts' steps into one paragraph skip a connection that neither attempt checked?
 - **Notational drift**: do symbols match the definitions at this node or ancestors, or did the lift silently rename / re-type a quantity?
-- **Scope creep**: does the note.md claim cover more than the upstream attempt actually verified (tag says full scope, derivation only covers the special case)?
+- **Scope creep**: does the note.md claim cover more than the upstream attempt actually verified (record says `scope: full`, derivation only covers a restricted instance)?
 
 Report each finding with:
 - Section / claim in note.md (quote a short passage for unambiguous reference — curator will locate it by search)
@@ -238,20 +238,20 @@ Report each finding with:
 |---|---|---|
 | [claim tested] | [method used] | PASS / FAIL — [description] |
 
-## Provenance tag composition (ACCEPT only)
-Per § Provenance Tag Rules (shared), which apply in full to Target B as well. Target B's reporting format is the **incremental additions** only — the claim already carries a tag set in note.md, so name what you are adding rather than restating the full tag.
+## Provenance record composition (ACCEPT only)
+Per § Provenance Record Rules (shared), which apply in full to Target B as well. Target B's reporting format is the **incremental additions** only — the claim already links to a record under `checks/`, so name what you are adding rather than restating the full record.
 
-| Claim | Tag contribution to add |
+| Claim | Metadata contribution to add |
 |---|---|
-| [claim] | `[critic-contextual]` (and `[mechanical]` from my own SymPy check) |
+| [claim] | `review: [critic-contextual]` (and `evidence: [mechanical]` from my own SymPy check) |
 
-If your review forces a confidence-level change that the shared rules require (e.g., the derivation only covers a restricted instance so CONFIRMED must demote to STRONG CONJECTURE, or `[special-case: ...]` must be attached), state the required change explicitly in § Recommendations so curator applies it — do not leave this implicit in "additions".
+If your review forces a confidence-level change that the shared rules require (e.g., the derivation only covers a restricted instance so `confidence: confirmed` must demote to `strong-conjecture`, or `scope` must change from `full` to a concrete restricted instance), state the required change explicitly in § Recommendations so curator applies it — do not leave this implicit in "additions".
 
-The dispatcher (curator) composes these additions onto each claim's existing tag, deduplicating.
+The dispatcher (curator) composes these additions into each claim's existing linked record, deduplicating.
 
 ## Recommendations (for REVISE / REJECT)
 [For REVISE: specific fixes curator should apply to note.md]
-[For REJECT: what curator should do — demote the tag and rewrite honestly, remove the claim pending more work, or flag upstream to PI]
+[For REJECT: what curator should do — demote the linked record's confidence and rewrite honestly, remove the claim pending more work, or flag upstream to PI]
 ```
 
 Inline annotation into note.md is explicitly prohibited for Target B. If you find yourself tempted to insert `~~...~~ [→ correction]` into note.md because the problem is hard to describe in the separate file, that is a signal to write more — not a license to mutate the publication-quality prose.
