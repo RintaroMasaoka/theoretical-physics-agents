@@ -49,3 +49,14 @@ The human researcher is the collaborator for both skills — sets direction via 
 - `/meeting` and `/improve` are the venues for user interaction
 - No writing outside the project directory (to prevent contaminating the user's environment)
 - Do not pollute the global environment (to prevent interference with other projects and loss of reproducibility)
+
+## Repository Boundary
+
+This checkout is a **research project workspace** unless the user explicitly says they are maintaining the `theoretical-physics-agents` framework itself.
+
+- Never treat `https://github.com/RintaroMasaoka/theoretical-physics-agents` as the research project's GitHub repository
+- Before any `git push`, inspect `git remote -v`; if the push destination is the framework repository, stop and report that the project remote has not been configured
+- Project commits may be made locally, but pushing requires a project-owned remote such as the user's private research repository
+- Framework prompt or script improvements from this child project are legitimate feedback to the framework, but they must use `/upstream-sync` or its explicit script workflow: `bash .scripts/sync.sh doctor`, `bash .scripts/sync.sh status`, path-scoped `bash .scripts/sync.sh pull <path>...`, then path-scoped `bash .scripts/sync.sh push <path>...`
+- Keep the two channels separate: `origin` is for this research project; `upstream` is for `theoretical-physics-agents` framework feedback
+- `.scripts/configure.mjs` installs a local `pre-push` guard that physically refuses pushes to the framework repository unless `TPRA_ALLOW_FRAMEWORK_PUSH=1` is set by a maintainer

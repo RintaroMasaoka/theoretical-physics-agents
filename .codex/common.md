@@ -19,7 +19,7 @@ Each worker produces two files:
 
 2. **Log**: A short process summary — what you attempted, what you found, blockers encountered. This helps the human researcher audit workflow. Type is the agent name (`reader`, `researcher`, etc.); no slug.
 
-**Filename creation.** Run `bash .scripts/new-log.sh <type> [<slug>]` and capture stdout — it returns an absolute path of the form `logs/{YYMMDD_HHMM}_{type}[_{slug}].md`. Then `Write` your content to that path. Do not run `date` yourself; do not pre-name the file. The timestamp is fixed at the moment of the script call, so naming is authoritative from creation — there is no downstream rename step that can fail and leave an orphan file behind.
+**Log path selection.** Run `bash .scripts/log-path.sh <type> [<slug>]` and capture stdout — it returns an absolute path of the form `logs/{YYMMDD_HHMM}_{type}[_{slug}].md`. Then `Write` your content to that path. Do not run `date` yourself; do not pre-name the file. The timestamp is fixed at the moment of the script call, so naming is authoritative from path selection — there is no downstream rename step that can fail and leave an orphan file behind.
 
 Deliverables and logs are provisional. In `/run`, the scheduler auto-dispatches a critic on every deliverable, and curator then absorbs the verified evidence into the research tree (see `.codex/research-tree.md`). In `/write`, PI independently verifies deliverables before integrating them into the paper.
 

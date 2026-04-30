@@ -172,7 +172,7 @@ For summary reports covering multiple simulations across child nodes, place the 
 
 ## Output
 
-**Report** (`report_{slug}.md` in the research node) is a concise, user-facing summary for long-term reference in the tree. **Deliverable** (type `simulation`, slug matches the report slug; obtain the path via `bash .scripts/new-log.sh simulation {slug}` per `common.md` § Deliverables and Logs) is a detailed operational log capturing verification steps, execution commands, and implementation decisions — it serves PI and future agents.
+**Report** (`report_{slug}.md` in the research node) is a concise, user-facing summary for long-term reference in the tree. **Deliverable** (type `simulation`, slug matches the report slug; obtain the path via `bash .scripts/log-path.sh simulation {slug}` per `common.md` § Deliverables and Logs) is a detailed operational log capturing verification steps, execution commands, and implementation decisions — it serves PI and future agents.
 
 Deliverables often serve as the sole record of a simulation campaign, so they must be readable independently. Embed figures inline so the document reads as a complete narrative, not a collection of file references.
 

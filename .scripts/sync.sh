@@ -7,6 +7,7 @@
 #   bash .scripts/sync.sh push [--yes]            — framework 全体を upstream に送る
 #   bash .scripts/sync.sh push <path>... [--yes]  — 指定パスのみ upstream に送る
 #   bash .scripts/sync.sh status                  — upstream との差分を表示する
+#   bash .scripts/sync.sh doctor                  — remote 設定と framework 参照を検査する
 #
 # <path> は FRAMEWORK_FILES 配下のファイル/ディレクトリ
 # (例: .templates/skills/improve/SKILL.src.md, .scripts/configure.mjs)
@@ -26,17 +27,18 @@ set -euo pipefail
 # ── 同期対象ファイル（framework ファイル）──────────────────────
 # これらのファイル/ディレクトリ配下だけが upstream と共有される
 FRAMEWORK_FILES=(
-  "CLAUDE.md"
+  "README.md"
   ".gitignore"
   ".github/"
+  ".config/"
   ".scripts/"
-  ".claude/config/"
   ".claude/settings.json"
   ".templates/"
 )
 
 # push 時 (bulk) に upstream から削除すべき stale ファイル
 STALE_FILES=(
+  "CLAUDE.md"          # .claude/CLAUDE.md と .codex/AGENTS.md に生成
   "AGENTS.md"           # CLAUDE.md に統合済み
   "configure.mjs"       # .scripts/configure.mjs に移動済み
   "scripts/"            # .scripts/ にリネーム済み
@@ -50,6 +52,7 @@ STALE_FILES=(
   "work/"               # プロジェクト固有
 )
 
+FRAMEWORK_REPO_CANONICAL="github.com/rintaromasaoka/theoretical-physics-agents"
 UPSTREAM_REMOTE="upstream"
 UPSTREAM_BRANCH="main"
 ORIG_ARGS=("$@")
@@ -58,9 +61,51 @@ ORIG_ARGS=("$@")
 
 die() { echo "Error: $*" >&2; exit 1; }
 
+normalize_remote_url() {
+  printf '%s' "$1" \
+    | sed -E 's#^git@github.com:#https://github.com/#' \
+    | sed -E 's#^[a-z]+://##' \
+    | sed -E 's#\.git$##' \
+    | sed -E 's#/$##' \
+    | tr '[:upper:]' '[:lower:]'
+}
+
+is_framework_repo_url() {
+  local canonical
+  canonical="$(normalize_remote_url "$1")"
+  [ "$canonical" = "$FRAMEWORK_REPO_CANONICAL" ] || [ "$canonical" = "www.$FRAMEWORK_REPO_CANONICAL" ]
+}
+
 check_upstream() {
   git remote get-url "$UPSTREAM_REMOTE" >/dev/null 2>&1 \
-    || die "remote '$UPSTREAM_REMOTE' が見つかりません。先に git remote add $UPSTREAM_REMOTE <url> を実行してください"
+    || die "remote '$UPSTREAM_REMOTE' が見つかりません。先に git remote add $UPSTREAM_REMOTE https://github.com/RintaroMasaoka/theoretical-physics-agents.git を実行してください"
+}
+
+check_remote_layout() {
+  local origin_url=""
+  local upstream_url=""
+
+  origin_url="$(git remote get-url origin 2>/dev/null || true)"
+  upstream_url="$(git remote get-url "$UPSTREAM_REMOTE" 2>/dev/null || true)"
+
+  if [ -n "$origin_url" ] && is_framework_repo_url "$origin_url"; then
+    echo "Warning: origin が framework repo を指しています。child project では origin は private project repo、upstream が framework repo です。" >&2
+    echo "  git remote set-url origin <your-project-repo-url>" >&2
+    if [ -z "$upstream_url" ]; then
+      echo "  git remote add upstream https://github.com/RintaroMasaoka/theoretical-physics-agents.git" >&2
+    fi
+  fi
+}
+
+normalize_path() {
+  local path="$1"
+  path="${path#./}"
+  while [[ "$path" == */ && "$path" != "/" ]]; do
+    path="${path%/}"
+  done
+  [[ "$path" = /* ]] && die "絶対パスは指定できません: $1"
+  [[ "$path" = *".."* ]] && die "'..' を含むパスは指定できません: $1"
+  printf '%s\n' "$path"
 }
 
 # 与えられた相対パスが FRAMEWORK_FILES の範囲内にあるか判定
@@ -91,6 +136,87 @@ validate_paths() {
   done
 }
 
+framework_reference_regex() {
+  local item item_clean escaped parts=()
+  for item in "${FRAMEWORK_FILES[@]}"; do
+    item_clean="${item%/}"
+    if [[ "$item" == */ ]]; then
+      escaped="$(printf '%s' "$item_clean" | sed -E 's/[][(){}.^$+*?|\\]/\\&/g')"
+      parts+=("$escaped/[A-Za-z0-9._/-]+")
+    else
+      escaped="$(printf '%s' "$item_clean" | sed -E 's/[][(){}.^$+*?|\\]/\\&/g')"
+      parts+=("$escaped")
+    fi
+  done
+  local IFS='|'
+  printf '(%s)' "${parts[*]}"
+}
+
+list_framework_files_at_root() {
+  local root="$1"
+  local item item_clean
+  for item in "${FRAMEWORK_FILES[@]}"; do
+    item_clean="${item%/}"
+    if [ -f "$root/$item_clean" ]; then
+      printf '%s\n' "$item_clean"
+    elif [ -d "$root/$item_clean" ]; then
+      (cd "$root" && find "$item_clean" -type f ! -name '.DS_Store' -print)
+    fi
+  done
+}
+
+list_local_framework_files() {
+  list_framework_files_at_root "."
+}
+
+list_upstream_framework_files() {
+  local item
+  for item in "${FRAMEWORK_FILES[@]}"; do
+    git ls-tree -r --name-only "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH" -- "$item" 2>/dev/null || true
+  done
+}
+
+upstream_has_file() {
+  git cat-file -e "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH:$1" 2>/dev/null
+}
+
+local_framework_has_changes() {
+  local item item_clean
+  for item in "$@"; do
+    item_clean="${item%/}"
+    if [ -n "$(git status --porcelain -- "$item_clean")" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+validate_framework_references() {
+  local root="$1"
+  local label="$2"
+  local missing=false
+  local ref
+  local regex
+  regex="$(framework_reference_regex)"
+
+  while IFS= read -r ref; do
+    if [ ! -e "$root/$ref" ]; then
+      echo "  missing in $label: $ref" >&2
+      missing=true
+    fi
+  done < <(
+    list_framework_files_at_root "$root" \
+      | while IFS= read -r file; do
+          grep -Eoh "$regex" "$root/$file" 2>/dev/null || true
+        done \
+      | sed -E 's#[),.;:]+$##' \
+      | grep -v '\.\.\.' \
+      | sort -u
+  )
+
+  [ "$missing" = false ] || die "framework ファイルが存在しない framework 内パスを参照しています"
+}
+
 # upstream clone (tmpdir) にローカルのパスをコピー
 # ディレクトリは一旦消してから再帰コピー (古いファイルの残留を防ぐ)
 copy_to_upstream_clone() {
@@ -106,7 +232,7 @@ copy_to_upstream_clone() {
   if [ -d "$item_clean" ]; then
     rm -rf "$dest_root/$item_clean"
     mkdir -p "$dest_root/$item_clean"
-    cp -R "$item_clean"/* "$dest_root/$item_clean/" 2>/dev/null || true
+    cp -R "$item_clean"/. "$dest_root/$item_clean/"
   else
     mkdir -p "$dest_root/$(dirname "$item_clean")"
     cp "$item_clean" "$dest_root/$item_clean"
@@ -139,6 +265,7 @@ self_update() {
 # ── pull: upstream → private repo ─────────────────────────────
 
 do_pull() {
+  check_remote_layout
   check_upstream
   echo "==> upstream/$UPSTREAM_BRANCH を fetch 中..."
   git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH"
@@ -156,6 +283,10 @@ do_pull() {
     targets=("${PATH_ARGS[@]}")
   fi
 
+  if [ "${FORCE_PULL:-false}" != true ] && local_framework_has_changes "${targets[@]}"; then
+    die "取り込み対象に未コミット変更があります。先に commit/stash するか、意図的に上書きする場合は --force を付けてください"
+  fi
+
   local item
   for item in "${targets[@]}"; do
     git checkout "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH" -- "$item" 2>/dev/null && \
@@ -166,6 +297,7 @@ do_pull() {
   echo ""
   echo "==> configure.mjs を実行してランタイムファイルを再生成中..."
   node .scripts/configure.mjs
+  validate_framework_references "." "local checkout"
 
   echo ""
   echo "Done! 取り込んだファイルを確認してください:"
@@ -179,9 +311,12 @@ do_pull() {
 # ── push: private repo → upstream ─────────────────────────────
 
 do_push() {
+  check_remote_layout
   check_upstream
   echo "==> upstream/$UPSTREAM_BRANCH を fetch 中..."
   git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH"
+
+  validate_framework_references "." "local checkout"
 
   # 一時ディレクトリに upstream をクローン
   local tmpdir
@@ -220,6 +355,8 @@ do_push() {
 
   echo "==> configure.mjs を実行してランタイムファイルを再生成中..."
   (cd "$tmpdir/repo" && node .scripts/configure.mjs 2>&1 | sed 's/^/  /')
+
+  validate_framework_references "$tmpdir/repo" "upstream candidate"
 
   echo ""
   echo "==> upstream クローンでの差分:"
@@ -261,6 +398,7 @@ do_push() {
 # ── status: 差分表示 ─────────────────────────────────────────
 
 do_status() {
+  check_remote_layout
   check_upstream
   echo "==> upstream/$UPSTREAM_BRANCH を fetch 中..."
   git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" 2>/dev/null
@@ -268,39 +406,62 @@ do_status() {
   echo ""
   echo "==> framework ファイルの差分 (upstream vs local):"
   local has_diff=false
-  for item in "${FRAMEWORK_FILES[@]}"; do
-    # ファイルの場合
-    if [ -f "$item" ]; then
-      if ! diff -q <(git show "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH:$item" 2>/dev/null) "$item" >/dev/null 2>&1; then
-        echo "  変更あり: $item"
+
+  local rel
+  while IFS= read -r rel; do
+    if [ -f "$rel" ] && upstream_has_file "$rel"; then
+      if ! diff -q <(git show "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH:$rel") "$rel" >/dev/null 2>&1; then
+        echo "  変更あり: $rel"
         has_diff=true
       fi
+    elif [ -f "$rel" ]; then
+      echo "  local only: $rel"
+      has_diff=true
+    elif upstream_has_file "$rel"; then
+      echo "  upstream only: $rel"
+      has_diff=true
     fi
-    # ディレクトリの場合は中のファイルを比較
-    if [ -d "$item" ]; then
-      while IFS= read -r -d '' file; do
-        local rel="${file#./}"
-        if ! diff -q <(git show "$UPSTREAM_REMOTE/$UPSTREAM_BRANCH:$rel" 2>/dev/null) "$rel" >/dev/null 2>&1; then
-          echo "  変更あり: $rel"
-          has_diff=true
-        fi
-      done < <(find "$item" -type f -print0)
-    fi
-  done
+  done < <({ list_local_framework_files; list_upstream_framework_files; } | sort -u)
 
   if [ "$has_diff" = false ]; then
     echo "  差分なし — upstream と同期済みです"
   fi
+
+  echo ""
+  echo "==> framework 参照検査:"
+  validate_framework_references "." "local checkout"
+  echo "  OK"
+}
+
+do_doctor() {
+  check_remote_layout
+
+  echo ""
+  echo "==> remote:"
+  git remote -v
+
+  echo ""
+  echo "==> framework 参照検査:"
+  validate_framework_references "." "local checkout"
+  echo "  OK"
+
+  check_upstream
+
+  echo ""
+  echo "==> upstream/$UPSTREAM_BRANCH を fetch 中..."
+  git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" 2>/dev/null
 }
 
 # ── メイン ────────────────────────────────────────────────────
 
 # --yes フラグと位置引数を分離
 AUTO_YES=false
+FORCE_PULL=false
 args=()
 for arg in "$@"; do
   case "$arg" in
     --yes|-y) AUTO_YES=true ;;
+    --force) FORCE_PULL=true ;;
     *) args+=("$arg") ;;
   esac
 done
@@ -311,19 +472,28 @@ PATH_ARGS=()
 if [ ${#args[@]} -gt 1 ]; then
   PATH_ARGS=("${args[@]:1}")
 fi
+if [ ${#PATH_ARGS[@]} -gt 0 ]; then
+  normalized_paths=()
+  for path in "${PATH_ARGS[@]}"; do
+    normalized_paths+=("$(normalize_path "$path")")
+  done
+  PATH_ARGS=("${normalized_paths[@]}")
+fi
 
 case "$subcmd" in
   pull)   do_pull ;;
   push)   do_push ;;
   status) do_status ;;
+  doctor) do_doctor ;;
   *)
-    echo "使い方: $0 {pull|push|status} [path...]"
+    echo "使い方: $0 {pull|push|status|doctor} [path...]"
     echo ""
-    echo "  pull              — upstream の最新 framework 全体を取り込む"
+    echo "  pull              — upstream の最新 framework 全体を取り込む (--force で未コミット変更を上書き)"
     echo "  pull <path>...    — 指定パスのみ取り込む (並列作業向け)"
     echo "  push [--yes]      — ローカルの framework 全体を upstream に送る"
     echo "  push <path>...    — 指定パスのみ送る (並列作業向け)"
     echo "  status            — upstream との差分を確認する"
+    echo "  doctor            — remote 設定と framework 参照を検査する"
     echo ""
     echo "<path> は FRAMEWORK_FILES 配下 (.templates/, .scripts/, ... など) である必要があります。"
     exit 1

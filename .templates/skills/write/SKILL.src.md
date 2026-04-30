@@ -68,7 +68,7 @@ logs/
 
 ## Session Start
 
-1. Session log filename: obtain via `bash .scripts/new-log.sh write` at session end (or wherever you finalise the log) — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_write.md`
+1. Session log filename: obtain via `bash .scripts/log-path.sh write` at session end (or wherever you finalise the log) — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_write.md`
 2. Read `logs/last_write_session.md` (if it exists)
 3. Read `research/note.md` (thesis, background) + `research/story.md` (narrative structure) + `research/principles.md`
 4. Navigate the tree: `ls research/` → read children's note.md (SoT) for established knowledge, and log.md frontmatter for kind/status
@@ -137,7 +137,7 @@ Retrieve deliverable paths from task return values and Read as needed:
 1. Write a session summary to `logs/last_write_session.md` (overwrite):
    - Completed sections, review results, remaining tasks
    - What to do in the next session
-2. **Write session log**: obtain the path via `bash .scripts/new-log.sh write` (returns `logs/{YYMMDD_HHMM}_write.md`); write to that path (permanent record — never overwrite):
+2. **Write session log**: obtain the path via `bash .scripts/log-path.sh write` (returns `logs/{YYMMDD_HHMM}_write.md`); write to that path (permanent record — never overwrite):
    ```markdown
    # Write YYYY-MM-DD HH:MM
 

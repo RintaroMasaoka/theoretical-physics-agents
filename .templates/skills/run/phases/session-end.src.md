@@ -17,7 +17,7 @@ No need to rush — the next `/run` resumes from where you left off.
 
 ## Mechanical Steps (delegated to `session-wrap-up` agent)
 
-3. **Assemble wrap-up input** by first running `bash .scripts/new-log.sh wrap-up-input` to obtain a timestamped path of the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`, then writing the substantive content there. The `session-wrap-up` agent distributes it to the right files, cleans up the beacon, and commits/pushes — it receives the path explicitly via its dispatch prompt (step 4).
+3. **Assemble wrap-up input** by first running `bash .scripts/log-path.sh wrap-up-input` to obtain a timestamped path of the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`, then writing the substantive content there. The `session-wrap-up` agent distributes it to the right files, cleans up the beacon, and commits/pushes — it receives the path explicitly via its dispatch prompt (step 4).
 
    **Parse contract** (must match what the agent expects): Top-level section boundaries are the five canonical `##` headings in the order `## Focus`, `## Last Session`, `## Session Log`, `## Agenda` (optional — omit the heading entirely if not needed), `## Commit`. Anything between two canonical headings (or between `## Commit` and EOF) is that section's body. **Intra-section `##` headings (e.g., the `## Next Session` / `## Blockers` inside the Focus body) are transcribed verbatim into the output file** — PI does not need to demote them. The full rule is duplicated in `{{ runtime.agents_dir }}/session-wrap-up.md` § Parse rule.
 
@@ -69,14 +69,14 @@ No need to rush — the next `/run` resumes from where you left off.
    - PI's thinking for next session
    - Anything useful to future PI that doesn't belong in the tree
 
-   The `Session Log` section becomes `logs/{YYMMDD_HHMM}_run.md` (permanent record, never overwrite). The `session-wrap-up` agent obtains its path via `bash .scripts/new-log.sh run` at the moment of writing, so the timestamp reflects when the log was finalised rather than session start.
+   The `Session Log` section becomes `logs/{YYMMDD_HHMM}_run.md` (permanent record, never overwrite). The `session-wrap-up` agent obtains its path via `bash .scripts/log-path.sh run` at the moment of writing, so the timestamp reflects when the log was finalised rather than session start.
 
    `Agenda` is optional. If present, the wrap-up agent overwrites `agenda.md` with these items.
 
 4. **Dispatch `session-wrap-up`**:
 
    ```
-   Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {path returned by new-log.sh in step 3}\n\nExecute per your own specification.")
+   Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {path returned by log-path.sh in step 3}\n\nExecute per your own specification.")
    ```
 
    The agent will: write the session log / focus.md / last_session.md / agenda.md, delete `logs/.run-active`, `git add` the relevant paths, `git commit` with the PI-provided message, and `git push`. It returns `DONE: committed {hash}` or `FAILED: {reason}`.

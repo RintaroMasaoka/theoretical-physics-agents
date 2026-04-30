@@ -34,7 +34,7 @@ The beacon is gitignored (see `.gitignore`) and deleted at Session End by `sessi
 
 ### 2. Session Log Filename
 
-The session log is created at Session End by `session-wrap-up`, which calls `bash .scripts/new-log.sh run` to obtain a timestamped path of the form `logs/{YYMMDD_HHMM}_run.md`. The scheduler does not manage the filename directly.
+The session log is created at Session End by `session-wrap-up`, which calls `bash .scripts/log-path.sh run` to obtain a timestamped path of the form `logs/{YYMMDD_HHMM}_run.md`. The scheduler does not manage the filename directly.
 
 ### 3. Directives Load (informational)
 
@@ -94,7 +94,7 @@ Dispatch the `pivot-review` agent once, after the final curator sweep and before
 ```
 Agent(subagent_type="pivot-review", prompt="""
 ## Task
-Session-end direction audit. Read the whole research tree and this session's logs, then write the 5-slot pivot-review forcing artifact (path obtained via `bash .scripts/new-log.sh pivot-review` per your agent definition).
+Session-end direction audit. Read the whole research tree and this session's logs, then write the 5-slot pivot-review forcing artifact (path obtained via `bash .scripts/log-path.sh pivot-review` per your agent definition).
 
 ## This Session's Evidence
 - Deliverables: {list of paths produced this session}
@@ -122,7 +122,7 @@ Agent(subagent_type="physicist", prompt="""
 ## Task
 mode: session-end
 
-Obtain a wrap-up-input path via `bash .scripts/new-log.sh wrap-up-input` and write to it per the session-end-mode format in your agent definition. Return the path as `DONE: {path}`.
+Obtain a wrap-up-input path via `bash .scripts/log-path.sh wrap-up-input` and write to it per the session-end-mode format in your agent definition. Return the path as `DONE: {path}`.
 
 ## This Session's Evidence (summary)
 - Deliverables: {list of paths produced this session}
@@ -145,7 +145,7 @@ If physicist returns `FAILED:`, the scheduler writes a minimal wrap-up input its
 Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {wrap-up-input path captured from step 3}\n\nExecute per your own specification.")
 ```
 
-The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `logs/last_session.md` / a session log file (created via `bash .scripts/new-log.sh run`) / `agenda.md` (if the input had an Agenda section), deletes `logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (physicist-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `logs/last_session.md` / a session log file (created via `bash .scripts/log-path.sh run`) / `agenda.md` (if the input had an Agenda section), deletes `logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (physicist-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 
 If `git push` fails (network, auth, non-fast-forward), the commit is preserved locally; the final report (step 5) notes the push failure so the user can retry.
 

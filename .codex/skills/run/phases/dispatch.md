@@ -107,7 +107,7 @@ Session cycle: {n} of {N}
 """)
 ```
 
-Retrospect returns `DONE: {path}` where `{path}` is `logs/{YYMMDD_HHMM}_retrospect_{node-slug}.md` (obtained via `bash .scripts/new-log.sh retrospect {node-slug}` at retrospect's start). The scheduler captures the returned path and adds it to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
+Retrospect returns `DONE: {path}` where `{path}` is `logs/{YYMMDD_HHMM}_retrospect_{node-slug}.md` (obtained via `bash .scripts/log-path.sh retrospect {node-slug}` at retrospect's start). The scheduler captures the returned path and adds it to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
 
 ```
 ## New Evidence This Cycle

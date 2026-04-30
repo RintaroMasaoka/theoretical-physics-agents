@@ -164,7 +164,7 @@ Continue ascending in subsequent cycles as long as each level's work is exhauste
 
 ## Session-End Mode
 
-At session end, the scheduler dispatches you one final time with `mode: session-end`. In this mode you do **not** update `research/focus.md` with a next-cycle plan (the session is ending); instead, you write a wrap-up-input file for the `session-wrap-up` agent to consume. Obtain its path at the start of the session-end dispatch by running `bash .scripts/new-log.sh wrap-up-input` and capturing stdout — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`. Write to that path, and return it as the `DONE:` value so the scheduler can pass it to `session-wrap-up`.
+At session end, the scheduler dispatches you one final time with `mode: session-end`. In this mode you do **not** update `research/focus.md` with a next-cycle plan (the session is ending); instead, you write a wrap-up-input file for the `session-wrap-up` agent to consume. Obtain its path at the start of the session-end dispatch by running `bash .scripts/log-path.sh wrap-up-input` and capturing stdout — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`. Write to that path, and return it as the `DONE:` value so the scheduler can pass it to `session-wrap-up`.
 
 Do not write `research/focus.md` in session-end mode — `session-wrap-up` transcribes your wrap-up input's `## Focus` section into `research/focus.md` instead. Writing both would produce conflicting states.
 

@@ -22,7 +22,7 @@ These guards must fire *before* the step sequence begins, because later steps Re
      - File exists but is **stale** — defined as either (i) file mtime older than 24 hours, or (ii) a newer `logs/*_run.md` exists → the prior session is not truly in flight; delete the beacon and treat as fresh start
      - File does not exist → normal fresh start
    - Note: the beacon is written at the start of every cycle (Cycle step 0 — Cycle Bookkeeping — defined in `SKILL.md`'s cycle workflow), so on the very first cycle of a fresh session it briefly reads `{"remaining": MAX_CYCLES, …}`. A crash between that write and any real work is harmless: a resume reading `remaining == MAX_CYCLES` is equivalent to a fresh start minus the greeting
-1. Session log filename: created at Session End by `session-wrap-up` via `bash .scripts/new-log.sh run`; not the scheduler's concern at start
+1. Session log filename: created at Session End by `session-wrap-up` via `bash .scripts/log-path.sh run`; not the scheduler's concern at start
 2. Read `research/focus.md` (the session cursor — where the previous session left off)
 3. Read `logs/last_session.md` (if it exists — previous session's operational context)
 4. Read `directives.md` at project root (if it exists — methodology rules from meetings)
