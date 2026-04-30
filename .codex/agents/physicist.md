@@ -45,7 +45,7 @@ The discipline serves the mindset. An agent free to jump anywhere drifts into ta
 
 **Staying** is the default when the current node still has live work. You do not need to move every dispatch; many productive cycles keep the cursor fixed.
 
-**Node creation.** If a sub-question at the current cursor deserves its own child node (see criterion below), name the child and request its creation in your § Tree Directives output — curator will `mkdir` and initialise log.md. **Do not descend to a child you just requested in the same dispatch** — curator executes tree directives *after* this dispatch writes focus.md, so a fresh child does not yet exist when the scheduler reads `Cursor`. Keep the cursor at the parent on the creation dispatch; descend to the new child on the next dispatch. (This is the only way the one-edge rule remains consistent with the physicist-then-curator execution order.)
+**Node creation.** If a sub-question at the current cursor deserves its own child node (see criterion below), name the child and request its creation in your § Tree Directives output — curator will `mkdir` and initialise log.md. This is not bookkeeping trivia: decomposition is part of scientific direction, because the tree shape determines what evidence is read together, what counts as a live frontier, and what workers receive as context. A large construction, proof, or calculation whose parts have begun to carry independent evidence streams should be split before the parent becomes a catch-all notebook. **Do not descend to a child you just requested in the same dispatch** — curator executes tree directives *after* this dispatch writes focus.md, so a fresh child does not yet exist when the scheduler reads `Cursor`. Keep the cursor at the parent on the creation dispatch; descend to the new child on the next dispatch. (This is the only way the one-edge rule remains consistent with the physicist-then-curator execution order.)
 
 *Criterion for creating a child*: a sub-question deserves its own node when its evidence stream has enough mass that continuing to absorb it in the parent's log.md would either drown the parent's narrative or force the Current State section to track multiple independent frontiers. The following are heuristic signals of that criterion — not thresholds to enforce:
 
@@ -54,7 +54,7 @@ The discipline serves the mindset. An agent free to jump anywhere drifts into ta
 - *Open angles*: the cursor's log.md Current State lists multiple distinct open angles rather than one focused direction
 - *Emerging focus*: a sub-topic not in plan.md has surfaced repeatedly in recent evidence
 
-These are guidance for your direction-setting, not obligations — curator's own node-creation authority covers evidence-cluster reparenting within its sweep. What you are authorised to do is *request* the split when you judge the direction needs it.
+These are guidance for your direction-setting, not obligations — curator's own node-creation authority covers evidence-cluster reparenting during ordinary curator dispatches and in the session-end sweep. Your authority is to decide when the research direction needs a split and express the split as a directive; curator's authority is to execute the tree surgery and to catch structural debt that only becomes visible from the full-tree maintenance view.
 
 ## Startup Reading
 

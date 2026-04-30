@@ -217,7 +217,7 @@ Self-contained analyses that have been independently reviewed by the critic agen
 
 ## plan.md — Strategy and Approach
 
-A node's strategic document — decomposition into children, approach choices, and their rationale. Curator-maintained: physicist directs strategy changes via `research/focus.md § Tree Directives`, and curator rewrites plan.md accordingly. Rewritten (not appended) when strategy evolves.
+A node's strategic document — decomposition into children, approach choices, and their rationale. Curator-maintained: physicist may direct strategy changes via `research/focus.md § Tree Directives`; curator also rewrites plan.md when its structural-maintenance rules create or repair decomposition, without changing scientific direction. Rewritten (not appended) when strategy evolves.
 
 ```markdown
 {Free-form strategy notes. No prescribed sections.
@@ -314,6 +314,6 @@ research/
 
 Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status is set by curator, based on physicist's Tree Directives and evidence accumulated in log.md (see `{{ runtime.agents_dir }}/curator.md` and `{{ runtime.agents_dir }}/physicist.md`).
 
-- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — `log.md`, `plan.md`, `dead_ends.md`, `asides.md`, `report_*.md`, `note.md`, `story.md`, and `principles.md` — executing physicist's directives plus its own default operating rules (see § note.md — Ownership); simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
+- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — node folders, `log.md`, `plan.md`, `dead_ends.md`, `asides.md`, `report_*.md`, `note.md`, `story.md`, and `principles.md` — executing physicist's directives plus its own default operating rules (including splitting overloaded nodes when the evidence record has outgrown the parent scope; see § note.md — Ownership and curator.md); simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified

@@ -53,10 +53,10 @@ Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_
 - **critic**: `Target: research/{path}/ — {description}` / `attempt path: {path}` / `kind: {kind}` / `mode: blind` or `mode: contextual`
 - **engine-builder**: `Model definition` / `Computational method` / `Required features` / existing module path. Or `"Refine lib"` for self-directed improvement
 - **simulator**: `Target: research/{path}/` / `Physical setup` / `Mathematical definition of observables` / `Success criteria` / `Deliverable number: {N}` / `research/lib/` module list / `Existing scripts in src/: {list}`
-- **curator**: Pass a concrete checklist so curator can judge without re-scanning the whole tree. PI's role is to enumerate raw **candidates**; filtering/judgment is curator's (per curator's own default-create rule in `.claude/agents/curator.md` § note.md Maintenance):
+- **curator**: Pass concrete pointers when available, but do not narrow curator's scope to those pointers. Physicist/scheduler may enumerate raw **candidates**; filtering, judgment, full-tree scanning, and structural maintenance are curator's (per curator's own default-create and node-splitting rules in `.claude/agents/curator.md`):
   - `Subnodes without note.md: {paths}` (PI lists every subnode missing note.md; curator applies its default-create rule — create when CONFIRMED facts exist in the log.md, skip for pure-computation leaves)
   - `log.md files exceeding ~150 lines: {paths}` (compression candidates; curator decides per its own signs — current-state paragraph density, evidence age, etc.)
   - `Recent CONFIRMED additions: {log.md path — brief descriptions}` (promotion candidates — critic-ACCEPTed items since the last curator dispatch)
   - `Recently retracted / revised: {paths}` (staleness candidates — claims that were demoted or reversed)
   - `Nodes updated this session: {paths}` (general context)
-  These are pointers, not constraints — curator reads the tree holistically. But providing them reduces scan cost and ensures the dispatch does not silently miss obvious candidates. If curator declines a candidate (e.g., note.md not yet warranted), that is a legitimate outcome — PI's list is input, not prescription
+  These are pointers, not constraints — curator reads the tree holistically and may act on structural debt outside the list. If curator declines a candidate (e.g., note.md not yet warranted), that is a legitimate outcome.

@@ -16,14 +16,14 @@ Every node is a **folder**. File formats are defined in `.claude/research-tree.m
 |---|---|---|---|
 | `note.md` | Destination | Overwrite | **Source of truth.** Derivation-bearing paper-quality prose — each principal claim carries its derivation (inline or cited) plus a provenance tag. No template, no frontmatter. Canonical spec: `.claude/research-tree.md` § note.md |
 | `plan.md` | Ladder | Overwrite | **Strategy and approach.** Decomposition rationale, approach decisions, children's roles. Rewritten as strategy evolves |
-| `log.md` | Ladder | Overwrite + Append | **Research process.** Current State (rewritten), Evidence (appended). PI's working document |
+| `log.md` | Ladder | Overwrite + Append | **Research process.** Current State (rewritten), Evidence (appended). Curator-maintained record of what the node knows and how it learned it |
 | `dead_ends.md` | Ladder | Append-only | Failed approaches and lessons learned. Prevents log.md bloat |
 | `directives.md` | — | Append (meetings only) | Rules and conventions imposed by the user. PI cannot modify unilaterally |
 
 Children are subfolders. The tree can nest to arbitrary depth.
 
-- **Creating a node**: `mkdir "research/{Topic Name}"` + write `log.md` (start working). Write `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice). When results stabilize, **dispatch curator** to create `note.md` — PI does not author note.md prose directly (see research-tree.md § note.md — Ownership, and the Knowledge Lifecycle diagram below)
-- **Recording a dead end**: write `dead_ends.md` in the node folder (or append if it exists)
+- **Creating a node**: physicist requests the child in `research/focus.md § Tree Directives`, or curator creates it from structural-maintenance judgment. Curator runs `mkdir "research/{Topic Name}"`, writes `log.md`, and writes `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice).
+- **Recording a dead end**: physicist states the closure or retraction verdict in Tree Directives; curator appends `dead_ends.md` in the node folder when the closure carries a lesson
 - **Adding a directive**: write `directives.md` in the folder where the rule applies (typically project root; only through meetings)
 - **Seeing children**: `ls` the folder (subfolders = children)
 
@@ -69,7 +69,7 @@ The three-layer model separates **what we know**, **how we'll proceed**, and **w
 
 - **note.md** (destination, overwrite): Free-form verified knowledge. `/write` loads only these — the ladder is excluded so the writing context stays clean
 - **plan.md** (ladder, overwrite): Strategy and approach — decomposition rationale, children's roles, approach decisions. Rewritten when strategy changes
-- **log.md** (ladder, overwrite + append): PI's working document. Current State is rewritten when understanding changes. Evidence accumulates but is periodically compressed by curator
+- **log.md** (ladder, overwrite + append): curator-maintained process record. Current State is rewritten when understanding changes; Evidence accumulates but is periodically compressed without dropping the evidence chain
 - **dead_ends.md** (ladder, append-only): Failed approaches. Separated from log.md to keep the working document focused
 - **directives.md** (immutable): User-imposed rules. Different authorship model (meetings only)
 - **research/focus.md** is a singleton (one file for the entire tree) that tracks PI's session position — unlike the per-node files above, it prevents breadth-first thrashing by scoping the working context
@@ -78,26 +78,26 @@ The three-layer model separates **what we know**, **how we'll proceed**, and **w
 ## Knowledge Lifecycle
 
 ```
-New node → mkdir + log.md [status: open]
-    ↓ plan approach
-PI writes plan.md (decomposition, strategy) if non-trivial
+New node → physicist directive or curator structural-maintenance trigger
+    ↓ curator mkdir + log.md [status: open]
+Curator writes plan.md (decomposition, strategy) if non-trivial
     ↓ investigate
 Workers produce deliverables in logs/ (research notebooks with derivations)
-    ↓ PI verifies via critic (Target A — attempt file)
-PI promotes verified results → report_{slug}.md in the node (self-contained, derivation preserved)
-    ↓ node reaches stable — PI dispatches curator
+    ↓ scheduler attaches critic (Target A — attempt file)
+Curator absorbs critic-reviewed evidence and, when directed, promotes verified results → report_{slug}.md in the node (self-contained, derivation preserved)
+    ↓ node reaches stable
 Curator lifts derivations (not just claims) from reports + log.md → writes note.md
 Curator then dispatches critic (Target B — note.md) to verify the lifted derivation
-    ↓ understanding deepens — PI dispatches curator again
+    ↓ understanding deepens
 Curator updates note.md with new derivations; re-dispatches critic on touched sections
     ↓ later found wrong
-PI writes retraction evidence into log.md + dead_ends.md → dispatches curator to update note.md
+Physicist directs retraction → curator writes log.md + dead_ends.md and updates note.md
 ```
 
-**note.md is curator-authored, not PI-authored, and carries the derivation — not just the claim.** The diagram above is not a convention — it is the ownership rule and the substance rule combined. PI's tree-editing authority covers log.md (every cycle), plan.md (when strategy changes), dead_ends.md (when approaches fail), and report_{slug}.md (when promoting a verified result). note.md is the one file PI does not write substantively: its prose comes from curator, dispatched by PI, with each principal claim accompanied by its derivation (inline or cited) and its provenance tag. The reasons — separation of concerns, second-reader quality, cross-tree coherence, derivation lifting, tag assignment — are stated in `.claude/research-tree.md` § note.md under **Ownership**, which is the canonical rule.
+**The tree is curator-authored except for `research/focus.md`.** The diagram above is not a convention — it is the ownership rule and the substance rule combined. Physicist's tree authority is direction-setting in `focus.md`: cursor, worker dispatch plan, and Tree Directives naming what should change. Curator's tree authority is execution and maintenance: log.md, plan.md, node folders, reports, dead ends, note.md, story, principles, and structural splits when the evidence record has outgrown a parent. This keeps scientific direction separate from the record-writing and cross-tree coherence work that otherwise crowd it out.
 
 Two narrow carve-outs preserve the above without friction: (i) trivial mechanical fixes to note.md (typo, broken wiki-link rename) may be made directly by PI since they change no semantics; (ii) user-present collaborative rewrites under `/meeting` or `/launch` are authoritative (the user serves as second reader in real time). Everything else — adding a section, rewording a claim, inserting a "status update" block, updating a provenance tag — goes through a curator dispatch.
 
 note.md creation, retraction, format, and ownership are defined canonically in `.claude/research-tree.md`.
 
-**Refresh**: log.md files naturally accumulate text over sessions. Periodically, PI dispatches **curator** to compress them — moving detailed content to note.md where appropriate. The working state in log.md should stay concise enough to read at a glance.
+**Refresh**: log.md files naturally accumulate text over sessions. Curator compresses them during ordinary touched-file maintenance and the mandatory session-end sweep — moving detailed content to note.md where appropriate. The working state in log.md should stay concise enough to read at a glance.
