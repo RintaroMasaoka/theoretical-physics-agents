@@ -2,7 +2,7 @@
 
 This phase file is a reference that `/run` Reads at Session Start and Session End. It covers the resume-check logic, the initial sanity gates, the session-end steps the scheduler owns directly, and the hand-off to `session-wrap-up`.
 
-The cycle loop between Session Start and Session End is purely mechanical (physicist → workers → critic → curator → loop) and lives in `SKILL.md § Cycle Loop`. This file covers only the lifecycle bookends.
+The cycle loop between Session Start and Session End is purely mechanical (direction-auditor → physicist → workers → critic → curator → loop) and lives in `SKILL.md § Cycle Loop`. This file covers only the lifecycle bookends.
 
 ---
 
@@ -28,7 +28,7 @@ The beacon is gitignored (see `.gitignore`) and deleted at Session End by `sessi
 ### 1. Initial Sanity Gates (fresh start only)
 
 - **`research/log.md` does not exist** → display "`research/log.md` が見つかりません。まず `/launch` でテーマを設定してください。" and stop. No further steps, no cycle loop.
-- **`research/focus.md` does not exist** → do not attempt to construct it in the scheduler. The first physicist dispatch in the cycle loop will initialise it (see SKILL § Cycle step 1 — pass `focus.md missing — initialise at research/ root` in the dispatch prompt).
+- **`research/focus.md` does not exist** → do not attempt to construct it in the scheduler. The first physicist dispatch in the cycle loop will initialise it (see SKILL § Cycle step 2 — pass `focus.md missing — initialise at research/ root` in the dispatch prompt).
 - **`concepts/` directory does not exist** → `mkdir concepts/`. Initial concept notes are written on-demand by curator when its self-containment audit finds undefined terms.
 - **`.gitignore` does not contain `logs/.run-active`** → append the line. The beacon must not enter the repo via `session-wrap-up`'s `git add`.
 
@@ -57,7 +57,7 @@ mv research/{path}/src/{slug}.md research/{path}/src/archive/
 
 Never delete — superseded scripts move to `src/archive/` so the reasoning history stays searchable. Record each move for the wrap-up input's `## Session Log` § `### Node Changes`.
 
-This is the one Tree Directive kind the scheduler executes directly rather than routing to curator. Reason: curator's write scope is the tree's **prose files** (log.md / plan.md / note.md / dead_ends.md / report_*.md / story.md / principles.md) — it does not touch simulation source code under `src/`. Filesystem moves of `.jl` / `.py` files therefore fall outside curator's authority and become scheduler-owned housekeeping. Every other Tree Directive routes to curator in step 5 of the cycle loop.
+This is the one Tree Directive kind the scheduler executes directly rather than routing to curator. Reason: curator's write scope is the tree's **prose files** (log.md / plan.md / note.md / dead_ends.md / report_*.md / story.md / principles.md) — it does not touch simulation source code under `src/`. Filesystem moves of `.jl` / `.py` files therefore fall outside curator's authority and become scheduler-owned housekeeping. Every other Tree Directive routes to curator in step 6 of the cycle loop.
 
 If physicist's focus.md has no archive directives, skip this step. Which scripts are superseded is a research judgment (physicist's), not a mechanical one.
 
@@ -87,34 +87,6 @@ The sweep is **not optional** and **not skippable** on the grounds that "nothing
 
 Curator returns `DONE: {summary}`. If it returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so the next session picks it up; do not block Session End on a curator failure.
 
-### 2.5. Pivot-Review Dispatch — Mandatory
-
-Dispatch the `pivot-review` agent once, after the final curator sweep and before the final physicist dispatch:
-
-```
-{{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="pivot-review", prompt="""
-## Task
-Session-end direction audit. Read the whole research tree and this session's logs, then write the 5-slot pivot-review forcing artifact (path obtained via `bash .scripts/log-path.sh pivot-review` per your agent definition).
-
-## This Session's Evidence
-- Deliverables: {list of paths produced this session}
-- Critic verdicts: {list of critic files or inline-annotated paths}
-- Curator sweeps: {list of curator deliverables / summaries}
-- Retrospect outputs: {list of timestamped retrospect paths captured from retrospect's DONE returns this session, if any}
-- Node changes: {new nodes, closes, status changes, report promotions — enumerate}
-
-## Context
-Final cursor: {cursor from research/focus.md}
-Session cycle: {n} of {N}
-""")
-```
-
-The dispatch is **mandatory** and **not skippable** on the grounds that "no pivot feels needed". Its rationale is the session-scale horizontal complement to retrospect's node-scale vertical synthesis: lost-pivot and trivial-convergence failure modes are only visible at the whole-tree + whole-session granularity. An empty pivot-review (all slots `(none)`) is itself a signal — either the research is at a healthy narrow-down stage or it has grown excessively narrow; `pivot-review` surfaces the observation so physicist and user can judge.
-
-Pivot-review returns `DONE: {path}` where `{path}` is the timestamped pivot-review file it created. Capture this path; it is included in step 3's physicist prompt as one of the session's evidence items.
-
-If pivot-review returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so physicist's next session reads it; do not block Session End on a pivot-review failure.
-
 ### 3. Final Physicist Dispatch (Session-End Mode)
 
 ```
@@ -128,8 +100,7 @@ Obtain a wrap-up-input path via `bash .scripts/log-path.sh wrap-up-input` and wr
 - Deliverables: {list of paths produced this session}
 - Critic verdicts: {list of critic files or inline-annotated paths}
 - Curator sweeps: {list of curator deliverables / summaries}
-- Retrospect outputs: {list of timestamped retrospect paths captured from retrospect's DONE returns this session, if any}
-- Pivot-review output: {timestamped pivot-review path captured from step 2.5} (Slot 5 flag translation rules in `{{ runtime.agents_dir }}/pivot-review.md`)
+- Direction-audit outputs: {list of timestamped direction-audit paths captured from direction-auditor DONE returns this session, if any}
 - Node changes: {new nodes, closes, status changes, report promotions — enumerate}
 - Simulation-script archives: {moves from step 1, if any}
 """)
