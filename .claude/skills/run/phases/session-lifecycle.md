@@ -68,7 +68,7 @@ Dispatch curator one final time with:
 ```
 Agent(subagent_type="curator", prompt="""
 ## Task
-Session-end tree-wide coherence pass. Apply your default operating rules (note.md creation for subnodes with CONFIRMED evidence, log.md compression for files over ~150 lines, staleness cleanup, wiki-link audit, cross-file coherence) across the whole tree.
+Session-end tree-wide coherence pass. Apply your default operating rules (note.md creation for subnodes with CONFIRMED evidence, log.md compression for files over ~150 lines, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree.
 
 ## Tree Directives
 (none — session-end sweep)

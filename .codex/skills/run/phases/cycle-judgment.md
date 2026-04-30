@@ -35,7 +35,7 @@ PI works **depth-first within the cursor's subtree**. The general movement: dive
 - Numerical verification → **simulator** (using existing `lib/` modules)
 - Verify note/plan readability → **self-check** (no research context — catches what PI overlooks)
 - Build/maintain concept definitions → **concept-checker**
-- Maintain knowledge base → **curator** (note.md polishing, wiki-links, log.md compression, staleness cleanup)
+- Maintain knowledge base → **curator** (note.md polishing, Markdown links, log.md compression, staleness cleanup)
 
 **PI judges as a researcher.** The above are guidelines; judge freely.
 

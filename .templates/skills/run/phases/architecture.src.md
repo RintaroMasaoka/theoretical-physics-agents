@@ -59,7 +59,7 @@ research/focus.md is a lightweight cursor pointing to PI's current position in t
 | Layer | Location | Role |
 |---|---|---|
 | **Worker deliverables** | `logs/{timestamp}_{type}_{slug}.md` | Provisional research notebooks produced by workers. Kept outside the tree because they are single-pass outputs awaiting PI verification |
-| **Concept definitions** | `concepts/` | Atomic term definitions (one per file). Wiki-linked from any file via `[[term]]` |
+| **Concept definitions** | `concepts/` | Atomic term definitions (one per file). Linked from notes via explicit Markdown links |
 | **Session handoff** | `logs/last_session.md` | Operational detail, PI's thinking for next session. Overwritten each session |
 | **Session log** | `logs/{timestamp}_run.md` | Permanent per-session record. One file per session, never overwritten |
 
@@ -96,7 +96,7 @@ Physicist directs retraction → curator writes log.md + dead_ends.md and update
 
 **The tree is curator-authored except for `research/focus.md`.** The diagram above is not a convention — it is the ownership rule and the substance rule combined. Physicist's tree authority is direction-setting in `focus.md`: cursor, worker dispatch plan, and Tree Directives naming what should change. Curator's tree authority is execution and maintenance: log.md, plan.md, node folders, reports, dead ends, note.md, story, principles, and structural splits when the evidence record has outgrown a parent. This keeps scientific direction separate from the record-writing and cross-tree coherence work that otherwise crowd it out.
 
-Two narrow carve-outs preserve the above without friction: (i) trivial mechanical fixes to note.md (typo, broken wiki-link rename) may be made directly by PI since they change no semantics; (ii) user-present collaborative rewrites under `/meeting` or `/launch` are authoritative (the user serves as second reader in real time). Everything else — adding a section, rewording a claim, inserting a "status update" block, updating a provenance tag — goes through a curator dispatch.
+Two narrow carve-outs preserve the above without friction: (i) trivial mechanical fixes to note.md (typo, broken Markdown-link rename) may be made directly by PI since they change no semantics; (ii) user-present collaborative rewrites under `/meeting` or `/launch` are authoritative (the user serves as second reader in real time). Everything else — adding a section, rewording a claim, inserting a "status update" block, updating a provenance tag — goes through a curator dispatch.
 
 note.md creation, retraction, format, and ownership are defined canonically in `{{ runtime.research_tree_file }}`.
 

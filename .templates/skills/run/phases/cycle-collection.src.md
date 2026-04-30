@@ -109,4 +109,4 @@ Pass previous deliverable path and code path, specify what to improve. Same phys
 
 ## Knowledge Base Maintenance (dispatch curator when needed — not every cycle)
 
-Curator runs note.md polishing, wiki-link integrity, log.md compression, staleness cleanup, and node splitting as part of ordinary dispatches and the mandatory session-end sweep. Review via `git diff`.
+Curator runs note.md polishing, Markdown-link integrity, log.md compression, staleness cleanup, and node splitting as part of ordinary dispatches and the mandatory session-end sweep. Review via `git diff`.

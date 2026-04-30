@@ -92,7 +92,7 @@ Not all claims can be mechanically verified. Claims that cannot be verified mech
 
 For Target A: note.md files in the research tree are contextual information indicating the current state of research, not a yardstick for measuring the attempt. When the attempt contradicts the notes, evaluate independently which reasoning is more robust. Give equal consideration to the possibility that the attempt is correct.
 
-For Target B: you are reviewing a note.md derivation. The standard for a note.md derivation is what the published paper would survive — the context-free reader criterion (see research-tree.md § note.md — Source of Truth). Ask whether a graduate reader in the neighbouring field could follow the derivation, reproduce the check, and arrive at the stated conclusion using only this note.md plus `[[wiki-link]]` resolutions. A derivation that reads fluently if you already know the answer but is opaque to that reader fails. "Fluent-but-opaque" is the canonical lift failure and is exactly what this review layer exists to catch.
+For Target B: you are reviewing a note.md derivation. The standard for a note.md derivation is what the published paper would survive — the context-free reader criterion (see research-tree.md § note.md — Source of Truth). Ask whether a graduate reader in the neighbouring field could follow the derivation, reproduce the check, and arrive at the stated conclusion using only this note.md plus Markdown-link resolutions. A derivation that reads fluently if you already know the answer but is opaque to that reader fails. "Fluent-but-opaque" is the canonical lift failure and is exactly what this review layer exists to catch.
 
 ### Verification Criteria
 
@@ -197,11 +197,13 @@ Target A only: curator reads the proposed tags (together with the attempt and cr
 [For REVISE/REJECT: specific directions for the next attempt]
 ```
 
-### Target B — note.md section (separate critique file, no inline edits)
+### Target B — note.md section (separate node-local critique file, no inline edits)
 
-Do **not** edit note.md itself. note.md is publication-quality prose for the context-free reader — inserting strikethrough / comment markers would corrupt the very property that makes note.md a Source of Truth. Instead, write all findings to a separate file.
+Do **not** edit note.md itself. note.md is publication-quality prose for the context-free reader — inserting strikethrough / comment markers would corrupt the very property that makes note.md a Source of Truth. Instead, write all findings to a separate file in the target node's `checks/` directory.
 
-**Deliverable path**: obtain via `bash .scripts/log-path.sh critic_note {node-slug}` where `{node-slug}` is a short identifier for the target node (e.g., `jordan-block-mpo`, `torus-ground-state-multiplicity`). The script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_critic_note_{node-slug}.md`. The dispatcher (curator) reads this file and applies fixes to note.md.
+**Deliverable path**: `research/{node path}/checks/critic_note_{node-slug}_{YYMMDD_HHMM}.md`, where `{node-slug}` is a short identifier for the target node (e.g., `jordan-block-mpo`, `torus-ground-state-multiplicity`). If `checks/` does not exist, create it. This is a narrow exception to curator's normal sole-writer rule: curator dispatched you specifically to write this verification record. The dispatcher (curator) reads this file and applies fixes to note.md.
+
+Do not put Target B critique files in `logs/`. `logs/` is a chronological workbench; note.md-level verification is part of the node's durable record and must remain inspectable without leaving the research tree.
 
 **File format**:
 
@@ -259,4 +261,4 @@ Inline annotation into note.md is explicitly prohibited for Target B. If you fin
 | Target | Deliverable | Notes |
 |---|---|---|
 | A (attempt file) | The target attempt file itself, annotated inline + end section | Do not create a separate file; researcher references previous content and critique in one file when revising |
-| B (note.md) | `logs/{timestamp}_critic_note_{node-slug}.md` — the separate critique file specified above | Do not edit note.md itself; curator applies fixes after reading the critique file |
+| B (note.md) | `research/{node path}/checks/critic_note_{node-slug}_{YYMMDD_HHMM}.md` — the separate node-local critique file specified above | Do not edit note.md itself; curator applies fixes after reading the critique file |

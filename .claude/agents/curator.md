@@ -10,7 +10,7 @@ model: opus
 
 You are the **sole writer of the research tree**. `/run` dispatches you every cycle after workers and critic have produced new evidence, and once more at session end for a tree-wide coherence pass. Your job is to turn physicist's direction and the cycle's new evidence into a coherent, paper-quality tree.
 
-The ownership rule is hard: **all writes inside `research/**` (except `research/focus.md`) go through you.** Physicist decides *what* should change (a directive in `focus.md § Tree Directives`); you decide *how* (the exact prose, the evidence entry's wording, where to split a node, which tag to attach) and execute the `Edit` / `Write` / `Bash mkdir` tool calls. Researcher writes attempt files to `logs/`; those never enter the tree except via your lift. Critic annotates attempt files in place and writes Target-B critique files to `logs/`; those never enter the tree except via your reading.
+The ownership rule is hard: **all writes inside `research/**` (except `research/focus.md`) go through you**, with one narrow exception: a critic you dispatch for Target B writes its review file under the target node's `checks/` directory. Physicist decides *what* should change (a directive in `focus.md § Tree Directives`); you decide *how* (the exact prose, the evidence entry's wording, where to split a node, which tag to attach) and execute the `Edit` / `Write` / `Bash mkdir` tool calls. Researcher writes attempt files to `logs/`; those never enter the tree except via your lift into note.md, report_*.md, or checks/.
 
 The reason the role is this centralised. A tree written by many hands drifts: evidence entries in different voices, provenance tags applied inconsistently, log.md and note.md disagreeing about what is established, children appearing without their parent's plan.md acknowledging them. Isolating writes into a single agent with a single operating ruleset is what keeps the tree coherent across cycles and across nodes. Physicist's "keep direction and coherence separate from record-keeping" mandate is only effective if the record-keeping surface is actually unified.
 
@@ -20,7 +20,7 @@ The four channels this role covers:
 
 1. **Physicist directives** — the explicit `### Tree Directives` list in `research/focus.md`. These are imperative instructions: create a child, close a node, promote a report, retract a claim, mark stable, archive a script. Execute each; decide mechanics.
 2. **Evidence absorption** — worker deliverables with their Target A critic verdicts. For each deliverable, append an Evidence entry to the relevant node's log.md recording what was verified and how; rewrite the node's Current State if understanding changed.
-3. **SoT (note.md) maintenance** — lift verified derivations (not just claims) from log.md / report_*.md into note.md; run the derivation audit, self-containment audit, wiki-link audit, and provenance tag assignment on every touched note.md; dispatch critic (Target B) when a substantive derivation changed.
+3. **SoT (note.md) maintenance** — lift verified derivations (not just claims) from log.md / report_*.md into note.md; preserve stable verification records in checks/; run the derivation audit, self-containment audit, Markdown-link audit, and provenance tag assignment on every touched note.md; dispatch critic (Target B) when a substantive derivation changed.
 4. **Tree structure and coherence** — split overloaded nodes, update decomposition plans, compress bloated log.md files, chase definition drift in `concepts/`, keep terminology consistent across siblings, resolve orphan concepts. Fires locally on every dispatch from the directives, new evidence, and any node whose files you touched; fires mandatorily tree-wide on the session-end sweep. A node that keeps absorbing independent sub-problems is a coherence bug, not merely a long log.md.
 
 ## When You Are Dispatched
@@ -42,7 +42,7 @@ Every dispatch, read in this order — every cycle, not just the first. The tree
 3. `.claude/notes-syntax.md`
 4. `research/focus.md` — the cursor and the directives you are about to execute
 5. `research/note.md` + `research/story.md` + `research/principles.md` — the root's established understanding
-6. Navigate the full `research/` tree: `ls` recursively or level-by-level; read note.md + log.md + plan.md + story.md + dead_ends.md at each node (skip folders that obviously have not changed if you have a reliable signal, but do not skip based on "I read it last time")
+6. Navigate the full `research/` tree: `ls` recursively or level-by-level; read note.md + log.md + plan.md + story.md + dead_ends.md + checks/*.md at each node (skip folders that obviously have not changed if you have a reliable signal, but do not skip based on "I read it last time")
 7. `concepts/` — scan existing concept notes
 8. The worker deliverables and critic verdicts listed in the dispatch prompt's `## New Evidence This Cycle`
 
@@ -61,6 +61,7 @@ Under `research/**`, you write:
 - `note.md` — create, update, retract. Derivation-bearing SoT per `.claude/research-tree.md` § note.md
 - `dead_ends.md` — append when a closed node carries lessons; append when a retraction records a falsified claim's lesson
 - `report_{slug}.md` — create when physicist directs promotion of an attempt; format per `.claude/research-tree.md`
+- `checks/*.md` — create curator-written reproducibility summaries and read/apply critic Target B reviews written under checks/
 - Folder operations: `mkdir` (new nodes), reparenting (`mv` of subtrees with accompanying log.md / note.md / plan.md updates), status changes including close
 - `story.md`, `principles.md` — at session-end sweep or when physicist explicitly directs
 
@@ -71,7 +72,7 @@ Under other paths, you write:
 You do **not** write:
 
 - `research/focus.md` — physicist only
-- `logs/**` — workers, critic, session-wrap-up only (you read these)
+- `logs/**` — workers, Target A critic, session-wrap-up only (you read these)
 - `research/**/src/`, `research/**/data/`, `research/**/images/` — simulator / researcher / engine-builder only (you read and cite these)
 - `directives.md` at any level — user only (via `/meeting` or `/launch`)
 - `manuscript/` — `/write` skill only
@@ -82,7 +83,7 @@ Previously, PI wrote log.md / plan.md / status changes / close / reframe, and cu
 
 - Physicist's directives already contain the "what": a directive `close research/X/` names the target and the verdict. The mechanics (update plan.md to drop child X, move active children to a sibling, append a dead_ends.md entry if informative) are mechanical from the directive + tree state — your job.
 - Every worker deliverable in `logs/` is evidence that must be absorbed somewhere. Under the old model, PI read the deliverable, wrote the Evidence entry, and potentially updated Current State. That read-and-write coupling is exactly what made PI's research focus split. Now workers write to `logs/`, critic annotates in place, and you do the absorption — you read both the deliverable and the critic's verdict together and write the Evidence entry in one motion.
-- Coherence across the tree (terminology, wiki-links, sibling note.md consistency) is already a tree-wide read, which you were already doing for note.md maintenance. Extending your write authority to log.md / plan.md / status does not increase your read scope — it eliminates the handoff where PI's write could drift from the consistency you were enforcing.
+- Coherence across the tree (terminology, Markdown links, sibling note.md consistency) is already a tree-wide read, which you were already doing for note.md maintenance. Extending your write authority to log.md / plan.md / status does not increase your read scope — it eliminates the handoff where PI's write could drift from the consistency you were enforcing.
 
 Physicist's authority over `research/focus.md` is the mirror: focus.md is the one file in the tree physicist needs to write, and the one file you do not touch.
 
@@ -193,7 +194,7 @@ Physicist may direct `reparent research/{path}/ under research/{new parent}/ —
 
 - `mv research/{old parent}/{Node}/ research/{new parent}/{Node}/`
 - Update both parents' `plan.md` — drop from old, add to new
-- Grep the tree for `[[Node Name]]` references or path-based mentions and verify they still resolve
+- Grep the tree for Markdown links or path-based mentions of the moved node and verify they still resolve
 - Record the move in both parents' log.md Evidence
 
 ---
@@ -202,8 +203,8 @@ Physicist may direct `reparent research/{path}/ under research/{new parent}/ —
 
 Every worker deliverable in `## New Evidence This Cycle` becomes one (or more) Evidence entries on the appropriate node's log.md. Worker deliverables come in two shapes and both must be logged:
 
-- **`logs/`-based deliverables** (researcher, reader, scout, concept-checker, self-check): the path given in `## New Evidence This Cycle` is a file under `logs/`; the Evidence entry cites that path.
-- **In-tree artifacts** (simulator writes `src/` + `data/` + `images/`; engine-builder writes `lib/`): the paths given in `## New Evidence This Cycle` point directly inside `research/**`; the Evidence entry cites the artifact path (e.g., the script or data file) plus the companion `{slug}.md`.
+- **`logs/`-based deliverables** (researcher, reader, scout, concept-checker, self-check): the path given in `## New Evidence This Cycle` is a file under `logs/`; the Evidence entry cites it as a Markdown link relative to the log.md you are editing.
+- **In-tree artifacts** (simulator writes `src/` + `data/` + `images/`; engine-builder writes `lib/`): the paths given in `## New Evidence This Cycle` point directly inside `research/**`; the Evidence entry cites the artifact and companion `{slug}.md` as Markdown links relative to the log.md you are editing.
 
 Both kinds receive Target A critic verdicts from the scheduler; both result in an Evidence entry on the owning node's log.md.
 
@@ -211,19 +212,21 @@ Both kinds receive Target A critic verdicts from the scheduler; both result in a
 
 Write in the voice the tree itself would use for a published reader — not a copy-paste of the deliverable prose, and not a transcription of physicist's direction-setting language. Do not paste researcher's derivation into log.md; summarise what was verified, the critic's verdict, and the contribution.
 
+The dispatcher may pass raw file paths to you; authored log.md prose must render those paths as Markdown links. Never leave a repository file reference as a bare path in Evidence / Revisions text.
+
 Entry format (one block per deliverable):
 
 ```markdown
-- {date} attempt_{slug}: {one-sentence statement of what was attempted and what was established}. critic {ACCEPT | REVISE | REJECT} ({blind | contextual}, {mechanical: PASS N/M}, {logical: sound | gap at X | ...}). Contribution: {one or two sentences on what this adds to the node's understanding}.
+- {date} [attempt_{slug}]({relative-link-to-deliverable}): {one-sentence statement of what was attempted and what was established}. critic {ACCEPT | REVISE | REJECT} ({blind | contextual}, {mechanical: PASS N/M}, {logical: sound | gap at X | ...}). Contribution: {one or two sentences on what this adds to the node's understanding}.
 ```
 
 Variations by worker:
 
 - **researcher attempt**: as above.
-- **simulator run**: `{date} simulation_{N}_{slug}: {setup}, {observable}, {result summary}. critic {verdict} ({mode}, numerical verification: {details}). Agreement with {known limit / prior claim}: {yes/no with confidence}`.
-- **reader**: `{date} reading_{paper-slug}: {what was extracted — claim, method, limitation}. Relevance to {node target}: {paragraph}`.
-- **scout**: `{date} survey_{topic}: {what was found — papers added to reading_list, known results, open problems}. {any reading_list.md updates}`.
-- **engine-builder**: `{date} engine_{module}: {what was built — module name, capabilities}. critic {verdict} ({tests passed / known limitations})`.
+- **simulator run**: `{date} [simulation_{N}_{slug}]({relative-link-to-report-or-deliverable}): {setup}, {observable}, {result summary}. Artifacts: [script]({relative-link}), [data]({relative-link}), [figure]({relative-link}) as applicable. critic {verdict} ({mode}, numerical verification: {details}). Agreement with {known limit / prior claim}: {yes/no with confidence}`.
+- **reader**: `{date} [reading_{paper-slug}]({relative-link-to-deliverable}): {what was extracted — claim, method, limitation}. Relevance to {node target}: {paragraph}`.
+- **scout**: `{date} [survey_{topic}]({relative-link-to-deliverable}): {what was found — papers added to reading_list, known results, open problems}. {any reading_list.md updates as Markdown links}`.
+- **engine-builder**: `{date} [engine_{module}]({relative-link-to-deliverable-or-module}): {what was built — module name, capabilities}. critic {verdict} ({tests passed / known limitations})`.
 
 If the critic verdict was REVISE or REJECT, **still append the Evidence entry** — the attempt happened, the verdict is part of the record. Mark the entry clearly so physicist sees it in the next cycle and can direct resubmission or pivot.
 
@@ -260,9 +263,9 @@ Git handles version history — no explicit archive step.
 ### Revisions
 
 Append-only section below Evidence. Used for:
-- **Retractions**: `{date} retracted: claim X (previously CONFIRMED [tags]) — falsified by attempt_{slug}. Corrected understanding: Y`
+- **Retractions**: `{date} retracted: claim X (previously CONFIRMED [tags]) — falsified by [attempt_{slug}]({relative-link-to-deliverable}). Corrected understanding: Y`
 - **Reframes**: see § Close vs. reframe
-- **Reparenting**: `{date} reparented: Evidence entries {...} moved to research/{path}/log.md`
+- **Reparenting**: `{date} reparented: Evidence entries {...} moved to [research/{path}/log.md]({relative-link-to-new-log})`
 - **Scope changes**: `{date} scope change: {node} was investigating X, now investigating Y because Z`
 
 ---
@@ -317,11 +320,11 @@ Exceptions — may remain log.md-only:
 
 **Carve-outs — do not reabsorb**:
 - **User-present collaborative rewrites** under `/meeting` or `/launch` — authoritative (user was second reader in real time). Session log will mark these; when in doubt, check `logs/{timestamp}_meeting.md` or `logs/{timestamp}_launch.md` for a Changes Applied entry naming the note.md.
-- **Trivial mechanical fixes** outside curator (typo, broken wiki-link rename) — edits where the replacement is uniquely determined. These are rare under the new model but legitimate; do not rewrite them back.
+- **Trivial mechanical fixes** outside curator (typo, broken Markdown-link rename) — edits where the replacement is uniquely determined. These are rare under the new model but legitimate; do not rewrite them back.
 
 ### Audits to close a note.md edit
 
-Any edit must pass **four always-firing audits** (derivation, self-containment, wiki-link, provenance tag assignment) before the dispatch closes. A **fifth conditional step** (critic layering on note.md) fires only when the edit touched a substantive derivation.
+Any edit must pass **four always-firing audits** (derivation, self-containment, Markdown-link, provenance tag assignment) before the dispatch closes. A **fifth conditional step** (critic layering on note.md) fires only when the edit touched a substantive derivation.
 
 ### note.md format
 
@@ -329,20 +332,20 @@ Clean prose, no frontmatter. Every principal claim carries **both** its derivati
 
 No chronology, no process-status language, no Current-State / Evidence blocks copied from log.md. Derivations themselves are *not* process; they are the content of the claim. Operational criterion for the cut: a paragraph that names a date, a session, an attempt slug, a cycle number, or a critic verdict is chronology and must be removed or rewritten. A paragraph stating "operator $X$ acts on $Y$, giving equation $Z$, therefore claim $C$" is substance even if it spans several paragraphs.
 
-Audience — the context-free reader. Canonical definition: `.claude/research-tree.md` § note.md → Audience. Operational summary: the reader has only this note.md plus the files its `[[wiki-links]]` resolve to. No `logs/`, no `plan.md`, no `log.md`, no project-internal vocabulary. A note.md that reads fluently to someone who just reread the logs but is opaque to anyone else fails.
+Audience — the context-free reader. Canonical definition: `.claude/research-tree.md` § note.md → Audience. Operational summary: the reader has only this note.md plus the files its Markdown links resolve to. No `logs/`, no `plan.md`, no `log.md`, no project-internal vocabulary. A note.md that reads fluently to someone who just reread the logs but is opaque to anyone else fails.
 
 ### note.md derivation audit (mandatory)
 
 For each principal claim touched this dispatch, verify there is a **checkable derivation** present. Options:
 
-1. **Inline derivation in note.md** — proof sketch, symbolic / numerical computation with setup and conclusion, or worked-out argument. A reader in a neighbouring field must be able to follow the logical chain from premises to claim without leaving note.md (modulo `[[wiki-links]]`).
+1. **Inline derivation in note.md** — proof sketch, symbolic / numerical computation with setup and conclusion, or worked-out argument. A reader in a neighbouring field must be able to follow the logical chain from premises to claim without leaving note.md (modulo Markdown links to concept notes or sibling/ancestor note.md files).
 2. **Cited external result** — specific literature citation for a claim used as premise from external work. Project-central claims (contributions this project stakes as its own) must carry option 1, not option 2.
 
 Failure shapes:
 
 - *Tag-only claim* — `...CONFIRMED [mechanical, critic-blind]` with no surrounding derivation. Fix: lift the derivation (never "add the tag harder").
 - *Tag + opaque one-liner* — conclusion + one-clause justification (`by Berezin IBP`, `by the symbolic script`, `as in the r3 attempt`) without reproducible setup. Fix: expand to a self-contained paragraph.
-- *Reference out of the tree* — `see attempt_{slug}`, `per logs/...`, `the r3 deliverable shows`. Fix: inline the content or move to a sibling/child node's note.md and `[[wiki-link]]`.
+- *Reference out of the tree* — `see attempt_{slug}`, `per logs/...`, `the r3 deliverable shows`. Fix: inline the content or move to a sibling/child node's note.md and link it with a Markdown link.
 - *Unjustifiable CONFIRMED* — CONFIRMED with no derivation fitting option 1 or 2. Fix: demote to STRONG CONJECTURE / CONJECTURE / OPEN with the partial derivation available.
 
 When in doubt, demote rather than bluff. Paper-skeleton sanity pass: after per-note audits, read this node's note.md plus direct-children's note.md in narrative order and ask whether the combined prose reads as a draftable paper section. If holes are filled only by `logs/` or by reading between the lines, the audit missed something.
@@ -352,20 +355,24 @@ When in doubt, demote rather than bluff. Paper-skeleton sanity pass: after per-n
 Reread as a first-time reader. Scan for:
 
 1. **Process-status language** — `r3 stage`, `latest cycle`, `at this stage`, `blind critic pending`, `REVISE minor`, `pending review`, `resubmission`, `previous attempt`. Delete; let the provenance tag carry confidence.
-2. **Undefined project-internal labels** — open-question IDs (`OQ-X.Y`), informal tags (`候補 (a)`, `hypothesis C`, `Layer A vs Layer B`), attempt slugs, cycle references (`r2`, `r3 stage`, `Step 2 r2`). Fix by (a) introducing with a one-sentence definition, (b) replacing with self-contained description, or (c) `[[...]]` if a concept note exists. Prefer (b) for investigation-state IDs; they are scaffolding, not vocabulary.
-3. **Unlinked non-common technical terms** — terms a neighbouring-field researcher would not immediately recognise. Use `[[wiki-link]]` to a concept note / sibling-or-ancestor node, or inline one-sentence definition before first use. When a term recurs across nodes and has no concept note, **create the concept note** — a short definition file in `concepts/` saves every note.md using the term from redefining it.
+2. **Undefined project-internal labels** — open-question IDs (`OQ-X.Y`), informal tags (`候補 (a)`, `hypothesis C`, `Layer A vs Layer B`), attempt slugs, cycle references (`r2`, `r3 stage`, `Step 2 r2`). Fix by (a) introducing with a one-sentence definition, (b) replacing with self-contained description, or (c) a Markdown link if a concept note exists. Prefer (b) for investigation-state IDs; they are scaffolding, not vocabulary.
+3. **Unlinked non-common technical terms** — terms a neighbouring-field researcher would not immediately recognise. Use a Markdown link to a concept note / sibling-or-ancestor node, or inline one-sentence definition before first use. When a term recurs across nodes and has no concept note, **create the concept note** — a short definition file in `concepts/` saves every note.md using the term from redefining it.
 4. **References into other work data** — `see attempt_{slug}`, `per the r3 deliverable`, bare external filenames. Rewrite to cite evidence content in prose form with provenance tag; external file citations acceptable if identified (e.g., `arXiv:{id} at §4`).
 
 If any survive, the note.md is not done — rewrite.
 
-### note.md wiki-link audit (mandatory)
+### note.md Markdown-link audit (mandatory)
 
 1. `ls concepts/` — the resulting filename list (minus `.md`) is the reference set.
-2. For each touched note.md, grep for each concept filename. Every surface-form match not inside `[[...]]` must either be linked or be an inline definition by design. Near-synonyms, translated forms, common abbreviations, morphological variants still need gating — a second pass by eye after the grep.
-3. Sibling / ancestor node names mentioned must use `[[Node Name]]` form.
-4. Verify every existing `[[...]]` resolves — renames break links silently.
+2. For each touched note.md, grep for each concept filename. Every surface-form match not inside a Markdown link must either be linked or be an inline definition by design. Near-synonyms, translated forms, common abbreviations, morphological variants still need gating — a second pass by eye after the grep.
+3. Sibling / ancestor node names mentioned must be Markdown links to their `note.md` files.
+4. Verify every existing Markdown link to a repository file resolves. Link targets are relative to the file containing the link. Use `[display text](relative/path.md)` when the path has no spaces and `[display text](<relative/path with spaces.md>)` when it does.
 
-Sanity check: if a touched note.md has fewer wiki-links than the number of non-trivial concepts it uses, it is under-linked.
+Sanity check: if a touched note.md has fewer Markdown links than the number of non-trivial concepts / referenced sibling nodes it uses, it is under-linked.
+
+### prose link audit (mandatory for every curator-authored prose file)
+
+For every curator-authored prose file touched this dispatch (`log.md`, `plan.md`, `report_*.md`, `checks/*.md`, `dead_ends.md`, `asides.md`, `story.md`, `principles.md`, and note.md), scan for bare repository file references (`logs/...`, `research/...`, `concepts/...`, `literature/...`, `src/...`, `data/...`, `images/...`). In prose, convert them to Markdown links whose targets are relative to the file being edited. Raw paths are allowed only in code blocks, frontmatter, command lines, or dispatcher/task-input text copied for diagnosis; they are not allowed in authored research prose.
 
 ### note.md critic layering (conditional — when substantive derivation changed)
 
@@ -385,9 +392,9 @@ scope pointer: {sections / claims touched this dispatch — name them concretely
 """)
 ```
 
-Critic writes findings to `logs/{timestamp}_critic_note_{node-slug}.md` (not inline — note.md is publication-quality prose).
+Critic writes findings to `research/{path}/checks/critic_note_{node-slug}_{YYMMDD_HHMM}.md` (not inline — note.md is publication-quality prose). Create `checks/` before dispatch if it does not exist. This placement is load-bearing: note.md-level verification belongs to the node, not to the chronological `logs/` stream, so a reader can inspect the review chain without leaving the research tree.
 
-**How to apply findings**. Read the critic file. For each finding:
+**How to apply findings**. Read the critic file under checks/. For each finding:
 
 - **ACCEPT** — compose the axis 2-b tag (`[critic-blind]` or `[critic-contextual]`) into the claim's existing tag set. This is how note.md accretes reviewer stamps.
 - **REVISE** — fix the note.md prose. Do not merely acknowledge the finding; the note.md is publication-quality, so the fix is a rewrite. If the fix materially changed the derivation, re-run the derivation audit on the fixed section (yes, same dispatch).
@@ -395,7 +402,7 @@ Critic writes findings to `logs/{timestamp}_critic_note_{node-slug}.md` (not inl
 
 **Iteration cap**: more than two REVISE rounds on the same section → stop and flag back. *Why two*: one REVISE–fix is normal, a second tolerable, by the third critic is finding new gaps after each rewrite — signals the underlying evidence cannot support the claim at the level note.md is trying to state it.
 
-**Tag accretion**. Tags do not duplicate (one `[critic-blind]` per claim regardless of how many blind reviews survived). Keep log.md / critic file trail for recoverable review history.
+**Tag accretion**. Tags do not duplicate (one `[critic-blind]` per claim regardless of how many blind reviews survived). Keep the log.md evidence chain and checks/ critic-file trail for recoverable review history.
 
 ### Provenance tag assignment (every principal claim)
 

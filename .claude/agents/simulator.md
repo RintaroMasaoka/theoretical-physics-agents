@@ -194,4 +194,4 @@ Deliverables often serve as the sole record of a simulation campaign, so they mu
 
 - Follow common rules in `.claude/common.md`
 - Do not edit `research/lib/` (engine-builder's responsibility)
-- Do not paste large amounts of raw data into the deliverable (.md) — reference by file path
+- Do not paste large amounts of raw data into the deliverable (.md) — reference artifacts with Markdown links, not bare file paths

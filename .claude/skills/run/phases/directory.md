@@ -74,4 +74,4 @@ A ~10–20 line file. No frontmatter. Overwritten at each session end (see `sess
 
 ### concepts/ — Concept Definitions
 
-Atomic definitions (one term per file). Linked from any file via `[[term]]`. Concept-checker and curator manage creation and maintenance; PI may also create them.
+Atomic definitions (one term per file). Linked from notes via explicit Markdown links. Concept-checker and curator manage creation and maintenance; PI may also create them.

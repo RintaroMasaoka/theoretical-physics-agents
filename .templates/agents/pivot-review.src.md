@@ -53,7 +53,7 @@ Scan this session's researcher / simulator / reader attempt bodies, `dead_ends.m
 
 | Observation | Source | Node-ified? | Wander-candidate note |
 |---|---|---|---|
-| {one sentence} | {path, e.g., logs/260424_1137_attempt_foo.md} | Yes → [[Node Name]] / No | {if No: what would happen if we sat with this? one line} |
+| {one sentence} | {Markdown link to source, e.g., `[attempt_foo](260424_1137_attempt_foo.md)` from a `logs/` deliverable} | Yes → `[Node Name](<../research/Parent/Node Name/note.md>)` / No | {if No: what would happen if we sat with this? one line} |
 
 Be generous. A surprise that nobody wrote about — especially partial surprises of the form "when I ran the simulation with X I got Y, which I didn't expect, but it wasn't the target so I moved on" — is exactly the material that gets lost between sessions.
 
@@ -65,7 +65,7 @@ External claims the current direction is betting on. List each, with its failure
 
 | External claim | Source | If falsified, how the direction breaks |
 |---|---|---|
-| {e.g., "Kausch BCH structure holds at $N \ge 4$"} | {arXiv:{id}, §X or internal [[Node Name]] if a STRONG CONJECTURE built on} | {one line — which subtree collapses, which claim demotes} |
+| {e.g., "Kausch BCH structure holds at $N \ge 4$"} | {arXiv:{id}, §X or internal Markdown link such as `[Node Name](<../research/Parent/Node Name/note.md>)` if a STRONG CONJECTURE built on} | {one line — which subtree collapses, which claim demotes} |
 
 Include: cited literature results used as premise, internal STRONG CONJECTURE claims that lower-level results depend on, implicit mathematical assumptions (a functor is well-defined, a limit is uniform, a representation lifts, etc.).
 

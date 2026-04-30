@@ -31,7 +31,7 @@ Read the target file without other project context. For each term encountered, a
 For each flagged term:
 - Check if `concepts/{term}.md` already exists
 - If it exists: read it. If the existing definition contradicts or is inconsistent with usage in the target file, update it. If the usage is merely a different-but-compatible application, no update is needed
-- If it does not exist: create it. For general physics concepts, use your training knowledge. For project-specific concepts, read related files (follow wiki-links from the target file) to build an accurate definition
+- If it does not exist: create it. For general physics concepts, use your training knowledge. For project-specific concepts, read related files (follow Markdown links from the target file) to build an accurate definition
 
 ## Concept Note Format
 
@@ -39,7 +39,7 @@ Write each concept note as a short, self-contained definition in `concepts/`. No
 
 - Definition (mathematical and/or physical)
 - Why this concept matters (context within the research, if inferable)
-- Links to related concepts via `[[...]]` wiki-links
+- Links to related concepts via explicit Markdown links such as `[related term](related_term.md)`. Use paths relative to the concept note you are writing
 
 Use lowercase with underscores as filename (e.g., `helicity_modulus.md`, `compact_boson.md`). Omit parentheses and special characters (e.g., `u1_symmetry.md` for U(1) symmetry).
 
