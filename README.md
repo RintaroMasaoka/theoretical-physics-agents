@@ -1,4 +1,4 @@
-# Research Agents Team for Theoretical Physics
+# Theoretical Physics Research Agents
 
 Autonomous research and paper-writing system for theoretical physics projects.
 
@@ -37,7 +37,7 @@ Core operating model:
 
 ### Setup
 
-1. Clone the repository
+1. Clone the repository, or download it directly into your project root
 2. Optionally edit `.config/config.yaml`
 3. Run `node .scripts/configure.mjs` to generate runtime files
 4. Start your agent session in the project root
@@ -45,6 +45,24 @@ Core operating model:
 By default, `node .scripts/configure.mjs` generates both `.claude/` and `.codex/`.
 
 If you are using Claude Code, `.claude/settings.json` runs `node .scripts/configure.mjs` automatically on session start, so generated prompt files stay in sync with the templates and config.
+
+GitHub's **Download ZIP** button always creates a top-level folder such as
+`theoretical-physics-agents-main/`. If you want the repository contents placed
+directly in the current directory instead, use the tarball form:
+
+```bash
+mkdir my-research-project
+cd my-research-project
+curl -L https://github.com/RintaroMasaoka/theoretical-physics-agents/archive/refs/heads/main.tar.gz | tar xz --strip-components=1
+node .scripts/configure.mjs
+```
+
+If you already downloaded and extracted the ZIP into a subfolder, move the
+contents up from the parent directory:
+
+```bash
+rsync -a theoretical-physics-agents-main/ ./
+```
 
 ### Minimal Workflow
 

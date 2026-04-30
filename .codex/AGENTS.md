@@ -1,4 +1,4 @@
-# Research Agents Team for Theoretical Physics — Autonomous Research Paper Generation System
+# Theoretical Physics Research Agents
 
 A system that autonomously generates academic papers with minimal human intervention.
 Users run `/run` to advance research, `/write` to draft papers, `/meeting` for progress review and course correction, and `/improve` to enhance agent behavior.
