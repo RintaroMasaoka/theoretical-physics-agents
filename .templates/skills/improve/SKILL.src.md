@@ -31,7 +31,7 @@ Prompt files are generated from templates — editing generated files directly i
 |---|---|---|
 | **Template (source of truth)** | `.templates/**/*.src.md` | Edit these |
 | **Generated (do not edit)** | `{{ runtime.agents_dir }}/*.md`, `{{ runtime.skills_dir }}/*/SKILL.md`, `{{ runtime.instruction_file }}`, `{{ runtime.common_file }}` | Overwritten by `configure.mjs` |
-| **Config values** | `{{ runtime.config_file }}` | Substituted into templates via `{{ key }}` |
+| **Config values** | `{{ runtime.config_source_file }}` | Substituted into templates via `{{ key }}` |
 
 When reading a target for review, read the `.src.md`. When making changes, edit the `.src.md`.
 

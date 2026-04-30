@@ -11,7 +11,7 @@
  *   node .scripts/configure.mjs --check                Validate config and templates (no writes)
  *
  * Source of truth:
- *   Config values:  target-defined config path (shared today via .claude/config/config.yaml)
+ *   Config values:  .config/config.yaml
  *   Prompt content: .templates/**\/*.src.md
  * Generated (do not edit directly — overwritten on each run):
  *   .claude/**\/*.md
@@ -24,21 +24,19 @@ import { fileURLToPath } from "url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC_DIR = join(ROOT, ".templates");
-const DEFAULT_CONFIG_PATH = join(ROOT, ".claude", "config", "config.yaml");
+const DEFAULT_CONFIG_SOURCE_PATH = join(ROOT, ".config", "config.yaml");
 
 const TARGETS = {
   claude: {
     name: "claude",
     outputDir: join(ROOT, ".claude"),
-    configSourcePath: DEFAULT_CONFIG_PATH,
-    configOutputPath: DEFAULT_CONFIG_PATH,
+    configSourcePath: DEFAULT_CONFIG_SOURCE_PATH,
     rootInstructionFileName: "CLAUDE.md",
   },
   codex: {
     name: "codex",
     outputDir: join(ROOT, ".codex"),
-    configSourcePath: DEFAULT_CONFIG_PATH,
-    configOutputPath: join(ROOT, ".codex", "config", "config.yaml"),
+    configSourcePath: DEFAULT_CONFIG_SOURCE_PATH,
     rootInstructionFileName: "AGENTS.md",
   },
 };
@@ -58,7 +56,7 @@ function buildRuntimeConfig(target) {
       research_tree_file: `${rootDir}/research-tree.md`,
       agents_dir: `${rootDir}/agents`,
       skills_dir: `${rootDir}/skills`,
-      config_file: relative(ROOT, target.configOutputPath).replace(/\\/g, "/"),
+      config_source_file: relative(ROOT, target.configSourcePath).replace(/\\/g, "/"),
       resume_hook_reference:
         target.name === "claude"
           ? "the `SessionStart` hook in `.claude/settings.json`"
@@ -236,30 +234,6 @@ function resolveOutputPath(target, templatePath) {
   return join(target.outputDir, outRel);
 }
 
-function syncConfigMirror(target, mode) {
-  const src = target.configSourcePath;
-  const dst = target.configOutputPath;
-
-  if (src === dst) {
-    return;
-  }
-
-  const content = readFileSync(src, "utf-8");
-
-  if (mode === "dry-run") {
-    let marker = " (new)";
-    if (existsSync(dst)) {
-      marker = readFileSync(dst, "utf-8") === content ? " (unchanged)" : " (changed)";
-    }
-    console.log(`  ${relative(ROOT, dst)}${marker}`);
-    return;
-  }
-
-  mkdirSync(dirname(dst), { recursive: true });
-  writeFileSync(dst, content);
-  console.log(`  ${relative(ROOT, dst)}`);
-}
-
 function printConfig(config) {
   console.log("Config:");
   for (const key of Object.keys(config).sort()) {
@@ -316,8 +290,6 @@ function runCheck(target, config) {
 
 function runRender(target, config, mode) {
   console.log(mode === "dry-run" ? "Would generate:" : "Generated:");
-
-  syncConfigMirror(target, mode);
 
   for (const tmplPath of findTemplates(SRC_DIR)) {
     const dst = resolveOutputPath(target, tmplPath);
@@ -383,7 +355,6 @@ for (const target of targets) {
   console.log(`Target: ${target.name}`);
   console.log(`Output: ${relative(ROOT, target.outputDir)}`);
   console.log(`Config source: ${relative(ROOT, target.configSourcePath)}`);
-  console.log(`Config output: ${relative(ROOT, target.configOutputPath)}`);
   printConfig(config);
 
   if (options.mode === "check") {

@@ -31,7 +31,7 @@ Prompt files are generated from templates — editing generated files directly i
 |---|---|---|
 | **Template (source of truth)** | `.templates/**/*.src.md` | Edit these |
 | **Generated (do not edit)** | `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, `.claude/CLAUDE.md`, `.claude/common.md` | Overwritten by `configure.mjs` |
-| **Config values** | `.claude/config/config.yaml` | Substituted into templates via `{{ key }}` |
+| **Config values** | `.config/config.yaml` | Substituted into templates via `{{ key }}` |
 
 When reading a target for review, read the `.src.md`. When making changes, edit the `.src.md`.
 

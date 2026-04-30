@@ -1,8 +1,8 @@
 # Project Configuration
 #
-# Edit values here, then run `node .scripts/configure.mjs` to apply.
+# Edit this file, then run `node .scripts/configure.mjs` to apply.
 # Templates are in .templates/; generated files are emitted into target runtime directories under the repository root.
-# Do not edit generated .md files directly — they will be overwritten.
+# Do not edit generated target config mirrors directly — they will be overwritten.
 
 # Response language for all user-facing output
 language: japanese

@@ -38,7 +38,7 @@ Core operating model:
 ### Setup
 
 1. Clone the repository
-2. Optionally edit `.claude/config/config.yaml`
+2. Optionally edit `.config/config.yaml`
 3. Run `node .scripts/configure.mjs` to generate runtime files
 4. Start your agent session in the project root
 
@@ -87,14 +87,15 @@ That means the main current value of the repository is autonomous research progr
 README.md                 # Project overview and operational expectations
 .scripts/configure.mjs    # Renders generated runtime files from config + templates
 
+.config/
+└── config.yaml           # Main editable shared config
+
 .claude/
-├── config/config.yaml    # Main editable config
 ├── agents/*.md           # Generated agent instructions
 ├── skills/*/SKILL.md     # Generated skills
 └── settings.json         # Claude Code settings, including SessionStart hook
 
 .codex/
-├── config/config.yaml    # Generated config mirror for Codex-facing references
 ├── agents/*.md           # Generated agent instructions
 └── skills/*/SKILL.md     # Generated skills
 
@@ -117,8 +118,8 @@ During actual research and writing sessions, the project creates working files i
 
 ## Configuration
 
-The main editable config is `.claude/config/config.yaml`.
-It is the current shared config source for both `.claude/` and `.codex/`.
+The main editable config is `.config/config.yaml`.
+It is the shared config source for both `.claude/` and `.codex/`.
 
 By default, the repository is configured for Japanese user-facing responses.
 
