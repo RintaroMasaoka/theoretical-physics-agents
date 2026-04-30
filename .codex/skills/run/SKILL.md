@@ -13,7 +13,7 @@ The team and who owns what:
 | Role | Agent | Owns |
 |---|---|---|
 | **Direction** | `physicist` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives |
-| **Record** | `curator` | All tree writes — log.md (Evidence + Current State), plan.md, node creation / status / close / reframe, `report_{slug}.md` promotion, retraction, `dead_ends.md`, note.md (SoT) |
+| **Record** | `curator` | All tree writes — log.md (Evidence + Current State), plan.md, conventions.md, node creation / status / close / reframe, `report_{slug}.md` promotion, retraction, `dead_ends.md`, note.md (SoT) |
 | **Verification** | `critic` | Independent review of every worker deliverable and of curator's note.md lifts |
 | **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing deliverables in `logs/` |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of physicist's wrap-up-input file into session log / focus / last_session / agenda; commit + push |
@@ -23,9 +23,9 @@ The team and who owns what:
 ## Constraints
 
 - **Write all prose in japanese.** Applies to `research/focus.md`, `logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `.codex/research-tree.md` and here may stay in English. The rule is about body prose, not structural tokens.
-- `AskUserQuestion` and all other user-input solicitations are prohibited. Users are often away during `/run`; asking blocks the session. Text output to the user is limited to the final report emitted at Session End.
+- `{{ runtime.tool_ask_user_question }}` and all other user-input solicitations are prohibited. Users are often away during `/run`; asking blocks the session. Text output to the user is limited to the final report emitted at Session End.
 - If the user initiates communication mid-session, respond and continue. Corrections from the user take precedence over scheduled dispatches.
-- **`Bash("sleep ...")` is prohibited; polling via `Bash("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
+- **`{{ runtime.tool_shell }}("sleep ...")` is prohibited; polling via `{{ runtime.tool_shell }}("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
 - Full paper text is acquired only from arXiv.
 - **Paper writing is NOT `/run`'s responsibility.** Writing is handled by the `/write` skill. `/run` drives research only.
 
@@ -48,7 +48,7 @@ The team and who owns what:
 |---|---|
 | **Session** | One `/run` execution — from start to final report |
 | **Cycle** | One iteration of the scheduler loop (physicist → workers → critic → curator) |
-| **Task** | One `Agent` tool call |
+| **Task** | One `{{ runtime.tool_agent }}` tool call |
 
 One session = up to `MAX_CYCLES` cycles. Multiple tasks can run in parallel within a cycle.
 
@@ -63,7 +63,7 @@ Detail lives in two phase files; read on demand, not all at once.
 | `phases/dispatch.md` | When launching workers or critic | Pattern A / B launch methods, prompt template, auto-critic rule, per-agent dynamic data |
 | `phases/session-lifecycle.md` | Session Start and Session End | Resume check, initial sanity check, scheduler-owned session-end mechanical steps (simulation housekeeping, final sweeps), wrap-up input handoff |
 
-The research information model (tree structure, file roles, context scoping, provenance taxonomy) is canonical in `.codex/research-tree.md` — physicist and curator Read it at every dispatch. `/run` itself does not need it in working memory; `/run` reads `research/focus.md` (the dispatch-spec file — treat it as the scheduler's interface with physicist, not as "tree content") only to extract the fields it dispatches on. `/run` never reads node-level files — `log.md`, `plan.md`, `note.md`, `dead_ends.md`, `report_*.md` are exclusively for physicist (read) and curator (read/write).
+The research information model (tree structure, file roles, context scoping, convention ledger, provenance taxonomy) is canonical in `.codex/research-tree.md` — physicist and curator Read it at every dispatch. `/run` itself does not need it in working memory; `/run` reads `research/focus.md` (the dispatch-spec file — treat it as the scheduler's interface with physicist, not as "tree content") only to extract the fields it dispatches on. `/run` never reads node-level files — `log.md`, `plan.md`, `note.md`, `conventions.md`, `dead_ends.md`, `report_*.md` are exclusively for physicist (read) and curator (read/write).
 
 ---
 
@@ -96,7 +96,7 @@ This is the resume beacon read at Session Start (see `phases/session-lifecycle.m
 ### 1. Physicist Dispatch — Direction
 
 ```
-Agent(subagent_type="physicist", prompt="""
+{{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="physicist", prompt="""
 ## Task
 Update research/focus.md for the next cycle.
 
@@ -169,7 +169,7 @@ Critic writes its verdict inline into the worker's deliverable file (Target A). 
 Dispatch curator once per cycle with:
 
 ```
-Agent(subagent_type="curator", prompt="""
+{{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="curator", prompt="""
 ## Task
 Execute the tree directives below and absorb the new evidence (worker deliverables + critic verdicts) into the tree per your own operating rules.
 
@@ -186,7 +186,7 @@ Session cycle: {cycle_number} of {MAX_CYCLES}
 """)
 ```
 
-Curator reads the deliverables, critic verdicts, and tree state; executes the directives; updates log.md / plan.md / note.md / status / report_*.md / dead_ends.md per its own operating rules; returns `DONE: {summary}`.
+Curator reads the deliverables, critic verdicts, and tree state; executes the directives; updates log.md / plan.md / conventions.md / note.md / status / report_*.md / dead_ends.md per its own operating rules; returns `DONE: {summary}`.
 
 If curator returns with REVISE or REJECT critic verdicts unresolved — i.e., a worker deliverable whose critic verdict is REVISE means the worker should be re-dispatched next cycle — curator flags these in its return. The scheduler records the flag; physicist sees the flagged deliverables in the next cycle's prompt (step 1 `Recent Deliverables` and `Critic Verdicts`) and decides whether to re-dispatch.
 

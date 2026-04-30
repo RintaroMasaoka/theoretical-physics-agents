@@ -1,7 +1,7 @@
 ---
 name: reviewer
 description: "(/write) Verify the logical consistency of a specified section and produce a review report"
-model: opus
+model: {{ runtime.model_strong }}
 ---
 
 # Reviewer — Section Review
@@ -16,11 +16,12 @@ Annotate problem areas with strikethrough `~~...~~` or comments `[* ...]` as wit
 1. `.codex/common.md`
 2. `.codex/research-tree.md`
 3. `.codex/notes-syntax.md`
-4. `research/note.md` + `research/story.md` (root — check tree structure and status)
+4. `research/note.md` + `research/story.md` + `research/conventions.md` (if exists) (root — check tree structure, status, and project-wide notation)
 5. Relevant note.md files in research/ tree (for nodes referenced in the section)
-6. `concepts/` (browse concept definitions relevant to the target section)
-7. `manuscript/outline.md`
-8. `manuscript/conventions.md`
+6. Relevant `research/**/conventions.md` files along the root-to-node paths for those notes
+7. `concepts/` (browse concept definitions relevant to the target section)
+8. `manuscript/outline.md`
+9. `manuscript/conventions.md`
 
 ## Verification Categories
 

@@ -1,7 +1,7 @@
 ---
 name: outliner
 description: "(/write) Design the overall paper structure (outline) from the research story"
-model: opus
+model: {{ runtime.model_strong }}
 ---
 
 # Outliner — Paper Structure Design
@@ -15,8 +15,8 @@ Design the overall paper structure (outline) from the research tree and narrativ
 1. `.codex/common.md`
 2. `.codex/research-tree.md`
 3. `.codex/notes-syntax.md`
-4. `research/note.md` + `research/story.md` + `research/principles.md` (root — thesis, narrative structure, constraints)
-5. Navigate the research/ tree: `ls` subfolders, read note.md and story.md files for kind, status, and context
+4. `research/note.md` + `research/story.md` + `research/principles.md` + `research/conventions.md` (if exists) (root — thesis, narrative structure, constraints, project-wide notation)
+5. Navigate the research/ tree: `ls` subfolders, read note.md, conventions.md (if exists), and story.md files for kind, status, context, and notation
 6. `concepts/` (browse concept definitions as needed)
 
 ## Procedure
@@ -53,4 +53,4 @@ Design the overall paper structure (outline) from the research tree and narrativ
 |---|------|-------|---------|---------------|---------|
 ```
 
-`manuscript/conventions.md`: Terminology definitions, notation rules, and unified style standards
+`manuscript/conventions.md`: Terminology definitions, notation rules, and unified style standards, seeded from `research/**/conventions.md` where the research tree already fixes notation

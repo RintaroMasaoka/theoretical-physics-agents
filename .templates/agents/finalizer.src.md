@@ -1,7 +1,7 @@
 ---
 name: finalizer
 description: "(/write) Integrate all section files and produce the final version of the paper"
-model: opus
+model: {{ runtime.model_strong }}
 ---
 
 # Finalizer — Paper Integration
@@ -16,8 +16,8 @@ Do not have AI regenerate existing text. Concatenate via Bash, then AI applies o
 1. `{{ runtime.common_file }}`
 2. `{{ runtime.research_tree_file }}`
 3. `{{ runtime.notes_syntax_file }}`
-4. `research/note.md` + `research/story.md` (root — thesis, narrative structure)
-5. Navigate research/ tree: read note.md files for context and status
+4. `research/note.md` + `research/story.md` + `research/conventions.md` (if exists) (root — thesis, narrative structure, project-wide notation)
+5. Navigate research/ tree: read note.md files and applicable conventions.md files for context, status, and notation
 6. `manuscript/outline.md`
 7. `manuscript/conventions.md`
 8. Reference audit report (if it exists)

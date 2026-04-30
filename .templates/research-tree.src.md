@@ -2,17 +2,18 @@
 
 Research information is organized as a **tree** under `research/`. Every node is a folder. Files serve distinct roles:
 
-**Language.** Body prose in every file described here (log.md Current State, Evidence entries, note.md, plan.md, story.md, report_*.md, checks/*.md, principles.md, focus.md, dead_ends.md, …) is written in **{{ language }}**. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current State`, `## Evidence`, `## Background`), frontmatter keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. The English examples below illustrate structure, not language.
+**Language.** Body prose in every file described here (log.md Current State, Evidence entries, note.md, plan.md, story.md, report_*.md, checks/*.md, principles.md, conventions.md, focus.md, dead_ends.md, …) is written in **{{ language }}**. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current State`, `## Evidence`, `## Background`), frontmatter keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. The English examples below illustrate structure, not language.
 
 | File | Layer | Role |
 |---|---|---|
-| `note.md` | Destination (SoT) | **Derivation-bearing paper-quality knowledge. Curator-authored** — see § note.md — Ownership below. Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries **both** a derivation (inline or cited, see Scope of derivation) and a verification tag (see Verification Provenance Taxonomy). Written when a node has significant established results. Not every node has one |
-| `report_{slug}.md` | Report (with provenance) | **Verified report with explicit provenance tags.** Self-contained analysis promoted from worker deliverables after independent critic review. Curator creates when physicist directs promotion. Belongs to the node, not to the timeline. See below |
+| `note.md` | Destination (SoT) | **Derivation-bearing paper-quality knowledge. Curator-authored** — see § note.md — Ownership below. Free-form prose — no prescribed sections, no frontmatter. Every principal claim carries **both** a derivation (inline or cited, see Scope of derivation) and a Markdown link to a `checks/*.md` verification record (see Verification Provenance Records). Written when a node has significant established results. Not every node has one |
+| `report_{slug}.md` | Report (with provenance) | **Verified report with explicit provenance references.** Self-contained analysis promoted from worker deliverables after independent critic review. Curator creates when physicist directs promotion. Belongs to the node, not to the timeline. See below |
 | `checks/` | Verification record | **Node-local verification record.** Stable critic-note reviews, reproduction notes, and mechanical/numerical check summaries for the node's note.md / report_*.md claims. These are the durable review artifacts a reader may inspect without leaving the tree. They are evidence ledgers, not substitutes for derivations in note.md |
 | `plan.md` | Ladder (strategy) | **Strategy and approach.** How to attack this node — decomposition rationale, approach decisions, children's roles. Rewritten by curator as strategy evolves (physicist directs the change via `research/focus.md § Tree Directives`) |
 | `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). Curator writes: every worker deliverable becomes an Evidence entry, every shift in understanding updates Current State |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
 | `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting research constraints |
+| `conventions.md` | Convention ledger | **Notation and convention source of truth (optional, root by default; subtree-local when needed).** Records choices that change how formulas are read — sign conventions, orderings, normalizations, index names, Fourier transforms, tensor leg orientation, symbol reservations, and terminology-to-symbol mappings. See § conventions.md — Notation and Convention Ledger |
 | `dead_ends.md` | Off-SoT register | **Rejected-direction register (optional).** Approaches shown wrong, with the reason and the evidence (counterexample, falsifying computation, or critic-rejected derivation). Free-form prose. Pairs with `asides.md` — together they form the two off-SoT registers (rejected vs parked). At root by default; a node may carry its own when the rejection is clearly subtree-local |
 | `asides.md` | Off-SoT register | **Parked off-thread items (optional).** Items not committed to the active thread but worth not forgetting — spare-capacity questions, side curiosities, loose details left unpinned, items of unclear project scope. Free-form prose, no derivation requirement. At root by default; a node may carry its own when the items are clearly subtree-local. Three exits: promoted into a node's note.md (becomes load-bearing), moved to `dead_ends.md` (shown wrong), or stays parked indefinitely. Capture path: workers surface candidate items in their deliverables; curator absorbs them. The user may also append directly during `/meeting`, mirroring the user-collaborative exception for `note.md` (the file is informal, so the second-reader rationale that locks `note.md` to curator does not bind here) |
 | `src/` | Computation | Source code tied to a node (measurement, analysis, plot, or verification scripts), each with a companion `{slug}.md` |
@@ -36,7 +37,7 @@ Research nodes may contain computation subdirectories alongside their text files
 
 Any source code tied to a node lives in `src/`: simulator's measurement / analysis / plot scripts, and researcher's ad-hoc verification scripts for conjectures and examples. Both writers follow the same rules below.
 
-**Node-root prohibition.** Never place source files (`.py`, `.jl`, …) directly in the node folder. Node roots are reserved for narrative files (`log.md`, `plan.md`, `note.md`, `report_*.md`, `story.md`, `principles.md`) plus named artifact directories such as `checks/`, `src/`, `data/`, and `images/`. Loose scripts in node roots break the tree's legibility and bypass the `src/` reuse rule, so creating `src/` (even for a single script) is mandatory.
+**Node-root prohibition.** Never place source files (`.py`, `.jl`, …) directly in the node folder. Node roots are reserved for narrative files (`log.md`, `plan.md`, `note.md`, `report_*.md`, `story.md`, `principles.md`, `conventions.md`) plus named artifact directories such as `checks/`, `src/`, `data/`, and `images/`. Loose scripts in node roots break the tree's legibility and bypass the `src/` reuse rule, so creating `src/` (even for a single script) is mandatory.
 
 **Placement — lowest common ancestor.** Place a script at the lowest node that is an ancestor of every node that uses it. Common cases: a script used only in node `X` lives in `X/src/`; a script shared across siblings of a parent `P` lives in `P/src/`; if two cousins share a script, it lives in their nearest common ancestor's `src/`. This avoids duplication and makes scripts discoverable from the research context.
 
@@ -54,15 +55,51 @@ Any source code tied to a node lives in `src/`: simulator's measurement / analys
 
 Agents that are not simulator, researcher, or engine-builder treat all of `src/`, `data/`, `images/`, and `lib/` as read-only context.
 
+## conventions.md — Notation and Convention Ledger
+
+`conventions.md` is the tree's ledger for choices that determine how symbols, formulas, and technical phrases are read. It is distinct from `concepts/`: a concept note defines what an object is; a convention entry fixes how this project denotes, orders, or normalizes that object. For example, "Grassmann variable" belongs in `concepts/`; "the site integration measure is ordered as ..." belongs in `conventions.md`.
+
+**Why this file exists.** Notational drift is not a local typo. A sign convention, Fourier convention, tensor-leg order, or symbol reservation can silently change the meaning of claims across siblings. Keeping these choices in ordinary prose inside one note.md makes them invisible to the next branch; scattering them across logs makes the reader reconstruct the project's language archaeologically. A convention ledger gives curator one place to reconcile the tree's symbolic language before the inconsistency reaches note.md or the manuscript.
+
+**Placement and scope.**
+- Root `research/conventions.md` carries project-wide conventions and symbol reservations.
+- A node may carry its own `conventions.md` only when the choice is genuinely subtree-local or intentionally differs from the parent. The child entry must state the parent convention it refines or overrides.
+- If a subtree-local convention becomes used outside that subtree, promote or copy the entry to the lowest common ancestor and update the old entry to point there. Do not let sibling branches rely on private conventions.
+
+**What belongs here.**
+- Symbol reservations and overloaded-symbol decisions: e.g., "$D_i$ always means the canonical defect tensor after the sign factor; bare tensors are written $D_i^{\mathrm{bare}}$."
+- Sign, orientation, ordering, and normalization choices: integration measure order, tensor leg ordering, Fourier transform convention, phase conventions, index ordering.
+- Project-specific terminology-to-symbol mappings when the term and symbol must stay paired across nodes.
+- Known compatibility bridges: how this project's convention translates to a cited paper's convention, with a reference when available.
+
+**What does not belong here.**
+- General definitions of technical concepts — put those in `concepts/` and link them.
+- Derivations proving a claim — put those in note.md or a promoted report; the convention ledger may link to the derivation.
+- Process history or "we changed this on date X" narrative — put the evidence trail in log.md if needed. The ledger states the current convention.
+
+**Entry shape.** Free-form prose is allowed, but each entry must make these four facts recoverable:
+
+```markdown
+## {Convention name}
+Scope: {project-wide | research/{subtree}/ | specific linked claims}
+Convention: {the actual notation / order / sign / normalization rule}
+Reason: {why this choice is used, or which external convention it matches}
+Consequences: {symbols reserved, formulas affected, links to note.md / report_*.md / checks/*.md that rely on it}
+```
+
+The reason is load-bearing: without it, later agents treat the entry as arbitrary dogma and may "simplify" it away. Consequences are also load-bearing: they define the impact surface for a future convention change.
+
+**Maintenance rule.** When curator promotes or rewrites a note.md/report claim that introduces, depends on, or changes a convention, curator must update the nearest applicable `conventions.md` in the same dispatch, then scan affected ancestor/sibling note.md files for inconsistent usage. If the convention is still provisional, state the scope honestly and do not let note.md use it as if project-wide. If two live conventions conflict, curator does not silently choose: keep the narrower convention scoped, add a compatibility note if possible, and flag the conflict to physicist when scientific judgment is needed.
+
 ## note.md — Source of Truth
 
-**What note.md is.** The paper's substantive content *in situ* — for each principal claim the node has established, the claim **together with the derivation that establishes it** (proof sketch, symbolic computation, argument, or cited external result) written to paper quality. Stacking the note.md files of the tree in narrative order should yield the body of the paper. An abstract-level registry of claims (each line a sentence plus a provenance tag, with the actual derivation kept elsewhere) is **not** note.md; it is a table of contents mistakenly labelled SoT.
+**What note.md is.** The paper's substantive content *in situ* — for each principal claim the node has established, the claim **together with the derivation that establishes it** (proof sketch, symbolic computation, argument, or cited external result) written to paper quality. Stacking the note.md files of the tree in narrative order should yield the body of the paper. An abstract-level registry of claims (each line a sentence plus a provenance link, with the actual derivation kept elsewhere) is **not** note.md; it is a table of contents mistakenly labelled SoT.
 
-**"Source of Truth" means derivation-bearing.** A reader who accepts a claim in note.md must be able to check *why* within note.md itself — because the derivation is present. Provenance tags are a navigation and confidence summary accompanying each claim; they are **not** a substitute for the derivation. A CONFIRMED claim accompanied only by a tag gives the reader a stamp and nothing to check, which forces the reader into `logs/` and defeats note.md's purpose. The dividing line between note.md as a paper seed and note.md as an index is exactly this: derivations live in the note, not behind the tag.
+**"Source of Truth" means derivation-bearing.** A reader who accepts a claim in note.md must be able to check *why* within note.md itself — because the derivation is present. Provenance references are Markdown links to node-local `checks/*.md` records whose front matter summarizes confidence, evidence channels, review channels, and scope; they are **not** a substitute for the derivation. A CONFIRMED claim accompanied only by a linked record gives the reader a stamp and nothing to check, which forces the reader into `logs/` and defeats note.md's purpose. The dividing line between note.md as a paper seed and note.md as an index is exactly this: derivations live in the note, not behind the record.
 
 **Scope of "derivation".** What counts satisfies one of:
 - *Inline derivation* — a proof sketch, symbolic / numerical computation with its setup and conclusion, or worked-out argument. Full textbook detail is not required; what is required is that a reader in a neighbouring field can follow the logical chain from premises to conclusion without leaving note.md (modulo Markdown links to concept notes or sibling nodes that supply definitions, referenced lemmas, or derivations covered at another node).
-- *Cited external result* — when the claim is a result from external literature used as a premise, cite the source (with section / theorem number where reasonable) in the note itself. The citation *is* the derivation pointer, and the tag set will then include `[literature]`. This route is acceptable for results the project *uses*; it is **not** acceptable for project-central claims (those this project is staking as its own contribution) — project-central claims must carry an inline derivation.
+- *Cited external result* — when the claim is a result from external literature used as a premise, cite the source (with section / theorem number where reasonable) in the note itself. The citation *is* the derivation pointer, and the linked provenance record will include `evidence: [literature]`. This route is acceptable for results the project *uses*; it is **not** acceptable for project-central claims (those this project is staking as its own contribution) — project-central claims must carry an inline derivation.
 
 **All confidence levels carry derivation, not only CONFIRMED.** STRONG CONJECTURE, CONJECTURE, and OPEN claims that appear in note.md carry the partial argument, special-case verification, or motivating evidence that *is* available — with explicit scope — rather than being stated as bare tagged sentences. An OPEN claim appears in note.md only when its formulation is itself established knowledge (i.e., the node knows *what* the question is and *why* it is the right question); the answer being unknown is stated, but the framing is substance.
 
@@ -77,15 +114,16 @@ This audience, combined with the derivation-bearing requirement, is the file's s
 **Content rules (enforced on every curator dispatch):**
 
 1. *No frontmatter* — SoT files are clean prose.
-2. *Derivation or citation for every principal claim* — per "Scope of derivation" above. A claim stated with a provenance tag but without an inline derivation or a cited source is incomplete and must be completed or demoted before the dispatch closes.
-3. *Provenance tag alongside every principal claim* — per the Verification Provenance Taxonomy below. The tag summarises the verification chain; it does not replace the derivation required by rule 2.
-4. *No chronology, no process-status phrasing.* The rule excludes **session history** from note.md, not **substance**. A proof, a symbolic computation with its setup and conclusion, or a worked-out argument is the content of a claim; rule 2 requires it to be there. What rule 4 rules out is the state of the investigation — dated status blocks (`Status update YYYY-MM-DD`, `Progress 2026-…`), Current-State / Evidence sections copied from log.md, cycle references (`r2`, `r3 stage`, `latest cycle`), review-state markers (`critic pending`, `REVISE minor`, `awaiting resubmission`), and workflow words (`resubmission`, `previous attempt`). These decay on the next cycle; the confidence information they try to convey is exactly what the provenance tag encodes. Write the derivation in timeless prose and let the tag carry confidence. Conflating substance with session history — treating a derivation as a "process artifact" and stripping it — produces the failure mode this whole section is written to prevent.
+2. *Derivation or citation for every principal claim* — per "Scope of derivation" above. A claim stated with a provenance reference but without an inline derivation or a cited source is incomplete and must be completed or demoted before the dispatch closes.
+3. *Provenance link alongside every principal claim* — per the Verification Provenance Records section below. The link points to the `checks/*.md` record that summarises the verification chain in front matter and explains it in prose; it does not replace the derivation required by rule 2.
+4. *No chronology, no process-status phrasing.* The rule excludes **session history** from note.md, not **substance**. A proof, a symbolic computation with its setup and conclusion, or a worked-out argument is the content of a claim; rule 2 requires it to be there. What rule 4 rules out is the state of the investigation — dated status blocks (`Status update YYYY-MM-DD`, `Progress 2026-…`), Current-State / Evidence sections copied from log.md, cycle references (`r2`, `r3 stage`, `latest cycle`), review-state markers (`critic pending`, `REVISE minor`, `awaiting resubmission`), and workflow words (`resubmission`, `previous attempt`). These decay on the next cycle; the confidence information they try to convey is exactly what the linked provenance record encodes. Write the derivation in timeless prose and let the link carry the reader to verification metadata. Conflating substance with session history — treating a derivation as a "process artifact" and stripping it — produces the failure mode this whole section is written to prevent.
 5. *No undefined project-internal labels* — ad-hoc identifiers that index items in a working list but have no stable definition elsewhere (e.g., open-question IDs, informal candidate/hypothesis tags, attempt slugs, cycle references) may appear only if they are either (a) introduced with a one-sentence explanation where first used, or (b) replaced by a self-contained description. Preferably just describe the thing in plain prose. A reader should never have to grep the repo to learn what an internal label means.
 6. *Every non-common technical term is gated* — for each term that a reader in a neighbouring field would not immediately recognise, use one of two gates:
    - *Markdown link*: `[display text](relative/path.md)` or `[display text](<relative/path with spaces.md>)` pointing to a concept note in `concepts/` or a sibling/ancestor node's note.md. Link targets are relative to the file containing the link. Follow the link to verify it resolves.
    - *Inline definition*: one sentence introducing the term before it is used.
    
    When in doubt, link; create a concept note in `concepts/` if one does not yet exist (see the curator agent's Knowledge Base Maintenance section).
+7. *Every load-bearing convention is either stated or linked* — if a claim depends on a nonstandard notation, sign, order, normalization, or symbol reservation, note.md must either state the convention before use or link to the applicable `conventions.md` entry. Do not rely on a convention being "known from earlier attempts" or buried in log.md. This rule is the convention analogue of rule 6: technical terms need definitions; symbolic choices need convention anchors.
 
 *How rules 5 and 6 divide the work*: rule 5 targets *labels* (no stable definition exists to link to, so the cleanest fix is to describe the thing in prose); rule 6 targets *technical vocabulary* (a stable definition exists or should exist, so the cleanest fix is to link to a concept note).
 
@@ -97,10 +135,10 @@ This audience, combined with the derivation-bearing requirement, is the file's s
 
 **Ownership — note.md is curator-authored.** This is the one file in the tree whose prose is written by curator. In the `/run` model, research judgment is split across three agents — physicist (direction, owns `research/focus.md`), curator (tree writes, owns every file under `research/**` except `research/focus.md` and curator-dispatched critic Target B review files under `checks/`), critic (auto-attached review). note.md is curator's deepest responsibility: the split exists because note.md demands cognitive modes that would otherwise compete with active research for attention:
 
-- **Derivation lifting and tag assignment (curator's core task)**: each principal claim in note.md carries its derivation *and* an axis 1 + axis 2-a + axis 2-b + (optional) axis 3 tag. Lifting the derivation into paper-quality prose and then assigning the tag correctly both require re-reading the underlying worker deliverables, report_*.md, and critic reports to reconstruct what was actually shown — including identifying the right level of detail to preserve in note.md vs. defer to a Markdown link. Tag assignment alone — attaching stamps to bare claim sentences — is the degenerate form § note.md — Source of Truth rules out; curator's mandate is the harder lift of writing the derivation into the note
+- **Derivation lifting and provenance linking (curator's core task)**: each principal claim in note.md carries its derivation *and* a Markdown link to a node-local `checks/*.md` record whose front matter contains confidence, first-order evidence, independent review, and optional scope. Lifting the derivation into paper-quality prose and then writing/linking the record correctly both require re-reading the underlying worker deliverables, report_*.md, and critic reports to reconstruct what was actually shown — including identifying the right level of detail to preserve in note.md vs. defer to a Markdown link. Provenance linking alone — attaching stamps to bare claim sentences — is the degenerate form § note.md — Source of Truth rules out; curator's mandate is the harder lift of writing the derivation into the note
 - **Separation of concerns**: physicist's attention during `/run` is on direction — what question matters next, whether the story holds together. Lifting verified evidence *with its derivation* into publication-quality prose is a different cognitive mode; combining it with direction-setting reliably starves synthesis under research load. Giving note.md a dedicated author (curator, auto-dispatched every cycle) prevents that drop
 - **Second-reader quality**: The agent who produced a result is anchored by the deliverable they wrote and is a poor judge of whether the prose reads cleanly to someone unfamiliar with the research process. note.md's promise is exactly that it reads cleanly to such a reader, with the derivation checkable in isolation, so the author should be a second reader — curator, coming to the evidence fresh
-- **Cross-tree coherence**: note.md at one node must harmonize with note.md at sibling and ancestor nodes (consistent terminology, valid Markdown links, referenced concept notes, derivations that compose across node boundaries). This requires reading the tree holistically, which physicist does not do during cycles — physicist's reading scope is the ancestor spine plus direct children. Curator reads the whole tree by design
+- **Cross-tree coherence**: note.md at one node must harmonize with note.md at sibling and ancestor nodes (consistent terminology and notation, valid Markdown links, referenced concept notes and convention entries, derivations that compose across node boundaries). This requires reading the tree holistically, which physicist does not do during cycles — physicist's reading scope is the ancestor spine plus direct children. Curator reads the whole tree by design
 
 Curator's role with respect to note.md: every cycle, read worker deliverables and their critic verdicts together with physicist's tree directives, append Evidence to log.md, promote verified results into `report_{slug}.md` when physicist directs, preserve durable verification records in `checks/`, and — when a node accumulates CONFIRMED / STRONG CONJECTURE claims with derivations — lift those derivations (not just claims) into note.md at paper quality. Physicist never writes note.md directly; physicist's directives live in `research/focus.md § Tree Directives` and curator executes them.
 
@@ -109,7 +147,7 @@ Two narrow exceptions to curator-only note.md authorship (for any agent, not onl
 1. **Trivial mechanical fixes.** Typo corrections, fixing a broken Markdown link, renaming a term after a concept note is renamed. The rule of thumb: if the replacement is uniquely determined — any competent reader would produce the same correction, with no judgment about phrasing or structure — the edit is mechanical. If there is any judgment about wording, ordering, or what claim to state, it is not mechanical and must go through curator
 2. **User-present collaborative rewrites (`/meeting`, `/launch`).** When the user is actively collaborating — during a meeting discussion, or during the initial project launch — the main agent and user may rewrite note.md together to reflect synthesis produced in the conversation. These skills explicitly treat note.md as the destination for human-in-the-loop narrative decisions. The user acts as the second reader in real time, which is what curator otherwise provides; so the curator-only rule does not bind
 
-Anything beyond these two categories — adding a section, rewording a claim, updating a provenance tag, restructuring prose, inserting a "status update" block — goes through curator. The critic Target B exception is only for separate `checks/` review files, never for note.md prose. A note.md edit written by another channel (e.g., a mistaken direct edit during a fast-paced cycle, or a legacy accretion from an earlier process model) is legitimate input to the tree, but curator will rewrite it on the next dispatch to restore SoT quality.
+Anything beyond these two categories — adding a section, rewording a claim, updating a provenance link, restructuring prose, inserting a "status update" block — goes through curator. The critic Target B exception is only for separate `checks/` review files, never for note.md prose. A note.md edit written by another channel (e.g., a mistaken direct edit during a fast-paced cycle, or a legacy accretion from an earlier process model) is legitimate input to the tree, but curator will rewrite it on the next dispatch to restore SoT quality.
 
 This rule has a failure mode to watch for: note.md drifting into a log-like chronicle with time-stamped "Status update YYYY-MM-DD" sections stacked on top of each other. That shape is the footprint of non-curator appending and signals that curator dispatches have been skipped; the next curator run should consolidate such stacks into a single, present-tense statement of the node's established knowledge.
 
@@ -126,96 +164,127 @@ The maintenance chain is therefore:
 5. Curator applies the critic's findings (fixing the note.md prose, not annotating it in place — note.md is publication-quality prose, so critic writes findings to a separate file under `checks/` that curator consumes; see the critic and curator agents)
 6. Over repeated maintenance cycles, this layers multiple critic passes over the same note.md section. That accretion is the mechanism by which note.md earns its property of surviving many critic eyes
 
-Curator composes each such review into the affected claims' provenance tags (adding `[critic-blind]` or `[critic-contextual]` when appropriate). A claim whose **note.md-level** derivation has been critic-reviewed carries a tag that reflects *this* review layer, distinct from whatever review the upstream attempt already had. Over time this produces note.md prose whose derivations have been re-examined in their published form, which is exactly what a paper seed requires.
+Curator composes each such review into the affected claims' linked provenance records (adding the appropriate review channel to the record's front matter and preserving the critic file in `checks/`). A claim whose **note.md-level** derivation has been critic-reviewed links to a record that reflects *this* review layer, distinct from whatever review the upstream attempt already had. Over time this produces note.md prose whose derivations have been re-examined in their published form, which is exactly what a paper seed requires.
 
 This layering is not optional decoration — when a note.md carries substantive new derivations (not just prose polish on an already-reviewed derivation), a note.md-level critic pass is part of closing the dispatch. Skipping it reproduces the failure mode the whole "derivation-bearing SoT" design is meant to prevent.
 
 ### `checks/` — Node-local verification record
 
-`checks/` is the node's durable verification ledger. It exists because `logs/` is a chronological workbench: useful for reconstructing what happened, but the research tree is intended to be clean and self-contained without routine archaeology through session notebooks. When a verification result is important enough to justify a provenance tag on note.md or report_*.md, the review artifact a reader may inspect should live with the node.
+`checks/` is the node's durable verification ledger. It exists because `logs/` is a chronological workbench: useful for reconstructing what happened, but the research tree is intended to be clean and self-contained without routine archaeology through session notebooks. When a verification result is important enough to justify a provenance reference on note.md or report_*.md, the review artifact a reader may inspect should live with the node.
 
 Typical contents:
 - `critic_note_{slug}_{YYMMDD_HHMM}.md` — critic Target B reviews of note.md sections, written as separate files so note.md stays publication-quality prose
 - `check_{slug}.md` — curator-written reproducibility summaries for scripts / computations that support a promoted claim, with links to the relevant `src/`, `data/`, or `images/` artifacts and the exact claim checked
 
-What belongs here is verification substance, not process chronology. A `checks/` file states the target claim, the method, the result, scope restrictions, and tag contribution. It may cite raw `logs/` notebooks as provenance, but it must not require the reader to open them to know what was checked. Conversely, `checks/` is not a loophole around note.md self-containment: note.md still carries the derivation or cited external result. `checks/` records how that derivation was reviewed or reproduced.
+What belongs here is verification substance, not process chronology. A `checks/` file states the target claim, the method, the result, scope restrictions, and provenance contribution. It may cite raw `logs/` notebooks as provenance, but it must not require the reader to open them to know what was checked. Conversely, `checks/` is not a loophole around note.md self-containment: note.md still carries the derivation or cited external result. `checks/` records how that derivation was reviewed or reproduced.
 
 **When to create**: when a note.md-level critic pass runs, when a mechanical / numerical check supports a promoted claim, or when a report_*.md needs a stable review record that should survive outside the chronological `logs/` stream.
 
 **Naming**: descriptive, lowercase-ish slugs with the check type first, e.g. `critic_note_surface_dispersion_260430_1430.md`, `check_sign_convention.md`. Timestamp Target B critic files so repeated review layers do not overwrite each other.
 
-## Verification Provenance Taxonomy
+## Verification Provenance Records
 
-Claims in note.md (and report_{slug}.md) carry an explicit verification tag so readers can assess **how** each fact was established, **whether it has been independently reviewed**, and **at what scope**. The tag decomposes into orthogonal axes. The purpose is to prevent a single "verified" label from collapsing distinct kinds of evidence (symbolic computation, literature citation, independent critique, small-instance checks) into one opaque stamp.
+Claims in note.md (and report_{slug}.md) carry a **Markdown link** to a node-local `checks/*.md` record so readers can assess **how** each fact was established, **whether it has been independently reviewed**, and **at what scope**. The metadata lives in YAML front matter at the top of the linked check file; the note.md prose remains ordinary Markdown rather than acquiring a project-specific inline tag syntax.
 
-**Tags accompany, not replace, the derivation.** Every claim carrying a tag in note.md must also carry the derivation that supports it (inline or cited — see § note.md — Source of Truth, "Scope of derivation"). The tag summarises the verification chain so a reader can decide how much trust to invest; the derivation is what the reader actually checks. A tagged claim without an accompanying derivation is the failure mode the whole § note.md — Source of Truth is written to prevent, and no refinement of the tag set repairs it.
+**Why links plus front matter.** Verification metadata is structured data about a claim, not part of the mathematical sentence itself. YAML front matter is a widely used Markdown convention for document metadata; keeping the axes there makes them machine-readable and keeps note.md publication-quality. The inline surface should therefore be a normal link such as `[verification](checks/check_projector_identity.md)`, while the target file carries the confidence/evidence/review/scope fields.
 
-### Axis 1 — Confidence
+**Records accompany, not replace, the derivation.** Every claim linking to a provenance record in note.md must also carry the derivation that supports it (inline or cited — see § note.md — Source of Truth, "Scope of derivation"). The record summarises the verification chain so a reader can decide how much trust to invest; the derivation is what the reader actually checks. A linked claim without an accompanying derivation is the failure mode the whole § note.md — Source of Truth is written to prevent, and no refinement of the record schema repairs it.
 
-| Tag | Meaning |
+### Front Matter Schema
+
+Every `checks/*.md` file that supports a note.md or report_{slug}.md claim starts with YAML front matter of this shape:
+
+```yaml
+---
+claim: "projector identity"
+claim_path: "../note.md#optional-heading-or-claim-anchor"
+confidence: confirmed
+evidence:
+  - proof
+  - mechanical
+review:
+  - critic-blind
+scope: full
+supports_project_central_claim: true
+---
+```
+
+Fields:
+
+| Field | Meaning |
 |---|---|
-| `CONFIRMED` | Verified with no known counterexamples. Publishable as stated |
-| `STRONG CONJECTURE` | Substantial partial evidence; holds in principal cases but full scope is not closed |
-| `CONJECTURE` | Motivated and locally supported, but not sufficiently verified |
-| `OPEN` | Unresolved |
+| `claim` | Short identifier for the claim being certified; enough to disambiguate within the node |
+| `claim_path` | Relative Markdown link target to the note.md/report location whose claim this record supports |
+| `confidence` | One of `confirmed`, `strong-conjecture`, `conjecture`, `open` |
+| `evidence` | First-order evidence channels: `proof`, `mechanical`, `numerical`, `literature`. One or more when multiple derivations agree |
+| `review` | Independent review channels: `critic-blind`, `critic-contextual`. Empty list if no independent review has been accepted |
+| `scope` | `full` when the full declared scope is verified, otherwise a concrete description of the restricted instance |
+| `supports_project_central_claim` | `true` when the project is staking this claim as its own contribution; `false` for external results cited as premises |
 
-### Axis 2-a — First-order evidence (how the claim was actually established; one or more)
+The body of the check file then explains the same metadata in prose: target claim, method, result, scope restrictions, links to scripts/data/literature, and the critic or curator judgment. Front matter is the index; the body is the inspectable record.
+
+### Confidence
+
+| Value | Meaning |
+|---|---|
+| `confirmed` | Verified with no known counterexamples. Publishable as stated |
+| `strong-conjecture` | Substantial partial evidence; holds in principal cases but full scope is not closed |
+| `conjecture` | Motivated and locally supported, but not sufficiently verified |
+| `open` | Unresolved |
+
+### First-Order Evidence
 
 These describe the **evidence chain itself**. A claim may rest on more than one when multiple derivations agree.
 
-| Tag | Meaning |
+| Value | Meaning |
 |---|---|
-| `[proof]` | Formal mathematical proof — hand-checked or machine-checked derivation closing the claim at its declared scope |
-| `[mechanical]` | Symbolic / exact computation (SymPy, SageMath, exact enumeration). Computer output is unaffected by LLM reasoning biases |
-| `[numerical]` | Finite-tolerance numerical check with stated convergence criteria |
-| `[literature]` | Established in cited external literature. Being cited as a premise — not yet independently re-derived in this project |
+| `proof` | Formal mathematical proof — hand-checked or machine-checked derivation closing the claim at its declared scope |
+| `mechanical` | Symbolic / exact computation (SymPy, SageMath, exact enumeration). Computer output is unaffected by LLM reasoning biases |
+| `numerical` | Finite-tolerance numerical check with stated convergence criteria |
+| `literature` | Established in cited external literature. Being cited as a premise — not yet independently re-derived in this project |
 
-### Axis 2-b — Independent review (orthogonal to 2-a; whether the evidence has been adversarially critiqued)
+### Independent Review
 
-These describe **who checked the evidence**. Independent review **composes with** first-order evidence — it does not substitute for it. `[critic-*]` alone cannot support CONFIRMED (see Rules). A claim with both `[proof]` and `[critic-blind]` is strictly stronger than either alone, because the proof has been subjected to adversarial scrutiny by an independent channel. Likewise `[literature, critic-blind]` records that a cited result was not just taken on faith but was re-examined by an independent critic for whether it actually supports the use being made of it.
+These describe **who checked the evidence**. Independent review **composes with** first-order evidence — it does not substitute for it. A record with `review: [critic-blind]` and no first-order `evidence` cannot support `confidence: confirmed` (see Rules). A claim with both `evidence: [proof]` and `review: [critic-blind]` is strictly stronger than either alone, because the proof has been subjected to adversarial scrutiny by an independent channel. Likewise `evidence: [literature]` plus `review: [critic-blind]` records that a cited result was not just taken on faith but was re-examined by an independent critic for whether it actually supports the use being made of it.
 
-| Tag | Meaning |
+| Value | Meaning |
 |---|---|
-| `[critic-blind]` | Independent adversarial critique by the critic agent in **blind mode** (no research context loaded). Removes expectation bias. The strongest review tier when the claim is mechanical or self-contained |
-| `[critic-contextual]` | Critic agent in **contextual mode** (ancestor chain loaded). Used when soundness genuinely depends on the claim's role in the overall narrative — e.g., "does this argument suffice for its intended position in the story?" |
+| `critic-blind` | Independent adversarial critique by the critic agent in **blind mode** (no research context loaded). Removes expectation bias. The strongest review tier when the claim is mechanical or self-contained |
+| `critic-contextual` | Critic agent in **contextual mode** (ancestor chain loaded). Used when soundness genuinely depends on the claim's role in the overall narrative — e.g., "does this argument suffice for its intended position in the story?" |
 
-When critic runs its own SymPy/numerical computation during review, that adds a first-order tag too — e.g., `[mechanical, critic-blind]`. A standalone `[critic-*]` tag (no axis 2-a) is rare — it indicates the critic's evidence was purely logical (just a soundness review of the researcher's argument structure) — and per the rules below such a standalone tag can attach only to labels at or below STRONG CONJECTURE.
+When critic runs its own SymPy/numerical computation during review, that adds first-order evidence too — e.g., `evidence: [mechanical]` plus `review: [critic-blind]`. A standalone review channel with no first-order evidence is rare — it indicates the critic's evidence was purely logical (just a soundness review of the researcher's argument structure) — and per the rules below such a record can attach only to confidence levels at or below `strong-conjecture`.
 
-### Axis 3 — Scope marker (optional; restricts the verified region)
+### Scope
 
-By default the claim is taken to be verified over its **full declared scope**. When that is not the case, attach an explicit scope marker — never leave scope implicit. A bare `[special-case]` without description is forbidden because readers cannot otherwise evaluate what was covered.
-
-| Marker | Meaning |
-|---|---|
-| `[special-case: {description}]` | Verified only on a restricted instance. The description must identify the instance — e.g., `[special-case: smallest parameter value]`, `[special-case: one concrete example]`, `[special-case: a specific boundary condition]` |
+By default `scope: full` means the claim is verified over its **full declared scope**. When that is not the case, write a concrete scope description — never leave scope implicit. A vague value such as `scope: special-case` is forbidden because readers cannot otherwise evaluate what was covered.
 
 ### Rules
 
-- Every `CONFIRMED` must carry at least one axis 2-a tag. Bare "CONFIRMED" with no first-order evidence is forbidden because readers cannot then evaluate the claim. An axis 2-b tag alone does not count as first-order evidence
-- Axis 2-a and 2-b tags compose freely when both apply (e.g., `[proof, critic-blind]`, `[literature, critic-contextual]`, `[mechanical, numerical, critic-blind]`). Always declare every applicable tag — omitting a true channel understates the verification chain
-- A claim tagged with `[special-case: ...]` **cannot** be elevated to CONFIRMED — the strongest allowed label is `STRONG CONJECTURE`, because full-scope verification is missing by definition
-- `[literature]` alone (no independent review, no local re-derivation) does not suffice for **project-central claims** — meaning a claim this project is staking out as its own contribution, as opposed to a premise cited from external work. (A citation-only `CONFIRMED [literature]` is fine when the claim is explicitly framed as the external result itself — e.g., "Theorem X of {Author et al.} holds" — and no project contribution is being attested.) To reach CONFIRMED on a project-central claim, pair `[literature]` with an independent channel: either a first-order re-derivation (`[proof]`, `[mechanical]`, `[numerical]`) or an independent review (`[critic-blind]` / `[critic-contextual]`) that examined the citation's applicability to the specific use being made of it
-- If provenance is unclear from the available documents, use the lower confidence label and flag back to physicist rather than guessing
+- Every `confidence: confirmed` record must carry at least one first-order `evidence` value. Bare confirmation with no first-order evidence is forbidden because readers cannot then evaluate the claim. A `review` value alone does not count as first-order evidence
+- Evidence and review channels compose freely when both apply. Always declare every applicable channel — omitting a true channel understates the verification chain
+- A record whose `scope` is not `full` **cannot** use `confidence: confirmed` — the strongest allowed value is `strong-conjecture`, because full-scope verification is missing by definition
+- `evidence: [literature]` alone (no independent review, no local re-derivation) does not suffice for **project-central claims** — meaning a claim this project is staking out as its own contribution, as opposed to a premise cited from external work. A citation-only record with `confidence: confirmed`, `evidence: [literature]`, and `supports_project_central_claim: false` is fine when the claim is explicitly framed as the external result itself — e.g., "Theorem X of {Author et al.} holds" — and no project contribution is being attested. To reach `confirmed` on a project-central claim, pair `literature` with an independent channel: either a first-order re-derivation (`proof`, `mechanical`, `numerical`) or an independent review (`critic-blind` / `critic-contextual`) that examined the citation's applicability to the specific use being made of it
+- If provenance is unclear from the available documents, use the lower confidence value and flag back to physicist rather than guessing
 
-### Strength guide (informal)
+### Strength Guide (informal)
 
-Strength grows monotonically along two directions: (i) more axis 2-a tags when independent channels agree, (ii) addition of axis 2-b review on top of axis 2-a. Rough ordering of individual contributions — `[proof]` is the strongest single first-order tag; `[mechanical]` and `[critic-blind]` are comparably strong second tiers; `[numerical]` below those; `[literature]` alone is weakest as first-order support for project claims. `[critic-contextual]` adds a soundness check but does not by itself close a mechanical question. Any `[special-case: ...]` marker weakens the combined label by restricting the verified region.
+Strength grows monotonically along two directions: (i) more first-order evidence channels when independent channels agree, (ii) addition of independent review on top of first-order evidence. Rough ordering of individual contributions — `proof` is the strongest single first-order channel; `mechanical` and `critic-blind` are comparably strong second tiers; `numerical` below those; `literature` alone is weakest as first-order support for project claims. `critic-contextual` adds a soundness check but does not by itself close a mechanical question. Any non-`full` scope weakens the combined record by restricting the verified region.
 
 ### Examples (illustrative shapes)
 
-These are shape-examples showing how the tag slots compose; the specific claims are illustrative, not tied to any particular project.
+These are shape-examples showing how the record fields compose; the specific claims are illustrative, not tied to any particular project.
 
-| Claim shape | Label |
+| Claim shape | Linked record front matter |
 |---|---|
-| A project-central algebraic identity with a hand proof that a critic then re-verified by running an independent symbolic script in blind mode | `CONFIRMED [proof, mechanical, critic-blind]` (the critic's own symbolic run contributes `[mechanical]`; the hand proof contributes `[proof]`; the review channel contributes `[critic-blind]`) |
-| A structural lemma derived by hand and independently read by critic with ancestor context loaded | `CONFIRMED [proof, critic-contextual]` (proof plus soundness check by critic reading the surrounding argument) |
-| An explicit matrix or closed-form expression checked by the researcher's symbolic script and re-verified by the critic's independent blind symbolic script | `CONFIRMED [mechanical, critic-blind]` |
-| A cited external theorem used as-is, not re-derived here — framed as citing the external result itself, not as a project contribution | `CONFIRMED [literature]` (the `[literature]`-alone rule does not bite for non-project-central citations; if the same statement were being staked as this project's own contribution, the strongest allowed label would be STRONG CONJECTURE until independently reviewed or re-derived) |
-| A dictionary/identification between an external result and this project's own objects, where critic has reviewed coherence but full re-derivation is pending | `STRONG CONJECTURE [literature, critic-contextual]` |
-| A counting/dimension claim established symbolically only on the smallest parameter instance | `STRONG CONJECTURE [mechanical, special-case: {smallest instance description}]` |
-| A structural separation tested on one small concrete example | `STRONG CONJECTURE [mechanical, special-case: {concrete example description}]` |
-| A numerical agreement with prediction on a specific parameter choice, checked by critic in blind mode | `STRONG CONJECTURE [numerical, critic-blind, special-case: {parameter choice}]` |
-| The same claim extended to the full declared scope, not yet verified | `OPEN` |
+| A project-central algebraic identity with a hand proof that a critic then re-verified by running an independent symbolic script in blind mode | `confidence: confirmed`; `evidence: [proof, mechanical]`; `review: [critic-blind]`; `scope: full` |
+| A structural lemma derived by hand and independently read by critic with ancestor context loaded | `confidence: confirmed`; `evidence: [proof]`; `review: [critic-contextual]`; `scope: full` |
+| An explicit matrix or closed-form expression checked by the researcher's symbolic script and re-verified by the critic's independent blind symbolic script | `confidence: confirmed`; `evidence: [mechanical]`; `review: [critic-blind]`; `scope: full` |
+| A cited external theorem used as-is, not re-derived here — framed as citing the external result itself, not as a project contribution | `confidence: confirmed`; `evidence: [literature]`; `review: []`; `supports_project_central_claim: false` |
+| A dictionary/identification between an external result and this project's own objects, where critic has reviewed coherence but full re-derivation is pending | `confidence: strong-conjecture`; `evidence: [literature]`; `review: [critic-contextual]`; `scope: full` |
+| A counting/dimension claim established symbolically only on the smallest parameter instance | `confidence: strong-conjecture`; `evidence: [mechanical]`; `review: []`; `scope: "smallest parameter instance"` |
+| A structural separation tested on one small concrete example | `confidence: strong-conjecture`; `evidence: [mechanical]`; `review: []`; `scope: "one concrete example"` |
+| A numerical agreement with prediction on a specific parameter choice, checked by critic in blind mode | `confidence: strong-conjecture`; `evidence: [numerical]`; `review: [critic-blind]`; `scope: "specific parameter choice"` |
+| The same claim extended to the full declared scope, not yet verified | `confidence: open`; `evidence: []`; `review: []`; `scope: full` |
 
 ## report_{slug}.md — Promoted Verified Reports
 
@@ -278,6 +347,7 @@ research/
   focus.md            (session cursor: "work here now")
   story.md             (paper narrative structure)
   principles.md        (cross-cutting research constraints)
+  conventions.md       (project-wide notation and convention ledger)
   dead_ends.md         (rejected-direction register — off-SoT)
   asides.md            (parked off-thread items — off-SoT)
   lib/                 (shared simulation framework — engine-builder manages)
@@ -317,12 +387,13 @@ research/
 
 | Layer | Location | Worker access | What it contains |
 |---|---|---|---|
-| **Research tree — SoT** | `research/**/note.md` | Read-only | Derivation-bearing verified knowledge — claim + derivation + provenance tag, free-form prose written to paper quality (the paper's substance) |
+| **Research tree — SoT** | `research/**/note.md` | Read-only | Derivation-bearing verified knowledge — claim + derivation + Markdown provenance link, free-form prose written to paper quality (the paper's substance) |
 | **Research tree — reports** | `research/**/report_*.md` | Read-only | Self-contained analyses promoted from worker deliverables in `logs/` after critic acceptance |
-| **Research tree — checks** | `research/**/checks/*.md` | Read-only, except curator and critic Target B | Node-local verification records: note.md critic reviews, reproducibility summaries, and check results supporting provenance tags |
+| **Research tree — checks** | `research/**/checks/*.md` | Read-only, except curator and critic Target B | Node-local verification records with YAML front matter: note.md critic reviews, reproducibility summaries, and check results supporting provenance links |
 | **Research tree — plan** | `research/**/plan.md` | Read-only | Strategy: decomposition rationale, approach decisions, children's roles |
 | **Research tree — log** | `research/**/log.md` | Read-only | Process: current state, evidence chain, kind/status |
-| **Concept definitions** | `concepts/` | Read-only (concept-checker may create entries) | Atomic term definitions, linked from any file via explicit Markdown links |
+| **Convention ledger** | `research/**/conventions.md` | Read-only | Current notation, sign, ordering, normalization, and symbol-reservation choices, scoped to the node/subtree |
+| **Concept definitions** | `concepts/` | Read-only (concept-checker and curator may create/update entries) | Atomic term definitions, linked from any file via explicit Markdown links |
 | **Computation — framework** | `research/lib/` | Read-only (engine-builder writes) | Shared simulation modules |
 | **Computation — source** | `research/**/src/` | Write (simulator, researcher) | Source code tied to a node: measurement / analysis / plot / verification scripts, each with a companion `{slug}.md` |
 | **Computation — data** | `research/**/data/` | Write (simulator) | Simulation data (TSV with metadata headers) |
@@ -331,10 +402,10 @@ research/
 | **Session cursor** | `research/focus.md` | Not relevant to workers | Physicist's current focus position in the tree |
 | **Session context** | `logs/last_session.md` | Not relevant to workers | Volatile work context for session handoff, written by session-wrap-up |
 
-**Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `report_*.md` for verified analyses, `checks/` for node-local verification records, `plan.md` for strategy and decomposition, `log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints.
+**Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `report_*.md` for verified analyses, `checks/` for node-local verification records, `plan.md` for strategy and decomposition, `log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints, and `conventions.md` for notation / convention choices.
 
 Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status is set by curator, based on physicist's Tree Directives and evidence accumulated in log.md (see `{{ runtime.agents_dir }}/curator.md` and `{{ runtime.agents_dir }}/physicist.md`).
 
-- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — node folders, `log.md`, `plan.md`, `dead_ends.md`, `asides.md`, `report_*.md`, `checks/`, `note.md`, `story.md`, and `principles.md` — executing physicist's directives plus its own default operating rules (including splitting overloaded nodes when the evidence record has outgrown the parent scope; see § note.md — Ownership and curator.md); **critic** may write only curator-dispatched Target B review files under `research/**/checks/`; simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
+- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — node folders, `log.md`, `plan.md`, `dead_ends.md`, `asides.md`, `report_*.md`, `checks/`, `note.md`, `story.md`, `principles.md`, and `conventions.md` — executing physicist's directives plus its own default operating rules (including splitting overloaded nodes when the evidence record has outgrown the parent scope; see § note.md — Ownership and curator.md); **critic** may write only curator-dispatched Target B review files under `research/**/checks/`; simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified

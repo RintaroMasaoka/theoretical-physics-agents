@@ -25,7 +25,7 @@ The system uses different orchestration models in `/run` and `/write`.
 | Role | Agent | Owns |
 |---|---|---|
 | **Direction** | `physicist` | `research/focus.md` — chooses cursor, formulates worker dispatches, issues tree directives. Thinks as a physicist (curiosity + critical thinking + narrative coherence) |
-| **Record** | `curator` | All tree writes: `log.md`, `plan.md`, `note.md`, `dead_ends.md`, `report_*.md`, `story.md`, `principles.md`. Executes physicist's tree directives and absorbs worker evidence |
+| **Record** | `curator` | All tree writes: `log.md`, `plan.md`, `note.md`, `conventions.md`, `dead_ends.md`, `report_*.md`, `story.md`, `principles.md`. Executes physicist's tree directives and absorbs worker evidence |
 | **Verification** | `critic` | Independent review of every worker deliverable (Target A, auto-attached by the scheduler) and of every curator-lifted note.md derivation (Target B) |
 | **Execution** | workers (researcher, simulator, reader, scout, engine-builder, concept-checker, self-check) | Bounded tasks — their deliverables stay provisional until critic has verified them |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of physicist's session-end wrap-up input into `research/focus.md`, `logs/last_session.md`, and the session log; commits and pushes |
@@ -45,7 +45,7 @@ The human researcher is the collaborator for both skills — sets direction via 
 
 ## Operational Rules
 
-- Do not request user input during `/run` or `/write` execution (all forms prohibited, including AskUserQuestion and tool permission requests). Users are often away during execution, and prompting them interrupts the session and wastes time
+- Do not request user input during `/run` or `/write` execution (all forms prohibited, including {{ runtime.tool_ask_user_question }} and tool permission requests). Users are often away during execution, and prompting them interrupts the session and wastes time
 - `/meeting` and `/improve` are the venues for user interaction
 - No writing outside the project directory (to prevent contaminating the user's environment)
 - Do not pollute the global environment (to prevent interference with other projects and loss of reproducibility)

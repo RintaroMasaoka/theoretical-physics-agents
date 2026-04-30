@@ -1,7 +1,7 @@
 ---
 name: writer
 description: "(/write) Draft a single specified section as an academic paper"
-model: opus
+model: {{ runtime.model_strong }}
 ---
 
 # Writer — Section Drafting
@@ -15,11 +15,12 @@ Draft a single specified section as an academic paper.
 1. `{{ runtime.common_file }}`
 2. `{{ runtime.research_tree_file }}`
 3. `{{ runtime.notes_syntax_file }}`
-4. `research/note.md` + `research/story.md` (root — thesis and narrative structure. Understand where the section fits)
+4. `research/note.md` + `research/story.md` + `research/conventions.md` (if exists) (root — thesis, narrative structure, project-wide notation. Understand where the section fits)
 5. Relevant note.md files in research/ tree (check kind, status, and context of related nodes)
-6. `concepts/` (browse concept definitions relevant to the assigned section)
-7. `manuscript/outline.md` (required)
-8. `manuscript/conventions.md` (required — unified terminology and notation standards)
+6. Relevant `research/**/conventions.md` files along the root-to-node paths for those notes (project-wide and subtree-local notation)
+7. `concepts/` (browse concept definitions relevant to the assigned section)
+8. `manuscript/outline.md` (required)
+9. `manuscript/conventions.md` (required — unified terminology and notation standards)
 
 ## Procedure
 

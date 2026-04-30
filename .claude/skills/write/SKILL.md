@@ -11,10 +11,10 @@ Draft research findings as an academic paper. The responsibility is to shape the
 ## Constraints
 
 - **Write PI-authored prose in japanese.** Scope: session records (`logs/{timestamp}_write.md`, `logs/last_write_session.md`), `agenda.md`, and the final report. `/write` does not modify `research/`. The manuscript (`manuscript/**`) is out of scope of this rule — it follows the paper's publication language as realised by outliner/writer (whatever language those agents emit in `manuscript/outline.md` and `manuscript/sections/*.md` is the manuscript's language; PI matches it rather than translating). Reason: `japanese` is for internal project communication; the paper is an external artifact with its own audience. Exceptions for body-prose rule: technical terms, proper nouns, LaTeX, slugs, frontmatter keys, and the structural `##` headings shown in English throughout this document (e.g., `## Accomplished`, `## Section Status`, `## Issues`) may stay English. Treat English example templates in this SKILL as structural illustrations, not language directives
-- `AskUserQuestion` is prohibited. Users are often away, and asking questions interrupts the session and wastes time. Text output is limited to the final report only. Work silently
+- `{{ runtime.tool_ask_user_question }}` is prohibited. Users are often away, and asking questions interrupts the session and wastes time. Text output is limited to the final report only. Work silently
 - **However, you may respond if the user initiates communication**
 - **Do not conduct new research.** If a research gap is discovered during writing, record it in `agenda.md` and leave it to `/run`. Do not launch researcher or scout yourself
-- **`Bash("sleep ...")` is prohibited. Polling is prohibited.** For waiting on agent completion, use only Pattern A / B
+- **`{{ runtime.tool_shell }}("sleep ...")` is prohibited. Polling is prohibited.** For waiting on agent completion, use only Pattern A / B
 
 ## Arguments
 
@@ -37,7 +37,9 @@ research/                 # Read-only — research tree
   note.md                 #   Root: thesis, background
   story.md                #   Paper narrative structure
   principles.md           #   Constraints
+  conventions.md          #   Project-wide notation and convention ledger
   {branch}/note.md        #   Verified knowledge (Source of Truth — what the node established)
+  {branch}/conventions.md #   Subtree-local notation / convention ledger when needed
   {branch}/log.md         #   Research process (ladder — kind/status in frontmatter)
   {branch}/report_*.md    #   PI-verified reports (self-contained analyses)
 concepts/                 # Read-only — concept definitions
@@ -54,7 +56,7 @@ logs/
   last_write_session.md    # Session handoff (overwrite each session)
 ```
 
-## Agents Used
+## {{ runtime.tool_agent }} dispatches Used
 
 | Agent | Role |
 |---|---|
@@ -70,8 +72,8 @@ logs/
 
 1. Session log filename: obtain via `bash .scripts/log-path.sh write` at session end (or wherever you finalise the log) — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_write.md`
 2. Read `logs/last_write_session.md` (if it exists)
-3. Read `research/note.md` (thesis, background) + `research/story.md` (narrative structure) + `research/principles.md`
-4. Navigate the tree: `ls research/` → read children's note.md (SoT) for established knowledge, and log.md frontmatter for kind/status
+3. Read `research/note.md` (thesis, background) + `research/story.md` (narrative structure) + `research/principles.md` + `research/conventions.md` (if exists)
+4. Navigate the tree: `ls research/` → read children's note.md (SoT) + conventions.md (if exists) for established knowledge and notation, and log.md frontmatter for kind/status
 5. Browse `concepts/` for relevant concept definitions as needed
 6. Read `manuscript/outline.md` (if it exists)
 7. Check existing section drafts (Glob `manuscript/sections/*.md`)
@@ -107,7 +109,7 @@ Phases are guidelines; judge flexibly. If a review reveals insufficient content,
 
 **Prompt template:**
 
-Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_type="{name}"`. Write only task-specific information:
+Each agent is defined in `.claude/agents/{agent}.md` and invoked with `{{ runtime.tool_agent_type_field }}="{name}"`. Write only task-specific information:
 
 ```
 ## Task
@@ -126,7 +128,7 @@ Dynamic data by agent:
 Retrieve deliverable paths from task return values and Read as needed:
 - **Reviewer results**: Check PASS / FAIL. For FAIL, decide the fix approach and relaunch writer
 - **Research gap discovery**: If writer or reviewer reports insufficient evidence, record specifically in `agenda.md` (which node is lacking what)
-- **Update TodoWrite**
+- **Update {{ runtime.tool_update_plan }}**
 
 ### 4. Next Cycle (Return to Step 1)
 
