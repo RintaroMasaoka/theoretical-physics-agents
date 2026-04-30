@@ -23,7 +23,7 @@ PI works **depth-first within the cursor's subtree**. The general movement: dive
 2. **Identify the most important gap**: Within the subtree, where does the argument break off?
 3. **Depth check**: Review stable nodes in the subtree. Do they mention unexplored angles? Deepening a stable result can be more valuable than starting the next open node
 4. **Design tasks with kind in mind**: For conjecture → "search for refutation"; for caution → "find problems"; for example → "calculate the concrete case". kind directly becomes the cognitive mode instruction (see `nodes.md` for the kind table)
-5. **Update TodoWrite**: Update based on findings
+5. **Update update_plan**: Update based on findings
 
 ## Agent Selection Guidelines (not rigid priorities)
 

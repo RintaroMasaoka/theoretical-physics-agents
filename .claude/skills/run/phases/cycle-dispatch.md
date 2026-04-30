@@ -14,7 +14,9 @@ Always think "what can be parallelized in this cycle?" and **launch everything a
 
 ## Pattern A: Foreground Parallel (default)
 
-Call multiple Agents in a single message without `run_in_background`. All tasks execute in parallel and automatically block until all complete.
+
+Call multiple Agent dispatches in a single message without `run_in_background=true`. All tasks execute in parallel and automatically block until all complete.
+
 
 ```
 Agent(prompt="...", subagent_type="researcher")   ─┐
@@ -24,14 +26,16 @@ Agent(prompt="...", subagent_type="scout")        ─┘
 
 ## Pattern B: Background + PI Parallel Work
 
+
 Launch with `run_in_background=true`, PI continues own work. System notifies on completion; retrieve with `TaskOutput`.
 
 ```
-Agent(prompt="...", subagent_type="researcher", run_in_background=true) → task_id_1
+Agent(prompt="...", subagent_type="researcher", run_in_background=true) → task_id
 PI: Continue own work (Read, Edit, etc.)
 ← System notification
-TaskOutput(task_id="task_id_1", block=true)
+TaskOutput(task_id=task_id, block=true)
 ```
+
 
 ## Prompt Template
 

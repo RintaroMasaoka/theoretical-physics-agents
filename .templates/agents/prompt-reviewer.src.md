@@ -1,7 +1,7 @@
 ---
 name: prompt-reviewer
 description: "(/improve) Review a rewritten prompt file as a first-time reader and flag coherence issues"
-model: opus
+model: {{ runtime.model_strong }}
 ---
 
 # Prompt Reviewer — Prompt File Coherence Verification

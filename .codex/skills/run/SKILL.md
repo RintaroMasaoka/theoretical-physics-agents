@@ -23,9 +23,9 @@ The team and who owns what:
 ## Constraints
 
 - **Write all prose in japanese.** Applies to `research/focus.md`, `logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `.codex/research-tree.md` and here may stay in English. The rule is about body prose, not structural tokens.
-- `{{ runtime.tool_ask_user_question }}` and all other user-input solicitations are prohibited. Users are often away during `/run`; asking blocks the session. Text output to the user is limited to the final report emitted at Session End.
+- `request_user_input` and all other user-input solicitations are prohibited. Users are often away during `/run`; asking blocks the session. Text output to the user is limited to the final report emitted at Session End.
 - If the user initiates communication mid-session, respond and continue. Corrections from the user take precedence over scheduled dispatches.
-- **`{{ runtime.tool_shell }}("sleep ...")` is prohibited; polling via `{{ runtime.tool_shell }}("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
+- **`exec_command("sleep ...")` is prohibited; polling via `exec_command("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
 - Full paper text is acquired only from arXiv.
 - **Paper writing is NOT `/run`'s responsibility.** Writing is handled by the `/write` skill. `/run` drives research only.
 
@@ -48,7 +48,7 @@ The team and who owns what:
 |---|---|
 | **Session** | One `/run` execution — from start to final report |
 | **Cycle** | One iteration of the scheduler loop (physicist → workers → critic → curator) |
-| **Task** | One `{{ runtime.tool_agent }}` tool call |
+| **Task** | One `spawn_agent` tool call |
 
 One session = up to `MAX_CYCLES` cycles. Multiple tasks can run in parallel within a cycle.
 
@@ -96,7 +96,7 @@ This is the resume beacon read at Session Start (see `phases/session-lifecycle.m
 ### 1. Physicist Dispatch — Direction
 
 ```
-{{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="physicist", prompt="""
+spawn_agent(agent_type="physicist", prompt="""
 ## Task
 Update research/focus.md for the next cycle.
 
@@ -169,7 +169,7 @@ Critic writes its verdict inline into the worker's deliverable file (Target A). 
 Dispatch curator once per cycle with:
 
 ```
-{{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="curator", prompt="""
+spawn_agent(agent_type="curator", prompt="""
 ## Task
 Execute the tree directives below and absorb the new evidence (worker deliverables + critic verdicts) into the tree per your own operating rules.
 

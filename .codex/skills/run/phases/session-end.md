@@ -76,7 +76,7 @@ No need to rush — the next `/run` resumes from where you left off.
 4. **Dispatch `session-wrap-up`**:
 
    ```
-   Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {path returned by log-path.sh in step 3}\n\nExecute per your own specification.")
+   spawn_agent(agent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {path returned by log-path.sh in step 3}\n\nExecute per your own specification.")
    ```
 
    The agent will: write the session log / focus.md / last_session.md / agenda.md, delete `logs/.run-active`, `git add` the relevant paths, `git commit` with the PI-provided message, and `git push`. It returns `DONE: committed {hash}` or `FAILED: {reason}`.

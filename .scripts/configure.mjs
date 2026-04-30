@@ -18,15 +18,13 @@
  *   .codex/**\/*.md
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, chmodSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "fs";
 import { join, dirname, relative } from "path";
 import { fileURLToPath } from "url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC_DIR = join(ROOT, ".templates");
 const DEFAULT_CONFIG_SOURCE_PATH = join(ROOT, ".config", "config.yaml");
-const GIT_PRE_PUSH_GUARD_SOURCE = join(ROOT, ".scripts", "git-pre-push-guard.sh");
-const GIT_PRE_PUSH_HOOK = join(ROOT, ".git", "hooks", "pre-push");
 
 const TARGETS = {
   claude: {
@@ -34,22 +32,81 @@ const TARGETS = {
     outputDir: join(ROOT, ".claude"),
     configSourcePath: DEFAULT_CONFIG_SOURCE_PATH,
     rootInstructionFileName: "CLAUDE.md",
+    model: {
+      strong: "opus",
+      balanced: "sonnet",
+    },
+    tools: {
+      askUserQuestion: "AskUserQuestion",
+      updatePlan: "TodoWrite",
+      agent: "Agent",
+      agentTypeField: "subagent_type",
+      taskWait: "TaskOutput",
+      shell: "Bash",
+      read: "Read",
+      write: "Write",
+      edit: "Edit",
+      backgroundArg: ", run_in_background=true",
+      backgroundPhrase: "run_in_background=true",
+      noBackgroundClause: "without `run_in_background=true`",
+      backgroundLaunchClause: "Launch with `run_in_background=true`",
+      taskIdName: "task_id",
+      taskWaitExample: "TaskOutput(task_id=task_id, block=true)",
+    },
+    forbiddenRenderedTerms: [".codex/"],
   },
   codex: {
     name: "codex",
     outputDir: join(ROOT, ".codex"),
     configSourcePath: DEFAULT_CONFIG_SOURCE_PATH,
     rootInstructionFileName: "AGENTS.md",
+    model: {
+      strong: "gpt-5.5",
+      balanced: "gpt-5.4",
+    },
+    tools: {
+      askUserQuestion: "request_user_input",
+      updatePlan: "update_plan",
+      agent: "spawn_agent",
+      agentTypeField: "agent_type",
+      taskWait: "wait_agent",
+      shell: "exec_command",
+      read: "read file",
+      write: "apply_patch",
+      edit: "apply_patch",
+      backgroundArg: "",
+      backgroundPhrase: "background dispatch",
+      noBackgroundClause: "using the normal dispatch form",
+      backgroundLaunchClause: "Launch normally and capture the returned agent id",
+      taskIdName: "agent_id",
+      taskWaitExample: "wait_agent(targets=[agent_id], timeout_ms=30000)",
+    },
+    forbiddenRenderedTerms: [
+      ".claude/",
+      "CLAUDE.md",
+      "model: opus",
+      "model: sonnet",
+      "AskUserQuestion",
+      "TodoWrite",
+      "TaskOutput",
+      "subagent_type",
+      "run_in_background",
+      "Agent(",
+      "Bash(",
+    ],
   },
 };
 
 function buildRuntimeConfig(target) {
   const rootDir = relative(ROOT, target.outputDir).replace(/\\/g, "/");
   const instructionFile = `${rootDir}/${target.rootInstructionFileName}`;
+  const agentInvocation = `${target.tools.agent}(${target.tools.agentTypeField}="{name}", prompt="...")`;
 
   return {
     runtime: {
       target: target.name,
+      is_claude: target.name === "claude" ? "true" : "false",
+      is_codex: target.name === "codex" ? "true" : "false",
       root_dir: rootDir,
       instruction_file: instructionFile,
       instruction_file_name: target.rootInstructionFileName,
@@ -63,6 +120,24 @@ function buildRuntimeConfig(target) {
         target.name === "claude"
           ? "the `SessionStart` hook in `.claude/settings.json`"
           : "the runtime's session-start hook (if configured)",
+      model_strong: target.model.strong,
+      model_balanced: target.model.balanced,
+      tool_ask_user_question: target.tools.askUserQuestion,
+      tool_update_plan: target.tools.updatePlan,
+      tool_agent: target.tools.agent,
+      tool_agent_type_field: target.tools.agentTypeField,
+      tool_task_wait: target.tools.taskWait,
+      tool_shell: target.tools.shell,
+      tool_read: target.tools.read,
+      tool_write: target.tools.write,
+      tool_edit: target.tools.edit,
+      agent_background_arg: target.tools.backgroundArg,
+      agent_background_phrase: target.tools.backgroundPhrase,
+      agent_no_background_clause: target.tools.noBackgroundClause,
+      agent_background_launch_clause: target.tools.backgroundLaunchClause,
+      agent_task_id_name: target.tools.taskIdName,
+      agent_invocation: agentInvocation,
+      agent_wait_example: target.tools.taskWaitExample,
     },
   };
 }
@@ -199,13 +274,49 @@ function findPlaceholders(template) {
   const cleaned = template.replace(/`[^`]*`/g, "");
   const keys = new Set();
   for (const m of cleaned.matchAll(/\{\{\s*([\w.]+)\s*\}\}/g)) {
+    if (m[1] === "else") continue;
+    keys.add(m[1]);
+  }
+  for (const m of cleaned.matchAll(/\{\{\s*#(?:if|unless)\s+([\w.]+)\s*\}\}/g)) {
     keys.add(m[1]);
   }
   return keys;
 }
 
+function isTruthy(value) {
+  if (value === undefined || value === null) return false;
+  const normalized = String(value).trim().toLowerCase();
+  return normalized !== "" && normalized !== "false" && normalized !== "0" && normalized !== "no";
+}
+
+function renderConditionals(template, config) {
+  const blockPattern = /\{\{\s*#(if|unless)\s+([\w.]+)\s*\}\}([\s\S]*?)\{\{\s*\/\1\s*\}\}/g;
+
+  let rendered = template;
+  let previous;
+
+  do {
+    previous = rendered;
+    rendered = rendered.replace(blockPattern, (match, operator, key, body) => {
+      if (!(key in config)) return match;
+
+      const elseMatch = body.match(/([\s\S]*?)\{\{\s*else\s*\}\}([\s\S]*)/);
+      const truthy = isTruthy(config[key]);
+      const includePrimary = operator === "if" ? truthy : !truthy;
+
+      if (elseMatch) {
+        return includePrimary ? elseMatch[1] : elseMatch[2];
+      }
+
+      return includePrimary ? body : "";
+    });
+  } while (rendered !== previous);
+
+  return rendered;
+}
+
 function render(template, config) {
-  return template.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (match, key) => {
+  return renderConditionals(template, config).replace(/\{\{\s*([\w.]+)\s*\}\}/g, (match, key) => {
     return key in config ? config[key] : match;
   });
 }
@@ -248,7 +359,7 @@ function runCheck(target, config) {
   const warnings = [];
   const allPlaceholders = new Set();
   const templateKeys = {};
-  const forbiddenRef = target.name === "claude" ? ".codex/" : ".claude/";
+  const forbiddenRenderedTerms = target.forbiddenRenderedTerms ?? [];
 
   for (const tmplPath of findTemplates(SRC_DIR)) {
     const rel = relative(ROOT, tmplPath);
@@ -258,8 +369,10 @@ function runCheck(target, config) {
     for (const key of keys) allPlaceholders.add(key);
 
     const rendered = render(content, config);
-    if (rendered.includes(forbiddenRef)) {
-      warnings.push(`Cross-target reference '${forbiddenRef}' present after rendering ${rel}`);
+    for (const forbidden of forbiddenRenderedTerms) {
+      if (rendered.includes(forbidden)) {
+        warnings.push(`Forbidden target-specific term '${forbidden}' present after rendering ${rel}`);
+      }
     }
   }
 
@@ -306,52 +419,13 @@ function runRender(target, config, mode) {
       console.log(`  ${relative(ROOT, dst)}${marker}`);
     } else {
       mkdirSync(dirname(dst), { recursive: true });
-      if (existsSync(dst) && readFileSync(dst, "utf-8") === rendered) {
-        console.log(`  ${relative(ROOT, dst)} (unchanged)`);
-      } else {
-        writeFileSync(dst, rendered);
-        console.log(`  ${relative(ROOT, dst)}`);
-      }
+      writeFileSync(dst, rendered);
+      console.log(`  ${relative(ROOT, dst)}`);
     }
   }
 
   console.log();
   console.log(mode === "dry-run" ? "Dry run complete (no files written)." : "Done.");
-}
-
-// ── Local Git safety guards ─────────────────────────────────────────
-
-function installGitGuards(mode) {
-  const relHook = relative(ROOT, GIT_PRE_PUSH_HOOK);
-
-  if (!existsSync(join(ROOT, ".git"))) {
-    console.log("Git guard: skipped (.git not found).");
-    return;
-  }
-
-  if (!existsSync(GIT_PRE_PUSH_GUARD_SOURCE)) {
-    console.log("Git guard: skipped (.scripts/git-pre-push-guard.sh not found).");
-    return;
-  }
-
-  const hook = `#!/usr/bin/env sh
-# Generated by .scripts/configure.mjs. Do not edit directly.
-exec sh ".scripts/git-pre-push-guard.sh" "$@"
-`;
-
-  if (mode === "dry-run") {
-    let marker = " (new)";
-    if (existsSync(GIT_PRE_PUSH_HOOK)) {
-      marker = readFileSync(GIT_PRE_PUSH_HOOK, "utf-8") === hook ? " (unchanged)" : " (changed)";
-    }
-    console.log(`Git guard: would install ${relHook}${marker}`);
-    return;
-  }
-
-  mkdirSync(dirname(GIT_PRE_PUSH_HOOK), { recursive: true });
-  writeFileSync(GIT_PRE_PUSH_HOOK, hook, { mode: 0o755 });
-  chmodSync(GIT_PRE_PUSH_HOOK, 0o755);
-  console.log(`Git guard: installed ${relHook}`);
 }
 
 // ── Main ─────────────────────────────────────────────────────────────
@@ -408,10 +482,6 @@ for (const target of targets) {
 
   runRender(target, config, options.mode);
   console.log();
-}
-
-if (options.mode !== "check") {
-  installGitGuards(options.mode);
 }
 
 process.exit(hasFailure ? 1 : 0);

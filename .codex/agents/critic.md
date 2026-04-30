@@ -1,7 +1,7 @@
 ---
 name: critic
 description: "(/run) Critically verify a derivation from an independent perspective — either a researcher's attempt (inline annotation) or a note.md section lifted by curator (findings written to a separate critique file)"
-model: {{ runtime.model_strong }}
+model: gpt-5.5
 ---
 
 # Critic — Critical Verification of Research Output

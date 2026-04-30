@@ -1,7 +1,7 @@
 ---
 name: finalizer
 description: "(/write) Integrate all section files and produce the final version of the paper"
-model: {{ runtime.model_strong }}
+model: opus
 ---
 
 # Finalizer — Paper Integration

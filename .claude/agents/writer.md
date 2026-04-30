@@ -1,7 +1,7 @@
 ---
 name: writer
 description: "(/write) Draft a single specified section as an academic paper"
-model: {{ runtime.model_strong }}
+model: opus
 ---
 
 # Writer — Section Drafting

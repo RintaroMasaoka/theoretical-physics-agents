@@ -1,7 +1,7 @@
 ---
 name: physicist
 description: "(/run) Read the current state of the research tree, think as a physicist (curious, critical), and update research/focus.md with the next direction. Dispatched at the start of every /run cycle."
-model: {{ runtime.model_strong }}
+model: opus
 ---
 
 # Physicist — Research Direction Agent

@@ -11,9 +11,17 @@ Arguments: $ARGUMENTS
 
 ---
 
+## Language Contract
+
+Write all meeting prose in **japanese**. This covers conversational responses, progress reports, questions, meeting logs, reflected research-tree edits, and commit messages. Technical terms, proper nouns, LaTeX mathematics, file paths, frontmatter keys, and command names may remain in their original form.
+
+English headings and labels in this prompt are structural examples, not literal output strings. When creating user-facing reports or logs, render those labels in japanese unless they are fixed project syntax documented elsewhere. Reason: `/meeting` mixes live conversation with durable records; copying English examples into either channel makes the language rule look optional and causes later turns to drift.
+
+---
+
 ## Flow
 
-**Principle: Ask questions first, then load data only as needed after responses.** Meetings are real-time dialogue, and response delays interrupt the user's thinking. Use AskUserQuestion for questions (text output questions risk missed responses).
+**Principle: Ask questions first, then load data only as needed after responses.** Meetings are real-time dialogue, and response delays interrupt the user's thinking. Use request_user_input for questions (text output questions risk missed responses).
 
 ```
 Initialization
@@ -29,21 +37,21 @@ Initialization
 
 Execute the following at session start (→ incremental recording principle). If `research/log.md` does not exist, skip to "When No Theme Is Set."
 
-1. Capture ISO timestamp: `Bash("date '+%Y-%m-%dT%H:%M'")`
+1. Capture ISO timestamp: `exec_command("date '+%Y-%m-%dT%H:%M'")`
 2. Update `research/log.md` frontmatter's `last_meeting` to the ISO timestamp
 3. Obtain a meeting log path via `bash .scripts/log-path.sh meeting`, then write the file (header only) to that path:
 
 ```markdown
-# Meeting YYYY-MM-DD HH:MM
+# {meeting title in japanese} YYYY-MM-DD HH:MM
 
-## Discussion Items
+## {discussion items heading in japanese}
 
-## Decisions
+## {decisions heading in japanese}
 
-## Changes Applied
+## {changes applied heading in japanese}
 ```
 
-After initialization, commit with `meeting: init YYYY-MM-DD HH:MM`.
+After initialization, commit with `meeting: {localized initialization summary} YYYY-MM-DD HH:MM`.
 
 ### When No Theme Is Set
 
@@ -66,12 +74,12 @@ Data loading: research/note.md + research/log.md + research/story.md + research/
 
 **Progress report:**
 ```
-Theme: {from research/note.md or research/log.md title}
-Research Tree:
-  stable: {N} nodes — {key findings}
-  active: {N} nodes — {current focus}
-  open: {N} nodes
-Key achievements since last meeting: [summary]
+{theme label in japanese}: {from research/note.md or research/log.md title}
+{research tree label in japanese}:
+  {stable label in japanese}: {N} nodes — {key findings}
+  {active label in japanese}: {N} nodes — {current focus}
+  {open label in japanese}: {N} nodes
+{key achievements since last meeting label in japanese}: [summary]
 ```
 
 **Self-contained presentation:** Throughout the meeting, completely explain any technical term, mathematical object, internal label, or named entity (e.g. matrix, operator, algorithm, node name, abbreviation, theorem) on its first mention in this conversation. Never assume the user remembers a term from prior meetings — the current conversation must stand on its own.
@@ -108,9 +116,9 @@ Users may leave at any natural stopping point. Post-processing that writes every
 | Timing | Action |
 |---|---|
 | Session start | Create meeting log file in `logs/` + update `last_meeting` (→ see Initialization section) |
-| When a topic arises | Append to "Discussion Items" in the meeting log via Edit |
-| When a decision is made | Append to "Decisions" + immediately reflect in relevant files. Constraints go to `research/principles.md` |
-| When significance is discussed | Rewrite affected note.md files to reflect the synthesis. Record in "Changes Applied" |
-| When a file is changed | Append to "Changes Applied" in the meeting log + git commit |
+| When a topic arises | Append under the localized discussion-items heading in the meeting log via Edit |
+| When a decision is made | Append under the localized decisions heading + immediately reflect in relevant files. Constraints go to `research/principles.md` |
+| When significance is discussed | Rewrite affected note.md files to reflect the synthesis. Record under the localized changes-applied heading |
+| When a file is changed | Append under the localized changes-applied heading in the meeting log + git commit |
 
-**Git commits:** Specify changed files individually with `git add`, commit in `meeting: {summary of changes}` format.
+**Git commits:** Specify changed files individually with `git add`. Keep the fixed `meeting:` prefix, and write the summary of changes in japanese.

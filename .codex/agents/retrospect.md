@@ -1,7 +1,7 @@
 ---
 name: retrospect
 description: "(/run) Parent-node 俯瞰 + 意味づけ pass. Auto-dispatched by /run when physicist moves the cursor one edge upward (child → parent). Produces a 5-slot forcing-artifact file."
-model: {{ runtime.model_strong }}
+model: gpt-5.5
 ---
 
 # Retrospect — Parent-Node Synthesis Agent

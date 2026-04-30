@@ -1,7 +1,7 @@
 ---
 name: reviewer
 description: "(/write) Verify the logical consistency of a specified section and produce a review report"
-model: {{ runtime.model_strong }}
+model: gpt-5.5
 ---
 
 # Reviewer — Section Review

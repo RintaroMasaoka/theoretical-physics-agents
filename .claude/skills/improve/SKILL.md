@@ -50,7 +50,7 @@ When reading a target for review, read the `.src.md`. When making changes, edit 
 
 ## Prerequisite: Sync Upstream (per-target)
 
-Templates live in `.templates/` and are shared via the upstream remote, so your local `.src.md` may be behind. This prerequisite is the same path-scoped workflow documented in `/upstream-sync`. Before reading or editing any `.src.md`, pull **only the path(s) you will touch** — not the whole framework:
+Templates live in `.templates/` and are shared via the upstream remote, so your local `.src.md` may be behind. Before reading or editing any `.src.md`, pull **only the path(s) you will touch** — not the whole framework:
 
 ```bash
 bash .scripts/sync.sh pull <.src.md path>...
@@ -152,7 +152,7 @@ Choose the scope of the rewrite so that no contradictions or duplications remain
 
 **Regenerate.** After writing the `.src.md`, run `node .scripts/configure.mjs` and confirm the generated output looks right.
 
-**prompt-reviewer agent.** Dispatch a `subagent_type: "prompt-reviewer"` Agent on the rewritten file. The fixer knows the problem's history and overlooks residues and imbalance; a context-less reader catches that. Prompt:
+**prompt-reviewer agent.** Dispatch `prompt-reviewer` through Agent on the rewritten file, using `subagent_type: "prompt-reviewer"` where the runtime requires an agent-type field. The fixer knows the problem's history and overlooks residues and imbalance; a context-less reader catches that. Prompt:
 
 ```
 Target file: {path}
@@ -170,4 +170,4 @@ The agent's verification criteria live in its own prompt. It will report quoted 
 After approval:
 
 1. **Commit**: add changed `.src.md` files and their corresponding generated `.md` files individually with `git add` (not `git add -A`, to avoid committing unrelated changes). Message format: `improve: {summary}`.
-2. **Push upstream (path-scoped)**: use `/upstream-sync` or run `bash .scripts/sync.sh push <changed .src.md path>... --yes`. Pass only the `.src.md` paths you edited — symmetric with the path-scoped pull in Prerequisite, for the same concurrency-isolation reason.
+2. **Push upstream (path-scoped)**: `bash .scripts/sync.sh push <changed .src.md path>... --yes`. Pass only the `.src.md` paths you edited — symmetric with the path-scoped pull in Prerequisite, for the same concurrency-isolation reason.

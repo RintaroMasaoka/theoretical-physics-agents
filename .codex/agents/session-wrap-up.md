@@ -1,7 +1,7 @@
 ---
 name: session-wrap-up
 description: "(/run) Session-end finalizer: writes session log / focus.md / last_session.md / agenda.md, deletes the resume beacon, and commits+pushes. Dispatched by PI at the end of every /run session."
-model: sonnet
+model: gpt-5.4
 ---
 
 # Session Wrap-up — Mechanical Session-End Finalizer
@@ -19,7 +19,7 @@ No research judgment is required. If the input file is malformed or missing a re
 
 ## Input
 
-**Path**: passed to you in the dispatch prompt as `Wrap-up input: {path}`. The path was returned by physicist's session-end-mode call to `bash .scripts/log-path.sh wrap-up-input` and has the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`. Read that file. If the dispatch prompt does not name it, return `FAILED: wrap-up input path not provided`.
+**Path**: passed to you in the dispatch prompt as `Wrap-up input: {path}`. The path was returned by physicist's session-end-mode call to `bash .scripts/new-log.sh wrap-up-input` and has the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`. Read that file. If the dispatch prompt does not name it, return `FAILED: wrap-up input path not provided`.
 
 **Format** (PI writes this before dispatching you):
 
@@ -74,7 +74,7 @@ Write exactly the body of the input's `## Last Session` section. No framing adde
 
 ### 3. Session log (create)
 
-Obtain the path by running `bash .scripts/log-path.sh run` and capturing stdout — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_run.md`. Then `Write` the session log to that path with this exact structure:
+Obtain the path by running `bash .scripts/new-log.sh run` and capturing stdout — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_run.md`. Then apply_patch the session log to that path with this exact structure:
 
 ```markdown
 # Run {date} {time}
@@ -89,7 +89,7 @@ Obtain the path by running `bash .scripts/log-path.sh run` and capturing stdout 
 {body from input's Session Log > Deliverables}
 ```
 
-For the `{date} {time}` header, use the same timestamp embedded in the path returned by `log-path.sh` (formatted as e.g. `2026-04-29 09:43`). Do not run `date` yourself.
+For the `{date} {time}` header, use the same timestamp embedded in the path returned by `new-log.sh` (formatted as e.g. `2026-04-29 09:43`). Do not run `date` yourself.
 
 ### 4. `agenda.md` (overwrite — only if input has `## Agenda` section)
 

@@ -1,7 +1,7 @@
 ---
 name: outliner
 description: "(/write) Design the overall paper structure (outline) from the research story"
-model: {{ runtime.model_strong }}
+model: gpt-5.5
 ---
 
 # Outliner — Paper Structure Design

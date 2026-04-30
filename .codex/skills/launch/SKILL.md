@@ -13,13 +13,13 @@ Arguments: $ARGUMENTS
 
 ## Flow
 
-**Principle: Ask questions first, then load data only as needed.** This skill is real-time dialogue — minimize response delays. Use AskUserQuestion for all questions (text output risks missed responses).
+**Principle: Ask questions first, then load data only as needed.** This skill is real-time dialogue — minimize response delays. Use request_user_input for all questions (text output risks missed responses).
 
 ```
 Check research/log.md
     ├─ Does not exist → New Theme flow
     └─ Exists → Theme Change flow
-If argument is provided → use it as the initial theme description (skip the first AskUserQuestion)
+If argument is provided → use it as the initial theme description (skip the first request_user_input)
 ```
 
 ### New Theme
@@ -27,7 +27,7 @@ If argument is provided → use it as the initial theme description (skip the fi
 Set the research theme and direction from scratch.
 
 ```
-AskUserQuestion: Ask user to describe the research theme overview in Other
+request_user_input: Ask user to describe the research theme overview in Other
     ▼ AI presents several approach options → Refine direction (2-3 rounds)
     ▼ Present drafted structure and get confirmation before writing
     ▼ Create research/ tree:
@@ -86,7 +86,7 @@ Data loading: research/note.md + research/log.md + research/story.md
     ▼ Present current theme summary:
         Core understanding: {from note.md, abbreviated}
         Narrative Structure: {steps overview with status}
-    ▼ AskUserQuestion: What aspect to change?
+    ▼ request_user_input: What aspect to change?
         - Research question / core claims
         - Narrative Structure (add/remove/reorder steps)
         - Scope (narrow or broaden)
@@ -123,14 +123,14 @@ Draw out the user's perspective rather than just accepting instructions.
 
 ## Recording
 
-Capture ISO timestamp at session start via `Bash("date '+%Y-%m-%dT%H:%M'")` for traceability markers. Obtain the launch log path via `bash .scripts/log-path.sh launch` — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_launch.md`; write the launch log to that path.
+Capture ISO timestamp at session start via `exec_command("date '+%Y-%m-%dT%H:%M'")` for traceability markers. Obtain the launch log path via `bash .scripts/new-log.sh launch` — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_launch.md`; write the launch log to that path.
 
 | Timing | Action |
 |---|---|
 | After theme is agreed | Write/update research/ tree (including focus.md) |
 | After files are written | Write launch log + Commit (see below) |
 
-**Launch log:** Obtain the path via `bash .scripts/log-path.sh launch` (returns `logs/{YYMMDD_HHMM}_launch.md`); write to that path (permanent record):
+**Launch log:** Obtain the path via `bash .scripts/new-log.sh launch` (returns `logs/{YYMMDD_HHMM}_launch.md`); write to that path (permanent record):
 
 ```markdown
 # Launch YYYY-MM-DD HH:MM

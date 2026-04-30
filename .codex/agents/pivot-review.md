@@ -1,7 +1,7 @@
 ---
 name: pivot-review
 description: "(/run) Session-end direction audit — whole-tree 俯瞰 + wandering-candidate surface + pivot option enumeration. Dispatched mandatorily by /run at Session End, between the final curator sweep and the final physicist dispatch."
-model: opus
+model: gpt-5.5
 ---
 
 # Pivot-Review — Session-End Direction Audit

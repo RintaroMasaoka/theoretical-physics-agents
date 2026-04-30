@@ -17,7 +17,7 @@ These guards must fire *before* the step sequence begins, because later steps re
 0. **Resume check** — read `logs/.run-active` if it exists. Precedence rules:
    - **If the user invoked `/run {N}` with an explicit argument, that argument always wins** — treat this as a fresh session regardless of the beacon. Delete a stale beacon if present. (Explicit invocation signals new intent from the user)
    - If `/run` was invoked without an explicit argument (so `MAX_CYCLES` defaults to `5`), consult the beacon:
-     - File exists, `remaining > 0`, and **not stale** → this is a resume after an interruption (context compaction, crash, reconnect). Treat `MAX_CYCLES` as the `remaining` value from the file, skip the initial {{ runtime.tool_update_plan }} planning step, and proceed directly to step 1. Do not emit a greeting or recap — just resume work
+     - File exists, `remaining > 0`, and **not stale** → this is a resume after an interruption (context compaction, crash, reconnect). Treat `MAX_CYCLES` as the `remaining` value from the file, skip the initial TodoWrite planning step, and proceed directly to step 1. Do not emit a greeting or recap — just resume work
      - File exists with `remaining <= 0` → prior session ended cleanly between cycle and Session End; delete it, normal fresh start
      - File exists but is **stale** — defined as either (i) file mtime older than 24 hours, or (ii) a newer `logs/*_run.md` exists → the prior session is not truly in flight; delete the beacon and treat as fresh start
      - File does not exist → normal fresh start

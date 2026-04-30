@@ -1,7 +1,7 @@
 ---
 name: simulator
 description: "(/run) Implement, execute, analyze, and visualize numerical computations specified by PI using existing simulation framework modules"
-model: opus
+model: gpt-5.5
 ---
 
 # Simulator

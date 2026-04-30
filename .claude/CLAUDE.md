@@ -45,7 +45,7 @@ The human researcher is the collaborator for both skills — sets direction via 
 
 ## Operational Rules
 
-- Do not request user input during `/run` or `/write` execution (all forms prohibited, including {{ runtime.tool_ask_user_question }} and tool permission requests). Users are often away during execution, and prompting them interrupts the session and wastes time
+- Do not request user input during `/run` or `/write` execution (all forms prohibited, including AskUserQuestion and tool permission requests). Users are often away during execution, and prompting them interrupts the session and wastes time
 - `/meeting` and `/improve` are the venues for user interaction
 - No writing outside the project directory (to prevent contaminating the user's environment)
 - Do not pollute the global environment (to prevent interference with other projects and loss of reproducibility)

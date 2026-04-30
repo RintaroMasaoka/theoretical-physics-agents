@@ -1,7 +1,7 @@
 ---
 name: self-check
 description: "(/run) Read a document as a first-time reader and flag self-containedness issues"
-model: opus
+model: {{ runtime.model_strong }}
 ---
 
 # Self-Check — Document Self-Containedness Verification

@@ -10,7 +10,9 @@ Use only the two patterns below. Never `Bash("sleep ...")` or `Bash("ls ...")` t
 
 ### Pattern A — Foreground Parallel (default)
 
-Call multiple `Agent` tools in a single message without `run_in_background`. All tasks execute in parallel and the scheduler blocks until every one completes.
+
+Call multiple `Agent` tools in a single message without `run_in_background=true`. All tasks execute in parallel and the scheduler blocks until every one completes.
+
 
 ```
 Agent(prompt="...", subagent_type="researcher")   ─┐
@@ -22,6 +24,7 @@ This is the default for the Worker Dispatch step and for Auto-Critic.
 
 ### Pattern B — Background + Continued Work
 
+
 Launch with `run_in_background=true`; the scheduler continues other work, and the system notifies on completion. Retrieve via `TaskOutput`.
 
 ```
@@ -30,6 +33,7 @@ Agent(prompt="...", subagent_type="researcher", run_in_background=true) → task
 ← System notification
 TaskOutput(task_id=task_id, block=true)
 ```
+
 
 Use Pattern B only when the scheduler genuinely has independent work to do in parallel — a rare case in the thin scheduler (Pattern A is usually sufficient because the scheduler's next step depends on the workers' outputs).
 
@@ -62,7 +66,7 @@ The physicist's focus.md entries are written concretely enough that these fields
 
 ## Auto-Critic Rule
 
-"Worker" here means the execution-tier agents listed in the Worker row of `CLAUDE.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Synthesis agents (`retrospect`, `pivot-review`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no auto-critic — their forcing-artifact format (synthesis agents) or scheduler-owned role (curator/wrap-up) is the integrity mechanism.
+"Worker" here means the execution-tier agents listed in the Worker row of `.claude/CLAUDE.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Synthesis agents (`retrospect`, `pivot-review`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no auto-critic — their forcing-artifact format (synthesis agents) or scheduler-owned role (curator/wrap-up) is the integrity mechanism.
 
 Every worker deliverable returned from step 3 is critiqued by a critic dispatch in step 4 — this is automatic, not something physicist requests. The rule is fixed:
 
@@ -107,7 +111,7 @@ Session cycle: {n} of {N}
 """)
 ```
 
-Retrospect returns `DONE: {path}` where `{path}` is `logs/{YYMMDD_HHMM}_retrospect_{node-slug}.md` (obtained via `bash .scripts/log-path.sh retrospect {node-slug}` at retrospect's start). The scheduler captures the returned path and adds it to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
+Retrospect returns `DONE: {path}` where `{path}` is `logs/{YYMMDD_HHMM}_retrospect_{node-slug}.md` (obtained via `bash .scripts/new-log.sh retrospect {node-slug}` at retrospect's start). The scheduler captures the returned path and adds it to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
 
 ```
 ## New Evidence This Cycle

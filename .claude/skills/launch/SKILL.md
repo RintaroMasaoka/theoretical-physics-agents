@@ -123,14 +123,14 @@ Draw out the user's perspective rather than just accepting instructions.
 
 ## Recording
 
-Capture ISO timestamp at session start via `Bash("date '+%Y-%m-%dT%H:%M'")` for traceability markers. Obtain the launch log path via `bash .scripts/log-path.sh launch` — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_launch.md`; write the launch log to that path.
+Capture ISO timestamp at session start via `Bash("date '+%Y-%m-%dT%H:%M'")` for traceability markers. Obtain the launch log path via `bash .scripts/new-log.sh launch` — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_launch.md`; write the launch log to that path.
 
 | Timing | Action |
 |---|---|
 | After theme is agreed | Write/update research/ tree (including focus.md) |
 | After files are written | Write launch log + Commit (see below) |
 
-**Launch log:** Obtain the path via `bash .scripts/log-path.sh launch` (returns `logs/{YYMMDD_HHMM}_launch.md`); write to that path (permanent record):
+**Launch log:** Obtain the path via `bash .scripts/new-log.sh launch` (returns `logs/{YYMMDD_HHMM}_launch.md`); write to that path (permanent record):
 
 ```markdown
 # Launch YYYY-MM-DD HH:MM

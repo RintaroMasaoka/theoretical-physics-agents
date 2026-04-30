@@ -10,32 +10,36 @@ This phase file is a reference that PI Reads during `/run` when dispatching work
 
 Always think "what can be parallelized in this cycle?" and **launch everything at once** unless there are dependencies.
 
-**Launch method:** Use only the following 2 patterns. Do not poll with `Bash("sleep ...")` or `Bash("ls ...")`.
+**Launch method:** Use only the following 2 patterns. Do not poll with `exec_command("sleep ...")` or `exec_command("ls ...")`.
 
 ## Pattern A: Foreground Parallel (default)
 
-Call multiple Agents in a single message without `run_in_background`. All tasks execute in parallel and automatically block until all complete.
+
+Call multiple spawn_agent dispatches in a single message using the normal dispatch form. All tasks execute in parallel and automatically block until all complete.
+
 
 ```
-Agent(prompt="...", subagent_type="researcher")   ─┐
-Agent(prompt="...", subagent_type="researcher")   ─┼─ Parallel, auto-block
-Agent(prompt="...", subagent_type="scout")        ─┘
+spawn_agent(prompt="...", agent_type="researcher")   ─┐
+spawn_agent(prompt="...", agent_type="researcher")   ─┼─ Parallel, auto-block
+spawn_agent(prompt="...", agent_type="scout")        ─┘
 ```
 
 ## Pattern B: Background + PI Parallel Work
 
-Launch with `run_in_background=true`, PI continues own work. System notifies on completion; retrieve with `TaskOutput`.
+
+Launch normally and capture the returned agent id, PI continues own work. System notifies on completion; retrieve with `wait_agent`.
 
 ```
-Agent(prompt="...", subagent_type="researcher", run_in_background=true) → task_id_1
+spawn_agent(prompt="...", agent_type="researcher") → agent_id
 PI: Continue own work (Read, Edit, etc.)
 ← System notification
-TaskOutput(task_id="task_id_1", block=true)
+wait_agent(targets=[agent_id], timeout_ms=30000)
 ```
+
 
 ## Prompt Template
 
-Each agent is defined in `.codex/agents/{agent}.md` and invoked with `subagent_type="{name}"`. PI's prompt contains only task-specific information:
+Each agent is defined in `.codex/agents/{agent}.md` and invoked with `agent_type="{name}"`. PI's prompt contains only task-specific information:
 
 ```
 ## Task

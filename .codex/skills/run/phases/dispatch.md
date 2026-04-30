@@ -6,36 +6,40 @@ This phase file is a reference that `/run` Reads when launching workers and crit
 
 ## Launch Patterns
 
-Use only the two patterns below. Never `Bash("sleep ...")` or `Bash("ls ...")` to poll for completion.
+Use only the two patterns below. Never `exec_command("sleep ...")` or `exec_command("ls ...")` to poll for completion.
 
 ### Pattern A — Foreground Parallel (default)
 
-Call multiple `Agent` tools in a single message without `run_in_background`. All tasks execute in parallel and the scheduler blocks until every one completes.
+
+Call multiple `spawn_agent` tools in a single message using the normal dispatch form. All tasks execute in parallel and the scheduler blocks until every one completes.
+
 
 ```
-Agent(prompt="...", subagent_type="researcher")   ─┐
-Agent(prompt="...", subagent_type="researcher")   ─┼─ Parallel, auto-block
-Agent(prompt="...", subagent_type="simulator")    ─┘
+spawn_agent(prompt="...", agent_type="researcher")   ─┐
+spawn_agent(prompt="...", agent_type="researcher")   ─┼─ Parallel, auto-block
+spawn_agent(prompt="...", agent_type="simulator")    ─┘
 ```
 
 This is the default for the Worker Dispatch step and for Auto-Critic.
 
 ### Pattern B — Background + Continued Work
 
-Launch with `run_in_background=true`; the scheduler continues other work, and the system notifies on completion. Retrieve via `TaskOutput`.
+
+Launch normally and capture the returned agent id; the scheduler continues other work, and the system notifies on completion. Retrieve via `wait_agent`.
 
 ```
-Agent(prompt="...", subagent_type="researcher", run_in_background=true) → task_id
+spawn_agent(prompt="...", agent_type="researcher") → agent_id
 {scheduler continues with other independent work}
 ← System notification
-TaskOutput(task_id=task_id, block=true)
+wait_agent(targets=[agent_id], timeout_ms=30000)
 ```
+
 
 Use Pattern B only when the scheduler genuinely has independent work to do in parallel — a rare case in the thin scheduler (Pattern A is usually sufficient because the scheduler's next step depends on the workers' outputs).
 
 ## Prompt Template
 
-Each agent is defined in `.codex/agents/{agent}.md` and invoked with `subagent_type="{name}"`. The scheduler's prompt contains only task-specific information — the agent's own definition carries the reading protocol, deliverable format, and operating rules.
+Each agent is defined in `.codex/agents/{agent}.md` and invoked with `agent_type="{name}"`. The scheduler's prompt contains only task-specific information — the agent's own definition carries the reading protocol, deliverable format, and operating rules.
 
 ```
 ## Task
@@ -62,7 +66,7 @@ The physicist's focus.md entries are written concretely enough that these fields
 
 ## Auto-Critic Rule
 
-"Worker" here means the execution-tier agents listed in the Worker row of `CLAUDE.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Synthesis agents (`retrospect`, `pivot-review`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no auto-critic — their forcing-artifact format (synthesis agents) or scheduler-owned role (curator/wrap-up) is the integrity mechanism.
+"Worker" here means the execution-tier agents listed in the Worker row of `.codex/AGENTS.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Synthesis agents (`retrospect`, `pivot-review`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no auto-critic — their forcing-artifact format (synthesis agents) or scheduler-owned role (curator/wrap-up) is the integrity mechanism.
 
 Every worker deliverable returned from step 3 is critiqued by a critic dispatch in step 4 — this is automatic, not something physicist requests. The rule is fixed:
 
@@ -96,7 +100,7 @@ The scheduler never dispatches critic on a note.md directly. That second-order d
 When SKILL § Cycle step 2 detects an ascent (new cursor is a proper prefix of the previous cursor) and the focus.md `Retrospect` field is `auto` or absent, dispatch `retrospect` in step 2.5 alongside the worker dispatch in step 3 (same message, Pattern A).
 
 ```
-Agent(subagent_type="retrospect", prompt="""
+spawn_agent(agent_type="retrospect", prompt="""
 ## Task
 Write the 5-slot retrospect forcing artifact at the new parent cursor. See your agent definition for the 5 slots and the required output path.
 
@@ -107,7 +111,7 @@ Session cycle: {n} of {N}
 """)
 ```
 
-Retrospect returns `DONE: {path}` where `{path}` is `logs/{YYMMDD_HHMM}_retrospect_{node-slug}.md` (obtained via `bash .scripts/log-path.sh retrospect {node-slug}` at retrospect's start). The scheduler captures the returned path and adds it to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
+Retrospect returns `DONE: {path}` where `{path}` is `logs/{YYMMDD_HHMM}_retrospect_{node-slug}.md` (obtained via `bash .scripts/new-log.sh retrospect {node-slug}` at retrospect's start). The scheduler captures the returned path and adds it to the curator input's `## New Evidence This Cycle` list in step 5, labelled as a retrospect deliverable rather than a worker deliverable:
 
 ```
 ## New Evidence This Cycle

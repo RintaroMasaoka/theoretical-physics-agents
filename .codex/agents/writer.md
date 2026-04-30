@@ -1,7 +1,7 @@
 ---
 name: writer
 description: "(/write) Draft a single specified section as an academic paper"
-model: {{ runtime.model_strong }}
+model: gpt-5.5
 ---
 
 # Writer — Section Drafting

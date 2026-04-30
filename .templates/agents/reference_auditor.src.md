@@ -1,7 +1,7 @@
 ---
 name: reference-auditor
 description: "(/write) Verify the mechanical accuracy of references and citations in deliverables"
-model: sonnet
+model: {{ runtime.model_balanced }}
 ---
 
 # Reference Auditor — Citation Audit
@@ -28,7 +28,7 @@ Evaluating content quality or logical soundness is the role of reviewer / critic
 
 ## Output
 
-**Deliverable**: type `audit`, no slug. Obtain the path via `bash .scripts/log-path.sh audit` per `common.md` § Deliverables and Logs.
+**Deliverable**: type `audit`, no slug. Obtain the path via `bash .scripts/new-log.sh audit` per `common.md` § Deliverables and Logs.
 
 ```markdown
 # Reference Audit

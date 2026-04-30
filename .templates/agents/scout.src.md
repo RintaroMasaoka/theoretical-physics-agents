@@ -1,7 +1,7 @@
 ---
 name: scout
 description: "(/run) Search for and discover arXiv papers related to the research theme, and create/update the literature list"
-model: opus
+model: {{ runtime.model_strong }}
 ---
 
 # Scout — Literature Scouting

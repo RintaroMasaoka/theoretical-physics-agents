@@ -23,7 +23,7 @@ The beacon is written at the start of every cycle (SKILL § step 0). Its presenc
 
 The beacon is gitignored (see `.gitignore`) and deleted at Session End by `session-wrap-up`. On the very first cycle of a fresh session it briefly reads `{"remaining": MAX_CYCLES, …}`; a resume reading `remaining == MAX_CYCLES` is equivalent to "fresh start minus the greeting" — proceed without the greeting.
 
-**Compaction survival fallback.** If the resume hook (via the runtime's session-start hook (if configured), script `.scripts/check-run-resume.sh`) fails to re-inject the skill content, read `.codex/skills/run/SKILL.md` directly with the `Read` tool and follow its Session Start from this step.
+**Compaction survival fallback.** If the resume hook (via the runtime's session-start hook (if configured), script `.scripts/check-run-resume.sh`) fails to re-inject the skill content, read `.codex/skills/run/SKILL.md` directly with the `read file` tool and follow its Session Start from this step.
 
 ### 1. Initial Sanity Gates (fresh start only)
 
@@ -66,7 +66,7 @@ If physicist's focus.md has no archive directives, skip this step. Which scripts
 Dispatch curator one final time with:
 
 ```
-Agent(subagent_type="curator", prompt="""
+spawn_agent(agent_type="curator", prompt="""
 ## Task
 Session-end tree-wide coherence pass. Apply your default operating rules (note.md creation for subnodes with CONFIRMED evidence, log.md compression for files over ~150 lines, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree.
 
@@ -92,7 +92,7 @@ Curator returns `DONE: {summary}`. If it returns `FAILED:`, record the failure i
 Dispatch the `pivot-review` agent once, after the final curator sweep and before the final physicist dispatch:
 
 ```
-Agent(subagent_type="pivot-review", prompt="""
+spawn_agent(agent_type="pivot-review", prompt="""
 ## Task
 Session-end direction audit. Read the whole research tree and this session's logs, then write the 5-slot pivot-review forcing artifact (path obtained via `bash .scripts/log-path.sh pivot-review` per your agent definition).
 
@@ -118,7 +118,7 @@ If pivot-review returns `FAILED:`, record the failure in the wrap-up input's `##
 ### 3. Final Physicist Dispatch (Session-End Mode)
 
 ```
-Agent(subagent_type="physicist", prompt="""
+spawn_agent(agent_type="physicist", prompt="""
 ## Task
 mode: session-end
 
@@ -142,7 +142,7 @@ If physicist returns `FAILED:`, the scheduler writes a minimal wrap-up input its
 ### 4. Dispatch `session-wrap-up`
 
 ```
-Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {wrap-up-input path captured from step 3}\n\nExecute per your own specification.")
+spawn_agent(agent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {wrap-up-input path captured from step 3}\n\nExecute per your own specification.")
 ```
 
 The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `logs/last_session.md` / a session log file (created via `bash .scripts/log-path.sh run`) / `agenda.md` (if the input had an Agenda section), deletes `logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (physicist-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.

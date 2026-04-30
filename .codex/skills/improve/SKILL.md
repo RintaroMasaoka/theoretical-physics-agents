@@ -50,7 +50,7 @@ When reading a target for review, read the `.src.md`. When making changes, edit 
 
 ## Prerequisite: Sync Upstream (per-target)
 
-Templates live in `.templates/` and are shared via the upstream remote, so your local `.src.md` may be behind. This prerequisite is the same path-scoped workflow documented in `/upstream-sync`. Before reading or editing any `.src.md`, pull **only the path(s) you will touch** — not the whole framework:
+Templates live in `.templates/` and are shared via the upstream remote, so your local `.src.md` may be behind. Before reading or editing any `.src.md`, pull **only the path(s) you will touch** — not the whole framework:
 
 ```bash
 bash .scripts/sync.sh pull <.src.md path>...
@@ -86,7 +86,7 @@ After the Prerequisite:
 5. User confirmation & commit — push to upstream
 ```
 
-If an argument is given, treat it as the complaint and go to step 1. If no argument is given, open with a single AskUserQuestion to establish the entry point (review the whole system / a specific target / a specific complaint), load only the files implied, then proceed to step 1.
+If an argument is given, treat it as the complaint and go to step 1. If no argument is given, open with a single request_user_input to establish the entry point (review the whole system / a specific target / a specific complaint), load only the files implied, then proceed to step 1.
 
 ---
 
@@ -98,7 +98,7 @@ Jumping to a solution before understanding almost always produces a symptomatic 
 
 **Every reply is a partial verbalization.** A single answer captures one facet, in one vocabulary, at one level of detail — not because the user is inarticulate but because verbalizing any internal state forces a choice that leaves other facets out. So questions do not end in one round: ask the same target from different facets, at different concreteness, under different hypotheses, and refine the integrated picture as precision grows. Start with a direct question. Read the reply as a partial verbalization — notice what facet it missed, where precision is thin, where it looks generated on the spot rather than genuine — and pick the next question: ask directly, name a facet and ask about it ("is it for this purpose?"), present a hypothesis and have the user evaluate it, raise concreteness, or surface a relevant area the user did not bring up. Not a lookup table — pick based on the texture of the reply. When a reply does not mesh with the stated complaint, hides in generalities, or looks like an ad-hoc answer, switch to hypothesis-presenting to re-ground it.
 
-**AskUserQuestion operation.**
+**request_user_input operation.**
 
 - **One question at a time.** Grouping embeds a hypothesis about the problem's structure and anchors both sides inside that frame. One-at-a-time lets each reply stand alone and the next question be re-planned.
 - **Ask by axis, not by candidate.** Listing "A / B / C" forces a user whose real position fits none to pick the nearest or write Other — both distorting. A good question places the user on an axis (tradeoff dimension) so off-list answers still position themselves. Continuous preferences: odd-count scales (3 or 5) — do not binarize, the middle carries information. Discrete branches: 2 choices suffice. For finer resolution, add an axis, not an option — refining the list returns to the candidate trap.
@@ -152,7 +152,7 @@ Choose the scope of the rewrite so that no contradictions or duplications remain
 
 **Regenerate.** After writing the `.src.md`, run `node .scripts/configure.mjs` and confirm the generated output looks right.
 
-**prompt-reviewer agent.** Dispatch a `subagent_type: "prompt-reviewer"` Agent on the rewritten file. The fixer knows the problem's history and overlooks residues and imbalance; a context-less reader catches that. Prompt:
+**prompt-reviewer agent.** Dispatch `prompt-reviewer` through spawn_agent on the rewritten file, using `agent_type: "prompt-reviewer"` where the runtime requires an agent-type field. The fixer knows the problem's history and overlooks residues and imbalance; a context-less reader catches that. Prompt:
 
 ```
 Target file: {path}
@@ -161,7 +161,7 @@ Pay special attention to: {areas changed in this fix}
 
 The agent's verification criteria live in its own prompt. It will report quoted passages, issue types, and suggested improvements.
 
-**Reflect and confirm.** Apply valid findings and re-run `configure.mjs` if changes were made. Then present the final change to the user via AskUserQuestion for approval.
+**Reflect and confirm.** Apply valid findings and re-run `configure.mjs` if changes were made. Then present the final change to the user via request_user_input for approval.
 
 ---
 
@@ -170,4 +170,4 @@ The agent's verification criteria live in its own prompt. It will report quoted 
 After approval:
 
 1. **Commit**: add changed `.src.md` files and their corresponding generated `.md` files individually with `git add` (not `git add -A`, to avoid committing unrelated changes). Message format: `improve: {summary}`.
-2. **Push upstream (path-scoped)**: use `/upstream-sync` or run `bash .scripts/sync.sh push <changed .src.md path>... --yes`. Pass only the `.src.md` paths you edited — symmetric with the path-scoped pull in Prerequisite, for the same concurrency-isolation reason.
+2. **Push upstream (path-scoped)**: `bash .scripts/sync.sh push <changed .src.md path>... --yes`. Pass only the `.src.md` paths you edited — symmetric with the path-scoped pull in Prerequisite, for the same concurrency-isolation reason.

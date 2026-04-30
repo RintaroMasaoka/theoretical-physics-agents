@@ -1,7 +1,7 @@
 ---
 name: self-check
 description: "(/run) Read a document as a first-time reader and flag self-containedness issues"
-model: opus
+model: gpt-5.5
 ---
 
 # Self-Check — Document Self-Containedness Verification

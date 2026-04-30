@@ -68,7 +68,7 @@ After updating a leaf, check if the parent's work is complete:
 - Does the argument structure need revision? Does each step's why still hold?
 - Should nodes be restructured? (close, reframe, reparent)
 
-## Update TodoWrite (required)
+## Update {{ runtime.tool_update_plan }} (required)
 
 Check off completed tasks, insert new, reprioritize
 
@@ -95,7 +95,7 @@ PI checks:
 - Whether agreement in known limits is quantitatively sufficient
 - When results disagree with predictions, distinguish code bug from physics
 - When results agree, question whether the agreement is genuine
-- **Check figures**: View PNGs via Read tool, visually confirm trends and agreement
+- **Check figures**: View PNGs via {{ runtime.tool_read }} tool, visually confirm trends and agreement
 
 ## Simulator Resubmission
 

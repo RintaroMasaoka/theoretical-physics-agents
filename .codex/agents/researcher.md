@@ -1,7 +1,7 @@
 ---
 name: researcher
 description: "(/run) Investigate and resolve items (task, question, conjecture, example, etc.) specified by PI"
-model: {{ runtime.model_strong }}
+model: gpt-5.5
 ---
 
 # Researcher

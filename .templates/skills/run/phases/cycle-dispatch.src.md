@@ -10,32 +10,47 @@ This phase file is a reference that PI Reads during `/run` when dispatching work
 
 Always think "what can be parallelized in this cycle?" and **launch everything at once** unless there are dependencies.
 
-**Launch method:** Use only the following 2 patterns. Do not poll with `Bash("sleep ...")` or `Bash("ls ...")`.
+**Launch method:** Use only the following 2 patterns. Do not poll with `{{ runtime.tool_shell }}("sleep ...")` or `{{ runtime.tool_shell }}("ls ...")`.
 
 ## Pattern A: Foreground Parallel (default)
 
-Call multiple Agents in a single message without `run_in_background`. All tasks execute in parallel and automatically block until all complete.
+{{#if runtime.is_claude}}
+Call multiple {{ runtime.tool_agent }} dispatches in a single message without `run_in_background=true`. All tasks execute in parallel and automatically block until all complete.
+{{else}}
+Call multiple {{ runtime.tool_agent }} dispatches in a single message using the normal dispatch form. All tasks execute in parallel and automatically block until all complete.
+{{/if}}
 
 ```
-Agent(prompt="...", subagent_type="researcher")   ─┐
-Agent(prompt="...", subagent_type="researcher")   ─┼─ Parallel, auto-block
-Agent(prompt="...", subagent_type="scout")        ─┘
+{{ runtime.tool_agent }}(prompt="...", {{ runtime.tool_agent_type_field }}="researcher")   ─┐
+{{ runtime.tool_agent }}(prompt="...", {{ runtime.tool_agent_type_field }}="researcher")   ─┼─ Parallel, auto-block
+{{ runtime.tool_agent }}(prompt="...", {{ runtime.tool_agent_type_field }}="scout")        ─┘
 ```
 
 ## Pattern B: Background + PI Parallel Work
 
-Launch with `run_in_background=true`, PI continues own work. System notifies on completion; retrieve with `TaskOutput`.
+{{#if runtime.is_claude}}
+Launch with `run_in_background=true`, PI continues own work. System notifies on completion; retrieve with `{{ runtime.tool_task_wait }}`.
 
 ```
-Agent(prompt="...", subagent_type="researcher", run_in_background=true) → task_id_1
+{{ runtime.tool_agent }}(prompt="...", {{ runtime.tool_agent_type_field }}="researcher"{{ runtime.agent_background_arg }}) → {{ runtime.agent_task_id_name }}
 PI: Continue own work (Read, Edit, etc.)
 ← System notification
-TaskOutput(task_id="task_id_1", block=true)
+{{ runtime.agent_wait_example }}
 ```
+{{else}}
+Launch normally and capture the returned agent id, PI continues own work. System notifies on completion; retrieve with `{{ runtime.tool_task_wait }}`.
+
+```
+{{ runtime.tool_agent }}(prompt="...", {{ runtime.tool_agent_type_field }}="researcher") → {{ runtime.agent_task_id_name }}
+PI: Continue own work (Read, Edit, etc.)
+← System notification
+{{ runtime.agent_wait_example }}
+```
+{{/if}}
 
 ## Prompt Template
 
-Each agent is defined in `{{ runtime.agents_dir }}/{agent}.md` and invoked with `subagent_type="{name}"`. PI's prompt contains only task-specific information:
+Each agent is defined in `{{ runtime.agents_dir }}/{agent}.md` and invoked with `{{ runtime.tool_agent_type_field }}="{name}"`. PI's prompt contains only task-specific information:
 
 ```
 ## Task
