@@ -32,7 +32,7 @@ These guards must fire *before* the step sequence begins, because later steps Re
 
 ## Unread Paper Principle
 
-For papers marked `unread` in reading_list.md, PI must not describe their content, claims, methods, or results. Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated (see `.claude/common.md` verification procedures).
+For papers marked `unread` in reading_list.md, PI must not describe their content, claims, methods, or results. Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated (see `{{ runtime.common_file }}` verification procedures).
 
 ## Feedback Processing
 

@@ -30,15 +30,15 @@ Prompt files are generated from templates — editing generated files directly i
 | Layer | Path | Role |
 |---|---|---|
 | **Template (source of truth)** | `.templates/**/*.src.md` | Edit these |
-| **Generated (do not edit)** | `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, `.claude/CLAUDE.md`, `.claude/common.md` | Overwritten by `configure.mjs` |
-| **Config values** | `.claude/config/config.yaml` | Substituted into templates via `{{ key }}` |
+| **Generated (do not edit)** | `{{ runtime.agents_dir }}/*.md`, `{{ runtime.skills_dir }}/*/SKILL.md`, `{{ runtime.instruction_file }}`, `{{ runtime.common_file }}` | Overwritten by `configure.mjs` |
+| **Config values** | `{{ runtime.config_file }}` | Substituted into templates via `{{ key }}` |
 
 When reading a target for review, read the `.src.md`. When making changes, edit the `.src.md`.
 
-**Mapping**: strip `.claude/`, prepend `.templates/`, insert `.src` before `.md`:
-- `.claude/agents/researcher.md` → `.templates/agents/researcher.src.md`
-- `.claude/skills/run/SKILL.md` → `.templates/skills/run/SKILL.src.md`
-- `.claude/common.md` → `.templates/common.src.md`
+**Mapping**: strip `{{ runtime.root_dir }}/`, prepend `.templates/`, insert `.src` before `.md`:
+- `{{ runtime.agents_dir }}/researcher.md` → `.templates/agents/researcher.src.md`
+- `{{ runtime.skills_dir }}/run/SKILL.md` → `.templates/skills/run/SKILL.src.md`
+- `{{ runtime.common_file }}` → `.templates/common.src.md`
 
 **Architecture the template system is built to satisfy.** When your rewrite adds or relocates content, stay within these:
 

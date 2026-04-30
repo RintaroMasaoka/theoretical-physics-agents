@@ -35,7 +35,7 @@ Use Pattern B only when the scheduler genuinely has independent work to do in pa
 
 ## Prompt Template
 
-Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_type="{name}"`. The scheduler's prompt contains only task-specific information — the agent's own definition carries the reading protocol, deliverable format, and operating rules.
+Each agent is defined in `{{ runtime.agents_dir }}/{agent}.md` and invoked with `subagent_type="{name}"`. The scheduler's prompt contains only task-specific information — the agent's own definition carries the reading protocol, deliverable format, and operating rules.
 
 ```
 ## Task
@@ -89,7 +89,7 @@ The scheduler does not read critic's output before proceeding to curator — cri
 
 ## Critic on note.md (Target B) — NOT scheduler-dispatched
 
-The scheduler never dispatches critic on a note.md directly. That second-order dispatch is curator's internal step: after lifting a derivation into note.md, curator dispatches critic with Target B (separate critique file, not inline annotation). See `.claude/agents/curator.md` § note.md critic layering.
+The scheduler never dispatches critic on a note.md directly. That second-order dispatch is curator's internal step: after lifting a derivation into note.md, curator dispatches critic with Target B (separate critique file, not inline annotation). See `{{ runtime.agents_dir }}/curator.md` § note.md critic layering.
 
 ## Retrospect Auto-Attach on Ascent
 

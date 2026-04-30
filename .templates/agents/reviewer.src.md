@@ -13,9 +13,9 @@ Annotate problem areas with strikethrough `~~...~~` or comments `[* ...]` as wit
 
 ## Startup Reading
 
-1. `.claude/common.md`
-2. `.claude/research-tree.md`
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}`
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/note.md` + `research/story.md` (root — check tree structure and status)
 5. Relevant note.md files in research/ tree (for nodes referenced in the section)
 6. `concepts/` (browse concept definitions relevant to the target section)

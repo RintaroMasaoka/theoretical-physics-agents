@@ -12,9 +12,9 @@ Design the overall paper structure (outline) from the research tree and narrativ
 
 ## Startup Reading
 
-1. `.claude/common.md`
-2. `.claude/research-tree.md`
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}`
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/note.md` + `research/story.md` + `research/principles.md` (root — thesis, narrative structure, constraints)
 5. Navigate the research/ tree: `ls` subfolders, read note.md and story.md files for kind, status, and context
 6. `concepts/` (browse concept definitions as needed)

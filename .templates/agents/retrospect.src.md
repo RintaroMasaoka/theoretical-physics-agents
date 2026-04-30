@@ -18,9 +18,9 @@ You do **not** dispatch workers, do **not** edit the tree, do **not** decide the
 
 Read in this order:
 
-1. `.claude/common.md`
-2. `.claude/research-tree.md` — for note.md semantics, provenance tags, derivation expectations
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}` — for note.md semantics, provenance tags, derivation expectations
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/focus.md` — the new (parent) cursor
 5. **Parent node files** at the new cursor: `log.md`, `plan.md` (if exists), `note.md` (if exists), `story.md` (if exists), `dead_ends.md` (if exists)
 6. **Every direct child** of the parent: for each child folder, `log.md` + `plan.md` (if exists) + `note.md` (if exists)

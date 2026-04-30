@@ -15,9 +15,9 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 
 ## Startup Reading
 
-1. `.claude/common.md`
-2. `.claude/research-tree.md`
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}`
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/note.md` + `research/story.md` (root — understand research questions from thesis and narrative structure)
 5. `research/story.md` (if it exists — understand the paper narrative structure)
 6. `literature/reading_list.md` (if it exists)

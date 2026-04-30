@@ -89,9 +89,9 @@ Adjust your working attitude according to the `kind` field provided by PI:
 
 ## Startup Reading
 
-1. `.claude/common.md`
-2. `.claude/research-tree.md`
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}`
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/note.md` + `research/story.md` (root — understand the research narrative and your task's position)
 5. Relevant note.md and story.md files along the ancestor chain in research/ (PI provides paths)
 6. `concepts/` (+ topic files specified by PI in the prompt)
@@ -109,7 +109,7 @@ Do not repeat the same approach as before. Address noted weaknesses head-on, car
 
 ## Auxiliary Scripts
 
-If an attempt involves running code (symbolic verification of a conjecture, constructing an explicit example, numerical sanity check, …), scripts live under a node's `src/` directory — **never** in the node folder root. Placement (lowest common ancestor), companion `{slug}.md`, archival under `src/archive/`, and hygiene (no bytecode commits) are all defined canonically in `.claude/research-tree.md` § Computation Artifacts; follow that spec. When this section and the canonical spec disagree, the canonical spec wins.
+If an attempt involves running code (symbolic verification of a conjecture, constructing an explicit example, numerical sanity check, …), scripts live under a node's `src/` directory — **never** in the node folder root. Placement (lowest common ancestor), companion `{slug}.md`, archival under `src/archive/`, and hygiene (no bytecode commits) are all defined canonically in `{{ runtime.research_tree_file }}` § Computation Artifacts; follow that spec. When this section and the canonical spec disagree, the canonical spec wins.
 
 Two locations to keep straight: the script lives at `research/{node path}/src/{slug}.{ext}`; the attempt deliverable lives in the flat `logs/` directory (path obtained via `bash .scripts/new-log.sh attempt {slug}`, see `common.md` § Deliverables and Logs). The deliverable references the script by its repo-relative path (e.g. `research/{Node Name}/src/{slug}.{ext}`) and carries the full derivation. The companion `{slug}.md` is the script's permanent label in the tree — a short paragraph or two on purpose, key parameters, and how to run it — so future readers browsing `src/` know what each file computes without chasing `logs/`.
 
@@ -132,7 +132,7 @@ Structure is flexible, but must include:
 
 - **Scope and limitations**: What this analysis addresses and what it does not. What assumptions were made and why. What alternative approaches or framings exist that were not pursued
 
-- **Self-assessed provenance tags**: For each principal claim in the attempt, propose a verification tag per `.claude/research-tree.md` § Verification Provenance Taxonomy — confidence label (`CONFIRMED` / `STRONG CONJECTURE` / `CONJECTURE` / `OPEN`) + axis 2-a first-order tags (`[proof]`, `[mechanical]`, `[numerical]`, `[literature]`) + optional `[special-case: {description}]` when scope is restricted. Do not assign axis 2-b tags (`[critic-*]`) to your own work — those are reserved for independent review that you cannot perform on yourself. Tag honestly and completely:
+- **Self-assessed provenance tags**: For each principal claim in the attempt, propose a verification tag per `{{ runtime.research_tree_file }}` § Verification Provenance Taxonomy — confidence label (`CONFIRMED` / `STRONG CONJECTURE` / `CONJECTURE` / `OPEN`) + axis 2-a first-order tags (`[proof]`, `[mechanical]`, `[numerical]`, `[literature]`) + optional `[special-case: {description}]` when scope is restricted. Do not assign axis 2-b tags (`[critic-*]`) to your own work — those are reserved for independent review that you cannot perform on yourself. Tag honestly and completely:
   - `[mechanical]` only if you actually ran SymPy or equivalent; `[literature]` if the claim is reused from a cited paper; `[proof]` for a fully closed derivation; `[numerical]` for finite-tolerance checks
   - **Declare every applicable axis 2-a tag.** If a claim rests on both a hand proof and an independent SymPy run, write both — omitting any true channel understates the verification chain. The axes compose freely: `[proof, mechanical]`, `[literature, numerical]`, etc.
   - **Scope marker is mandatory when applicable, and so is its description.** Write `[special-case: {concrete instance}]`, not a bare `[special-case]` — readers cannot evaluate the coverage without the description. Any claim carrying `[special-case: ...]` must be labeled at or below STRONG CONJECTURE (never CONFIRMED), because full-scope verification is missing by definition

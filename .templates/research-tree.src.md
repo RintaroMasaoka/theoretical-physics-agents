@@ -312,7 +312,7 @@ research/
 
 **Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `report_*.md` for verified analyses, `plan.md` for strategy and decomposition, `log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints.
 
-Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status is set by curator, based on physicist's Tree Directives and evidence accumulated in log.md (see `.claude/agents/curator.md` and `.claude/agents/physicist.md`).
+Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status is set by curator, based on physicist's Tree Directives and evidence accumulated in log.md (see `{{ runtime.agents_dir }}/curator.md` and `{{ runtime.agents_dir }}/physicist.md`).
 
 - Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — `log.md`, `plan.md`, `dead_ends.md`, `asides.md`, `report_*.md`, `note.md`, `story.md`, and `principles.md` — executing physicist's directives plus its own default operating rules (see § note.md — Ownership); simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
 - To propose a status change, describe the rationale in your deliverable file

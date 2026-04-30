@@ -12,9 +12,9 @@ Draft a single specified section as an academic paper.
 
 ## Startup Reading
 
-1. `.claude/common.md`
-2. `.claude/research-tree.md`
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}`
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/note.md` + `research/story.md` (root — thesis and narrative structure. Understand where the section fits)
 5. Relevant note.md files in research/ tree (check kind, status, and context of related nodes)
 6. `concepts/` (browse concept definitions relevant to the assigned section)

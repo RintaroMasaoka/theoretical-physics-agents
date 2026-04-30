@@ -8,13 +8,13 @@ Research information forms a **tree** under `research/`. PI navigates this tree 
 
 ## The Research Tree (`research/`)
 
-Every node is a **folder**. File formats are defined in `.claude/research-tree.md` (the canonical reference). Key points for PI:
+Every node is a **folder**. File formats are defined in `{{ runtime.research_tree_file }}` (the canonical reference). Key points for PI:
 
 **Layer classification**: each file is tagged either **Destination** (verified knowledge that survives as the node's final output — currently only note.md) or **Ladder** (working/scaffolding files that evolve as understanding grows — plan.md, log.md, dead_ends.md). The metaphor: Ladder files are how you *climb* to the Destination; the Destination is what remains after the climb. `/write` loads only Destination files; Ladder files are for the research process itself.
 
 | File | Layer | Accumulation | Role |
 |---|---|---|---|
-| `note.md` | Destination | Overwrite | **Source of truth.** Derivation-bearing paper-quality prose — each principal claim carries its derivation (inline or cited) plus a provenance tag. No template, no frontmatter. Canonical spec: `.claude/research-tree.md` § note.md |
+| `note.md` | Destination | Overwrite | **Source of truth.** Derivation-bearing paper-quality prose — each principal claim carries its derivation (inline or cited) plus a provenance tag. No template, no frontmatter. Canonical spec: `{{ runtime.research_tree_file }}` § note.md |
 | `plan.md` | Ladder | Overwrite | **Strategy and approach.** Decomposition rationale, approach decisions, children's roles. Rewritten as strategy evolves |
 | `log.md` | Ladder | Overwrite + Append | **Research process.** Current State (rewritten), Evidence (appended). PI's working document |
 | `dead_ends.md` | Ladder | Append-only | Failed approaches and lessons learned. Prevents log.md bloat |
@@ -94,10 +94,10 @@ Curator updates note.md with new derivations; re-dispatches critic on touched se
 PI writes retraction evidence into log.md + dead_ends.md → dispatches curator to update note.md
 ```
 
-**note.md is curator-authored, not PI-authored, and carries the derivation — not just the claim.** The diagram above is not a convention — it is the ownership rule and the substance rule combined. PI's tree-editing authority covers log.md (every cycle), plan.md (when strategy changes), dead_ends.md (when approaches fail), and report_{slug}.md (when promoting a verified result). note.md is the one file PI does not write substantively: its prose comes from curator, dispatched by PI, with each principal claim accompanied by its derivation (inline or cited) and its provenance tag. The reasons — separation of concerns, second-reader quality, cross-tree coherence, derivation lifting, tag assignment — are stated in `.claude/research-tree.md` § note.md under **Ownership**, which is the canonical rule.
+**note.md is curator-authored, not PI-authored, and carries the derivation — not just the claim.** The diagram above is not a convention — it is the ownership rule and the substance rule combined. PI's tree-editing authority covers log.md (every cycle), plan.md (when strategy changes), dead_ends.md (when approaches fail), and report_{slug}.md (when promoting a verified result). note.md is the one file PI does not write substantively: its prose comes from curator, dispatched by PI, with each principal claim accompanied by its derivation (inline or cited) and its provenance tag. The reasons — separation of concerns, second-reader quality, cross-tree coherence, derivation lifting, tag assignment — are stated in `{{ runtime.research_tree_file }}` § note.md under **Ownership**, which is the canonical rule.
 
 Two narrow carve-outs preserve the above without friction: (i) trivial mechanical fixes to note.md (typo, broken wiki-link rename) may be made directly by PI since they change no semantics; (ii) user-present collaborative rewrites under `/meeting` or `/launch` are authoritative (the user serves as second reader in real time). Everything else — adding a section, rewording a claim, inserting a "status update" block, updating a provenance tag — goes through a curator dispatch.
 
-note.md creation, retraction, format, and ownership are defined canonically in `.claude/research-tree.md`.
+note.md creation, retraction, format, and ownership are defined canonically in `{{ runtime.research_tree_file }}`.
 
 **Refresh**: log.md files naturally accumulate text over sessions. Periodically, PI dispatches **curator** to compress them — moving detailed content to note.md where appropriate. The working state in log.md should stay concise enough to read at a glance.

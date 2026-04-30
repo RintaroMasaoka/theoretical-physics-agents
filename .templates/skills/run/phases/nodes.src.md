@@ -6,7 +6,7 @@ This phase file is a reference that PI Reads during `/run` when creating, modify
 
 ## Naming Convention
 
-Folders are named in **Title Case with spaces**, using **semantic slugs** that describe the research content (e.g., `research/Winding Gap/`, not `research/01_analysis/`). **No ordering-encoded prefixes** — numbering forces manual reordering as the tree evolves and couples the path to presentation-layer concerns. Canonical rationale: `.claude/research-tree.md` § Folder Names.
+Folders are named in **Title Case with spaces**, using **semantic slugs** that describe the research content (e.g., `research/Winding Gap/`, not `research/01_analysis/`). **No ordering-encoded prefixes** — numbering forces manual reordering as the tree evolves and couples the path to presentation-layer concerns. Canonical rationale: `{{ runtime.research_tree_file }}` § Folder Names.
 
 ## kind (Cognitive Mode)
 

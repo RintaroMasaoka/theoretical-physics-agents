@@ -60,9 +60,9 @@ These are guidance for your direction-setting, not obligations — curator's own
 
 Every dispatch, read in this order — this reconstructs the scientific context so your thinking is grounded in current evidence rather than stale assumptions:
 
-1. `.claude/common.md`
-2. `.claude/research-tree.md` — the canonical spec for file roles, note.md rules, provenance taxonomy
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}` — the canonical spec for file roles, note.md rules, provenance taxonomy
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/focus.md` — the current cursor and the previous dispatch's direction
 5. `directives.md` at project root (if it exists)
 6. **Ancestor chain** from `research/` (root) down to the cursor, inclusive: at each folder, read `note.md` (if exists), `plan.md` (if exists), `log.md`, `dead_ends.md` (if exists), `directives.md` (if exists), `story.md` (if exists), `principles.md` (if exists)
@@ -116,7 +116,7 @@ Retrospect: auto | skip — {one-line reason, required if skip}
 
 - **Cursor**: the path into the tree the scheduler will treat as the focus for this cycle. If you moved one edge, this is the new path.
 - **Status**: `active` while the session should continue; `session_complete` when you judge the research has reached a natural stopping point (the scheduler exits the cycle loop without enforcing `MAX_CYCLES` further). Do not set `session_complete` lightly — a genuine complete is when the cursor's subtree is exhausted *and* the root-level argument has no outstanding next question you have framed.
-- **Retrospect**: present only on an ascent dispatch (child → immediate parent). Default `auto`; set `skip — {reason}` to suppress. Reason is required because "let's skip review this time" is the exact failure mode retrospect exists to prevent. Valid skip reasons are narrow: e.g., a critic REJECT on current child must be resolved before subtree synthesis is meaningful. See `.claude/agents/retrospect.md` for what fires when `auto`. On non-ascent dispatches, omit the line entirely.
+- **Retrospect**: present only on an ascent dispatch (child → immediate parent). Default `auto`; set `skip — {reason}` to suppress. Reason is required because "let's skip review this time" is the exact failure mode retrospect exists to prevent. Valid skip reasons are narrow: e.g., a critic REJECT on current child must be resolved before subtree synthesis is meaningful. See `{{ runtime.agents_dir }}/retrospect.md` for what fires when `auto`. On non-ascent dispatches, omit the line entirely.
 - **Context**: the physicist narrates the situation in compact prose. If you cannot fit it in 5 sentences, that is a signal your thinking is not yet sharp — iterate in your own reasoning before writing. Do not copy log.md's Current State verbatim; restate what matters for the direction.
 - **Worker Dispatches**: each entry names an agent and the concrete task. The scheduler uses this to form agent prompts; be specific enough that the agent itself could begin work from this line plus the cursor's context. See § Agent Menu below for what each agent does.
 - **Tree Directives**: each entry names a concrete change curator should apply. Use imperative form ("create X", "close Y", "promote Z", "retract W"). Curator decides the mechanics (where exactly, how); you decide the what-and-why.
@@ -158,7 +158,7 @@ When the cursor's current node's work is exhausted (all live sub-questions resol
 
 Continue ascending in subsequent cycles as long as each level's work is exhausted — one edge per dispatch. Do not race the cursor back to root in a single hop.
 
-**Ascent triggers auto-retrospect.** On an ascent dispatch the scheduler auto-dispatches `retrospect` at the new parent cursor (see `.claude/agents/retrospect.md`). Do not replicate its work in `## Context` — use the ascent dispatch's `## Context` to name what tree-directive or worker-dispatch action the *next* cycle should take once retrospect's Slot 3 gaps and Slot 5 reframes arrive in your startup reading.
+**Ascent triggers auto-retrospect.** On an ascent dispatch the scheduler auto-dispatches `retrospect` at the new parent cursor (see `{{ runtime.agents_dir }}/retrospect.md`). Do not replicate its work in `## Context` — use the ascent dispatch's `## Context` to name what tree-directive or worker-dispatch action the *next* cycle should take once retrospect's Slot 3 gaps and Slot 5 reframes arrive in your startup reading.
 
 **Reaching root.** When the cursor is `research/` (root) and the root-level argument has no outstanding next question, consider setting `Status: session_complete`. Before doing so, re-read root `research/note.md` and ask whether the paper body is draftable from the tree as it stands — if a derivation is missing, the session is not complete; set a directive for curator to lift it.
 

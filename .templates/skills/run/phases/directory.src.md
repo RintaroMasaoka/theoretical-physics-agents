@@ -16,7 +16,7 @@ research/                 # Research tree — the single knowledge structure
     note.md               #     Verified knowledge (free-form prose)
     plan.md               #     (optional) Strategy and approach for this branch
     log.md                #     Research process (current state, evidence)
-    report_{slug}.md      #     (optional) PI-verified report (format: see .claude/research-tree.md)
+    report_{slug}.md      #     (optional) PI-verified report (format: see {{ runtime.research_tree_file }})
     dead_ends.md          #     (optional) Failed approaches and lessons
     directives.md         #     (optional) Subtree-specific rules from meetings
     src/                  #     Measurement scripts and descriptions (simulator)
@@ -41,7 +41,7 @@ agenda.md                 # Items for next meeting (consumed by /meeting)
 
 ## Root Files
 
-File formats (note.md, plan.md, log.md) are defined in `.claude/research-tree.md`. This section covers only files specific to `/run` operations.
+File formats (note.md, plan.md, log.md) are defined in `{{ runtime.research_tree_file }}`. This section covers only files specific to `/run` operations.
 
 ### Directives (`directives.md`)
 

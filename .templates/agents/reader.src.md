@@ -32,8 +32,8 @@ Do not: use web search as a substitute, complete from training data, repurpose o
 
 ## Startup Reading
 
-1. `.claude/common.md`
-2. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.notes_syntax_file }}`
 3. `research/note.md` (if it exists — understand the overall research picture)
 4. `literature/reading_list.md`
 

@@ -39,9 +39,9 @@ AskUserQuestion: Ask user to describe the research theme overview in Other
         6. research/focus.md (session cursor pointing to the first active child)
 ```
 
-File formats (note.md, log.md) are defined in `.claude/research-tree.md`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
+File formats (note.md, log.md) are defined in `{{ runtime.research_tree_file }}`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
 
-**Child folder names** follow the tree-wide naming convention in `.claude/research-tree.md` (§ Folder Names): semantic slugs describing the node, not ordering-encoded paths.
+**Child folder names** follow the tree-wide naming convention in `{{ runtime.research_tree_file }}` (§ Folder Names): semantic slugs describing the node, not ordering-encoded paths.
 
 **Narrative structure (`research/story.md`):**
 

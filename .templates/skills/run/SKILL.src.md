@@ -22,7 +22,7 @@ The team and who owns what:
 
 ## Constraints
 
-- **Write all prose in {{ language }}.** Applies to `research/focus.md`, `logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `.claude/research-tree.md` and here may stay in English. The rule is about body prose, not structural tokens.
+- **Write all prose in {{ language }}.** Applies to `research/focus.md`, `logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `{{ runtime.research_tree_file }}` and here may stay in English. The rule is about body prose, not structural tokens.
 - `AskUserQuestion` and all other user-input solicitations are prohibited. Users are often away during `/run`; asking blocks the session. Text output to the user is limited to the final report emitted at Session End.
 - If the user initiates communication mid-session, respond and continue. Corrections from the user take precedence over scheduled dispatches.
 - **`Bash("sleep ...")` is prohibited; polling via `Bash("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
@@ -63,7 +63,7 @@ Detail lives in two phase files; read on demand, not all at once.
 | `phases/dispatch.md` | When launching workers or critic | Pattern A / B launch methods, prompt template, auto-critic rule, per-agent dynamic data |
 | `phases/session-lifecycle.md` | Session Start and Session End | Resume check, initial sanity check, scheduler-owned session-end mechanical steps (simulation housekeeping, final sweeps), wrap-up input handoff |
 
-The research information model (tree structure, file roles, context scoping, provenance taxonomy) is canonical in `.claude/research-tree.md` — physicist and curator Read it at every dispatch. `/run` itself does not need it in working memory; `/run` reads `research/focus.md` (the dispatch-spec file — treat it as the scheduler's interface with physicist, not as "tree content") only to extract the fields it dispatches on. `/run` never reads node-level files — `log.md`, `plan.md`, `note.md`, `dead_ends.md`, `report_*.md` are exclusively for physicist (read) and curator (read/write).
+The research information model (tree structure, file roles, context scoping, provenance taxonomy) is canonical in `{{ runtime.research_tree_file }}` — physicist and curator Read it at every dispatch. `/run` itself does not need it in working memory; `/run` reads `research/focus.md` (the dispatch-spec file — treat it as the scheduler's interface with physicist, not as "tree content") only to extract the fields it dispatches on. `/run` never reads node-level files — `log.md`, `plan.md`, `note.md`, `dead_ends.md`, `report_*.md` are exclusively for physicist (read) and curator (read/write).
 
 ---
 

@@ -19,7 +19,7 @@ No need to rush — the next `/run` resumes from where you left off.
 
 3. **Assemble wrap-up input** by first running `bash .scripts/new-log.sh wrap-up-input` to obtain a timestamped path of the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`, then writing the substantive content there. The `session-wrap-up` agent distributes it to the right files, cleans up the beacon, and commits/pushes — it receives the path explicitly via its dispatch prompt (step 4).
 
-   **Parse contract** (must match what the agent expects): Top-level section boundaries are the five canonical `##` headings in the order `## Focus`, `## Last Session`, `## Session Log`, `## Agenda` (optional — omit the heading entirely if not needed), `## Commit`. Anything between two canonical headings (or between `## Commit` and EOF) is that section's body. **Intra-section `##` headings (e.g., the `## Next Session` / `## Blockers` inside the Focus body) are transcribed verbatim into the output file** — PI does not need to demote them. The full rule is duplicated in `.claude/agents/session-wrap-up.md` § Parse rule.
+   **Parse contract** (must match what the agent expects): Top-level section boundaries are the five canonical `##` headings in the order `## Focus`, `## Last Session`, `## Session Log`, `## Agenda` (optional — omit the heading entirely if not needed), `## Commit`. Anything between two canonical headings (or between `## Commit` and EOF) is that section's body. **Intra-section `##` headings (e.g., the `## Next Session` / `## Blockers` inside the Focus body) are transcribed verbatim into the output file** — PI does not need to demote them. The full rule is duplicated in `{{ runtime.agents_dir }}/session-wrap-up.md` § Parse rule.
 
    The input file format:
 

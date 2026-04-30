@@ -13,7 +13,7 @@ Evaluating content quality or logical soundness is the role of reviewer / critic
 
 ## Startup Reading
 
-1. `.claude/common.md`
+1. `{{ runtime.common_file }}`
 2. `manuscript/conventions.md` (if it exists — citation format standards)
 
 ## Verification Items

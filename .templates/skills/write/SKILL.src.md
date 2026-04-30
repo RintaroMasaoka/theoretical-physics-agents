@@ -107,7 +107,7 @@ Phases are guidelines; judge flexibly. If a review reveals insufficient content,
 
 **Prompt template:**
 
-Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_type="{name}"`. Write only task-specific information:
+Each agent is defined in `{{ runtime.agents_dir }}/{agent}.md` and invoked with `subagent_type="{name}"`. Write only task-specific information:
 
 ```
 ## Task

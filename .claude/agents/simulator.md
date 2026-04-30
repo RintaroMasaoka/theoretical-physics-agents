@@ -136,7 +136,7 @@ Bash tool timeout is 10 minutes. For computations exceeding this, split the para
 
 Output analysis results as figures that humans can grasp intuitively. Visualization is also a means of visually confirming result reliability — data anomalies and systematic biases are easier to spot in plots than in numerical tables.
 
-**Plot scripts**: Implement as `src/{slug}_plot.{ext}` in the target node using **{{ simulation.visualization }}** (follows the project's configured visualization backend). Read data from the node's `data/` directory and output PNGs to the node's `images/` directory. Use PNG format (widely supported raster format that agents and humans can inspect directly).
+**Plot scripts**: Implement as `src/{slug}_plot.{ext}` in the target node using **cairomakie** (follows the project's configured visualization backend). Read data from the node's `data/` directory and output PNGs to the node's `images/` directory. Use PNG format (widely supported raster format that agents and humans can inspect directly).
 
 **Figure design guidelines**:
 - One message per figure. The axis labels and title should make clear what the figure shows

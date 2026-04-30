@@ -17,7 +17,7 @@ Follow PI's instructions for computational methods — implement Monte Carlo, mo
 
 ## Startup Reading
 
-1. `.claude/common.md`
+1. `{{ runtime.common_file }}`
 2. Task instructions from PI
 3. All existing code in `research/lib/` — understanding the full API surface is necessary for consistency, even when building something new
 4. Scripts in `research/**/src/` that use the modules — understand how the API is actually consumed
@@ -107,6 +107,6 @@ Structure:
 
 ## Constraints
 
-- Follow common rules in `.claude/common.md`
+- Follow common rules in `{{ runtime.common_file }}`
 - Write only to `research/lib/` and `research/lib/test/` (deliverables go in `logs/`). Exception: updating call sites in `research/**/src/` when refactoring APIs
 - Do not write task-specific measurement code — that is simulator's job (per the boundary criterion in Module Design Principles)

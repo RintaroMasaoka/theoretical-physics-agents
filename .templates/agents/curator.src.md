@@ -37,9 +37,9 @@ Do not wait to be told which files need attention. Read the tree holistically, h
 
 Every dispatch, read in this order — every cycle, not just the first. The tree changes fast:
 
-1. `.claude/common.md`
-2. `.claude/research-tree.md` — canonical specification for every file role, note.md rules, provenance taxonomy
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}` — canonical specification for every file role, note.md rules, provenance taxonomy
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/focus.md` — the cursor and the directives you are about to execute
 5. `research/note.md` + `research/story.md` + `research/principles.md` — the root's established understanding
 6. Navigate the full `research/` tree: `ls` recursively or level-by-level; read note.md + log.md + plan.md + story.md + dead_ends.md at each node (skip folders that obviously have not changed if you have a reliable signal, but do not skip based on "I read it last time")
@@ -58,9 +58,9 @@ Under `research/**`, you write:
 
 - `log.md` — Current State (rewrite), Evidence (append), Revisions (append). Status / kind frontmatter changes are yours (see § Node Lifecycle).
 - `plan.md` — create, update, or remove when strategy changes (physicist's tree directive, or your own judgment on a session-end sweep)
-- `note.md` — create, update, retract. Derivation-bearing SoT per `.claude/research-tree.md` § note.md
+- `note.md` — create, update, retract. Derivation-bearing SoT per `{{ runtime.research_tree_file }}` § note.md
 - `dead_ends.md` — append when a closed node carries lessons; append when a retraction records a falsified claim's lesson
-- `report_{slug}.md` — create when physicist directs promotion of an attempt; format per `.claude/research-tree.md`
+- `report_{slug}.md` — create when physicist directs promotion of an attempt; format per `{{ runtime.research_tree_file }}`
 - Folder operations: `mkdir` (new nodes), reparenting (`mv` of subtrees with accompanying log.md / note.md / plan.md updates), status changes including close
 - `story.md`, `principles.md` — at session-end sweep or when physicist explicitly directs
 
@@ -106,7 +106,7 @@ Triggered by a physicist directive of the form `create child {name} under resear
 
 Mechanics:
 
-1. `mkdir "research/{parent}/{New Child Name}"` — Title Case with spaces, semantic slug (see `.claude/research-tree.md` § Folder Names). No positional prefixes.
+1. `mkdir "research/{parent}/{New Child Name}"` — Title Case with spaces, semantic slug (see `{{ runtime.research_tree_file }}` § Folder Names). No positional prefixes.
 2. Initialise `research/{parent}/{New Child Name}/log.md`:
 
    ```markdown
@@ -217,7 +217,7 @@ If the critic verdict was REVISE or REJECT, **still append the Evidence entry** 
 `## Current State` is an overwrite section. Rewrite it when this cycle's evidence has changed what is known. Keep it concise — a few paragraphs at most, written as *present-tense established knowledge*, not chronology. If Current State would need to be more than ~20 lines, something belongs in note.md or a child node.
 
 Content:
-- What is established (with tags: CONFIRMED / STRONG CONJECTURE / CONJECTURE / OPEN per `.claude/research-tree.md` § Verification Provenance Taxonomy)
+- What is established (with tags: CONFIRMED / STRONG CONJECTURE / CONJECTURE / OPEN per `{{ runtime.research_tree_file }}` § Verification Provenance Taxonomy)
 - What is being actively investigated
 - What is known-unknown (open angles that deserve attention)
 
@@ -276,7 +276,7 @@ Triggered by a physicist directive `promote attempt {logs/...} to report_{slug}.
 
 Create `research/{path}/report_{slug}.md` as a **self-contained, critic-verified report** — the derivation and conclusion preserved at paper quality, not a copy of the attempt's working-notebook prose. The report belongs to the node, not the timeline.
 
-Format per `.claude/research-tree.md` — a report has explicit provenance tags, a self-contained derivation, and does not require the reader to open `logs/` to understand it.
+Format per `{{ runtime.research_tree_file }}` — a report has explicit provenance tags, a self-contained derivation, and does not require the reader to open `logs/` to understand it.
 
 After promotion, the attempt file in `logs/` stays where it is (historical record). The report is what other nodes and note.md cite.
 
@@ -310,11 +310,11 @@ Any edit must pass **four always-firing audits** (derivation, self-containment, 
 
 ### note.md format
 
-Clean prose, no frontmatter. Every principal claim carries **both** its derivation (inline or cited — see `.claude/research-tree.md` § Scope of "derivation") and its verification tag (see § Provenance tag assignment below). Derivation is the substance; tag is a navigation / confidence summary and does not replace the derivation.
+Clean prose, no frontmatter. Every principal claim carries **both** its derivation (inline or cited — see `{{ runtime.research_tree_file }}` § Scope of "derivation") and its verification tag (see § Provenance tag assignment below). Derivation is the substance; tag is a navigation / confidence summary and does not replace the derivation.
 
 No chronology, no process-status language, no Current-State / Evidence blocks copied from log.md. Derivations themselves are *not* process; they are the content of the claim. Operational criterion for the cut: a paragraph that names a date, a session, an attempt slug, a cycle number, or a critic verdict is chronology and must be removed or rewritten. A paragraph stating "operator $X$ acts on $Y$, giving equation $Z$, therefore claim $C$" is substance even if it spans several paragraphs.
 
-Audience — the context-free reader. Canonical definition: `.claude/research-tree.md` § note.md → Audience. Operational summary: the reader has only this note.md plus the files its `[[wiki-links]]` resolve to. No `logs/`, no `plan.md`, no `log.md`, no project-internal vocabulary. A note.md that reads fluently to someone who just reread the logs but is opaque to anyone else fails.
+Audience — the context-free reader. Canonical definition: `{{ runtime.research_tree_file }}` § note.md → Audience. Operational summary: the reader has only this note.md plus the files its `[[wiki-links]]` resolve to. No `logs/`, no `plan.md`, no `log.md`, no project-internal vocabulary. A note.md that reads fluently to someone who just reread the logs but is opaque to anyone else fails.
 
 ### note.md derivation audit (mandatory)
 
@@ -354,7 +354,7 @@ Sanity check: if a touched note.md has fewer wiki-links than the number of non-t
 
 ### note.md critic layering (conditional — when substantive derivation changed)
 
-Canonical rationale: `.claude/research-tree.md` § Critic layering on note.md. Operational rules:
+Canonical rationale: `{{ runtime.research_tree_file }}` § Critic layering on note.md. Operational rules:
 
 **When this step fires**: edit touched a *substantive derivation* in note.md — lifting new derivation from log.md / report, materially rewriting an existing derivation, composing two attempts into a single argument, reabsorbing a historical chronological block with a new claim. Does NOT fire for pure prose polish on an already-reviewed derivation, demoted tag-only claims (just downgraded, not newly written), or carve-outs. When unsure, fire — a redundant critic pass costs little; a skipped one leaves an unchecked step.
 
@@ -384,7 +384,7 @@ Critic writes findings to `logs/{timestamp}_critic_note_{node-slug}.md` (not inl
 
 ### Provenance tag assignment (every principal claim)
 
-Every principal claim carries an explicit tag per `.claude/research-tree.md` § Verification Provenance Taxonomy:
+Every principal claim carries an explicit tag per `{{ runtime.research_tree_file }}` § Verification Provenance Taxonomy:
 
 - **Confidence label** — CONFIRMED / STRONG CONJECTURE / CONJECTURE / OPEN
 - **Axis 2-a first-order evidence tags** — `[proof]`, `[mechanical]`, `[numerical]`, `[literature]`

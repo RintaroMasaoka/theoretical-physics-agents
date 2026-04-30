@@ -42,7 +42,7 @@ If a worker deliverable (in `logs/`) contains a verified, significant result, PI
 
 ## Feed note.md Through Curator, Do Not Write It Directly
 
-note.md is curator-owned — canonical rule in `.claude/research-tree.md` § note.md; rationale, the five reasons (separation of concerns, second-reader quality, cross-tree coherence, derivation lifting, tag assignment), and the two carve-outs (trivial mechanical fixes; `/meeting`-scope collaborative rewrites) are in `architecture.md` § Knowledge Lifecycle.
+note.md is curator-owned — canonical rule in `{{ runtime.research_tree_file }}` § note.md; rationale, the five reasons (separation of concerns, second-reader quality, cross-tree coherence, derivation lifting, tag assignment), and the two carve-outs (trivial mechanical fixes; `/meeting`-scope collaborative rewrites) are in `architecture.md` § Knowledge Lifecycle.
 
 Operational rule at step 3: when a result reaches stable and warrants a SoT entry, PI's cycle-level action is to (a) ensure evidence is written into log.md and (b) **dispatch curator** to distill into note.md — not to write note.md prose directly. This applies to updates as well as first creation. If you catch yourself opening Edit against a note.md for a prose-substantive change during a cycle, stop and dispatch curator instead. Per-cycle dispatches are not required; the Session End mandatory curator sweep (`session-end.md` step 2) guarantees at-least-once-per-session coverage.
 
@@ -79,7 +79,7 @@ Check off completed tasks, insert new, reprioritize
 
 Rule of thumb: "Does the critic need to know the research purpose?" — No → blind, Yes → contextual.
 
-*Critic on note.md (Target B) is curator's internal step, not PI's.* Curator dispatches critic on lifted note.md derivations as part of its own maintenance workflow (see `.claude/agents/curator.md` § note.md critic layering). PI's `/run` cycles do not dispatch critic on note.md directly — that second-order dispatch is nested inside the curator dispatch PI already issues.
+*Critic on note.md (Target B) is curator's internal step, not PI's.* Curator dispatches critic on lifted note.md derivations as part of its own maintenance workflow (see `{{ runtime.agents_dir }}/curator.md` § note.md critic layering). PI's `/run` cycles do not dispatch critic on note.md directly — that second-order dispatch is nested inside the curator dispatch PI already issues.
 
 ## Researcher Resubmission
 

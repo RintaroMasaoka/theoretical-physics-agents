@@ -23,7 +23,7 @@ The beacon is written at the start of every cycle (SKILL § step 0). Its presenc
 
 The beacon is gitignored (see `.gitignore`) and deleted at Session End by `session-wrap-up`. On the very first cycle of a fresh session it briefly reads `{"remaining": MAX_CYCLES, …}`; a resume reading `remaining == MAX_CYCLES` is equivalent to "fresh start minus the greeting" — proceed without the greeting.
 
-**Compaction survival fallback.** If the resume hook (`SessionStart` matcher `compact` in `.claude/settings.json`, script `.scripts/check-run-resume.sh`) fails to re-inject the skill content, read `.claude/skills/run/SKILL.md` directly with the `Read` tool and follow its Session Start from this step.
+**Compaction survival fallback.** If the resume hook (via the `SessionStart` hook in `.claude/settings.json`, script `.scripts/check-run-resume.sh`) fails to re-inject the skill content, read `.claude/skills/run/SKILL.md` directly with the `Read` tool and follow its Session Start from this step.
 
 ### 1. Initial Sanity Gates (fresh start only)
 

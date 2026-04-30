@@ -2,7 +2,7 @@
 
 Autonomous research and paper-writing system for theoretical physics projects.
 
-The system is organized like a small research lab: a PI agent drives the project, specialized worker agents handle bounded tasks, and the human user steers direction through meetings. The repository is tool-agnostic at the instruction level, with shared rules in `CLAUDE.md`, and currently includes Claude Code-specific configuration under `.claude/`.
+The system is organized like a small research lab: a PI agent drives the project, specialized worker agents handle bounded tasks, and the human user steers direction through meetings. The repository is tool-agnostic at the instruction level, with shared template sources under `.templates/` and generated runtime-specific outputs under `.claude/` and `.codex/`.
 
 ## Current Status
 
@@ -32,15 +32,19 @@ Core operating model:
 
 - A compatible coding-agent environment
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) if you want to use the included `.claude/` configuration directly
+- Codex if you want to use the generated `.codex/` runtime files directly
 - [Node.js](https://nodejs.org/) for `configure.mjs`
 
 ### Setup
 
 1. Clone the repository
 2. Optionally edit `.claude/config/config.yaml`
-3. Start your agent session in the project root
+3. Run `node .scripts/configure.mjs` to generate runtime files
+4. Start your agent session in the project root
 
-If you are using Claude Code, `.claude/settings.json` runs `node configure.mjs` automatically on session start, so generated prompt files stay in sync with the templates and config.
+By default, `node .scripts/configure.mjs` generates both `.claude/` and `.codex/`.
+
+If you are using Claude Code, `.claude/settings.json` runs `node .scripts/configure.mjs` automatically on session start, so generated prompt files stay in sync with the templates and config.
 
 ### Minimal Workflow
 
@@ -80,12 +84,8 @@ That means the main current value of the repository is autonomous research progr
 ## Repository Layout
 
 ```text
-CLAUDE.md                 # Canonical shared instructions for agent behavior
 README.md                 # Project overview and operational expectations
-configure.mjs             # Renders generated prompt files from config + templates
-
-.agents/
-└── skills/               # Local skill definitions used by the current environment
+.scripts/configure.mjs    # Renders generated runtime files from config + templates
 
 .claude/
 ├── config/config.yaml    # Main editable config
@@ -93,7 +93,13 @@ configure.mjs             # Renders generated prompt files from config + templat
 ├── skills/*/SKILL.md     # Generated skills
 └── settings.json         # Claude Code settings, including SessionStart hook
 
-templates/                # Prompt templates (source of truth for generated .md files)
+.codex/
+├── config/config.yaml    # Generated config mirror for Codex-facing references
+├── agents/*.md           # Generated agent instructions
+└── skills/*/SKILL.md     # Generated skills
+
+.templates/               # Prompt templates (source of truth for generated runtime files)
+└── AGENTS.src.md         # Shared root instruction template
 ```
 
 ## Runtime Artifacts
@@ -112,6 +118,7 @@ During actual research and writing sessions, the project creates working files i
 ## Configuration
 
 The main editable config is `.claude/config/config.yaml`.
+It is the current shared config source for both `.claude/` and `.codex/`.
 
 By default, the repository is configured for Japanese user-facing responses.
 
@@ -121,17 +128,20 @@ Current supported top-level values include:
 |---|---|
 | `language` | User-facing response language |
 | `simulation.language` | Preferred language for simulation code |
+| `simulation.visualization` | Preferred visualization backend for simulation plots |
 | `cycles.run` | Default cycle count for `/run` |
 | `cycles.write` | Default cycle count for `/write` |
 
-Prompt content lives in `templates/`, and generated files are rebuilt from those templates.
+Prompt content lives in `.templates/`, and generated files are rebuilt from those templates.
 
 Manual commands:
 
 ```bash
-node configure.mjs
-node configure.mjs --dry-run
-node configure.mjs --check
+node .scripts/configure.mjs
+node .scripts/configure.mjs --dry-run
+node .scripts/configure.mjs --check
+node .scripts/configure.mjs --target claude
+node .scripts/configure.mjs --target codex
 ```
 
 ## Design Constraints
@@ -144,7 +154,7 @@ The system is intentionally opinionated.
 - Prefer file-based state and handoff over large prompt-only context
 - Track progress honestly; unresolved work should not be marked resolved
 
-These rules are defined canonically in `CLAUDE.md`.
+These rules are defined canonically in `.templates/AGENTS.src.md` and emitted into the runtime-specific instruction files.
 
 ## License
 

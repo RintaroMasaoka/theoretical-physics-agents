@@ -35,7 +35,7 @@ TaskOutput(task_id="task_id_1", block=true)
 
 ## Prompt Template
 
-Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_type="{name}"`. PI's prompt contains only task-specific information:
+Each agent is defined in `{{ runtime.agents_dir }}/{agent}.md` and invoked with `subagent_type="{name}"`. PI's prompt contains only task-specific information:
 
 ```
 ## Task
@@ -53,7 +53,7 @@ Each agent is defined in `.claude/agents/{agent}.md` and invoked with `subagent_
 - **critic**: `Target: research/{path}/ — {description}` / `attempt path: {path}` / `kind: {kind}` / `mode: blind` or `mode: contextual`
 - **engine-builder**: `Model definition` / `Computational method` / `Required features` / existing module path. Or `"Refine lib"` for self-directed improvement
 - **simulator**: `Target: research/{path}/` / `Physical setup` / `Mathematical definition of observables` / `Success criteria` / `Deliverable number: {N}` / `research/lib/` module list / `Existing scripts in src/: {list}`
-- **curator**: Pass a concrete checklist so curator can judge without re-scanning the whole tree. PI's role is to enumerate raw **candidates**; filtering/judgment is curator's (per curator's own default-create rule in `.claude/agents/curator.md` § note.md Maintenance):
+- **curator**: Pass a concrete checklist so curator can judge without re-scanning the whole tree. PI's role is to enumerate raw **candidates**; filtering/judgment is curator's (per curator's own default-create rule in `{{ runtime.agents_dir }}/curator.md` § note.md Maintenance):
   - `Subnodes without note.md: {paths}` (PI lists every subnode missing note.md; curator applies its default-create rule — create when CONFIRMED facts exist in the log.md, skip for pure-computation leaves)
   - `log.md files exceeding ~150 lines: {paths}` (compression candidates; curator decides per its own signs — current-state paragraph density, evidence age, etc.)
   - `Recent CONFIRMED additions: {log.md path — brief descriptions}` (promotion candidates — critic-ACCEPTed items since the last curator dispatch)

@@ -24,13 +24,13 @@ Two distinct review targets, selected by the dispatcher. Verification criteria a
 
 A researcher's attempt (`logs/{timestamp}_attempt_{slug}.md`). Attempt files are research notebooks — explicitly provisional, allow strikethrough and comments, and are never published as-is. Inline annotation is appropriate: the researcher will read your annotated file when producing the next revision, so keeping critique and content in the same file preserves continuity.
 
-Typical dispatcher: the `/run` scheduler, auto-attaching to every worker deliverable in the cycle's Critic step. The scheduler selects mode per `.claude/skills/run/phases/dispatch.md` § Auto-Critic Rule (blind for mechanical/mathematical deliverables — researcher attempts, simulator runs, engine-builder modules; contextual for narrative-dependent deliverables — reader summaries, scout surveys). The scheduler does not read your verdict; curator reads the inline-annotated file in the following step and lifts / absorbs accordingly. Physicist reads your verdict in the next cycle's prompt (via curator's flagged-for-review list) when it was REVISE / REJECT and decides whether to direct resubmission, pivot, or close.
+Typical dispatcher: the `/run` scheduler, auto-attaching to every worker deliverable in the cycle's Critic step. The scheduler selects mode per `{{ runtime.skills_dir }}/run/phases/dispatch.md` § Auto-Critic Rule (blind for mechanical/mathematical deliverables — researcher attempts, simulator runs, engine-builder modules; contextual for narrative-dependent deliverables — reader summaries, scout surveys). The scheduler does not read your verdict; curator reads the inline-annotated file in the following step and lifts / absorbs accordingly. Physicist reads your verdict in the next cycle's prompt (via curator's flagged-for-review list) when it was REVISE / REJECT and decides whether to direct resubmission, pivot, or close.
 
 ### Target B — A note.md section (or sections) in the research tree
 
-A publication-quality prose file (`research/{path}/note.md`). note.md is the Source of Truth that `/write` reads and that eventually becomes the paper body (see `.claude/research-tree.md` § note.md — Source of Truth, loaded in contextual mode). It is **not** annotated inline — strikethrough or correction markers would corrupt prose intended for publication. You write findings to a separate file that the dispatcher consumes when applying fixes.
+A publication-quality prose file (`research/{path}/note.md`). note.md is the Source of Truth that `/write` reads and that eventually becomes the paper body (see `{{ runtime.research_tree_file }}` § note.md — Source of Truth, loaded in contextual mode). It is **not** annotated inline — strikethrough or correction markers would corrupt prose intended for publication. You write findings to a separate file that the dispatcher consumes when applying fixes.
 
-Typical dispatcher: curator, running the "critic layering on note.md" step (see `.claude/agents/curator.md` § note.md critic layering) to verify that a derivation lifted into note.md is sound *as it appears in note.md*, not merely as it appeared in the upstream attempt.
+Typical dispatcher: curator, running the "critic layering on note.md" step (see `{{ runtime.agents_dir }}/curator.md` § note.md critic layering) to verify that a derivation lifted into note.md is sound *as it appears in note.md*, not merely as it appeared in the upstream attempt.
 
 The dispatcher states the target explicitly in the prompt (target type + path + scope pointer listing which sections / claims to focus on for Target B). If the target type is ambiguous from the prompt, infer from the path: `logs/...attempt...` is Target A; `research/...note.md` is Target B. *Why path inference is safe as a fallback*: the two targets have disjoint write-paths by convention (attempts are never placed under `research/`, and note.md files are never placed under `logs/`), so the path alone disambiguates without risk of writing to the wrong surface. If a path fits neither pattern (e.g., a `report_*.md` or a custom location), return `FAILED: target type ambiguous for path {path} — dispatcher must state Target A / B explicitly` rather than guessing — writing to the wrong target corrupts either a research notebook or publication-quality prose.
 
@@ -43,7 +43,7 @@ In the reading lists below, "the target file" is the attempt file for Target A o
 ### Blind Mode (for mechanical/mathematical checks)
 
 **Read only:**
-1. `.claude/common.md`
+1. `{{ runtime.common_file }}`
 2. The target file (dispatcher provides the path)
 
 **Do NOT read** research/note.md, research/story.md, or other research/ tree files. The purpose is to evaluate the derivation purely on internal consistency — without knowing the research intent, expected outcome, or broader narrative. This eliminates expectation bias: you judge whether the mathematics is correct, not whether it matches what the research hopes to show.
@@ -53,9 +53,9 @@ Blind mode on Target B is unusual but legitimate when the derivation in note.md 
 ### Contextual Mode (for logical/value judgments)
 
 **Read in order:**
-1. `.claude/common.md`
-2. `.claude/research-tree.md`
-3. `.claude/notes-syntax.md`
+1. `{{ runtime.common_file }}`
+2. `{{ runtime.research_tree_file }}`
+3. `{{ runtime.notes_syntax_file }}`
 4. `research/note.md` + `research/story.md` (root — understand the research narrative and the node's position)
 5. Relevant note.md and story.md files along the ancestor chain in research/ (dispatcher provides paths)
 6. `concepts/` (browse concept definitions as needed for term definitions)
@@ -129,7 +129,7 @@ Verify that equations in the target are written in `$...$` / `$$...$$` notation.
 
 ## Provenance Tag Rules (ACCEPT only — shared across targets)
 
-On ACCEPT, propose provenance tag updates using the taxonomy defined in `.claude/research-tree.md` § Verification Provenance Taxonomy. A tag is composed of: a **confidence label** (`CONFIRMED` / `STRONG CONJECTURE` / `CONJECTURE` / `OPEN`) + one or more **axis 2-a first-order evidence tags** (`[proof]` / `[mechanical]` / `[numerical]` / `[literature]`) + exactly one **axis 2-b review tag** from your own review (`[critic-blind]` or `[critic-contextual]`) + an optional **scope marker** (`[special-case: {description}]`) when verification covered only a restricted instance. The following rules apply to both Target A (where the dispatcher is PI and proposed tags feed into the next critic/curator cycle) and Target B (where the dispatcher is curator and proposed tags feed into note.md directly).
+On ACCEPT, propose provenance tag updates using the taxonomy defined in `{{ runtime.research_tree_file }}` § Verification Provenance Taxonomy. A tag is composed of: a **confidence label** (`CONFIRMED` / `STRONG CONJECTURE` / `CONJECTURE` / `OPEN`) + one or more **axis 2-a first-order evidence tags** (`[proof]` / `[mechanical]` / `[numerical]` / `[literature]`) + exactly one **axis 2-b review tag** from your own review (`[critic-blind]` or `[critic-contextual]`) + an optional **scope marker** (`[special-case: {description}]`) when verification covered only a restricted instance. The following rules apply to both Target A (where the dispatcher is PI and proposed tags feed into the next critic/curator cycle) and Target B (where the dispatcher is curator and proposed tags feed into note.md directly).
 
 - **Axis 2-b tag from your own review.** `[critic-blind]` when dispatched in blind mode, `[critic-contextual]` when dispatched in contextual mode. Always add exactly one
 - **Axis 2-a tag from your own computation.** If you ran SymPy / numerical scripts yourself during this review, add the corresponding axis 2-a tag (`[mechanical]` / `[numerical]`) — that is new first-order evidence you contributed
