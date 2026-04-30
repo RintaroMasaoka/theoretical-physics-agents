@@ -145,6 +145,71 @@ node .scripts/configure.mjs --target claude
 node .scripts/configure.mjs --target codex
 ```
 
+Claude Code also has a session-start hook in `.claude/settings.json` that runs
+the configure step automatically.
+
+## Git Remotes and Upstream Sync
+
+Child research projects should use two remotes:
+
+- `origin`: the private or project-owned research repository
+- `upstream`: `https://github.com/RintaroMasaoka/theoretical-physics-agents.git`
+
+Set them explicitly:
+
+```bash
+git remote set-url origin <your-project-repo-url>
+git remote add upstream https://github.com/RintaroMasaoka/theoretical-physics-agents.git
+```
+
+`.scripts/configure.mjs` installs a local `pre-push` guard. When a push targets
+the framework repository, the guard first checks that the framework templates,
+config, generated runtime files, and framework-internal references are
+consistent. It blocks stale or unvalidated framework pushes, not framework
+pushes as such. You can run the same local check explicitly:
+
+```bash
+bash .scripts/sync.sh check
+```
+
+For larger or path-scoped framework syncs, use `/upstream-sync` or the
+underlying script:
+
+```bash
+bash .scripts/sync.sh doctor
+bash .scripts/sync.sh status
+bash .scripts/sync.sh pull .templates/skills/run/SKILL.src.md
+# edit, regenerate, test
+node .scripts/configure.mjs
+bash .scripts/sync.sh push .templates/skills/run/SKILL.src.md --yes
+```
+
+Use the smallest coherent path set when syncing. Path-scoped operations avoid
+overwriting unrelated in-flight framework edits.
+
+Framework maintainers can intentionally bypass the local consistency check:
+
+```bash
+TPRA_ALLOW_FRAMEWORK_PUSH=1 git push origin main
+```
+
+## arXiv Fetching
+
+`/fetch-arxiv` downloads papers through a GitHub Actions relay, which is useful
+when the local agent environment cannot fetch arXiv directly.
+
+```bash
+/fetch-arxiv 2301.00001 hep-th/0506213
+```
+
+Fetched files are written under `literature/papers/`:
+
+```text
+literature/papers/2301.00001/paper.pdf
+literature/papers/2301.00001/*.tex
+literature/papers/hep-th/0506213/paper.pdf
+```
+
 ## Design Constraints
 
 The system is intentionally opinionated.

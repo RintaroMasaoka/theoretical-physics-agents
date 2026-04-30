@@ -55,8 +55,8 @@ The human researcher is the collaborator for both skills — sets direction via 
 This checkout is a **research project workspace** unless the user explicitly says they are maintaining the `theoretical-physics-agents` framework itself.
 
 - Never treat `https://github.com/RintaroMasaoka/theoretical-physics-agents` as the research project's GitHub repository
-- Before any `git push`, inspect `git remote -v`; if the push destination is the framework repository, stop and report that the project remote has not been configured
+- Before any `git push`, inspect `git remote -v`; if the push destination is the framework repository, treat the push as framework publication and verify the framework/runtime consistency first with `bash .scripts/sync.sh check`
 - Project commits may be made locally, but pushing requires a project-owned remote such as the user's private research repository
-- Framework prompt or script improvements from this child project are legitimate feedback to the framework, but they must use `/upstream-sync` or its explicit script workflow: `bash .scripts/sync.sh doctor`, `bash .scripts/sync.sh status`, path-scoped `bash .scripts/sync.sh pull <path>...`, then path-scoped `bash .scripts/sync.sh push <path>...`
+- Framework prompt or script improvements from this child project are legitimate feedback to the framework. For larger or path-scoped syncs, use `/upstream-sync` or its explicit script workflow: `bash .scripts/sync.sh doctor`, `bash .scripts/sync.sh status`, path-scoped `bash .scripts/sync.sh pull <path>...`, then path-scoped `bash .scripts/sync.sh push <path>...`
 - Keep the two channels separate: `origin` is for this research project; `upstream` is for `theoretical-physics-agents` framework feedback
-- `.scripts/configure.mjs` installs a local `pre-push` guard that physically refuses pushes to the framework repository unless `TPRA_ALLOW_FRAMEWORK_PUSH=1` is set by a maintainer
+- `.scripts/configure.mjs` installs a local `pre-push` guard that runs `bash .scripts/sync.sh check` and blocks framework pushes only when the framework checks fail. `TPRA_ALLOW_FRAMEWORK_PUSH=1` intentionally bypasses that local check for maintainers

@@ -7,6 +7,7 @@
 #   bash .scripts/sync.sh push [--yes]            — framework 全体を upstream に送る
 #   bash .scripts/sync.sh push <path>... [--yes]  — 指定パスのみ upstream に送る
 #   bash .scripts/sync.sh status                  — upstream との差分を表示する
+#   bash .scripts/sync.sh check                   — ローカル framework 整合性を検査する
 #   bash .scripts/sync.sh doctor                  — remote 設定と framework 参照を検査する
 #
 # <path> は FRAMEWORK_FILES 配下のファイル/ディレクトリ
@@ -452,6 +453,25 @@ do_doctor() {
   git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" 2>/dev/null
 }
 
+do_check() {
+  echo "==> configure.mjs の設定・テンプレート検査:"
+  node .scripts/configure.mjs --check
+
+  echo ""
+  echo "==> 生成済み runtime ファイルの鮮度検査:"
+  local dry_run_output
+  dry_run_output="$(node .scripts/configure.mjs --dry-run)"
+  printf '%s\n' "$dry_run_output"
+  if printf '%s\n' "$dry_run_output" | grep -E '\((changed|new)\)' >/dev/null; then
+    die "生成済み framework/runtime ファイルが stale です。node .scripts/configure.mjs を実行して生成物をコミットしてください"
+  fi
+
+  echo ""
+  echo "==> framework 参照検査:"
+  validate_framework_references "." "local checkout"
+  echo "  OK"
+}
+
 # ── メイン ────────────────────────────────────────────────────
 
 # --yes フラグと位置引数を分離
@@ -484,15 +504,17 @@ case "$subcmd" in
   pull)   do_pull ;;
   push)   do_push ;;
   status) do_status ;;
+  check)  do_check ;;
   doctor) do_doctor ;;
   *)
-    echo "使い方: $0 {pull|push|status|doctor} [path...]"
+    echo "使い方: $0 {pull|push|status|check|doctor} [path...]"
     echo ""
     echo "  pull              — upstream の最新 framework 全体を取り込む (--force で未コミット変更を上書き)"
     echo "  pull <path>...    — 指定パスのみ取り込む (並列作業向け)"
     echo "  push [--yes]      — ローカルの framework 全体を upstream に送る"
     echo "  push <path>...    — 指定パスのみ送る (並列作業向け)"
     echo "  status            — upstream との差分を確認する"
+    echo "  check             — ローカル framework 整合性を検査する"
     echo "  doctor            — remote 設定と framework 参照を検査する"
     echo ""
     echo "<path> は FRAMEWORK_FILES 配下 (.templates/, .scripts/, ... など) である必要があります。"
