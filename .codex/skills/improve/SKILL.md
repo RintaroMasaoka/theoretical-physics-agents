@@ -21,6 +21,17 @@ A **root-cause fix** climbs up to the cause that generated the symptom — *why*
 
 The target prompt is a **hypothesis to question**, not a doctrine to protect. Questioning reaches beyond explicit prescriptive wording to the **underlying premise layer** — the concepts, categories, causal models, goals, and structure the target has adopted. Re-touching surface wording while a symptom-generating premise remains is still symptomatic. The asymmetry justifies the stance: questioning is cheap (propose an alternative, the user judges); not questioning is expensive (stay at the symptom layer and miss unknown symptoms from the same cause). Questioning may conclude with re-adopting the old wording — what is required is avoiding blind preservation, not change for its own sake.
 
+## Problem-space discipline before solution-space work
+
+This skill's first duty is not to edit prompts; it is to **frame the right problem**. A plausible fix found early is evidence about the problem, not permission to start rewriting. Early fixes are dangerous because they collapse the problem space around the first local symptom, making adjacent axes invisible: ownership, audience, information flow, lifecycle, scope, authority, and the user's actual dissatisfaction.
+
+Treat the work as two separated modes:
+
+1. **Problem-space work** — discover and define what is wrong. Broaden first: identify the visible symptom, the user's value judgment, the affected workflow, adjacent design axes, and at least one alternative framing. Then narrow: state the integrated problem in your own words and test whether it explains the observed complaint and nearby likely failures.
+2. **Solution-space work** — only after the problem frame is explicit, choose and implement the best prompt change.
+
+While in problem-space work, keep candidate fixes in quarantine. You may name them as hypotheses ("one possible fix would be X, but first I need to know whether the real issue is Y"), but you must not edit files, regenerate prompts, or present an implementation plan as settled. The checkpoint that permits solution-space work is a concise integrated picture: **symptom → underlying cause → affected surfaces → success criterion → why a prompt change here is the right lever**. If any part is still vague and the user is available, ask; if the user is not available, state the uncertainty and choose a conservative next investigation, not a rewrite.
+
 ---
 
 ## Template System
@@ -79,8 +90,8 @@ Paired with the path-scoped push in "Commit & Upstream Sync", this completes a p
 After the Prerequisite:
 
 ```
-1. Understand the complaint   — iterate questions until the root cause is visible
-2. Propose a solution         — check external prior art, present one best case
+1. Frame the problem          — stay in problem-space until the integrated picture is explicit
+2. Propose a solution         — check external prior art, present one best case grounded in the frame
 3. Rewrite                    — edit .src.md at a scope that preserves coherence
 4. Regenerate & verify        — configure.mjs, then prompt-reviewer agent
 5. User confirmation & commit — push to upstream
@@ -90,11 +101,17 @@ If an argument is given, treat it as the complaint and go to step 1. If no argum
 
 ---
 
-## 1. Understand the complaint
+## 1. Frame the problem
 
 Jumping to a solution before understanding almost always produces a symptomatic fix. A root-cause fix needs root-cause understanding.
 
+**Do not treat the first plausible fix as progress.** In `/improve`, premature implementation is usually a reasoning failure, not decisiveness: it spends the user's trust before the system has proved it understands the complaint. The right early output is an integrated problem frame, not a patch. If the user challenges your framing, that is useful data; if the user challenges a patch you already made, you have forced them into code-reviewing your misunderstanding.
+
 **Division of labor by where information lives.** Information **inside the user** (motivation, constraints, what they've tried, values, judgment criteria) must be asked. Information **outside the user** (prior solutions to similar prompt-design problems, general prompt-engineering principles, adjacent-domain knowledge) is AI's job to fetch via web search and background knowledge. Sending the user to look up external information is a division-of-labor failure. Equally, prompt-design implementation choices — naming a concept, deciding what to foreground, predicting how an LLM will read wording, drawing the line between a specific instruction and a general principle — are AI's domain. Returning them to the user dumps a decision the user lacks material to make. If the user volunteers vocabulary, take it as data; do not invite them to decide.
+
+**Broaden before narrowing.** Before choosing a target or edit, inspect adjacent axes that could change the diagnosis: whether the problem is about timing, authorship, authority, context loading, persistence, user visibility, lifecycle, evaluation, or handoff. A complaint often names the place where pain surfaced, not the place where the design is wrong. For example, "this file should exist here" may actually be about memory durability, write ownership, reader audience, or task-local versus project-global scope. If a proposed fix would be different under one of these framings, the framing is not settled yet.
+
+**How-language is a danger signal.** Users often express a deep dissatisfaction in the language of an implementation move: "put X here", "make Y do Z", "rename this", "add a file", "forbid that". Treat such `how` wording as a hypothesis about the problem, not the problem itself. The missing information is usually the `why`: what observation triggered the proposal, what responsibility boundary looked wrong, what workflow pressure made the current design feel distorted, or what value tradeoff the user is trying to protect. Do not hard-code a single question like "why do you think that?"; choose the least distorting move for the situation — ask for the originating observation, restate a likely hidden concern and invite correction, or compare two plausible framings. The rule is: if the user gave a `how` without enough `why`, recover the `why` before editing.
 
 **Every reply is a partial verbalization.** A single answer captures one facet, in one vocabulary, at one level of detail — not because the user is inarticulate but because verbalizing any internal state forces a choice that leaves other facets out. So questions do not end in one round: ask the same target from different facets, at different concreteness, under different hypotheses, and refine the integrated picture as precision grows. Start with a direct question. Read the reply as a partial verbalization — notice what facet it missed, where precision is thin, where it looks generated on the spot rather than genuine — and pick the next question: ask directly, name a facet and ask about it ("is it for this purpose?"), present a hypothesis and have the user evaluate it, raise concreteness, or surface a relevant area the user did not bring up. Not a lookup table — pick based on the texture of the reply. When a reply does not mesh with the stated complaint, hides in generalities, or looks like an ad-hoc answer, switch to hypothesis-presenting to re-ground it.
 
@@ -103,7 +120,13 @@ Jumping to a solution before understanding almost always produces a symptomatic 
 - **One question at a time.** Grouping embeds a hypothesis about the problem's structure and anchors both sides inside that frame. One-at-a-time lets each reply stand alone and the next question be re-planned.
 - **Ask by axis, not by candidate.** Listing "A / B / C" forces a user whose real position fits none to pick the nearest or write Other — both distorting. A good question places the user on an axis (tradeoff dimension) so off-list answers still position themselves. Continuous preferences: odd-count scales (3 or 5) — do not binarize, the middle carries information. Discrete branches: 2 choices suffice. For finer resolution, add an axis, not an option — refining the list returns to the candidate trap.
 
-**Integrated-picture checkpoints.** At junctures — during questioning, before proposing — reflect back "here is how I understand it" and let the user react. Partial-verbalization fragments cohere only after AI integrates them, and the integration can only be tested against the user's internal reaction. A correction is itself another partial verbalization: update the picture and, if needed, ask again from another facet.
+**Integrated-picture checkpoints.** At junctures — during questioning, before proposing — reflect back "here is how I understand it" and let the user react. Partial-verbalization fragments cohere only after AI integrates them, and the integration can only be tested against the user's internal reaction. A correction is itself another partial verbalization: update the picture and, if needed, ask again from another facet. The final checkpoint before solution-space work must cover:
+
+- **Symptom**: what happened that disappointed the user
+- **Underlying cause**: what premise, tradeoff, or workflow pressure produced it
+- **Affected surfaces**: which prompts/files/roles/lifecycle steps could be implicated
+- **Success criterion**: how the user would tell the behavior has changed
+- **Edit lever**: why a prompt change, and this prompt location, is the right lever
 
 **Stopping rule.** Not "understanding is complete" (unreachable — every reply is partial) but "the marginal precision from one more question is no longer worth the solution-quality gain". If a solution written now would miss a facet the user obviously cares about, ask one more. When in doubt, ask.
 
@@ -112,6 +135,8 @@ Jumping to a solution before understanding almost always produces a symptomatic 
 ## 2. Propose a solution
 
 **Check external prior art first.** Before generating a solution from scratch, see whether similar prompt-design problems have well-tested answers — web search, prompt-engineering best practices, adjacent-domain knowledge. This is the "outside the user" side of the division-of-labor rule, at the design step.
+
+**Start the proposal with the problem frame.** The first paragraph of the proposal should say what problem you believe you are solving and why the obvious local fix is insufficient or sufficient. This makes the proposal falsifiable before implementation. If you cannot state the frame crisply, return to Section 1; do not compensate with a longer solution.
 
 **One best case, not parallel alternatives.** Present the case you judge best, with reasons. Parallel alternatives dump the selection (a prompt-design judgment — see Section 1) back to the user, and additionally frame the interaction as menu-selection rather than critique, which discourages questioning the framing itself. The presented case is a discussion starting point, not a decision — if the user chooses a different direction, move there. The user's reaction is another partial verbalization, so expect one or two update cycles rather than one final reading.
 

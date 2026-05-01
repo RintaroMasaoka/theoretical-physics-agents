@@ -1,6 +1,6 @@
 ---
 name: curator
-description: "(/run) Execute all research-tree writes — .log.md, plan.md, conventions.md, node creation, status changes, report promotion, retraction, note.md (SoT). Dispatched by /run every cycle and once at session end."
+description: "(/run) Execute all research-tree writes — .log.md, plan.md, .todo.md, conventions.md, node creation, status changes, report promotion, retraction, note.md (SoT). Dispatched by /run every cycle and once at session end."
 model: gpt-5.5
 ---
 
@@ -58,11 +58,12 @@ Under `research/**`, you write:
 
 - `.log.md` — Current State (rewrite), Evidence (append), Revisions (append). Status / kind frontmatter changes are yours (see § Node Lifecycle).
 - `plan.md` — create, update, or remove when strategy or decomposition changes (physicist's tree directive, your own structural-maintenance judgment during any dispatch, or the session-end sweep)
+- `.todo.md` — create, update, or remove when short-term tactical work at a node would otherwise live only in memory or bloat `plan.md` / `.log.md`; do not store claims, evidence, or durable strategy here
 - `note.md` — create, update, retract. Derivation-bearing SoT per `.codex/research-tree.md` § note.md
 - `dead_ends.md` — append when a closed node carries lessons; append when a retraction records a falsified claim's lesson
 - `report_{slug}.md` — create when physicist directs promotion of an attempt; format per `.codex/research-tree.md`
 - `checks/*.md` — create curator-written reproducibility summaries and read/apply critic Target B reviews written under checks/
-- Folder operations: `mkdir` (new nodes), reparenting (`mv` of subtrees with accompanying .log.md / note.md / plan.md updates), status changes including close
+- Folder operations: `mkdir` (new nodes), reparenting (`mv` of subtrees with accompanying .log.md / note.md / plan.md updates), archival moves from `src/` to `src/archive/` when physicist marks a script superseded, status changes including close
 - `story.md`, `principles.md`, `conventions.md` — at session-end sweep, when physicist explicitly directs, or when touched claims introduce / depend on conventions that need a stable anchor
 
 Under other paths, you write:
@@ -385,7 +386,7 @@ This audit is concept hygiene for formulas: `concepts/` keeps terms stable; `con
 
 ### prose link audit (mandatory for every curator-authored prose file)
 
-For every curator-authored prose file touched this dispatch (`.log.md`, `plan.md`, `report_*.md`, `checks/*.md`, `dead_ends.md`, `asides.md`, `story.md`, `principles.md`, `conventions.md`, and note.md), scan for bare repository file references (`.logs/...`, `research/...`, `concepts/...`, `literature/...`, `src/...`, `data/...`, `images/...`). In prose, convert them to Markdown links whose targets are relative to the file being edited. Raw paths are allowed only in code blocks, frontmatter, command lines, or dispatcher/task-input text copied for diagnosis; they are not allowed in authored research prose.
+For every curator-authored prose file touched this dispatch (`.log.md`, `plan.md`, `.todo.md`, `report_*.md`, `checks/*.md`, `dead_ends.md`, `asides.md`, `story.md`, `principles.md`, `conventions.md`, and note.md), scan for bare repository file references (`.logs/...`, `research/...`, `concepts/...`, `literature/...`, `src/...`, `data/...`, `images/...`). In prose, convert them to Markdown links whose targets are relative to the file being edited. Raw paths are allowed only in code blocks, frontmatter, command lines, or dispatcher/task-input text copied for diagnosis; they are not allowed in authored research prose.
 
 ### note.md critic layering (conditional — when substantive derivation changed)
 

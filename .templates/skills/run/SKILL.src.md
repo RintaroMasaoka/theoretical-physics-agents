@@ -14,7 +14,7 @@ The team and who owns what:
 |---|---|---|
 | **Direction audit** | `direction-auditor` | Lightweight pre-direction questions: local loop smell, external-knowledge smell, suspect premise, goal-lock risk |
 | **Direction** | `physicist` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives |
-| **Record** | `curator` | All tree writes — .log.md (Evidence + Current State), plan.md, conventions.md, node creation / status / close / reframe, `report_{slug}.md` promotion, retraction, `dead_ends.md`, note.md (SoT) |
+| **Record** | `curator` | All tree writes — .log.md (Evidence + Current State), plan.md, .todo.md, conventions.md, node creation / status / close / reframe, `report_{slug}.md` promotion, retraction, `dead_ends.md`, note.md (SoT) |
 | **Verification** | `critic` | Independent review of every worker deliverable and of curator's note.md lifts |
 | **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing deliverables in `.logs/` |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of physicist's wrap-up-input file into session log / focus / last_session / agenda; commit + push |
@@ -207,8 +207,8 @@ Increment `cycles_done`. If `cycles_done < MAX_CYCLES` and `Status` is still `ac
 
 Read `phases/session-lifecycle.md` § Session End. Summary:
 
-1. **Simulation housekeeping** — if simulator ran, `/run` checks `research/**/src/` for superseded scripts and moves them to `src/archive/`. This is a mechanical step (physicist judges which are superseded — express as Tree Directives in the final focus.md — but the `mv` itself is scheduler-level).
-2. **Final curator sweep** — dispatch curator once more with an empty `Tree Directives` list and the accumulated evidence, asking for a tree-wide coherence pass (per curator's own session-end mandate).
+1. **Simulation housekeeping decision** — if simulator ran, physicist may identify superseded scripts in final `research/focus.md` Tree Directives. Do not move them in the scheduler.
+2. **Final curator sweep** — dispatch curator once more with the final Tree Directives and accumulated evidence, asking for a tree-wide coherence pass (per curator's own session-end mandate). Curator executes any `archive superseded script {path}` directives by moving the script and its companion `.md` to `src/archive/`.
 3. **Final physicist dispatch (session-end mode)** — physicist writes the wrap-up-input file (path obtained via `bash .scripts/log-path.sh wrap-up-input` and returned as `DONE: {path}`), using the final curator sweep and this session's direction-audit files as evidence for the next session's Focus and any `## Agenda` items. Capture the returned path for step 4.
 4. **`session-wrap-up` dispatch** — the agent consumes the wrap-up-input file (path passed in the dispatch prompt), writes `research/focus.md` / `.logs/last_session.md` / a session log file (path obtained via `bash .scripts/log-path.sh run`) / `agenda.md`, deletes `.logs/.run-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 5. **Final report to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.

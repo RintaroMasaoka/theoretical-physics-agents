@@ -48,16 +48,16 @@ Entered when `cycles_done == MAX_CYCLES`, or when physicist has returned `Status
 
 ### 1. Simulation Housekeeping (if simulator ran this session)
 
-Physicist's final focus.md may include Tree Directives of the form `archive superseded script {path}`. The scheduler executes these directives mechanically:
+Physicist's final focus.md may include Tree Directives of the form `archive superseded script {path}`. Route these directives to curator during the final curator sweep; the scheduler does not move files inside `research/**`.
 
 ```
 mv research/{path}/src/{slug}.{ext} research/{path}/src/archive/
 mv research/{path}/src/{slug}.md research/{path}/src/archive/
 ```
 
-Never delete — superseded scripts move to `src/archive/` so the reasoning history stays searchable. Record each move for the wrap-up input's `## Session Log` § `### Node Changes`.
+Never delete — superseded scripts move to `src/archive/` so the reasoning history stays searchable. Curator records each move in its sweep output; include that summary in the wrap-up input's `## Session Log` § `### Node Changes`.
 
-This is the one Tree Directive kind the scheduler executes directly rather than routing to curator. Reason: curator's write scope is the tree's **prose files** (.log.md / plan.md / note.md / dead_ends.md / report_*.md / story.md / principles.md) — it does not touch simulation source code under `src/`. Filesystem moves of `.jl` / `.py` files therefore fall outside curator's authority and become scheduler-owned housekeeping. Every other Tree Directive routes to curator in step 6 of the cycle loop.
+These archive moves are tree maintenance, so curator executes them together with any accompanying `.log.md`, `plan.md`, or `.todo.md` updates. Keeping the move and the prose record in one role preserves the tree-write authority split.
 
 If physicist's focus.md has no archive directives, skip this step. Which scripts are superseded is a research judgment (physicist's), not a mechanical one.
 
@@ -71,7 +71,7 @@ Dispatch curator one final time with:
 Session-end tree-wide coherence pass. Apply your default operating rules (note.md creation for subnodes with CONFIRMED evidence, .log.md compression for files over ~150 lines, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree.
 
 ## Tree Directives
-(none — session-end sweep)
+{verbatim copy of final research/focus.md § Tree Directives; use `(none)` only if the section is empty}
 
 ## New Evidence This Cycle
 (none — no worker dispatch on the final step)

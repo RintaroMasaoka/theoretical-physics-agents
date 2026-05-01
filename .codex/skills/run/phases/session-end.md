@@ -1,17 +1,17 @@
 # Phase: Session End
 
-This phase file is a reference that PI Reads during `/run` when the session terminates (MAX_CYCLES reached or PI judges completion). It covers the simulation housekeeping + mandatory curator sweep that PI must do directly, and the handoff to the `session-wrap-up` agent for the mechanical finalization (session log, focus.md, last_session.md, beacon cleanup, commit+push).
+This phase file is a reference that physicist reads during `/run` when the session terminates (MAX_CYCLES reached or physicist judges completion). It covers the simulation-housekeeping judgment, mandatory curator sweep, and handoff to the `session-wrap-up` agent for the mechanical finalization (session log, focus.md, last_session.md, beacon cleanup, commit+push).
 
 ---
 
-End the session when MAX_CYCLES is reached or PI judges completion.
+End the session when MAX_CYCLES is reached or physicist judges completion.
 No need to rush — the next `/run` resumes from where you left off.
 
 **Do not suggest transitioning to `/write`**. The user decides when research is mature enough for writing.
 
-## PI-owned Steps (require research judgment)
+## Physicist-Owned Steps (require research judgment)
 
-1. **Simulation housekeeping** (if simulator ran): Check research nodes' `src/` for superseded scripts. Move to `src/archive/` — never delete. Which are superseded is a research judgment (which physical setup is the current canonical one?) — PI does this, not the wrap-up agent. Note each move in the wrap-up input (step 3 below) so it is recorded in `.logs/last_session.md`.
+1. **Simulation housekeeping judgment** (if simulator ran): Check research nodes' `src/` for superseded scripts and express any archival as Tree Directives (`archive superseded script {path}`). Which scripts are superseded is a research judgment (which physical setup is the current canonical one?), so physicist decides; curator performs the move during the final sweep. Never delete — superseded scripts move to `src/archive/` so the reasoning history stays searchable.
 
 2. **Knowledge base coherence** (mandatory at session end — not optional, not skippable on the grounds that changes "felt minor"): Dispatch **curator** to sweep the tree with `Session-end sweep: true`. Include concrete pointers from this session when available — subnodes without note.md, .log.md files over ~150 lines, CONFIRMED claims added since the last curator dispatch, recently retracted/revised claims, and overloaded nodes that may need splitting. These pointers help curator avoid missing obvious candidates, but they do not define the sweep's boundary; curator still reads the tree holistically and applies its own default-create, compression, staleness, and structural-maintenance rules. Curator's work, once complete, is reviewed via `git diff` before commit.
 
