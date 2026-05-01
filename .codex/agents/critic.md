@@ -105,6 +105,8 @@ For Target B: you are reviewing a note.md derivation. The standard for a note.md
 - Does the claimed confidence label (CONFIRMED / STRONG CONJECTURE / …) match the actual argumentation?
 - Is CONFIRMED claimed when gaps actually remain? Is a scope marker needed?
 - Do cited references actually support the claims?
+- Does the target preserve epistemic boundaries in prose? Flag cases where a source statement silently gains project interpretation, a project-side diagnostic is phrased as the external target object, a compatibility bridge is asserted without the map/basis/normalization that makes it meaningful, or a restricted bridge is summarized as an unconditional identification.
+- Conversely, does the target leak management vocabulary into research prose? Claim IDs and schema-like headings such as `Role:` / `Status:` / `Scope:` are appropriate only in explicit metadata blocks, not in note.md-style exposition or user-facing summaries.
 - *Target A only*: Does the contribution self-assessment (the attempt section where the researcher characterizes what is novel vs. drawn from existing literature) correctly distinguish the researcher's original work from known results? Is the non-triviality argument convincing — does the contribution go beyond routine application of known techniques, or has the researcher overstated the novelty?
 - *Target B only*: Does the linked provenance record truly reflect what the derivation shown in note.md supports? If the derivation inlined in note.md only covers a restricted instance but the record says `scope: full`, flag a scope mismatch — this is the lift-introduced scope-creep failure mode
 

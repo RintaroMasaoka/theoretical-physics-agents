@@ -83,6 +83,12 @@ Follow the failure procedure in the "Source Requirement" section and terminate i
    - If fetch-arxiv fails for some papers, construct bib entries manually from metadata
 6. Run `node .scripts/render-reading-list.mjs` after catalog updates. `literature/reading_list.md` is a generated linked view for humans; never edit it directly
 
+### Boundary discipline while extracting
+
+Your reading note is a source-facing artifact. When the paper introduces notation, conventions, basis choices, normalizations, or named objects, preserve those choices as the paper states them. Do not translate them into this project's notation, identify them with this project's constructions, or repair apparent discrepancies unless the paper itself supplies that bridge. If the research context makes a possible bridge important, write it as a prose handoff such as "This is the source-side statement that a later project-side comparison would need to relate to ..." and stop there.
+
+This distinction is especially important for formulas that look familiar. A paper's Hamiltonian object, path-integral convention, projector, zero-mode insertion, or correlation matrix is not automatically the same object as this project's internal diagnostic or construction just because the symbols resemble each other. The reading note should leave the next agent with the source-language fact, not an unreviewed translation.
+
 **Deliverable**: type `reading`, slug = arXiv ID with dots replaced by hyphens (e.g., `0804-4527`). Obtain the path via `bash .scripts/new-log.sh reading {id}` per `common.md` § Deliverables and Logs.
 
 ```markdown

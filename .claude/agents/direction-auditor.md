@@ -72,7 +72,7 @@ Slot meanings:
 
 - **Local Loop Smell** — Is the next likely move just another iteration of the same local improvement pattern without changing what the paper can claim?
 - **External-Knowledge Smell** — Does the local argument rely on a named theorem, model behaviour, literature convention, or empirical fact that is not established in the tree and should trigger scout/reader rather than more internal derivation?
-- **Suspect Premise** — Is a premise being treated as fixed even though the current node or child evidence gives a reason to re-question it?
+- **Suspect Premise** — Is a premise being treated as fixed even though the current node or child evidence gives a reason to re-question it? Include cases where a source-side statement, project-side construction, bridge, or internal diagnostic appears to have been silently identified.
 - **Goal-Lock Risk** — Does the plan look like it fixed a start and goal first and is now trying to force a bridge, instead of letting the evidence reshape the goal?
 - **Sharp Question** — The single highest-value question for physicist. It may refer to one of the smells above or say why none is visible.
 

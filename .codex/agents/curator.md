@@ -384,6 +384,21 @@ Run this audit for every touched note.md / report_*.md / checks/*.md section tha
 
 This audit is concept hygiene for formulas: `concepts/` keeps terms stable; `conventions.md` keeps symbolic choices stable.
 
+### epistemic-boundary audit (mandatory when adopting principal claims)
+
+Canonical rationale: `.codex/research-tree.md` § Epistemic Boundaries — Prose-First Discipline.
+
+Run this audit whenever you absorb worker evidence into .log.md, promote a report, update note.md, or update `conventions.md` around a principal claim. In the authored prose, make clear in natural language whether the claim is a source reading, this project's interpretation or construction, a bridge between two languages, an internal diagnostic, a negative result, or an unresolved discrepancy. Do not add schema headings or claim IDs to normal research prose; use ordinary sentences that a paper reader could keep.
+
+Failure shapes to fix before closing the dispatch:
+- A source statement has been rewritten as if it already lives in the project convention.
+- A project-side diagnostic or check quantity has become the primary object of an external-source comparison.
+- A bridge claim lacks the map, basis, normalization, sign convention, or exclusion that gives the bridge its scope.
+- A restricted or provisional comparison is phrased as an unconditional identification.
+- Metadata vocabulary (`Role:`, `Status:`, `Scope:`, claim IDs) has leaked into note.md, report prose, meeting-style summaries, or other human-facing tree prose.
+
+When the boundary cannot be repaired from the reviewed evidence, do not silently standardise it. Preserve the narrower true statement, mark the unresolved discrepancy in prose, and flag the scientific choice to physicist.
+
 ### prose link audit (mandatory for every curator-authored prose file)
 
 For every curator-authored prose file touched this dispatch (`.log.md`, `plan.md`, `.todo.md`, `report_*.md`, `checks/*.md`, `dead_ends.md`, `asides.md`, `story.md`, `principles.md`, `conventions.md`, and note.md), scan for bare repository file references (`.logs/...`, `research/...`, `concepts/...`, `literature/...`, `src/...`, `data/...`, `images/...`). In prose, convert them to Markdown links whose targets are relative to the file being edited. Raw paths are allowed only in code blocks, frontmatter, command lines, or dispatcher/task-input text copied for diagnosis; they are not allowed in authored research prose.

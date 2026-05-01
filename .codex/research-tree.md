@@ -92,6 +92,23 @@ The reason is load-bearing: without it, later agents treat the entry as arbitrar
 
 **Maintenance rule.** When curator promotes or rewrites a note.md/report claim that introduces, depends on, or changes a convention, curator must update the nearest applicable `conventions.md` in the same dispatch, then scan affected ancestor/sibling note.md files for inconsistent usage. If the convention is still provisional, state the scope honestly and do not let note.md use it as if project-wide. If two live conventions conflict, curator does not silently choose: keep the narrower convention scoped, add a compatibility note if possible, and flag the conflict to physicist when scientific judgment is needed.
 
+## Epistemic Boundaries — Prose-First Discipline
+
+Research drift often begins before verification: prose quietly stops distinguishing what a source says, how this project interprets it, what this project constructs, what bridge relates two languages, and what is only an internal diagnostic. The framework preserves those boundaries in ordinary research prose, not in a separate claim database and not with visible management tags. The aim is to keep meaning stable while leaving the research tree readable.
+
+**Principal claim unit.** A principal claim is any statement that later work could rely on: a mathematical result, a source reading, a convention, a compatibility bridge, a scope restriction, a negative result, a diagnostic-to-object distinction, or a stable interpretation. Expository restatements, local derivation steps, and reader-guidance sentences are not principal claims unless deleting them would change what future work is allowed to assume.
+
+**Boundary types are meanings, not output labels.** Agents may reason about these distinctions internally, but authored prose should express them in natural language rather than emitting schema headings such as `Role:`, `Status:`, `Scope:`, or claim IDs. Good prose says "Masaoka Eq. (52) is being read on its own source convention" or "the projector is only a project-side diagnostic here"; it does not turn the research note into a registry. Machine-readable state may exist in tooling later, but the LLM-facing and user-facing surface remains prose.
+
+**Where the boundary is carried.**
+- Reader extracts what is written in the source and does not translate it into project convention unless the paper itself gives the translation.
+- Researcher states, in ordinary prose, which parts of an argument are source readings, project constructions, compatibility bridges, internal diagnostics, or unresolved discrepancies.
+- Critic checks whether a claim changed category while being summarized or lifted: source statements gaining project interpretation, diagnostics becoming target objects, bridge claims missing the explicit map, or restricted results being phrased as unconditional.
+- Curator adopts only the principal claims that survive review, writes them as prose in .log.md / note.md / report_*.md, and records notation-changing bridges or conventions in `conventions.md`.
+- Physicist specifies the intended work mode when dispatching tasks if a confusion is likely: source-native reading, project-side construction, bridge construction, diagnostic audit, or discrepancy resolution.
+
+This is deliberately prose-first. The framework does not require line-by-line claim tagging, and it does not introduce hidden IDs into normal agent context. It requires enough explicit wording that the next agent does not have to infer whether two formulas are being identified, compared through a map, or merely placed side by side.
+
 ## note.md — Source of Truth
 
 **What note.md is.** The paper's substantive content *in situ* — for each principal claim the node has established, the claim **together with the derivation that establishes it** (proof sketch, symbolic computation, argument, or cited external result) written to paper quality. Stacking the note.md files of the tree in narrative order should yield the body of the paper. An abstract-level registry of claims (each line a sentence plus a provenance link, with the actual derivation kept elsewhere) is **not** note.md; it is a table of contents mistakenly labelled SoT.
