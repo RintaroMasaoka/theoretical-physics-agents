@@ -14,16 +14,16 @@ The team and who owns what:
 |---|---|---|
 | **Direction audit** | `direction-auditor` | Lightweight pre-direction questions: local loop smell, external-knowledge smell, suspect premise, goal-lock risk |
 | **Direction** | `physicist` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives |
-| **Record** | `curator` | All tree writes — log.md (Evidence + Current State), plan.md, conventions.md, node creation / status / close / reframe, `report_{slug}.md` promotion, retraction, `dead_ends.md`, note.md (SoT) |
+| **Record** | `curator` | All tree writes — .log.md (Evidence + Current State), plan.md, conventions.md, node creation / status / close / reframe, `report_{slug}.md` promotion, retraction, `dead_ends.md`, note.md (SoT) |
 | **Verification** | `critic` | Independent review of every worker deliverable and of curator's note.md lifts |
-| **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing deliverables in `logs/` |
+| **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing deliverables in `.logs/` |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of physicist's wrap-up-input file into session log / focus / last_session / agenda; commit + push |
 
 `/run` itself owns only: the cycle loop, the resume beacon, pre-direction audit dispatch, parallel worker dispatch, auto-attaching critic to each worker, dispatching curator once per cycle with the right inputs, and handing session end to `session-wrap-up`.
 
 ## Constraints
 
-- **Write all prose in japanese.** Applies to `research/focus.md`, `logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `.codex/research-tree.md` and here may stay in English. The rule is about body prose, not structural tokens.
+- **Write all prose in japanese.** Applies to `research/focus.md`, `.logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `.codex/research-tree.md` and here may stay in English. The rule is about body prose, not structural tokens.
 - `request_user_input` and all other user-input solicitations are prohibited. Users are often away during `/run`; asking blocks the session. Text output to the user is limited to the final report emitted at Session End.
 - If the user initiates communication mid-session, respond and continue. Corrections from the user take precedence over scheduled dispatches.
 - **`exec_command("sleep ...")` is prohibited; polling via `exec_command("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
@@ -36,8 +36,8 @@ The team and who owns what:
 
 - **Never end a turn mid-run with a user-facing progress report.** Between cycles, the next action is a tool call — the next direction-auditor dispatch, the next physicist dispatch, the next worker batch, or Session End. If you are tempted to draft "I have finished cycle N of M; continuing with cycle N+1?", that is the stall — replace it with the actual next dispatch.
 - The **only** user-facing closing message is the final Session End report, emitted when `MAX_CYCLES` is exhausted or physicist returns `Status: session_complete`.
-- Compaction / reconnect / crash do not terminate a run. The `logs/.run-active` beacon (written at the start of every cycle) and the `SessionStart` hook jointly ensure the next session resumes the loop without a greeting. See `phases/session-lifecycle.md` § Resume for the mechanics and the fallback.
-- Progress summaries that genuinely belong somewhere go into `logs/{timestamp}_run.md` (session log, written by `session-wrap-up` from physicist's wrap-up input) or `research/focus.md § Context` (physicist's next-cycle direction). Neither is a yielded turn.
+- Compaction / reconnect / crash do not terminate a run. The `.logs/.run-active` beacon (written at the start of every cycle) and the `SessionStart` hook jointly ensure the next session resumes the loop without a greeting. See `phases/session-lifecycle.md` § Resume for the mechanics and the fallback.
+- Progress summaries that genuinely belong somewhere go into `.logs/{timestamp}_run.md` (session log, written by `session-wrap-up` from physicist's wrap-up input) or `research/focus.md § Context` (physicist's next-cycle direction). Neither is a yielded turn.
 
 ## Arguments
 
@@ -73,7 +73,7 @@ The research information model (tree structure, file roles, context scoping, con
 Read `phases/session-lifecycle.md` § Session Start. Key outcomes:
 
 - Beacon-based resume decision (fresh vs. resume mid-cycle)
-- Initial sanity gates: `research/log.md` must exist (else "Please /launch first" and stop); `concepts/` exists; `.gitignore` covers `logs/.run-active`
+- Initial sanity gates: `research/.log.md` must exist (else "Please /launch first" and stop); `concepts/` exists; `.gitignore` covers `.logs/.run-active`
 - `research/focus.md` existence check (if missing, the first physicist dispatch initialises it after direction-auditor runs — see session-lifecycle)
 
 `/run` does **not** read node-level tree files at session start. The ancestor-chain read is physicist's responsibility and happens at the start of every cycle (so physicist's context always reflects the post-cycle state, not a stale session-start snapshot).
@@ -86,7 +86,7 @@ Repeat up to `MAX_CYCLES`. At each iteration:
 
 ### 0. Beacon
 
-Overwrite `logs/.run-active` with:
+Overwrite `.logs/.run-active` with:
 
 ```json
 {"remaining": <MAX_CYCLES - cycles_done>, "max_cycles": <MAX_CYCLES>}
@@ -193,7 +193,7 @@ Session cycle: {cycle_number} of {MAX_CYCLES}
 """)
 ```
 
-Curator reads the deliverables, critic verdicts, and tree state; executes the directives; updates log.md / plan.md / conventions.md / note.md / status / report_*.md / dead_ends.md per its own operating rules; returns `DONE: {summary}`.
+Curator reads the deliverables, critic verdicts, and tree state; executes the directives; updates .log.md / plan.md / conventions.md / note.md / status / report_*.md / dead_ends.md per its own operating rules; returns `DONE: {summary}`.
 
 If curator returns with REVISE or REJECT critic verdicts unresolved — i.e., a worker deliverable whose critic verdict is REVISE means the worker should be re-dispatched next cycle — curator flags these in its return. The scheduler records the flag; direction-auditor and physicist see the flagged deliverables in the next cycle's prompts, and physicist decides whether to re-dispatch.
 
@@ -210,5 +210,5 @@ Read `phases/session-lifecycle.md` § Session End. Summary:
 1. **Simulation housekeeping** — if simulator ran, `/run` checks `research/**/src/` for superseded scripts and moves them to `src/archive/`. This is a mechanical step (physicist judges which are superseded — express as Tree Directives in the final focus.md — but the `mv` itself is scheduler-level).
 2. **Final curator sweep** — dispatch curator once more with an empty `Tree Directives` list and the accumulated evidence, asking for a tree-wide coherence pass (per curator's own session-end mandate).
 3. **Final physicist dispatch (session-end mode)** — physicist writes the wrap-up-input file (path obtained via `bash .scripts/log-path.sh wrap-up-input` and returned as `DONE: {path}`), using the final curator sweep and this session's direction-audit files as evidence for the next session's Focus and any `## Agenda` items. Capture the returned path for step 4.
-4. **`session-wrap-up` dispatch** — the agent consumes the wrap-up-input file (path passed in the dispatch prompt), writes `research/focus.md` / `logs/last_session.md` / a session log file (path obtained via `bash .scripts/log-path.sh run`) / `agenda.md`, deletes `logs/.run-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+4. **`session-wrap-up` dispatch** — the agent consumes the wrap-up-input file (path passed in the dispatch prompt), writes `research/focus.md` / `.logs/last_session.md` / a session log file (path obtained via `bash .scripts/log-path.sh run`) / `agenda.md`, deletes `.logs/.run-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 5. **Final report to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.

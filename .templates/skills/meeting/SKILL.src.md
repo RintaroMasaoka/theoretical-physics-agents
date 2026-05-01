@@ -25,9 +25,9 @@ English headings and labels in this prompt are structural examples, not literal 
 
 ```
 Initialization
-    ▼ Data loading: research/log.md + research/note.md (if exists) + research/story.md
+    ▼ Data loading: research/.log.md + research/note.md (if exists) + research/story.md
     ▼ Context-dependent start
-        ├─ No theme set (research/log.md missing) → Tell user to run /launch first
+        ├─ No theme set (research/.log.md missing) → Tell user to run /launch first
         └─ Theme already set → Present progress report and open discussion
     ▼ Free discussion with user
     ▼ Reflect decisions as they are made
@@ -35,10 +35,10 @@ Initialization
 
 ### Initialization
 
-Execute the following at session start (→ incremental recording principle). If `research/log.md` does not exist, skip to "When No Theme Is Set."
+Execute the following at session start (→ incremental recording principle). If `research/.log.md` does not exist, skip to "When No Theme Is Set."
 
 1. Capture ISO timestamp: `{{ runtime.tool_shell }}("date '+%Y-%m-%dT%H:%M'")`
-2. Update `research/log.md` frontmatter's `last_meeting` to the ISO timestamp
+2. Update `research/.log.md` frontmatter's `last_meeting` to the ISO timestamp
 3. Obtain a meeting log path via `bash .scripts/log-path.sh meeting`, then write the file (header only) to that path:
 
 ```markdown
@@ -55,15 +55,15 @@ After initialization, commit with `meeting: {localized initialization summary} Y
 
 ### When No Theme Is Set
 
-Research theme has not been configured (`research/log.md` does not exist). Tell the user to run `/launch` to set the theme and direction, then end the session.
+Research theme has not been configured (`research/.log.md` does not exist). Tell the user to run `/launch` to set the theme and direction, then end the session.
 
 ### When Theme Is Already Set
 
 Review the overall research direction and open discussion.
 
 ```
-Data loading: research/note.md + research/log.md + research/story.md + research/principles.md + research/focus.md + latest meeting log
-    ▼ Navigate the tree: ls research/ to see top-level children, read their log.md for status (note.md if exists)
+Data loading: research/note.md + research/.log.md + research/story.md + research/principles.md + research/focus.md + latest meeting log
+    ▼ Navigate the tree: ls research/ to see top-level children, read their .log.md for status (note.md if exists)
     ▼ If agenda.md exists (agenda accumulated by physicist during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
     ▼ Present progress report
     ▼ If loaded agenda items exist, display and discuss them as well
@@ -74,7 +74,7 @@ Data loading: research/note.md + research/log.md + research/story.md + research/
 
 **Progress report:**
 ```
-{theme label in {{ language }}}: {from research/note.md or research/log.md title}
+{theme label in {{ language }}}: {from research/note.md or research/.log.md title}
 {research tree label in {{ language }}}:
   {stable label in {{ language }}}: {N} nodes — {key findings}
   {active label in {{ language }}}: {N} nodes — {current focus}
@@ -87,9 +87,9 @@ Data loading: research/note.md + research/log.md + research/story.md + research/
 **Where to reflect:**
 - Changes to the paper's narrative structure (add/remove/reorder steps) → Edit `research/story.md`. Leave a `> [Meeting YYYY-MM-DD] {reason}` marker
 - Verified understanding changes → Edit `research/note.md`
-- Background / working state changes → Edit `research/log.md`
+- Background / working state changes → Edit `research/.log.md`
 - Cross-cutting constraints → Edit `research/principles.md` with a `> [Meeting YYYY-MM-DD]` marker
-- Direction changes scoped to a specific branch → Edit that branch's note.md (if exists) or log.md
+- Direction changes scoped to a specific branch → Edit that branch's note.md (if exists) or .log.md
 - Next `/run` session's focus changed → Edit `research/focus.md` (the session cursor that tells `/run` where to resume). Set the `Working on:` path to the new focus node and update context accordingly
 - **Significance rewrite**: When the discussion recontextualizes results, rewrite affected note.md files to reflect that synthesis. Meetings produce understanding that won't propagate to documents unless explicitly written. The meeting is the moment of synthesis — capture it in the documents, not just in the meeting log
 
@@ -115,7 +115,7 @@ Users may leave at any natural stopping point. Post-processing that writes every
 
 | Timing | Action |
 |---|---|
-| Session start | Create meeting log file in `logs/` + update `last_meeting` (→ see Initialization section) |
+| Session start | Create meeting log file in `.logs/` + update `last_meeting` (→ see Initialization section) |
 | When a topic arises | Append under the localized discussion-items heading in the meeting log via Edit |
 | When a decision is made | Append under the localized decisions heading + immediately reflect in relevant files. Constraints go to `research/principles.md` |
 | When significance is discussed | Rewrite affected note.md files to reflect the synthesis. Record under the localized changes-applied heading |

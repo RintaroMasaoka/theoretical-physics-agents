@@ -8,14 +8,14 @@ This phase file is a reference that PI Reads during `/run` to locate files in th
 research/                 # Research tree — the single knowledge structure
   note.md                 #   Root: verified knowledge (SoT, free-form)
   plan.md                 #   Root: strategy and decomposition
-  log.md                  #   Root: background, working state (ladder)
+  .log.md                  #   Root: background, working state (ladder)
   focus.md               #   Session cursor: "work here now"
   lib/                    #   Shared simulation framework (engine-builder)
     test/                 #     Module tests
   {Branch Name}/          #   Research direction (Title Case with spaces)
     note.md               #     Verified knowledge (free-form prose)
     plan.md               #     (optional) Strategy and approach for this branch
-    log.md                #     Research process (current state, evidence)
+    .log.md                #     Research process (current state, evidence)
     report_{slug}.md      #     (optional) PI-verified report (format: see .claude/research-tree.md)
     dead_ends.md          #     (optional) Failed approaches and lessons
     directives.md         #     (optional) Subtree-specific rules from meetings
@@ -23,7 +23,7 @@ research/                 # Research tree — the single knowledge structure
     data/                 #     Simulation data (simulator)
     images/               #     Figures and visualizations (simulator)
     {Child Name}/
-      log.md              #     Leaf: may only have log.md (no note.md yet)
+      .log.md              #     Leaf: may only have .log.md (no note.md yet)
 directives.md             # Project-wide methodology rules from meetings
 concepts/                 # Concept definitions (one term per file)
   {term}.md
@@ -31,7 +31,7 @@ literature/
   reading_list.md
   papers/{arxiv_id}/
 manuscript/               # Paper (managed by /write)
-logs/                     # Worker deliverables + chronological history
+.logs/                     # Worker deliverables + chronological history
   {timestamp}_{type}_{slug}.md  # Worker deliverables (reading notes, attempts, etc.)
   {timestamp}_{agent}.md  #   Worker logs (brief work summaries)
   {timestamp}_run.md      #   Session logs (PI's session records)
@@ -41,7 +41,7 @@ agenda.md                 # Items for next meeting (consumed by /meeting)
 
 ## Root Files
 
-File formats (note.md, plan.md, log.md) are defined in `.claude/research-tree.md`. This section covers only files specific to `/run` operations.
+File formats (note.md, plan.md, .log.md) are defined in `.claude/research-tree.md`. This section covers only files specific to `/run` operations.
 
 ### Directives (`directives.md`)
 
@@ -57,7 +57,7 @@ Rules imposed by the user through meetings. PI cannot create or modify directive
 
 ### Dead Ends (`dead_ends.md`)
 
-Optional. For nodes where approaches have been tried and failed. Prevents log.md from accumulating failed-approach details that obscure the working state.
+Optional. For nodes where approaches have been tried and failed. Prevents .log.md from accumulating failed-approach details that obscure the working state.
 
 ```markdown
 # Dead Ends

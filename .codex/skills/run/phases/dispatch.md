@@ -119,7 +119,7 @@ Session-end sweep: {true | false}
 
 Set `Session-end sweep: true` only on the final dispatch (session-end step 2). Curator reads this flag and performs the tree-wide coherence pass required at session boundaries.
 
-The scheduler does not enumerate "subnodes without note.md" / "log.md files over 150 lines" / etc. on every cycle — that is curator's own scanning responsibility. The scheduler only reports *what happened this cycle* (directives, evidence, cursor). Curator decides what to change based on its own state of the tree.
+The scheduler does not enumerate "subnodes without note.md" / ".log.md files over 150 lines" / etc. on every cycle — that is curator's own scanning responsibility. The scheduler only reports *what happened this cycle* (directives, evidence, cursor). Curator decides what to change based on its own state of the tree.
 
 Exception — session-end sweep: the scheduler still does not enumerate candidates; curator's own default-create / compress / staleness rules fire automatically when `Session-end sweep: true`.
 

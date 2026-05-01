@@ -32,7 +32,7 @@ Draft a single specified section as an academic paper.
    - **question** (stable) → Write as a conclusion. Present the question and provide the answer
    - **active** → Write honestly showing gaps. Clearly state what is known and what remains unresolved
    - **Writing non-stable items as established results is prohibited**
-2. Read evidence files (`logs/*_attempt_*.md`, `logs/*_reading_*.md`) and reports (`research/**/*report_*.md`) directly
+2. Read evidence files (`.logs/*_attempt_*.md`, `.logs/*_reading_*.md`) and reports (`research/**/*report_*.md`) directly
 3. Also Read original sources (`literature/papers/` `.tex` files) as needed
 4. Write following the conventions in `manuscript/conventions.md`
 5. If new terminology or notation is introduced, append to `manuscript/conventions.md` (modifying existing content is not allowed — to avoid breaking consistency with other sections. If existing conventions need changes, coordinate via PI / meeting)

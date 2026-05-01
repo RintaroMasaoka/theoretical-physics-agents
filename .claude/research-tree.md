@@ -2,7 +2,7 @@
 
 Research information is organized as a **tree** under `research/`. Every node is a folder. Files serve distinct roles:
 
-**Language.** Body prose in every file described here (log.md Current State, Evidence entries, note.md, plan.md, story.md, report_*.md, checks/*.md, principles.md, conventions.md, focus.md, dead_ends.md, …) is written in **japanese**. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current State`, `## Evidence`, `## Background`), frontmatter keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. The English examples below illustrate structure, not language.
+**Language.** Body prose in every file described here (.log.md Current State, Evidence entries, note.md, plan.md, story.md, report_*.md, checks/*.md, principles.md, conventions.md, focus.md, dead_ends.md, …) is written in **japanese**. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current State`, `## Evidence`, `## Background`), frontmatter keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. The English examples below illustrate structure, not language.
 
 | File | Layer | Role |
 |---|---|---|
@@ -10,7 +10,7 @@ Research information is organized as a **tree** under `research/`. Every node is
 | `report_{slug}.md` | Report (with provenance) | **Verified report with explicit provenance references.** Self-contained analysis promoted from worker deliverables after independent critic review. Curator creates when physicist directs promotion. Belongs to the node, not to the timeline. See below |
 | `checks/` | Verification record | **Node-local verification record.** Stable critic-note reviews, reproduction notes, and mechanical/numerical check summaries for the node's note.md / report_*.md claims. These are the durable review artifacts a reader may inspect without leaving the tree. They are evidence ledgers, not substitutes for derivations in note.md |
 | `plan.md` | Ladder (strategy) | **Strategy and approach.** How to attack this node — decomposition rationale, approach decisions, children's roles. Rewritten by curator as strategy evolves (physicist directs the change via `research/focus.md § Tree Directives`) |
-| `log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). Curator writes: every worker deliverable becomes an Evidence entry, every shift in understanding updates Current State |
+| `.log.md` | Ladder (process) | **Research process.** Has frontmatter (`kind`, `status`). Contains Current State (rewritten) and Evidence (append-only). Curator writes: every worker deliverable becomes an Evidence entry, every shift in understanding updates Current State |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
 | `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting research constraints |
 | `conventions.md` | Convention ledger | **Notation and convention source of truth (optional, root by default; subtree-local when needed).** Records choices that change how formulas are read — sign conventions, orderings, normalizations, index names, Fourier transforms, tensor leg orientation, symbol reservations, and terminology-to-symbol mappings. See § conventions.md — Notation and Convention Ledger |
@@ -37,11 +37,11 @@ Research nodes may contain computation subdirectories alongside their text files
 
 Any source code tied to a node lives in `src/`: simulator's measurement / analysis / plot scripts, and researcher's ad-hoc verification scripts for conjectures and examples. Both writers follow the same rules below.
 
-**Node-root prohibition.** Never place source files (`.py`, `.jl`, …) directly in the node folder. Node roots are reserved for narrative files (`log.md`, `plan.md`, `note.md`, `report_*.md`, `story.md`, `principles.md`, `conventions.md`) plus named artifact directories such as `checks/`, `src/`, `data/`, and `images/`. Loose scripts in node roots break the tree's legibility and bypass the `src/` reuse rule, so creating `src/` (even for a single script) is mandatory.
+**Node-root prohibition.** Never place source files (`.py`, `.jl`, …) directly in the node folder. Node roots are reserved for narrative files (`.log.md`, `plan.md`, `note.md`, `report_*.md`, `story.md`, `principles.md`, `conventions.md`) plus named artifact directories such as `checks/`, `src/`, `data/`, and `images/`. Loose scripts in node roots break the tree's legibility and bypass the `src/` reuse rule, so creating `src/` (even for a single script) is mandatory.
 
 **Placement — lowest common ancestor.** Place a script at the lowest node that is an ancestor of every node that uses it. Common cases: a script used only in node `X` lives in `X/src/`; a script shared across siblings of a parent `P` lives in `P/src/`; if two cousins share a script, it lives in their nearest common ancestor's `src/`. This avoids duplication and makes scripts discoverable from the research context.
 
-**Companion `{slug}.md` required.** Every script `{slug}.{ext}` carries a companion `{slug}.md` in the same `src/` directory — this is the script's permanent label in the tree, so a reader browsing `src/` knows what each file computes without opening the code or grepping `logs/`. Minimum content: what the script computes, key parameters, and how to run it. For simulator's long-lived measurement scripts the companion expands into a full implementation description (see simulator agent). For researcher's one-off attempt scripts a short blurb (a paragraph or two) is enough while the work is provisional. Once a script supports a note.md / report_*.md claim, the reproducibility summary belongs in the node's `checks/` record or in the promoted report; `logs/` remains the raw notebook, not the durable verification surface.
+**Companion `{slug}.md` required.** Every script `{slug}.{ext}` carries a companion `{slug}.md` in the same `src/` directory — this is the script's permanent label in the tree, so a reader browsing `src/` knows what each file computes without opening the code or grepping `.logs/`. Minimum content: what the script computes, key parameters, and how to run it. For simulator's long-lived measurement scripts the companion expands into a full implementation description (see simulator agent). For researcher's one-off attempt scripts a short blurb (a paragraph or two) is enough while the work is provisional. Once a script supports a note.md / report_*.md claim, the reproducibility summary belongs in the node's `checks/` record or in the promoted report; `.logs/` remains the raw notebook, not the durable verification surface.
 
 **Retirement.** Superseded scripts move to `src/archive/` rather than being deleted, so the reasoning history stays searchable.
 
@@ -75,7 +75,7 @@ Agents that are not simulator, researcher, or engine-builder treat all of `src/`
 **What does not belong here.**
 - General definitions of technical concepts — put those in `concepts/` and link them.
 - Derivations proving a claim — put those in note.md or a promoted report; the convention ledger may link to the derivation.
-- Process history or "we changed this on date X" narrative — put the evidence trail in log.md if needed. The ledger states the current convention.
+- Process history or "we changed this on date X" narrative — put the evidence trail in .log.md if needed. The ledger states the current convention.
 
 **Entry shape.** Free-form prose is allowed, but each entry must make these four facts recoverable:
 
@@ -95,7 +95,7 @@ The reason is load-bearing: without it, later agents treat the entry as arbitrar
 
 **What note.md is.** The paper's substantive content *in situ* — for each principal claim the node has established, the claim **together with the derivation that establishes it** (proof sketch, symbolic computation, argument, or cited external result) written to paper quality. Stacking the note.md files of the tree in narrative order should yield the body of the paper. An abstract-level registry of claims (each line a sentence plus a provenance link, with the actual derivation kept elsewhere) is **not** note.md; it is a table of contents mistakenly labelled SoT.
 
-**"Source of Truth" means derivation-bearing.** A reader who accepts a claim in note.md must be able to check *why* within note.md itself — because the derivation is present. Provenance references are Markdown links to node-local `checks/*.md` records whose front matter summarizes confidence, evidence channels, review channels, and scope; they are **not** a substitute for the derivation. A CONFIRMED claim accompanied only by a linked record gives the reader a stamp and nothing to check, which forces the reader into `logs/` and defeats note.md's purpose. The dividing line between note.md as a paper seed and note.md as an index is exactly this: derivations live in the note, not behind the record.
+**"Source of Truth" means derivation-bearing.** A reader who accepts a claim in note.md must be able to check *why* within note.md itself — because the derivation is present. Provenance references are Markdown links to node-local `checks/*.md` records whose front matter summarizes confidence, evidence channels, review channels, and scope; they are **not** a substitute for the derivation. A CONFIRMED claim accompanied only by a linked record gives the reader a stamp and nothing to check, which forces the reader into `.logs/` and defeats note.md's purpose. The dividing line between note.md as a paper seed and note.md as an index is exactly this: derivations live in the note, not behind the record.
 
 **Scope of "derivation".** What counts satisfies one of:
 - *Inline derivation* — a proof sketch, symbolic / numerical computation with its setup and conclusion, or worked-out argument. Full textbook detail is not required; what is required is that a reader in a neighbouring field can follow the logical chain from premises to conclusion without leaving note.md (modulo Markdown links to concept notes or sibling nodes that supply definitions, referenced lemmas, or derivations covered at another node).
@@ -103,11 +103,11 @@ The reason is load-bearing: without it, later agents treat the entry as arbitrar
 
 **All confidence levels carry derivation, not only CONFIRMED.** STRONG CONJECTURE, CONJECTURE, and OPEN claims that appear in note.md carry the partial argument, special-case verification, or motivating evidence that *is* available — with explicit scope — rather than being stated as bare tagged sentences. An OPEN claim appears in note.md only when its formulation is itself established knowledge (i.e., the node knows *what* the question is and *why* it is the right question); the answer being unknown is stated, but the framing is substance.
 
-**Audience — the context-free reader.** note.md is the one file in the tree written **for a reader who knows nothing about the research process**: no memory of attempts, critic verdicts, revision rounds, or session history; no access to `logs/`, `plan.md`, or `log.md`; no prior exposure to this project's internal vocabulary. The reader is presumed to be a working researcher in a neighbouring field, so standard terminology of that field can be used — but anything project-specific (internal IDs, attempt labels, working-group jargon) must be introduced before use, or linked to a concept note / sibling note.md with an explicit Markdown link. The test: if reading note.md leaves the reader needing to open any other file in this repository — whether to understand *what* the node has established or to check *why* it holds — note.md has failed. Markdown links are the acceptable form of "other file" — following a link to a concept definition or a sibling node's derivation is part of normal reading; forcing the reader into `log.md` or `logs/` is not.
+**Audience — the context-free reader.** note.md is the one file in the tree written **for a reader who knows nothing about the research process**: no memory of attempts, critic verdicts, revision rounds, or session history; no access to `.logs/`, `plan.md`, or `.log.md`; no prior exposure to this project's internal vocabulary. The reader is presumed to be a working researcher in a neighbouring field, so standard terminology of that field can be used — but anything project-specific (internal IDs, attempt labels, working-group jargon) must be introduced before use, or linked to a concept note / sibling note.md with an explicit Markdown link. The test: if reading note.md leaves the reader needing to open any other file in this repository — whether to understand *what* the node has established or to check *why* it holds — note.md has failed. Markdown links are the acceptable form of "other file" — following a link to a concept definition or a sibling node's derivation is part of normal reading; forcing the reader into `.log.md` or `.logs/` is not.
 
 This audience, combined with the derivation-bearing requirement, is the file's strongest constraint. The prose must read cleanly **in isolation** — not merely "in principle understandable given enough context."
 
-**Paper-skeleton test (run after any substantive edit).** Ask: *can a reader assemble this node's contribution into the paper body from note.md alone?* If the only way to reconstruct the derivation of a claim is by reading `logs/`, the note.md is still an abstract, not a paper section — it fails. The correct response is to either (i) lift the derivation into note.md at paper-quality detail, (ii) replace the bare claim with an honest lower-confidence formulation together with the partial derivation that is available, or (iii) remove the claim from note.md pending more work. A bare tagged claim whose derivation lives only in `logs/` is **never** the correct end state.
+**Paper-skeleton test (run after any substantive edit).** Ask: *can a reader assemble this node's contribution into the paper body from note.md alone?* If the only way to reconstruct the derivation of a claim is by reading `.logs/`, the note.md is still an abstract, not a paper section — it fails. The correct response is to either (i) lift the derivation into note.md at paper-quality detail, (ii) replace the bare claim with an honest lower-confidence formulation together with the partial derivation that is available, or (iii) remove the claim from note.md pending more work. A bare tagged claim whose derivation lives only in `.logs/` is **never** the correct end state.
 
 **No template.** The content and structure emerge from the research itself. A node studying a mathematical structure will naturally differ from one resolving a paradox or surveying a field. Prescribed sections constrain the researcher's thinking — the prose should take whatever form best captures the established knowledge together with its derivation.
 
@@ -116,14 +116,14 @@ This audience, combined with the derivation-bearing requirement, is the file's s
 1. *No frontmatter* — SoT files are clean prose.
 2. *Derivation or citation for every principal claim* — per "Scope of derivation" above. A claim stated with a provenance reference but without an inline derivation or a cited source is incomplete and must be completed or demoted before the dispatch closes.
 3. *Provenance link alongside every principal claim* — per the Verification Provenance Records section below. The link points to the `checks/*.md` record that summarises the verification chain in front matter and explains it in prose; it does not replace the derivation required by rule 2.
-4. *No chronology, no process-status phrasing.* The rule excludes **session history** from note.md, not **substance**. A proof, a symbolic computation with its setup and conclusion, or a worked-out argument is the content of a claim; rule 2 requires it to be there. What rule 4 rules out is the state of the investigation — dated status blocks (`Status update YYYY-MM-DD`, `Progress 2026-…`), Current-State / Evidence sections copied from log.md, cycle references (`r2`, `r3 stage`, `latest cycle`), review-state markers (`critic pending`, `REVISE minor`, `awaiting resubmission`), and workflow words (`resubmission`, `previous attempt`). These decay on the next cycle; the confidence information they try to convey is exactly what the linked provenance record encodes. Write the derivation in timeless prose and let the link carry the reader to verification metadata. Conflating substance with session history — treating a derivation as a "process artifact" and stripping it — produces the failure mode this whole section is written to prevent.
+4. *No chronology, no process-status phrasing.* The rule excludes **session history** from note.md, not **substance**. A proof, a symbolic computation with its setup and conclusion, or a worked-out argument is the content of a claim; rule 2 requires it to be there. What rule 4 rules out is the state of the investigation — dated status blocks (`Status update YYYY-MM-DD`, `Progress 2026-…`), Current-State / Evidence sections copied from .log.md, cycle references (`r2`, `r3 stage`, `latest cycle`), review-state markers (`critic pending`, `REVISE minor`, `awaiting resubmission`), and workflow words (`resubmission`, `previous attempt`). These decay on the next cycle; the confidence information they try to convey is exactly what the linked provenance record encodes. Write the derivation in timeless prose and let the link carry the reader to verification metadata. Conflating substance with session history — treating a derivation as a "process artifact" and stripping it — produces the failure mode this whole section is written to prevent.
 5. *No undefined project-internal labels* — ad-hoc identifiers that index items in a working list but have no stable definition elsewhere (e.g., open-question IDs, informal candidate/hypothesis tags, attempt slugs, cycle references) may appear only if they are either (a) introduced with a one-sentence explanation where first used, or (b) replaced by a self-contained description. Preferably just describe the thing in plain prose. A reader should never have to grep the repo to learn what an internal label means.
 6. *Every non-common technical term is gated* — for each term that a reader in a neighbouring field would not immediately recognise, use one of two gates:
    - *Markdown link*: `[display text](relative/path.md)` or `[display text](<relative/path with spaces.md>)` pointing to a concept note in `concepts/` or a sibling/ancestor node's note.md. Link targets are relative to the file containing the link. Follow the link to verify it resolves.
    - *Inline definition*: one sentence introducing the term before it is used.
    
    When in doubt, link; create a concept note in `concepts/` if one does not yet exist (see the curator agent's Knowledge Base Maintenance section).
-7. *Every load-bearing convention is either stated or linked* — if a claim depends on a nonstandard notation, sign, order, normalization, or symbol reservation, note.md must either state the convention before use or link to the applicable `conventions.md` entry. Do not rely on a convention being "known from earlier attempts" or buried in log.md. This rule is the convention analogue of rule 6: technical terms need definitions; symbolic choices need convention anchors.
+7. *Every load-bearing convention is either stated or linked* — if a claim depends on a nonstandard notation, sign, order, normalization, or symbol reservation, note.md must either state the convention before use or link to the applicable `conventions.md` entry. Do not rely on a convention being "known from earlier attempts" or buried in .log.md. This rule is the convention analogue of rule 6: technical terms need definitions; symbolic choices need convention anchors.
 
 *How rules 5 and 6 divide the work*: rule 5 targets *labels* (no stable definition exists to link to, so the cleanest fix is to describe the thing in prose); rule 6 targets *technical vocabulary* (a stable definition exists or should exist, so the cleanest fix is to link to a concept note).
 
@@ -140,7 +140,7 @@ This audience, combined with the derivation-bearing requirement, is the file's s
 - **Second-reader quality**: The agent who produced a result is anchored by the deliverable they wrote and is a poor judge of whether the prose reads cleanly to someone unfamiliar with the research process. note.md's promise is exactly that it reads cleanly to such a reader, with the derivation checkable in isolation, so the author should be a second reader — curator, coming to the evidence fresh
 - **Cross-tree coherence**: note.md at one node must harmonize with note.md at sibling and ancestor nodes (consistent terminology and notation, valid Markdown links, referenced concept notes and convention entries, derivations that compose across node boundaries). This requires reading the tree holistically, which physicist does not do during cycles — physicist's reading scope is the ancestor spine plus direct children. Curator reads the whole tree by design
 
-Curator's role with respect to note.md: every cycle, read worker deliverables and their critic verdicts together with physicist's tree directives, append Evidence to log.md, promote verified results into `report_{slug}.md` when physicist directs, preserve durable verification records in `checks/`, and — when a node accumulates CONFIRMED / STRONG CONJECTURE claims with derivations — lift those derivations (not just claims) into note.md at paper quality. Physicist never writes note.md directly; physicist's directives live in `research/focus.md § Tree Directives` and curator executes them.
+Curator's role with respect to note.md: every cycle, read worker deliverables and their critic verdicts together with physicist's tree directives, append Evidence to .log.md, promote verified results into `report_{slug}.md` when physicist directs, preserve durable verification records in `checks/`, and — when a node accumulates CONFIRMED / STRONG CONJECTURE claims with derivations — lift those derivations (not just claims) into note.md at paper quality. Physicist never writes note.md directly; physicist's directives live in `research/focus.md § Tree Directives` and curator executes them.
 
 Two narrow exceptions to curator-only note.md authorship (for any agent, not only curator's):
 
@@ -153,11 +153,11 @@ This rule has a failure mode to watch for: note.md drifting into a log-like chro
 
 ### Critic layering on note.md
 
-The derivations written into note.md are the substance the paper will carry. They must pass independent scrutiny **as they appear in note.md**, not merely inherit the scrutiny of the upstream attempt in `logs/`. Curator's distillation can introduce new failure modes that the attempt-level critic never saw — simplifications that glossed a gap, notational drift, a step that was obvious to the researcher being compressed past legibility, a composed argument spanning several attempts whose joint soundness was never checked.
+The derivations written into note.md are the substance the paper will carry. They must pass independent scrutiny **as they appear in note.md**, not merely inherit the scrutiny of the upstream attempt in `.logs/`. Curator's distillation can introduce new failure modes that the attempt-level critic never saw — simplifications that glossed a gap, notational drift, a step that was obvious to the researcher being compressed past legibility, a composed argument spanning several attempts whose joint soundness was never checked.
 
 The maintenance chain is therefore:
 
-1. Researcher produces an attempt in `logs/` with full working-note derivation
+1. Researcher produces an attempt in `.logs/` with full working-note derivation
 2. Critic reviews the attempt (blind or contextual) — the existing first-layer review
 3. Curator lifts the derivation into note.md at paper quality, consolidating across attempts as needed
 4. **Curator dispatches critic on the note.md derivation itself** as a separate pass, targeting the derivations touched in this dispatch. Mode is contextual by default (the critic needs the surrounding note.md + ancestor chain to judge whether the lifted derivation suffices for its role in the narrative); blind mode may be chosen when the derivation is purely mechanical
@@ -170,15 +170,15 @@ This layering is not optional decoration — when a note.md carries substantive 
 
 ### `checks/` — Node-local verification record
 
-`checks/` is the node's durable verification ledger. It exists because `logs/` is a chronological workbench: useful for reconstructing what happened, but the research tree is intended to be clean and self-contained without routine archaeology through session notebooks. When a verification result is important enough to justify a provenance reference on note.md or report_*.md, the review artifact a reader may inspect should live with the node.
+`checks/` is the node's durable verification ledger. It exists because `.logs/` is a chronological workbench: useful for reconstructing what happened, but the research tree is intended to be clean and self-contained without routine archaeology through session notebooks. When a verification result is important enough to justify a provenance reference on note.md or report_*.md, the review artifact a reader may inspect should live with the node.
 
 Typical contents:
 - `critic_note_{slug}_{YYMMDD_HHMM}.md` — critic Target B reviews of note.md sections, written as separate files so note.md stays publication-quality prose
 - `check_{slug}.md` — curator-written reproducibility summaries for scripts / computations that support a promoted claim, with links to the relevant `src/`, `data/`, or `images/` artifacts and the exact claim checked
 
-What belongs here is verification substance, not process chronology. A `checks/` file states the target claim, the method, the result, scope restrictions, and provenance contribution. It may cite raw `logs/` notebooks as provenance, but it must not require the reader to open them to know what was checked. Conversely, `checks/` is not a loophole around note.md self-containment: note.md still carries the derivation or cited external result. `checks/` records how that derivation was reviewed or reproduced.
+What belongs here is verification substance, not process chronology. A `checks/` file states the target claim, the method, the result, scope restrictions, and provenance contribution. It may cite raw `.logs/` notebooks as provenance, but it must not require the reader to open them to know what was checked. Conversely, `checks/` is not a loophole around note.md self-containment: note.md still carries the derivation or cited external result. `checks/` records how that derivation was reviewed or reproduced.
 
-**When to create**: when a note.md-level critic pass runs, when a mechanical / numerical check supports a promoted claim, or when a report_*.md needs a stable review record that should survive outside the chronological `logs/` stream.
+**When to create**: when a note.md-level critic pass runs, when a mechanical / numerical check supports a promoted claim, or when a report_*.md needs a stable review record that should survive outside the chronological `.logs/` stream.
 
 **Naming**: descriptive, lowercase-ish slugs with the check type first, e.g. `critic_note_surface_dispersion_260430_1430.md`, `check_sign_convention.md`. Timestamp Target B critic files so repeated review layers do not overwrite each other.
 
@@ -288,10 +288,10 @@ These are shape-examples showing how the record fields compose; the specific cla
 
 ## report_{slug}.md — Promoted Verified Reports
 
-Self-contained analyses that have been independently reviewed by the critic agent (auto-attached when the source deliverable was produced) and promoted from worker deliverables in `logs/` (a flat directory for raw research notebooks, outside the tree). Think of these as a student's report submitted for the record — structured, verified, and complete enough to stand on their own.
+Self-contained analyses that have been independently reviewed by the critic agent (auto-attached when the source deliverable was produced) and promoted from worker deliverables in `.logs/` (a flat directory for raw research notebooks, outside the tree). Think of these as a student's report submitted for the record — structured, verified, and complete enough to stand on their own.
 
 **Relationship to other files:**
-- Worker deliverables in `logs/` are research notebooks (raw work). Reports are the verified, promoted subset
+- Worker deliverables in `.logs/` are research notebooks (raw work). Reports are the verified, promoted subset
 - `note.md` is the node's integrated knowledge. Reports are individual analyses that note.md may draw from
 - `checks/` stores the stable verification record for reviews and reproducibility checks supporting note.md / report_*.md claims
 - Not every deliverable becomes a report. Not every node has reports
@@ -312,13 +312,13 @@ approach decisions and alternatives considered, strategic priorities.}
 
 **No template.** The content depends on the node's nature. A branch node might describe why its children exist and how they contribute; a leaf might outline the approach to a specific calculation or proof.
 
-**Relationship to log.md**: plan.md is forward-looking (how to proceed), while log.md captures current understanding and accumulated evidence. When strategy changes, rewrite plan.md; when results come in, update log.md.
+**Relationship to .log.md**: plan.md is forward-looking (how to proceed), while .log.md captures current understanding and accumulated evidence. When strategy changes, rewrite plan.md; when results come in, update .log.md.
 
 **When to create**: When a node has non-trivial strategic decisions — decomposition into children, choice of approach, prioritization. Simple leaf nodes doing straightforward work may not need one.
 
-## log.md — Research Process
+## .log.md — Research Process
 
-The node's research-process log — current state and evidence chain. Curator-maintained: every cycle, curator appends an Evidence entry for each new worker deliverable (with its critic verdict) and rewrites Current State when understanding shifts. Every node starts with log.md. plan.md is added when strategic decisions need recording. note.md comes last, when results are stable.
+The node's research-process log — current state and evidence chain. Curator-maintained: every cycle, curator appends an Evidence entry for each new worker deliverable (with its critic verdict) and rewrites Current State when understanding shifts. Every node starts with .log.md. plan.md is added when strategic decisions need recording. note.md comes last, when results are stable.
 
 ```markdown
 ---
@@ -335,7 +335,7 @@ status: {status}
 {append-only — never delete evidence entries}
 ```
 
-Root log.md additionally carries `last_meeting` in frontmatter and a `## Background` section for key references and prior work.
+Root .log.md additionally carries `last_meeting` in frontmatter and a `## Background` section for key references and prior work.
 
 ## Example Tree
 
@@ -343,7 +343,7 @@ Root log.md additionally carries `last_meeting` in frontmatter and a `## Backgro
 research/
   note.md              (project-level verified knowledge — SoT)
   plan.md              (root-level strategy and decomposition)
-  log.md               (background, working state — ladder)
+  .log.md               (background, working state — ladder)
   focus.md            (session cursor: "work here now")
   story.md             (paper narrative structure)
   principles.md        (cross-cutting research constraints)
@@ -357,20 +357,20 @@ research/
   Paradox Resolution/
     note.md            (derivation-bearing: the paradox stated, and the derivation resolving it)
     plan.md            (approach strategy)
-    log.md             (research process: current state, evidence)
+    .log.md             (research process: current state, evidence)
     report_symmetry_analysis.md  (curator-promoted verified report on symmetry constraints)
     checks/
       critic_note_symmetry_analysis_260430_1430.md
   Lattice BKT/
     note.md            (derivation-bearing knowledge of this direction)
     plan.md            (children decomposition and strategy)
-    log.md             (working state, evidence trail)
+    .log.md             (working state, evidence trail)
     src/               (scripts relevant to this branch)
       winding_decay.jl           (simulator's long-lived measurement script)
       winding_decay.md           (companion: algorithm + params + how to run)
       archive/                   (superseded scripts kept for history)
     Coulomb Escape/
-      log.md           (leaf: may only have log.md, no note.md yet)
+      .log.md           (leaf: may only have .log.md, no note.md yet)
       src/             (scripts specific to this leaf)
         escape_rate.jl           (simulator's measurement)
         escape_rate.md
@@ -388,24 +388,24 @@ research/
 | Layer | Location | Worker access | What it contains |
 |---|---|---|---|
 | **Research tree — SoT** | `research/**/note.md` | Read-only | Derivation-bearing verified knowledge — claim + derivation + Markdown provenance link, free-form prose written to paper quality (the paper's substance) |
-| **Research tree — reports** | `research/**/report_*.md` | Read-only | Self-contained analyses promoted from worker deliverables in `logs/` after critic acceptance |
+| **Research tree — reports** | `research/**/report_*.md` | Read-only | Self-contained analyses promoted from worker deliverables in `.logs/` after critic acceptance |
 | **Research tree — checks** | `research/**/checks/*.md` | Read-only, except curator and critic Target B | Node-local verification records with YAML front matter: note.md critic reviews, reproducibility summaries, and check results supporting provenance links |
 | **Research tree — plan** | `research/**/plan.md` | Read-only | Strategy: decomposition rationale, approach decisions, children's roles |
-| **Research tree — log** | `research/**/log.md` | Read-only | Process: current state, evidence chain, kind/status |
+| **Research tree — log** | `research/**/.log.md` | Read-only | Process: current state, evidence chain, kind/status |
 | **Convention ledger** | `research/**/conventions.md` | Read-only | Current notation, sign, ordering, normalization, and symbol-reservation choices, scoped to the node/subtree |
 | **Concept definitions** | `concepts/` | Read-only (concept-checker and curator may create/update entries) | Atomic term definitions, linked from any file via explicit Markdown links |
 | **Computation — framework** | `research/lib/` | Read-only (engine-builder writes) | Shared simulation modules |
 | **Computation — source** | `research/**/src/` | Write (simulator, researcher) | Source code tied to a node: measurement / analysis / plot / verification scripts, each with a companion `{slug}.md` |
 | **Computation — data** | `research/**/data/` | Write (simulator) | Simulation data (TSV with metadata headers) |
 | **Computation — figures** | `research/**/images/` | Write (simulator) | Visualizations |
-| **Research notebooks** | `logs/*_{type}_*.md` | Write (own deliverables only) | Worker deliverables: reading notes, attempts, simulations |
+| **Research notebooks** | `.logs/*_{type}_*.md` | Write (own deliverables only) | Worker deliverables: reading notes, attempts, simulations |
 | **Session cursor** | `research/focus.md` | Not relevant to workers | Physicist's current focus position in the tree |
-| **Session context** | `logs/last_session.md` | Not relevant to workers | Volatile work context for session handoff, written by session-wrap-up |
+| **Session context** | `.logs/last_session.md` | Not relevant to workers | Volatile work context for session handoff, written by session-wrap-up |
 
-**Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `report_*.md` for verified analyses, `checks/` for node-local verification records, `plan.md` for strategy and decomposition, `log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints, and `conventions.md` for notation / convention choices.
+**Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for verified knowledge (SoT), `report_*.md` for verified analyses, `checks/` for node-local verification records, `plan.md` for strategy and decomposition, `.log.md` for current research state and evidence, `story.md` for narrative structure, `principles.md` for constraints, and `conventions.md` for notation / convention choices.
 
-Each node has a `kind` and `status` in its **log.md** frontmatter (not note.md). Node status is set by curator, based on physicist's Tree Directives and evidence accumulated in log.md (see `.claude/agents/curator.md` and `.claude/agents/physicist.md`).
+Each node has a `kind` and `status` in its **.log.md** frontmatter (not note.md). Node status is set by curator, based on physicist's Tree Directives and evidence accumulated in .log.md (see `.claude/agents/curator.md` and `.claude/agents/physicist.md`).
 
-- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — node folders, `log.md`, `plan.md`, `dead_ends.md`, `asides.md`, `report_*.md`, `checks/`, `note.md`, `story.md`, `principles.md`, and `conventions.md` — executing physicist's directives plus its own default operating rules (including splitting overloaded nodes when the evidence record has outgrown the parent scope; see § note.md — Ownership and curator.md); **critic** may write only curator-dispatched Target B review files under `research/**/checks/`; simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
+- Writes to the research tree are split by agent: **physicist** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator** writes everything else in the tree — node folders, `.log.md`, `plan.md`, `dead_ends.md`, `asides.md`, `report_*.md`, `checks/`, `note.md`, `story.md`, `principles.md`, and `conventions.md` — executing physicist's directives plus its own default operating rules (including splitting overloaded nodes when the evidence record has outgrown the parent scope; see § note.md — Ownership and curator.md); **critic** may write only curator-dispatched Target B review files under `research/**/checks/`; simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`. No other agent writes to the tree
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified

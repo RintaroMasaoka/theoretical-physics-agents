@@ -11,7 +11,7 @@ The dispatcher provides file paths rather than inline data. Read only the sectio
 
 ## Deliverables and Logs
 
-Worker output goes to `logs/` — all worker output is provisional and stored there until downstream agents verify it (auto-critic in `/run`, PI review in `/write`) and incorporate the verified result into the research tree or paper.
+Worker output goes to `.logs/` — all worker output is provisional and stored there until downstream agents verify it (auto-critic in `/run`, PI review in `/write`) and incorporate the verified result into the research tree or paper.
 
 Each worker produces two files:
 
@@ -19,7 +19,7 @@ Each worker produces two files:
 
 2. **Log**: A short process summary — what you attempted, what you found, blockers encountered. This helps the human researcher audit workflow. Type is the agent name (`reader`, `researcher`, etc.); no slug.
 
-**Filename creation.** Run `bash .scripts/new-log.sh <type> [<slug>]` through Bash and capture stdout — it returns an absolute path of the form `logs/{YYMMDD_HHMM}_{type}[_{slug}].md`. Then use Write to put your content at that path. Do not run `date` yourself; do not pre-name the file. The timestamp is fixed at the moment of the script call, so naming is authoritative from creation — there is no downstream rename step that can fail and leave an orphan file behind.
+**Filename creation.** Run `bash .scripts/new-log.sh <type> [<slug>]` through Bash and capture stdout — it returns an absolute path of the form `.logs/{YYMMDD_HHMM}_{type}[_{slug}].md`. Then use Write to put your content at that path. Do not run `date` yourself; do not pre-name the file. The timestamp is fixed at the moment of the script call, so naming is authoritative from creation — there is no downstream rename step that can fail and leave an orphan file behind.
 
 Deliverables and logs are provisional. In `/run`, the scheduler auto-dispatches a critic on every deliverable, and curator then absorbs the verified evidence into the research tree (see `.claude/research-tree.md`). In `/write`, PI independently verifies deliverables before integrating them into the paper.
 

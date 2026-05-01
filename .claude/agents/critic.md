@@ -20,9 +20,9 @@ Verification is performed through two independent channels:
 
 Two distinct review targets, selected by the dispatcher. Verification criteria are shared; annotation method and output path differ because the two targets have different editability.
 
-### Target A — Attempt file in `logs/`
+### Target A — Attempt file in `.logs/`
 
-A researcher's attempt (`logs/{timestamp}_attempt_{slug}.md`). Attempt files are research notebooks — explicitly provisional, allow strikethrough and comments, and are never published as-is. Inline annotation is appropriate: the researcher will read your annotated file when producing the next revision, so keeping critique and content in the same file preserves continuity.
+A researcher's attempt (`.logs/{timestamp}_attempt_{slug}.md`). Attempt files are research notebooks — explicitly provisional, allow strikethrough and comments, and are never published as-is. Inline annotation is appropriate: the researcher will read your annotated file when producing the next revision, so keeping critique and content in the same file preserves continuity.
 
 Typical dispatcher: the `/run` scheduler, auto-attaching to every worker deliverable in the cycle's Critic step. The scheduler selects mode per `.claude/skills/run/phases/dispatch.md` § Auto-Critic Rule (blind for mechanical/mathematical deliverables — researcher attempts, simulator runs, engine-builder modules; contextual for narrative-dependent deliverables — reader summaries, scout surveys). The scheduler does not read your verdict; curator reads the inline-annotated file in the following step and lifts / absorbs accordingly. Physicist reads your verdict in the next cycle's prompt (via curator's flagged-for-review list) when it was REVISE / REJECT and decides whether to direct resubmission, pivot, or close.
 
@@ -32,7 +32,7 @@ A publication-quality prose file (`research/{path}/note.md`). note.md is the Sou
 
 Typical dispatcher: curator, running the "critic layering on note.md" step (see `.claude/agents/curator.md` § note.md critic layering) to verify that a derivation lifted into note.md is sound *as it appears in note.md*, not merely as it appeared in the upstream attempt.
 
-The dispatcher states the target explicitly in the prompt (target type + path + scope pointer listing which sections / claims to focus on for Target B). If the target type is ambiguous from the prompt, infer from the path: `logs/...attempt...` is Target A; `research/...note.md` is Target B. *Why path inference is safe as a fallback*: the two targets have disjoint write-paths by convention (attempts are never placed under `research/`, and note.md files are never placed under `logs/`), so the path alone disambiguates without risk of writing to the wrong surface. If a path fits neither pattern (e.g., a `report_*.md` or a custom location), return `FAILED: target type ambiguous for path {path} — dispatcher must state Target A / B explicitly` rather than guessing — writing to the wrong target corrupts either a research notebook or publication-quality prose.
+The dispatcher states the target explicitly in the prompt (target type + path + scope pointer listing which sections / claims to focus on for Target B). If the target type is ambiguous from the prompt, infer from the path: `.logs/...attempt...` is Target A; `research/...note.md` is Target B. *Why path inference is safe as a fallback*: the two targets have disjoint write-paths by convention (attempts are never placed under `research/`, and note.md files are never placed under `.logs/`), so the path alone disambiguates without risk of writing to the wrong surface. If a path fits neither pattern (e.g., a `report_*.md` or a custom location), return `FAILED: target type ambiguous for path {path} — dispatcher must state Target A / B explicitly` rather than guessing — writing to the wrong target corrupts either a research notebook or publication-quality prose.
 
 ## Verification Mode
 
@@ -191,7 +191,7 @@ Per § Provenance Record Rules (shared). Target A's reporting format is the **fu
 |---|---|
 | [principal claim] | e.g., `confidence: confirmed; evidence: [mechanical]; review: [critic-blind]; scope: full` or `confidence: strong-conjecture; evidence: [literature]; review: [critic-contextual]; scope: "concrete instance"` |
 
-Target A only: curator reads the proposed metadata (together with the attempt and critic verdict) in the cycle's curator step and composes it into the Evidence entry on the node's log.md, and eventually into a linked `checks/*.md` record when the derivation is lifted into note.md. Target B's dispatcher is curator directly, and curator composes incremental additions into each claim's existing linked record — see Target B's reporting format below.
+Target A only: curator reads the proposed metadata (together with the attempt and critic verdict) in the cycle's curator step and composes it into the Evidence entry on the node's .log.md, and eventually into a linked `checks/*.md` record when the derivation is lifted into note.md. Target B's dispatcher is curator directly, and curator composes incremental additions into each claim's existing linked record — see Target B's reporting format below.
 
 ### Recommendations for Resubmission
 [For REVISE/REJECT: specific directions for the next attempt]
@@ -203,7 +203,7 @@ Do **not** edit note.md itself. note.md is publication-quality prose for the con
 
 **Deliverable path**: `research/{node path}/checks/critic_note_{node-slug}_{YYMMDD_HHMM}.md`, where `{node-slug}` is a short identifier for the target node (e.g., `jordan-block-mpo`, `torus-ground-state-multiplicity`). If `checks/` does not exist, create it. This is a narrow exception to curator's normal sole-writer rule: curator dispatched you specifically to write this verification record. The dispatcher (curator) reads this file and applies fixes to note.md.
 
-Do not put Target B critique files in `logs/`. `logs/` is a chronological workbench; note.md-level verification is part of the node's durable record and must remain inspectable without leaving the research tree.
+Do not put Target B critique files in `.logs/`. `.logs/` is a chronological workbench; note.md-level verification is part of the node's durable record and must remain inspectable without leaving the research tree.
 
 **File format**:
 

@@ -108,5 +108,5 @@ Structure:
 ## Constraints
 
 - Follow common rules in `{{ runtime.common_file }}`
-- Write only to `research/lib/` and `research/lib/test/` (deliverables go in `logs/`). Exception: updating call sites in `research/**/src/` when refactoring APIs
+- Write only to `research/lib/` and `research/lib/test/` (deliverables go in `.logs/`). Exception: updating call sites in `research/**/src/` when refactoring APIs
 - Do not write task-specific measurement code — that is simulator's job (per the boundary criterion in Module Design Principles)

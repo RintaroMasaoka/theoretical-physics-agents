@@ -11,13 +11,13 @@ No need to rush — the next `/run` resumes from where you left off.
 
 ## PI-owned Steps (require research judgment)
 
-1. **Simulation housekeeping** (if simulator ran): Check research nodes' `src/` for superseded scripts. Move to `src/archive/` — never delete. Which are superseded is a research judgment (which physical setup is the current canonical one?) — PI does this, not the wrap-up agent. Note each move in the wrap-up input (step 3 below) so it is recorded in `logs/last_session.md`.
+1. **Simulation housekeeping** (if simulator ran): Check research nodes' `src/` for superseded scripts. Move to `src/archive/` — never delete. Which are superseded is a research judgment (which physical setup is the current canonical one?) — PI does this, not the wrap-up agent. Note each move in the wrap-up input (step 3 below) so it is recorded in `.logs/last_session.md`.
 
-2. **Knowledge base coherence** (mandatory at session end — not optional, not skippable on the grounds that changes "felt minor"): Dispatch **curator** to sweep the tree with `Session-end sweep: true`. Include concrete pointers from this session when available — subnodes without note.md, log.md files over ~150 lines, CONFIRMED claims added since the last curator dispatch, recently retracted/revised claims, and overloaded nodes that may need splitting. These pointers help curator avoid missing obvious candidates, but they do not define the sweep's boundary; curator still reads the tree holistically and applies its own default-create, compression, staleness, and structural-maintenance rules. Curator's work, once complete, is reviewed via `git diff` before commit.
+2. **Knowledge base coherence** (mandatory at session end — not optional, not skippable on the grounds that changes "felt minor"): Dispatch **curator** to sweep the tree with `Session-end sweep: true`. Include concrete pointers from this session when available — subnodes without note.md, .log.md files over ~150 lines, CONFIRMED claims added since the last curator dispatch, recently retracted/revised claims, and overloaded nodes that may need splitting. These pointers help curator avoid missing obvious candidates, but they do not define the sweep's boundary; curator still reads the tree holistically and applies its own default-create, compression, staleness, and structural-maintenance rules. Curator's work, once complete, is reviewed via `git diff` before commit.
 
 ## Mechanical Steps (delegated to `session-wrap-up` agent)
 
-3. **Assemble wrap-up input** by first running `bash .scripts/log-path.sh wrap-up-input` to obtain a timestamped path of the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`, then writing the substantive content there. The `session-wrap-up` agent distributes it to the right files, cleans up the beacon, and commits/pushes — it receives the path explicitly via its dispatch prompt (step 4).
+3. **Assemble wrap-up input** by first running `bash .scripts/log-path.sh wrap-up-input` to obtain a timestamped path of the form `.logs/{YYMMDD_HHMM}_wrap-up-input.md`, then writing the substantive content there. The `session-wrap-up` agent distributes it to the right files, cleans up the beacon, and commits/pushes — it receives the path explicitly via its dispatch prompt (step 4).
 
    **Parse contract** (must match what the agent expects): Top-level section boundaries are the five canonical `##` headings in the order `## Focus`, `## Last Session`, `## Session Log`, `## Agenda` (optional — omit the heading entirely if not needed), `## Commit`. Anything between two canonical headings (or between `## Commit` and EOF) is that section's body. **Intra-section `##` headings (e.g., the `## Next Session` / `## Blockers` inside the Focus body) are transcribed verbatim into the output file** — PI does not need to demote them. The full rule is duplicated in `.claude/agents/session-wrap-up.md` § Parse rule.
 
@@ -30,7 +30,7 @@ No need to rush — the next `/run` resumes from where you left off.
    {body to write into research/focus.md — see template below}
 
    ## Last Session
-   {body to write into logs/last_session.md — see template below}
+   {body to write into .logs/last_session.md — see template below}
 
    ## Session Log
    ### Accomplished
@@ -64,12 +64,12 @@ No need to rush — the next `/run` resumes from where you left off.
    {If any}
    ```
 
-   `## Last Session` body (overwrites `logs/last_session.md`):
+   `## Last Session` body (overwrites `.logs/last_session.md`):
    - Active nodes' operational detail (sizes, seed counts, blockers)
    - PI's thinking for next session
    - Anything useful to future PI that doesn't belong in the tree
 
-   The `Session Log` section becomes `logs/{YYMMDD_HHMM}_run.md` (permanent record, never overwrite). The `session-wrap-up` agent obtains its path via `bash .scripts/log-path.sh run` at the moment of writing, so the timestamp reflects when the log was finalised rather than session start.
+   The `Session Log` section becomes `.logs/{YYMMDD_HHMM}_run.md` (permanent record, never overwrite). The `session-wrap-up` agent obtains its path via `bash .scripts/log-path.sh run` at the moment of writing, so the timestamp reflects when the log was finalised rather than session start.
 
    `Agenda` is optional. If present, the wrap-up agent overwrites `agenda.md` with these items.
 
@@ -79,9 +79,9 @@ No need to rush — the next `/run` resumes from where you left off.
    Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {path returned by log-path.sh in step 3}\n\nExecute per your own specification.")
    ```
 
-   The agent will: write the session log / focus.md / last_session.md / agenda.md, delete `logs/.run-active`, `git add` the relevant paths, `git commit` with the PI-provided message, and `git push`. It returns `DONE: committed {hash}` or `FAILED: {reason}`.
+   The agent will: write the session log / focus.md / last_session.md / agenda.md, delete `.logs/.run-active`, `git add` the relevant paths, `git commit` with the PI-provided message, and `git push`. It returns `DONE: committed {hash}` or `FAILED: {reason}`.
 
-   **Prerequisite**: `logs/.run-active` must be listed in `.gitignore`. If you notice it is missing from `.gitignore`, add it before the dispatch so a crash-left beacon never accidentally enters the repo via the wrap-up's `git add`.
+   **Prerequisite**: `.logs/.run-active` must be listed in `.gitignore`. If you notice it is missing from `.gitignore`, add it before the dispatch so a crash-left beacon never accidentally enters the repo via the wrap-up's `git add`.
 
 ## Final Report (to the user)
 

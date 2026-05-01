@@ -19,7 +19,7 @@ No research judgment is required. If the input file is malformed or missing a re
 
 ## Input
 
-**Path**: passed to you in the dispatch prompt as `Wrap-up input: {path}`. The path was returned by physicist's session-end-mode call to `bash .scripts/new-log.sh wrap-up-input` and has the form `logs/{YYMMDD_HHMM}_wrap-up-input.md`. Read that file. If the dispatch prompt does not name it, return `FAILED: wrap-up input path not provided`.
+**Path**: passed to you in the dispatch prompt as `Wrap-up input: {path}`. The path was returned by physicist's session-end-mode call to `bash .scripts/new-log.sh wrap-up-input` and has the form `.logs/{YYMMDD_HHMM}_wrap-up-input.md`. Read that file. If the dispatch prompt does not name it, return `FAILED: wrap-up input path not provided`.
 
 **Format** (PI writes this before dispatching you):
 
@@ -30,7 +30,7 @@ No research judgment is required. If the input file is malformed or missing a re
 {body for research/focus.md}
 
 ## Last Session
-{body for logs/last_session.md}
+{body for .logs/last_session.md}
 
 ## Session Log
 ### Accomplished
@@ -68,13 +68,13 @@ Execute in this order:
 
 Write exactly the body of the input's `## Focus` section. PI's body already carries the `# Focus` top-level heading and the `## Next Session` / `## Blockers` subheadings — do not add your own framing.
 
-### 2. `logs/last_session.md` (overwrite)
+### 2. `.logs/last_session.md` (overwrite)
 
 Write exactly the body of the input's `## Last Session` section. No framing added.
 
 ### 3. Session log (create)
 
-Obtain the path by running `bash .scripts/new-log.sh run` and capturing stdout — the script returns a timestamped path of the form `logs/{YYMMDD_HHMM}_run.md`. Then {{ runtime.tool_write }} the session log to that path with this exact structure:
+Obtain the path by running `bash .scripts/new-log.sh run` and capturing stdout — the script returns a timestamped path of the form `.logs/{YYMMDD_HHMM}_run.md`. Then {{ runtime.tool_write }} the session log to that path with this exact structure:
 
 ```markdown
 # Run {date} {time}
@@ -106,12 +106,12 @@ If the input has no `## Agenda` section, skip this file entirely (leave any exis
 ### 5. Delete the resume beacon
 
 ```bash
-rm -f logs/.run-active
+rm -f .logs/.run-active
 ```
 
 This marks the session as cleanly ended. The next `/run` will see no beacon and start fresh.
 
-**Prerequisite check before committing**: `logs/.run-active` must be listed in `.gitignore`. If a `git check-ignore logs/.run-active` (or equivalent) shows it is NOT ignored, append `logs/.run-active` to `.gitignore` and `git add .gitignore` before step 6. This guards against a race where a crash-left beacon from a parallel session gets accidentally committed.
+**Prerequisite check before committing**: `.logs/.run-active` must be listed in `.gitignore`. If a `git check-ignore .logs/.run-active` (or equivalent) shows it is NOT ignored, append `.logs/.run-active` to `.gitignore` and `git add .gitignore` before step 6. This guards against a race where a crash-left beacon from a parallel session gets accidentally committed.
 
 ### 6. Commit and push
 

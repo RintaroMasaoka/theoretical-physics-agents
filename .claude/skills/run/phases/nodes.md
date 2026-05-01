@@ -10,7 +10,7 @@ Folders are named in **Title Case with spaces**, using **semantic slugs** that d
 
 ## kind (Cognitive Mode)
 
-kind defines the nature of a node and determines the **cognitive mode** when passing it to the researcher. Physicist may propose new kinds in `research/focus.md`; curator records the chosen kind in the node's log.md frontmatter when creating or updating the node.
+kind defines the nature of a node and determines the **cognitive mode** when passing it to the researcher. Physicist may propose new kinds in `research/focus.md`; curator records the chosen kind in the node's .log.md frontmatter when creating or updating the node.
 
 | kind | Cognitive Mode | Description |
 |------|---------------|-------------|

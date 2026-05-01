@@ -10,7 +10,7 @@ The cycle loop between Session Start and Session End is purely mechanical (direc
 
 Execute in order.
 
-### 0. Resume Check — `logs/.run-active` beacon
+### 0. Resume Check — `.logs/.run-active` beacon
 
 The beacon is written at the start of every cycle (SKILL § step 0). Its presence at session start means a prior run was mid-cycle when interrupted (compaction, crash, reconnect). Rules:
 
@@ -18,7 +18,7 @@ The beacon is written at the start of every cycle (SKILL § step 0). Its presenc
 - **If `/run` was invoked without an argument** (`MAX_CYCLES` defaults to `5`), consult the beacon:
   - File exists, `remaining > 0`, **not stale** → resume after interruption. Set `MAX_CYCLES := remaining`, skip any greeting, skip the initial sanity gates below (the prior session passed them), proceed directly to Cycle Loop step 0. Do not re-emit a welcome message.
   - File exists with `remaining <= 0` → prior session ended cleanly between the last cycle and Session End. Delete the beacon; treat as fresh start.
-  - File exists but **stale** — mtime older than 24h, or a newer `logs/*_run.md` exists → prior session is not truly in flight. Delete the beacon; treat as fresh start.
+  - File exists but **stale** — mtime older than 24h, or a newer `.logs/*_run.md` exists → prior session is not truly in flight. Delete the beacon; treat as fresh start.
   - File does not exist → normal fresh start.
 
 The beacon is gitignored (see `.gitignore`) and deleted at Session End by `session-wrap-up`. On the very first cycle of a fresh session it briefly reads `{"remaining": MAX_CYCLES, …}`; a resume reading `remaining == MAX_CYCLES` is equivalent to "fresh start minus the greeting" — proceed without the greeting.
@@ -27,14 +27,14 @@ The beacon is gitignored (see `.gitignore`) and deleted at Session End by `sessi
 
 ### 1. Initial Sanity Gates (fresh start only)
 
-- **`research/log.md` does not exist** → display "`research/log.md` が見つかりません。まず `/launch` でテーマを設定してください。" and stop. No further steps, no cycle loop.
+- **`research/.log.md` does not exist** → display "`research/.log.md` が見つかりません。まず `/launch` でテーマを設定してください。" and stop. No further steps, no cycle loop.
 - **`research/focus.md` does not exist** → do not attempt to construct it in the scheduler. The first physicist dispatch in the cycle loop will initialise it (see SKILL § Cycle step 2 — pass `focus.md missing — initialise at research/ root` in the dispatch prompt).
 - **`concepts/` directory does not exist** → `mkdir concepts/`. Initial concept notes are written on-demand by curator when its self-containment audit finds undefined terms.
-- **`.gitignore` does not contain `logs/.run-active`** → append the line. The beacon must not enter the repo via `session-wrap-up`'s `git add`.
+- **`.gitignore` does not contain `.logs/.run-active`** → append the line. The beacon must not enter the repo via `session-wrap-up`'s `git add`.
 
 ### 2. Session Log Filename
 
-The session log is created at Session End by `session-wrap-up`, which calls `bash .scripts/log-path.sh run` to obtain a timestamped path of the form `logs/{YYMMDD_HHMM}_run.md`. The scheduler does not manage the filename directly.
+The session log is created at Session End by `session-wrap-up`, which calls `bash .scripts/log-path.sh run` to obtain a timestamped path of the form `.logs/{YYMMDD_HHMM}_run.md`. The scheduler does not manage the filename directly.
 
 ### 3. Directives Load (informational)
 
@@ -57,7 +57,7 @@ mv research/{path}/src/{slug}.md research/{path}/src/archive/
 
 Never delete — superseded scripts move to `src/archive/` so the reasoning history stays searchable. Record each move for the wrap-up input's `## Session Log` § `### Node Changes`.
 
-This is the one Tree Directive kind the scheduler executes directly rather than routing to curator. Reason: curator's write scope is the tree's **prose files** (log.md / plan.md / note.md / dead_ends.md / report_*.md / story.md / principles.md) — it does not touch simulation source code under `src/`. Filesystem moves of `.jl` / `.py` files therefore fall outside curator's authority and become scheduler-owned housekeeping. Every other Tree Directive routes to curator in step 6 of the cycle loop.
+This is the one Tree Directive kind the scheduler executes directly rather than routing to curator. Reason: curator's write scope is the tree's **prose files** (.log.md / plan.md / note.md / dead_ends.md / report_*.md / story.md / principles.md) — it does not touch simulation source code under `src/`. Filesystem moves of `.jl` / `.py` files therefore fall outside curator's authority and become scheduler-owned housekeeping. Every other Tree Directive routes to curator in step 6 of the cycle loop.
 
 If physicist's focus.md has no archive directives, skip this step. Which scripts are superseded is a research judgment (physicist's), not a mechanical one.
 
@@ -68,7 +68,7 @@ Dispatch curator one final time with:
 ```
 Agent(subagent_type="curator", prompt="""
 ## Task
-Session-end tree-wide coherence pass. Apply your default operating rules (note.md creation for subnodes with CONFIRMED evidence, log.md compression for files over ~150 lines, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree.
+Session-end tree-wide coherence pass. Apply your default operating rules (note.md creation for subnodes with CONFIRMED evidence, .log.md compression for files over ~150 lines, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree.
 
 ## Tree Directives
 (none — session-end sweep)
@@ -116,7 +116,7 @@ If physicist returns `FAILED:`, the scheduler writes a minimal wrap-up input its
 Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {wrap-up-input path captured from step 3}\n\nExecute per your own specification.")
 ```
 
-The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `logs/last_session.md` / a session log file (created via `bash .scripts/log-path.sh run`) / `agenda.md` (if the input had an Agenda section), deletes `logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (physicist-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `.logs/last_session.md` / a session log file (created via `bash .scripts/log-path.sh run`) / `agenda.md` (if the input had an Agenda section), deletes `.logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (physicist-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 
 If `git push` fails (network, auth, non-fast-forward), the commit is preserved locally; the final report (step 5) notes the push failure so the user can retry.
 
