@@ -30,7 +30,7 @@ Read in this order:
 
 Do **not** read:
 
-- `literature/reading_list.md`
+- `literature/catalog.jsonl`
 - arbitrary recent `.logs/`
 - sibling branches outside the cursor
 - grandchildren

@@ -226,7 +226,7 @@ Variations by worker:
 - **researcher attempt**: as above.
 - **simulator run**: `{date} [simulation_{N}_{slug}]({relative-link-to-report-or-deliverable}): {setup}, {observable}, {result summary}. Artifacts: [script]({relative-link}), [data]({relative-link}), [figure]({relative-link}) as applicable. critic {verdict} ({mode}, numerical verification: {details}). Agreement with {known limit / prior claim}: {yes/no with confidence}`.
 - **reader**: `{date} [reading_{paper-slug}]({relative-link-to-deliverable}): {what was extracted — claim, method, limitation}. Relevance to {node target}: {paragraph}`.
-- **scout**: `{date} [survey_{topic}]({relative-link-to-deliverable}): {what was found — papers added to reading_list, known results, open problems}. {any reading_list.md updates as Markdown links}`.
+- **scout**: `{date} [survey_{topic}]({relative-link-to-deliverable}): {what was found — papers added to the literature catalog, known results, open problems}. {any `literature/catalog.jsonl` updates as Markdown links}`.
 - **engine-builder**: `{date} [engine_{module}]({relative-link-to-deliverable-or-module}): {what was built — module name, capabilities}. critic {verdict} ({tests passed / known limitations})`.
 
 If the critic verdict was REVISE or REJECT, **still append the Evidence entry** — the attempt happened, the verdict is part of the record. Mark the entry clearly so physicist sees it in the next cycle and can direct resubmission or pivot.

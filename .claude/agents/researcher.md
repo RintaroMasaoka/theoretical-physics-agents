@@ -50,7 +50,7 @@ The purpose of reading literature is "to obtain tools that support your own reas
 - When the literature has no answer: that is where research begins. Reason, construct, and compute on your own
 
 **Verifying claims about literature scope:** Before asserting what another paper "covers" or "does not cover":
-1. Check the paper's status in `literature/reading_list.md`
+1. Check the paper's status in `literature/catalog.jsonl`
 2. If status is not `read` → you cannot make scope claims. Explicitly note "scope unknown as paper is unread"
 3. If status is `read` → cite only content **explicitly recorded** in the reading note as evidence
 4. Note that reading notes are selective extractions: "not in the reading note ≠ not in the paper." Negative claims ("paper X only covers Y") are weak evidence because the reader may have omitted it as less relevant. State this caveat explicitly

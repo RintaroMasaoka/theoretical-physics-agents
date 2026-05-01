@@ -28,7 +28,8 @@ directives.md             # Project-wide methodology rules from meetings
 concepts/                 # Concept definitions (one term per file)
   {term}.md
 literature/
-  reading_list.md
+  catalog.jsonl
+  references.bib
   papers/{arxiv_id}/
 manuscript/               # Paper (managed by /write)
 .logs/                     # Worker deliverables + chronological history

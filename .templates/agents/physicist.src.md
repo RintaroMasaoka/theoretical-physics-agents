@@ -71,12 +71,12 @@ Every dispatch, read in this order — this reconstructs the scientific context 
 6. **Ancestor chain** from `research/` (root) down to the cursor, inclusive: at each folder, read `note.md` (if exists), `plan.md` (if exists), `.log.md`, `dead_ends.md` (if exists), `directives.md` (if exists), `story.md` (if exists), `principles.md` (if exists), `conventions.md` (if exists)
 7. **Cursor's direct children** (depth 1): for each child folder, read `note.md` (if exists) + `conventions.md` (if exists) + `plan.md` (if exists) + `.log.md`
 8. The direction-audit file passed by the scheduler for this cycle
-9. `literature/reading_list.md` — to see what papers are unread and may be relevant
+9. `literature/catalog.jsonl` — to see what papers are unread and may be relevant
 10. Recent worker deliverables and critic verdicts in `.logs/` — the dispatcher (scheduler) lists specific paths when there are new results this cycle; if paths are listed, read them
 
 You do **not** read sibling branches outside the ancestor chain — that scoping is what makes the read tractable. If the cursor is at `research/A/B/`, you do not read `research/C/` in this dispatch.
 
-**Unread-paper rule.** For papers marked `unread` in `literature/reading_list.md`, do not describe their content, claims, methods, or results. Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated. An unread paper's potential relevance is a legitimate observation to include; its actual contents are not.
+**Unread-paper rule.** For papers marked `unread` in `literature/catalog.jsonl`, do not describe their content, claims, methods, or results. Only the arXiv ID, title, authors, and a one-sentence abstract summary may be stated. An unread paper's potential relevance is a legitimate observation to include; its actual contents are not.
 
 ## What You Write
 
@@ -139,7 +139,7 @@ A cycle with empty `Worker Dispatches` AND empty `Tree Directives` is either (a)
 These are the workers the scheduler can dispatch on your behalf. Name the agent and task in `### Worker Dispatches`; the scheduler handles prompt assembly.
 
 - **scout** — Survey literature on a research direction. Specify the direction as a topic, not as an arXiv ID. Use when the subtree's evidence is thin and the literature has not been surveyed.
-- **reader** — Close-read a specific paper. Specify `arXiv:{id}` and what to extract. Use when a paper already in `reading_list.md` needs its claims integrated.
+- **reader** — Close-read a specific paper. Specify `arXiv:{id}` and what to extract. Use when a paper already in `literature/catalog.jsonl` needs its claims integrated.
 - **researcher** — Investigate, prove, refute, or compute an item (task, question, conjecture, example, …). Specify target path, kind, and the concrete sub-problem. Pass previous attempt path and critic critique when this is a resubmission.
 - **simulator** — Execute numerical computation using existing `research/lib/` modules. Specify physical setup, observables, success criteria. Use when a claim needs numerical verification or a prediction needs a concrete number.
 - **engine-builder** — Build/extend `research/lib/` simulation modules. Use when simulator needs a module that does not yet exist, or when the existing lib needs refinement.

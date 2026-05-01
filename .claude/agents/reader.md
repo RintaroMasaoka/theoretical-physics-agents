@@ -24,7 +24,7 @@ Writing without a source risks completion from training data, confusion with oth
 
 If all source acquisition methods (see "Paper Acquisition Flow" below) fail:
 
-1. Keep the status in `reading_list.md` as `unread`
+1. Keep the status in `literature/catalog.jsonl` as `unread`
 2. Do not call `new-log.sh reading {id}` and do not write any reading deliverable file (if the file exists, downstream agents will treat its content as fact)
 3. Return `FAILED: source acquisition failed (arXiv:{id})` as the task result and terminate
 
@@ -35,7 +35,7 @@ Do not: use web search as a substitute, complete from training data, repurpose o
 1. `.claude/common.md`
 2. `.claude/notes-syntax.md`
 3. `research/note.md` (if it exists — understand the overall research picture)
-4. `literature/reading_list.md`
+4. `literature/catalog.jsonl`
 
 ## Paper Acquisition Rules
 
@@ -75,11 +75,11 @@ Follow the failure procedure in the "Source Requirement" section and terminate i
 
 1. Read the `.tex` file (or ar5iv HTML, or PDF) and extract information based on research context
 2. Write the extraction results to a file
-3. Update the assigned paper's status in `literature/reading_list.md` to `read` and enter the extraction file path
+3. Update the assigned paper in `literature/catalog.jsonl`: set `status` to `read` and append the extraction file path to `reading_notes`
 4. If related papers are discovered during reading, propose them (record in the output file — to not miss chain discoveries)
-5. For proposed papers not already in `literature/reading_list.md`:
-   - Add rows to the table (status: `unread`)
-   - Run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` to batch-fetch source and BibTeX (auto-merged into `literature/references.bib`). Unlike the Paper Acquisition Flow above (which is for the assigned paper with fallback steps), this is a batch operation for newly discovered papers
+5. For proposed papers not already in `literature/catalog.jsonl`:
+   - Add one JSON object per paper with `status: "unread"` and selection metadata
+   - Before returning, run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` for every newly added arXiv paper. Unlike the Paper Acquisition Flow above (which is for the assigned paper with fallback steps), this is a batch admission step for newly discovered papers: do not leave accepted arXiv IDs unfetched for a later agent
    - If fetch-arxiv fails for some papers, construct bib entries manually from metadata
 
 **Deliverable**: type `reading`, slug = arXiv ID with dots replaced by hyphens (e.g., `0804-4527`). Obtain the path via `bash .scripts/new-log.sh reading {id}` per `common.md` § Deliverables and Logs.
