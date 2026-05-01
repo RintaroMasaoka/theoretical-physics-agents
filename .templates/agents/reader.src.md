@@ -81,6 +81,7 @@ Follow the failure procedure in the "Source Requirement" section and terminate i
    - Add one JSON object per paper with `status: "unread"` and selection metadata
    - Before returning, run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` for every newly added arXiv paper. Unlike the Paper Acquisition Flow above (which is for the assigned paper with fallback steps), this is a batch admission step for newly discovered papers: do not leave accepted arXiv IDs unfetched for a later agent
    - If fetch-arxiv fails for some papers, construct bib entries manually from metadata
+6. Run `node .scripts/render-reading-list.mjs` after catalog updates. `literature/reading_list.md` is a generated linked view for humans; never edit it directly
 
 **Deliverable**: type `reading`, slug = arXiv ID with dots replaced by hyphens (e.g., `0804-4527`). Obtain the path via `bash .scripts/new-log.sh reading {id}` per `common.md` § Deliverables and Logs.
 

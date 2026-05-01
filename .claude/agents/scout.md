@@ -29,6 +29,7 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 3. WebFetch `https://arxiv.org/abs/{id}` for each candidate to obtain title, authors, and abstract
 4. Create/update `literature/catalog.jsonl`
 5. Before returning, run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` for every newly added arXiv paper in this dispatch. Fetch is part of admission to the catalog, not later reader work: once an ID has been accepted, immediately acquire PDF, LaTeX source, and BibTeX so the reader can start without acquisition delay. BibTeX entries are auto-merged into `literature/references.bib`
+6. Run `node .scripts/render-reading-list.mjs` after catalog/fetch updates. `literature/reading_list.md` is a linked human-readable view generated from the catalog; do not edit it by hand
 
 ## Output
 
@@ -65,3 +66,7 @@ After fetch, verify that entries for all newly added papers are present in this 
 
 - **Citation key**: `{FirstAuthorSurname}{Year}` (e.g., `Moore2008`). If a key already exists, append a lowercase letter (`Moore2008b`)
 - Do not duplicate entries (check by eprint field before appending)
+
+### 3. Human Reading List (`literature/reading_list.md`)
+
+Regenerate this view with `node .scripts/render-reading-list.mjs` after every catalog change. It should be pleasant to inspect: paper titles link to arXiv abstracts, PDF/local-file/reading-note links are explicit, and arXiv IDs are not the primary visual object. The catalog remains the source of truth.

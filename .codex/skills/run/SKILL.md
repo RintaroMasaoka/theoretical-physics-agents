@@ -115,6 +115,8 @@ The auditor reads only its narrow local scope and returns `DONE: {path}`. If it 
 
 ### 2. Physicist Dispatch — Direction
 
+Before dispatching physicist, run `node .scripts/literature-status.mjs --limit=8` if `literature/catalog.jsonl` exists. Pass the output verbatim in `## Literature Status`. This is scheduler-owned context condensation: physicist should see unread/read/fetch pressure automatically without spending direction-setting attention parsing the full catalog unless the summary makes literature decisive.
+
 ```
 spawn_agent(agent_type="physicist", prompt="""
 ## Task
@@ -131,6 +133,9 @@ Update research/focus.md for the next cycle.
 
 ## Curator Sweep
 {path to curator's output from the previous cycle, if any}
+
+## Literature Status
+{output of `node .scripts/literature-status.mjs --limit=8`, or "No literature catalog present"}
 """)
 ```
 

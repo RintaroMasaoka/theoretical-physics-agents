@@ -71,7 +71,7 @@ Every dispatch, read in this order — this reconstructs the scientific context 
 6. **Ancestor chain** from `research/` (root) down to the cursor, inclusive: at each folder, read `note.md` (if exists), `plan.md` (if exists), `.log.md`, `dead_ends.md` (if exists), `directives.md` (if exists), `story.md` (if exists), `principles.md` (if exists), `conventions.md` (if exists)
 7. **Cursor's direct children** (depth 1): for each child folder, read `note.md` (if exists) + `conventions.md` (if exists) + `plan.md` (if exists) + `.log.md`
 8. The direction-audit file passed by the scheduler for this cycle
-9. `literature/catalog.jsonl` — to see what papers are unread and may be relevant
+9. The scheduler-passed `## Literature Status` summary — to see unread/read/fetch pressure without parsing the full catalog. If the next direction may depend on a specific paper choice, then read `literature/catalog.jsonl` for exact status and `literature/reading_list.md` for the linked human view
 10. Recent worker deliverables and critic verdicts in `.logs/` — the dispatcher (scheduler) lists specific paths when there are new results this cycle; if paths are listed, read them
 
 You do **not** read sibling branches outside the ancestor chain — that scoping is what makes the read tractable. If the cursor is at `research/A/B/`, you do not read `research/C/` in this dispatch.

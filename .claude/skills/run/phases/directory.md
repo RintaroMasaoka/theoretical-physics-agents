@@ -29,6 +29,7 @@ concepts/                 # Concept definitions (one term per file)
   {term}.md
 literature/
   catalog.jsonl
+  reading_list.md       # Generated human view of catalog.jsonl; do not edit by hand
   references.bib
   papers/{arxiv_id}/
 manuscript/               # Paper (managed by /write)
