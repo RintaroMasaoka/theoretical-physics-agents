@@ -37,6 +37,10 @@ FRAMEWORK_FILES=(
   ".templates/"
 )
 
+OPTIONAL_FRAMEWORK_REFERENCES=(
+  "README.md"
+)
+
 # push 時 (bulk) に upstream から削除すべき stale ファイル
 STALE_FILES=(
   "CLAUDE.md"          # .claude/CLAUDE.md と .codex/AGENTS.md に生成
@@ -77,6 +81,15 @@ is_framework_repo_url() {
   [ "$canonical" = "$FRAMEWORK_REPO_CANONICAL" ] || [ "$canonical" = "www.$FRAMEWORK_REPO_CANONICAL" ]
 }
 
+is_optional_framework_reference() {
+  local ref="$1"
+  local optional
+  for optional in "${OPTIONAL_FRAMEWORK_REFERENCES[@]}"; do
+    [ "$ref" = "$optional" ] && return 0
+  done
+  return 1
+}
+
 check_upstream() {
   git remote get-url "$UPSTREAM_REMOTE" >/dev/null 2>&1 \
     || die "remote '$UPSTREAM_REMOTE' が見つかりません。先に git remote add $UPSTREAM_REMOTE https://github.com/RintaroMasaoka/theoretical-physics-agents.git を実行してください"
@@ -89,12 +102,9 @@ check_remote_layout() {
   origin_url="$(git remote get-url origin 2>/dev/null || true)"
   upstream_url="$(git remote get-url "$UPSTREAM_REMOTE" 2>/dev/null || true)"
 
-  if [ -n "$origin_url" ] && is_framework_repo_url "$origin_url"; then
+  if [ -n "$origin_url" ] && is_framework_repo_url "$origin_url" && [ -n "$upstream_url" ]; then
     echo "Warning: origin が framework repo を指しています。child project では origin は private project repo、upstream が framework repo です。" >&2
     echo "  git remote set-url origin <your-project-repo-url>" >&2
-    if [ -z "$upstream_url" ]; then
-      echo "  git remote add upstream https://github.com/RintaroMasaoka/theoretical-physics-agents.git" >&2
-    fi
   fi
 }
 
@@ -202,6 +212,10 @@ validate_framework_references() {
 
   while IFS= read -r ref; do
     if [ ! -e "$root/$ref" ]; then
+      if is_optional_framework_reference "$ref"; then
+        echo "  warning: optional reference missing in $label: $ref" >&2
+        continue
+      fi
       echo "  missing in $label: $ref" >&2
       missing=true
     fi
@@ -446,11 +460,20 @@ do_doctor() {
   validate_framework_references "." "local checkout"
   echo "  OK"
 
-  check_upstream
-
   echo ""
-  echo "==> upstream/$UPSTREAM_BRANCH を fetch 中..."
-  git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" 2>/dev/null
+  if git remote get-url "$UPSTREAM_REMOTE" >/dev/null 2>&1; then
+    echo "==> upstream/$UPSTREAM_BRANCH を fetch 中..."
+    git fetch "$UPSTREAM_REMOTE" "$UPSTREAM_BRANCH" 2>/dev/null
+  else
+    local origin_url=""
+    origin_url="$(git remote get-url origin 2>/dev/null || true)"
+    if [ -n "$origin_url" ] && is_framework_repo_url "$origin_url"; then
+      echo "==> origin/$UPSTREAM_BRANCH を fetch 中..."
+      git fetch origin "$UPSTREAM_BRANCH" 2>/dev/null
+    else
+      check_upstream
+    fi
+  fi
 }
 
 do_check() {
