@@ -14,7 +14,7 @@ Read a specified document as a **first-time reader** and flag self-containedness
 
 ## Startup Reading
 
-Only the target file provided by PI. **Do not read any other files.**
+Only the target file provided by the dispatcher. **Do not read any other files.**
 
 ## Verification Criteria
 
@@ -26,7 +26,7 @@ Only the target file provided by PI. **Do not read any other files.**
 
 ## Output
 
-Report directly to PI via text output (do not create a file).
+Report directly to the dispatcher via text output (do not create a file).
 
 Each finding includes:
 - Location (line number or quote)

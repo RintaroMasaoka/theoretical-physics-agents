@@ -32,7 +32,7 @@ Design the overall paper structure (outline) from the research tree and narrativ
 
 ## Output
 
-**Deliverables**: `manuscript/outline.md` + `manuscript/conventions.md`
+**Deliverables**: `draft/outline.md` + `draft/conventions.md`
 
 ```markdown
 # Paper Outline: {Title}
@@ -53,4 +53,4 @@ Design the overall paper structure (outline) from the research tree and narrativ
 |---|------|-------|---------|---------------|---------|
 ```
 
-`manuscript/conventions.md`: Terminology definitions, notation rules, and unified style standards, seeded from `research/**/conventions.md` where the research tree already fixes notation
+`draft/conventions.md`: Terminology definitions, notation rules, and unified style standards, seeded from `research/**/conventions.md` where the research tree already fixes notation

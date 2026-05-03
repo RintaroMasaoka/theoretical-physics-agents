@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Choose a timestamped log path under logs/ and print it to stdout.
+# Choose a timestamped log path under .logs/ and print it to stdout.
 #
 # Usage:
 #   bash .scripts/log-path.sh <type> [<slug>]
 #
 # Output: absolute path of the form
-#   {project}/logs/{YYMMDD_HHMM}_{type}[_{slug}].md
+#   {project}/.logs/{YYMMDD_HHMM}_{type}[_{slug}].md
 #
 # The path does not yet exist as a file; the caller writes content to it.
 # The timestamp is fixed at the moment of this script's invocation, so naming
@@ -25,7 +25,7 @@ if [ -z "$TYPE" ]; then
 fi
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-LOGS_DIR="$ROOT/logs"
+LOGS_DIR="$ROOT/.logs"
 mkdir -p "$LOGS_DIR"
 
 TS=$(date '+%y%m%d_%H%M')

@@ -10,7 +10,7 @@ Folders are named in **Title Case with spaces**, using **semantic slugs** that d
 
 ## kind (Cognitive Mode)
 
-kind defines the nature of a node and determines the **cognitive mode** when passing it to the researcher. Physicist may propose new kinds in `research/focus.md`; curator records the chosen kind in the node's .log.md frontmatter when creating or updating the node.
+kind defines the nature of a node and determines the **cognitive mode** when passing it to the researcher. Research planner may propose new kinds in `research/focus.md`; curator records the chosen kind in the node's state.md frontmatter when creating or updating the node.
 
 | kind | Cognitive Mode | Description |
 |------|---------------|-------------|
@@ -22,7 +22,7 @@ kind defines the nature of a node and determines the **cognitive mode** when pas
 | **example** | Calculate precisely on a concrete case | Concrete verification of theory |
 | **caution** | Verify risks in assumptions/logic | Finding problems is the job |
 | **gap** | Analyze what's missing | Analysis, not resolution |
-| **observation** | Record and explore a finding | Physicist decides whether to pursue |
+| **observation** | Record and explore a finding | Research planner decides whether to pursue |
 
 ## status (Research Disposition)
 
@@ -30,20 +30,20 @@ kind defines the nature of a node and determines the **cognitive mode** when pas
 |--------|---------|
 | **open** | Not yet started |
 | **active** | Currently investing cycles |
-| **stable** | Has results PI can reference. Deepening is always an option |
+| **stable** | Has results the research planner and later manuscript workflows can reference. Deepening is always an option |
 | **closed** | Not being pursued |
 
 ## Closing Nodes
 
-Physicist decides the research verdict and expresses it as a Tree Directive; curator executes the tree write. Update status to `closed`. If the closure is informative, add an entry to the node's `dead_ends.md`. If the node has a plan.md describing children, update or remove it to reflect the closure. If the closed node has active/stable children, reparent them (move the subfolder to an appropriate location).
+Research planner decides the research verdict and expresses it as a Tree Directive; curator executes the tree write. Update status to `closed`. If the closure is informative, add an entry to the node's `dead_ends.md`. If the node has a plan.md describing children, update or remove it to reflect the closure. If the closed node has active/stable children, reparent them (move the subfolder to an appropriate location).
 
 ## Splitting Nodes
 
-Node splitting is a structural-maintenance operation, not a cosmetic cleanup. A node exists to keep one coherent evidence stream, strategy, and worker context together. When a parent starts carrying separable evidence streams, keeping everything in the parent makes future dispatches worse: workers receive muddy context, plan.md stops explaining the actual decomposition, and Current State becomes a list of unrelated frontiers.
+Node splitting is a structural-maintenance operation, not a cosmetic cleanup. A node exists to keep one coherent evidence stream, strategy, and worker context together. When a parent starts carrying separable evidence streams, keeping everything in the parent makes future dispatches worse: workers receive muddy context, plan.md stops explaining the actual decomposition, and Current Board becomes a list of unrelated frontiers.
 
 Authority is deliberately split:
 
-- **Physicist** requests splits when the scientific direction needs a child node. It names the sub-question and why it now deserves independent focus.
-- **Curator** executes the split and may initiate one from the maintenance side when the evidence record already shows structural debt. Curator reads the whole tree every dispatch, so it is the agent positioned to notice broad overloaded nodes even when physicist is focused on the cursor's immediate direction.
+- **Research planner** requests splits when the scientific direction needs a child node. It names the sub-question and why it now deserves independent focus.
+- **Curator** executes the split and may initiate one from the maintenance side when the evidence record already shows structural debt. Curator scans the whole tree every dispatch, so it is the agent positioned to notice broad overloaded nodes even when research planner is focused on the cursor's immediate direction.
 
-Typical triggers: repeated attempts on the same sub-problem, several Evidence entries sharing a sub-target, a compound construction with separable phases or artifacts, three or more open angles in Current State, or repeated recent evidence that the parent's plan.md does not account for.
+Typical triggers: repeated attempts on the same sub-problem, several Evidence entries sharing a sub-target, a compound construction with separable phases or artifacts, three or more open angles in Current Board, or repeated recent evidence that the parent's plan.md does not account for.

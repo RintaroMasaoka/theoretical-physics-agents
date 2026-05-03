@@ -16,7 +16,7 @@ Arguments: $ARGUMENTS
 **Principle: Ask questions first, then load data only as needed.** This skill is real-time dialogue — minimize response delays. Use request_user_input for all questions (text output risks missed responses).
 
 ```
-Check research/.log.md
+Check research/state.md
     ├─ Does not exist → New Theme flow
     └─ Exists → Theme Change flow
 If argument is provided → use it as the initial theme description (skip the first request_user_input)
@@ -32,14 +32,14 @@ request_user_input: Ask user to describe the research theme overview in Other
     ▼ Present drafted structure and get confirmation before writing
     ▼ Create research/ tree:
         1. research/note.md (project's initial understanding — free-form, no template)
-        2. research/.log.md (background, working state — with frontmatter)
+        2. research/state.md (background, working state — with frontmatter)
         3. research/story.md (narrative structure)
         4. research/principles.md (constraints, empty if none)
-        5. research/{step}/.log.md for each step in the narrative structure (child nodes start with .log.md)
+        5. research/{step}/state.md for each step in the narrative structure (child nodes start with state.md)
         6. research/focus.md (session cursor pointing to the first active child)
 ```
 
-File formats (note.md, .log.md) are defined in `.codex/research-tree.md`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
+File formats (note.md, state.md) are defined in `.codex/research-tree.md`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
 
 **Child folder names** follow the tree-wide naming convention in `.codex/research-tree.md` (§ Folder Names): semantic slugs describing the node, not ordering-encoded paths.
 
@@ -79,10 +79,10 @@ Working on: research/{first_active_child}/
 
 ### Theme Change
 
-Modify the existing research direction. Read `research/note.md` (if exists), `research/.log.md`, and `research/story.md` first, then present the current state. If the discussion touches specific nodes, navigate the tree and load relevant files before reflecting changes.
+Modify the existing research direction. Read `research/note.md` (if exists), `research/state.md`, and `research/story.md` first, then present the current state. If the discussion touches specific nodes, navigate the tree and load relevant files before reflecting changes.
 
 ```
-Data loading: research/note.md + research/.log.md + research/story.md
+Data loading: research/note.md + research/state.md + research/story.md
     ▼ Present current theme summary:
         Core understanding: {from note.md, abbreviated}
         Narrative Structure: {steps overview with status}
@@ -98,10 +98,10 @@ Data loading: research/note.md + research/.log.md + research/story.md
 
 **Where to reflect:**
 - Verified understanding → edit `research/note.md`
-- Background / working state → edit `research/.log.md`
+- Background / working state → edit `research/state.md`
 - Narrative Structure → edit `research/story.md`
 - Constraints → edit `research/principles.md`
-- New research directions → create child folders with .log.md
+- New research directions → create child folders with state.md
 - Recontextualized results → update affected note.md files in the subtree
 - Full pivot → update all root files, restructure children as needed
 - Session cursor → update `research/focus.md` if the current focus node was moved, removed, or is no longer the logical next step

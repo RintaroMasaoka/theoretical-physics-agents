@@ -2,7 +2,7 @@
 
 This phase file is a reference that `/run` Reads at Session Start and Session End. It covers the resume-check logic, the initial sanity gates, the session-end steps the scheduler owns directly, and the hand-off to `session-wrap-up`.
 
-The cycle loop between Session Start and Session End is purely mechanical (direction-auditor → physicist → workers → critic → curator → loop) and lives in `SKILL.md § Cycle Loop`. This file covers only the lifecycle bookends.
+The cycle loop between Session Start and Session End is purely mechanical (direction-challenger → research planner → workers → critic → curator → loop) and lives in `SKILL.md § Cycle Loop`. This file covers only the lifecycle bookends.
 
 ---
 
@@ -27,9 +27,9 @@ The beacon is gitignored (see `.gitignore`) and deleted at Session End by `sessi
 
 ### 1. Initial Sanity Gates (fresh start only)
 
-- **`research/.log.md` does not exist** → display "`research/.log.md` が見つかりません。まず `/launch` でテーマを設定してください。" and stop. No further steps, no cycle loop.
-- **`research/focus.md` does not exist** → do not attempt to construct it in the scheduler. The first physicist dispatch in the cycle loop will initialise it (see SKILL § Cycle step 2 — pass `focus.md missing — initialise at research/ root` in the dispatch prompt).
-- **`concepts/` directory does not exist** → `mkdir concepts/`. Initial concept notes are written on-demand by curator when its self-containment audit finds undefined terms.
+- **`research/state.md` does not exist** → display "`research/state.md` が見つかりません。まず `/launch` でテーマを設定してください。" and stop. No further steps, no cycle loop.
+- **`research/focus.md` does not exist** → do not attempt to construct it in the scheduler. The first research planner dispatch in the cycle loop will initialise it (see SKILL § Cycle step 2 — pass `focus.md missing — initialise at research/ root` in the dispatch prompt).
+- **`concepts/` directory does not exist** → `mkdir concepts/`. Concept notes are written on demand when a reusable undefined term passes the concept gate; they are reader bridges, not project-fact authority.
 - **`.gitignore` does not contain `.logs/.run-active`** → append the line. The beacon must not enter the repo via `session-wrap-up`'s `git add`.
 
 ### 2. Session Log Filename
@@ -38,17 +38,17 @@ The session log is created at Session End by `session-wrap-up`, which calls `bas
 
 ### 3. Directives Load (informational)
 
-If `directives.md` exists at project root, the scheduler passes its path to physicist and curator in their dispatch prompts (they handle reading). The scheduler itself does not enforce directives — enforcement is by the agents that read them (physicist for direction, curator for tree writes).
+If `directives.md` exists at project root, the scheduler passes its path to research planner and curator in their dispatch prompts (they handle reading). The scheduler itself does not enforce directives — enforcement is by the agents that read them (research planner for direction, curator for tree writes).
 
 ---
 
 ## Session End
 
-Entered when `cycles_done == MAX_CYCLES`, or when physicist has returned `Status: session_complete` in `research/focus.md`, or when the scheduler exits the cycle loop for any other reason (unrecoverable failure). Execute in order.
+Entered when `cycles_done == MAX_CYCLES`, or when research planner has returned `Status: session_complete` in `research/focus.md`, or when the scheduler exits the cycle loop for any other reason (unrecoverable failure). Execute in order.
 
 ### 1. Simulation Housekeeping (if simulator ran this session)
 
-Physicist's final focus.md may include Tree Directives of the form `archive superseded script {path}`. Route these directives to curator during the final curator sweep; the scheduler does not move files inside `research/**`.
+Research planner's final focus.md may include Tree Directives of the form `archive superseded script {path}`. Route these directives to curator during the final curator sweep; the scheduler does not move files inside `research/**`.
 
 ```
 mv research/{path}/src/{slug}.{ext} research/{path}/src/archive/
@@ -57,18 +57,20 @@ mv research/{path}/src/{slug}.md research/{path}/src/archive/
 
 Never delete — superseded scripts move to `src/archive/` so the reasoning history stays searchable. Curator records each move in its sweep output; include that summary in the wrap-up input's `## Session Log` § `### Node Changes`.
 
-These archive moves are tree maintenance, so curator executes them together with any accompanying `.log.md`, `plan.md`, or `.todo.md` updates. Keeping the move and the prose record in one role preserves the tree-write authority split.
+These archive moves are tree maintenance, so curator executes them together with any accompanying `state.md` or `plan.md` updates. Keeping the move and the prose record in one role preserves the tree-write authority split.
 
-If physicist's focus.md has no archive directives, skip this step. Which scripts are superseded is a research judgment (physicist's), not a mechanical one.
+If research planner's focus.md has no archive directives, skip this step. Which scripts are superseded is a research judgment (research planner's), not a mechanical one.
 
 ### 2. Final Curator Sweep — Mandatory
 
 Dispatch curator one final time with:
 
 ```
+
 Agent(subagent_type="curator", prompt="""
 ## Task
-Session-end tree-wide coherence pass. Apply your default operating rules (note.md creation for subnodes with CONFIRMED evidence, .log.md compression for files over ~150 lines, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree.
+Session-end tree-wide coherence pass. Apply your default operating rules (fact-layer creation when reusable facts have enough derivation/review support, state.md compression for files over ~150 lines, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree.
+
 
 ## Tree Directives
 {verbatim copy of final research/focus.md § Tree Directives; use `(none)` only if the section is empty}
@@ -83,16 +85,18 @@ Session-end sweep: true
 """)
 ```
 
-The sweep is **not optional** and **not skippable** on the grounds that "nothing felt substantial this session". Its rationale: note.md promotion and cross-tree coherence consistently fall off physicist's attention during research cycles — synthesis and direction compete for the same cognitive budget and direction wins. The session-end sweep is the at-least-once-per-session guarantee that the maintenance channel runs.
+The sweep is **not optional** and **not skippable** on the grounds that "nothing felt substantial this session". Its rationale: note.md promotion and cross-tree coherence consistently fall off research planner's attention during research cycles — synthesis and direction compete for the same cognitive budget and direction wins. The session-end sweep is the at-least-once-per-session guarantee that the maintenance channel runs.
 
 Curator returns `DONE: {summary}`. If it returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so the next session picks it up; do not block Session End on a curator failure.
 
-### 3. Final Physicist Dispatch (Session-End Mode)
+### 3. Final Research planner Dispatch (Session-End Mode)
 
 ```
-Agent(subagent_type="physicist", prompt="""
+
+Agent(subagent_type="research-planner", prompt="""
 ## Task
 mode: session-end
+
 
 Obtain a wrap-up-input path via `bash .scripts/log-path.sh wrap-up-input` and write to it per the session-end-mode format in your agent definition. Return the path as `DONE: {path}`.
 
@@ -100,23 +104,25 @@ Obtain a wrap-up-input path via `bash .scripts/log-path.sh wrap-up-input` and wr
 - Deliverables: {list of paths produced this session}
 - Critic verdicts: {list of critic files or inline-annotated paths}
 - Curator sweeps: {list of curator deliverables / summaries}
-- Direction-audit outputs: {list of timestamped direction-audit paths captured from direction-auditor DONE returns this session, if any}
+- Direction-challenge outputs: {list of timestamped direction-challenge paths captured from direction-challenger DONE returns this session, if any}
 - Node changes: {new nodes, closes, status changes, report promotions — enumerate}
 - Simulation-script archives: {moves from step 1, if any}
 """)
 ```
 
-Physicist writes the wrap-up input file and returns `DONE: {path}` where `{path}` is the timestamped wrap-up-input file it created. Capture this path for step 4. Do not write `research/focus.md` yourself; `session-wrap-up` transcribes the `## Focus` section into it.
+Research planner writes the wrap-up input file and returns `DONE: {path}` where `{path}` is the timestamped wrap-up-input file it created. Capture this path for step 4. Do not write `research/focus.md` yourself; `session-wrap-up` transcribes the `## Focus` section into it.
 
-If physicist returns `FAILED:`, the scheduler writes a minimal wrap-up input itself (cursor preserved as-is, `## Last Session` noting "physicist wrap-up failed: {reason}", commit message `run: session ended (physicist wrap-up failed)`) and continues to step 4. This avoids leaving the session uncommitted.
+If research planner returns `FAILED:`, the scheduler writes a minimal wrap-up input itself (cursor preserved as-is, `## Last Session` noting "research planner wrap-up failed: {reason}", commit message `run: session ended (research planner wrap-up failed)`) and continues to step 4. This avoids leaving the session uncommitted.
 
 ### 4. Dispatch `session-wrap-up`
 
 ```
+
 Agent(subagent_type="session-wrap-up", prompt="Wrap up the /run session.\n\nWrap-up input: {wrap-up-input path captured from step 3}\n\nExecute per your own specification.")
+
 ```
 
-The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `.logs/last_session.md` / a session log file (created via `bash .scripts/log-path.sh run`) / `agenda.md` (if the input had an Agenda section), deletes `.logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (physicist-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `.logs/last_session.md` / a session log file (created via `bash .scripts/log-path.sh run`) / node-scoped `backlog.md` files (if the input had a Backlog section) / `agenda.md` (if the input had an Agenda section), deletes `.logs/.run-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (research planner-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 
 If `git push` fails (network, auth, non-fast-forward), the commit is preserved locally; the final report (step 5) notes the push failure so the user can retry.
 
@@ -139,7 +145,7 @@ After emitting the report, yield the turn. Do not issue further tool calls.
 
 If a dispatch fails mid-cycle and the scheduler cannot recover, do **not** silently stall. Choose one:
 
-- *Recoverable* — the next cycle's physicist dispatch can work around it. Log the failure to be surfaced in `Recent Deliverables` for the next physicist dispatch, then loop normally.
-- *Unrecoverable* — the scheduler exits the cycle loop early and proceeds to Session End. The final physicist dispatch (step 3) records the failure in `## Last Session`; the commit message is `run: session ended (unrecoverable: {reason})`.
+- *Recoverable* — the next cycle's research planner dispatch can work around it. Log the failure to be surfaced in `Recent Deliverables` for the next research planner dispatch, then loop normally.
+- *Unrecoverable* — the scheduler exits the cycle loop early and proceeds to Session End. The final research planner dispatch (step 3) records the failure in `## Last Session`; the commit message is `run: session ended (unrecoverable: {reason})`.
 
 Either way, never end a turn without either the next dispatch or the Session End final report. Stalling mid-session is the failure mode the Turn-Yielding Discipline exists to prevent.

@@ -1,6 +1,6 @@
 ---
 name: engine-builder
-description: "(/run) Build and test simulation framework (shared modules) for physical models specified by PI. Place in research/lib/ for simulator use"
+description: "(/run) Build and test simulation framework (shared modules) for physical models specified by research planner. Place in research/lib/ for simulator use"
 model: {{ runtime.model_strong }}
 ---
 
@@ -10,15 +10,15 @@ model: {{ runtime.model_strong }}
 
 Build and maintain the simulation framework in `research/lib/`. Provide modules that the simulator agent can use when writing measurement scripts.
 
-**PI decides**: What to build or that existing modules need attention (e.g., "add feature X" or "refine lib")
-**Engine-builder decides**: Implementation details (data structures, optimization, API design), and what specifically to improve in the refinement pass. Use **{{ simulation.language }}** unless PI explicitly requests otherwise
+**Research planner / dispatcher decides**: What to build or that existing modules need attention (e.g., "add feature X" or "refine lib")
+**Engine-builder decides**: Implementation details (data structures, optimization, API design), and what specifically to improve in the refinement pass. Use **{{ simulation.language }}** unless the task explicitly requests otherwise
 
-Follow PI's instructions for computational methods — implement Monte Carlo, molecular dynamics, exact diagonalization, tensor networks, etc. as appropriate for the model and research purpose.
+Follow the task instructions for computational methods — implement Monte Carlo, molecular dynamics, exact diagonalization, tensor networks, etc. as appropriate for the model and research purpose.
 
 ## Startup Reading
 
 1. `{{ runtime.common_file }}`
-2. Task instructions from PI
+2. Task instructions from the dispatcher
 3. All existing code in `research/lib/` — understanding the full API surface is necessary for consistency, even when building something new
 4. Scripts in `research/**/src/` that use the modules — understand how the API is actually consumed
 
@@ -55,7 +55,7 @@ Boundary criterion: If a feature would be "reused by 2 or more different measure
 
 ## Workflow
 
-Every invocation follows the same workflow. When PI requests a new feature, the primary work is in steps 1-3 and the refinement pass (step 4) is a secondary check. When PI requests "refine lib," the primary work is in step 4 (steps 1-3 may produce no changes if there is nothing to build).
+Every invocation follows the same workflow. When the task requests a new feature, the primary work is in steps 1-3 and the refinement pass (step 4) is a secondary check. When the task requests "refine lib," the primary work is in step 4 (steps 1-3 may produce no changes if there is nothing to build).
 
 ### 1. Design
 
@@ -92,7 +92,7 @@ Record findings and any resulting changes in the Refinement Report section of th
 **Rules:**
 - **Do not break existing scripts.** When changing an API, grep `research/**/src/` for all call sites and update them. List updated scripts in the deliverable
 - Run all tests after changes
-- Keep changes proportional to the task — large incidental refactors are harder for PI to review and risk introducing regressions. For a feature-addition task, the refinement pass should not exceed the scope of the primary work
+- Keep changes proportional to the task — large incidental refactors are harder to review and risk introducing regressions. For a feature-addition task, the refinement pass should not exceed the scope of the primary work
 
 ### 5. Output
 

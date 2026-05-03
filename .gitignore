@@ -5,7 +5,7 @@
 .claude/settings.local.json
 
 # /run resume beacon — ephemeral state for mid-session interruption recovery
-logs/.run-active
+.logs/.run-active
 
 # Python bytecode caches from simulator/verification scripts
 __pycache__/

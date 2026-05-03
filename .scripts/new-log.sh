@@ -10,12 +10,12 @@ type="$1"
 slug="${2:-}"
 stamp="$(date '+%y%m%d_%H%M')"
 
-mkdir -p logs
+mkdir -p .logs
 
 if [[ -n "$slug" ]]; then
-  path="logs/${stamp}_${type}_${slug}.md"
+  path=".logs/${stamp}_${type}_${slug}.md"
 else
-  path="logs/${stamp}_${type}.md"
+  path=".logs/${stamp}_${type}.md"
 fi
 
 if [[ -e "$path" ]]; then

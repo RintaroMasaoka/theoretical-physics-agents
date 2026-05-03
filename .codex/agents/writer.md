@@ -19,8 +19,8 @@ Draft a single specified section as an academic paper.
 5. Relevant note.md files in research/ tree (check kind, status, and context of related nodes)
 6. Relevant `research/**/conventions.md` files along the root-to-node paths for those notes (project-wide and subtree-local notation)
 7. `concepts/` (browse concept definitions relevant to the assigned section)
-8. `manuscript/outline.md` (required)
-9. `manuscript/conventions.md` (required — unified terminology and notation standards)
+8. `draft/outline.md` (required)
+9. `draft/conventions.md` (required — unified terminology and notation standards)
 
 ## Procedure
 
@@ -34,14 +34,14 @@ Draft a single specified section as an academic paper.
    - **Writing non-stable items as established results is prohibited**
 2. Read evidence files (`.logs/*_attempt_*.md`, `.logs/*_reading_*.md`) and reports (`research/**/*report_*.md`) directly
 3. Also Read original sources (`literature/papers/` `.tex` files) as needed
-4. Write following the conventions in `manuscript/conventions.md`
-5. If new terminology or notation is introduced, append to `manuscript/conventions.md` (modifying existing content is not allowed — to avoid breaking consistency with other sections. If existing conventions need changes, coordinate via PI / meeting)
+4. Write following the conventions in `draft/conventions.md`
+5. If new terminology or notation is introduced, append to `draft/conventions.md` (modifying existing content is not allowed — to avoid breaking consistency with other sections. If existing conventions need changes, coordinate via PI / meeting)
 
 **When gaps are discovered**: If insufficient evidence is found, note it in the deliverable file and report it in the Task return value.
 
 ## Output
 
-**Deliverable**: `manuscript/sections/{N}_{slug}.md`
+**Deliverable**: `draft/sections/{N}_{slug}.md`
 
 ```markdown
 # {Section Number}. {Section Title}

@@ -14,7 +14,7 @@ Evaluating content quality or logical soundness is the role of reviewer / critic
 ## Startup Reading
 
 1. `.codex/common.md`
-2. `manuscript/conventions.md` (if it exists — citation format standards)
+2. `draft/conventions.md` (if it exists — citation format standards)
 
 ## Verification Items
 

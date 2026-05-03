@@ -45,6 +45,7 @@ const read = records.filter((record) => record.status === "read");
 const skipped = records.filter((record) => record.status === "skipped");
 const failedFetch = records.filter((record) => record.fetch?.status === "failed");
 const pendingFetch = records.filter((record) => record.fetch?.status === "pending");
+const readMissingSourceNote = read.filter((record) => !record.source_note);
 
 console.log("## Literature Status");
 if (records.length === 0) {
@@ -58,6 +59,10 @@ console.log(`- Fetch breakdown: ${countBy(records, (record) => record.fetch?.sta
 if (failedFetch.length || pendingFetch.length) {
   const blocked = [...pendingFetch, ...failedFetch].map(paperLabel).slice(0, limit);
   console.log(`- Acquisition attention: ${blocked.join("; ")}.`);
+}
+if (readMissingSourceNote.length) {
+  const missing = readMissingSourceNote.map(paperLabel).slice(0, limit);
+  console.log(`- Read papers missing durable source notes (${readMissingSourceNote.length}): ${missing.join("; ")}.`);
 }
 if (unread.length) {
   console.log(`- Unread queue (${unread.length}):`);

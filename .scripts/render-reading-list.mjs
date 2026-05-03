@@ -58,6 +58,10 @@ function notesLinks(notes) {
   return (notes ?? []).map((note, index) => link(`note ${index + 1}`, relativeRepoLink(note)));
 }
 
+function sourceNoteLink(record) {
+  return record.source_note ? [link("source note", relativeRepoLink(record.source_note))] : [];
+}
+
 function sourceLinks(record) {
   const links = [];
   if (record.source === "arxiv") {
@@ -83,6 +87,7 @@ function sourceLinks(record) {
       });
     }
   }
+  links.push(...sourceNoteLink(record));
   links.push(...notesLinks(record.reading_notes));
   return links.join(" · ");
 }

@@ -1,6 +1,6 @@
 # Research Tree
 
-Research information is organized into typed surfaces. The `research/` tree is the working research memory; `manuscript/` is the human-authorized paper surface. Every file has an identity, authority level, and link boundary. These distinctions are not cosmetic: later agents reconstruct context from these files, so mixing fact, state, strategy, backlog, and raw audit records lets local mistakes propagate as durable assumptions.
+Research information is organized into typed surfaces. The active `research/` tree is working research memory; `research/archive/` preserves retired nodes; `manuscript/` is the human-authorized paper surface. Every file has an identity, authority level, and link boundary. These distinctions are not cosmetic: later agents reconstruct context from these files, so mixing fact, state, strategy, backlog, raw audit records, and process-heavy retired nodes lets local mistakes propagate as durable assumptions.
 
 **Language.** Body prose in every durable file described here (manuscript prose, note.md, state.md Current Board / Evidence entries, plan.md, backlog.md, story.md, report_*.md, checks/*.md, principles.md, conventions.md, focus.md, dead_ends.md, …) is written in **japanese**. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current Board`, `## Evidence`, `## Background`), frontmatter keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. The English examples below illustrate structure, not language.
 
@@ -33,7 +33,7 @@ This is an authority order, not a link chain. `literature/notes/{id}.md` is auth
 | `report_{slug}.md` | Clean analysis artifact | **Worker-authored or worker-originated clean analysis.** A closed, self-contained analysis artifact placed in the node whose scope it serves. Not an authority layer for integrated facts and not a living workspace. A report may later trigger a subnode, but the graph change is a separate authority action |
 | `checks/` | Durable verification surface | **Node-local verification records.** Critic verdicts, reproduction records, report reviews, and note reviews. A check file states target, method, result, scope, and limitations in its own prose. It does not link to `.logs/`, is not a substitute for the derivation in note.md/report prose, and is not a standalone fact surface |
 | `state.md` | Research state layer | **Graph-structured current board and absorbed evidence ledger.** Has frontmatter (`kind`, `status`). Records what is known, unknown, active, blocked, or disputed at this node, plus compact evidence entries. It is not the fact layer. It absorbs `.logs/` content but does not link to `.logs/` |
-| `plan.md` | Strategy layer | **Why and how to attack the node.** Decomposition rationale, children roles, approach choices, success criteria, and strategy changes. Not current evidence, not tactical reminders |
+| `plan.md` | Decomposition / strategy layer | **Recorded node decomposition and planner-supplied strategy.** Children roles, decomposition rationale, approach choices, and success criteria when they are needed to understand the active graph. Not current evidence, not tactical reminders, not an append-only history |
 | `sources.md` | Source map (optional) | **Node-local map of external sources.** States which `literature/notes/{id}.md` records matter to this node, what source-side questions remain, what each source is used for, what it is explicitly not used for, and whether any bridge is absent, candidate, or established elsewhere. It is not a source record, not a fact layer, and not a convention ledger |
 | `backlog.md` | Backlog layer (optional) | **Parked executable reminders.** Pending work that should survive beyond `research/focus.md` but is not immediate dispatch, not strategy rationale, not evidence, and not fact. Prune stale items during session-end maintenance |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
@@ -45,6 +45,7 @@ This is an authority order, not a link chain. `literature/notes/{id}.md` is auth
 | `data/` | Computation | Simulation data (TSV format with metadata headers) |
 | `images/` | Computation | Figures and visualizations |
 | `lib/` | Computation (root only) | Shared simulation framework modules (managed by engine-builder) |
+| `research/archive/` | Retired research memory | **Archived nodes.** Process-heavy, duplicated, superseded, or scaffold-like nodes removed from the active planning surface after their reusable residue has been extracted into active state.md, note.md, report_*.md, dead_ends.md, concepts/, or conventions.md. Archive is history, not normal context |
 
 ## Literature Surfaces
 
@@ -93,6 +94,8 @@ Every node is a folder, and the folder name is the only thing a reader sees when
 The folder path must be stable under reorderings of the narrative. This rules out any slug that depends on where the node sits in the current story — positional prefixes, sequence indices, phase labels, and similar ordering markers all go stale the moment the story is rewritten. Narrative order lives in the parent's `story.md` or `plan.md`, not in the path.
 
 A reader who sees only the folder name should be able to guess the node's content. If the name only makes sense given the current story, it is the wrong name.
+
+`research/archive/` is the exception to active-node naming. Archived nodes are stored under `research/archive/{YYYY-MM-DD}/{relative-node-path}/` so the original path and archive date remain recoverable. Agents do not browse archive during ordinary context loading; open it only for explicit archaeology, contamination tracing, or when an active file intentionally links to archived process history.
 
 ## Computation Artifacts
 
@@ -401,21 +404,21 @@ Self-contained analyses authored by a worker or rewritten from a worker delivera
 
 **Report vs subnode.** `report_{slug}.md` is a closed artifact. `research/{Topic}/` is a living scope: future attempts, state.md, plan.md, checks, conventions, and multiple reports may accumulate there. Avoid `X/report.md` because it makes the node and artifact identities collapse into each other. If a report starts to require follow-up attempts, multiple checks, competing variants, or its own strategy, the graph authority creates or proposes a subnode and places future work there; the original report remains a report.
 
-## plan.md — Strategy and Approach
+## plan.md — Decomposition and Planner-Supplied Strategy
 
-A node's strategic document — decomposition into children, approach choices, and their rationale. Curator-maintained: research planner may direct strategy changes via `research/focus.md § Tree Directives`; curator also rewrites plan.md when its structural-maintenance rules create or repair decomposition, without changing scientific direction. Rewritten (not appended) when strategy evolves.
+A node's active decomposition document: child roles, structural dependencies, and planner-supplied approach choices or success criteria. Curator-maintained means graph consistency, not scientific authorship: research planner may direct strategy changes via `research/focus.md § Tree Directives`; curator rewrites plan.md when node creation, closure, archive, or reparenting makes the recorded decomposition false. Curator does not infer what to try next, which method to prioritize, or success criteria from structure. Rewritten (not appended) when the active decomposition changes.
 
 ```markdown
-{Free-form strategy notes. No prescribed sections.
+{Free-form decomposition / strategy notes. No prescribed sections.
 Typical content: decomposition rationale, why children exist and their roles,
-approach decisions and alternatives considered, strategic priorities.}
+structural dependencies, planner-supplied approach decisions, planner-supplied success criteria, and active structural constraints.}
 ```
 
-**No template.** The content depends on the node's nature. A branch node might describe why its children exist and how they contribute; a leaf might outline the approach to a specific calculation or proof.
+**No template.** The content depends on the node's nature. A branch node might describe why its children exist and how they contribute; a leaf might outline an approach only when that approach is useful durable context rather than a transient task instruction.
 
-**Relationship to state.md**: plan.md is forward-looking (how to proceed), while state.md captures current understanding and accumulated evidence. When strategy changes, rewrite plan.md; when results come in, update state.md.
+**Relationship to state.md**: plan.md records active decomposition and planner-supplied strategy only; state.md captures current understanding and accumulated evidence. When the graph or planner strategy changes, rewrite plan.md; when results come in, update state.md.
 
-**When to create**: When a node has non-trivial strategic decisions — decomposition into children, choice of approach, prioritization. Simple leaf nodes doing straightforward work may not need one.
+**When to create**: When a node has non-trivial decomposition or planner-supplied strategic decisions. Simple leaf nodes doing straightforward work may not need one.
 
 ## state.md — Research State
 
@@ -495,7 +498,7 @@ research/
 | **Research tree — facts** | `research/**/note.md` | Read-only except fact-maintenance transactions and human-present rewrites | Draft fact layer — established claims + derivation/derivation skeleton + scope + limitations + Markdown provenance link |
 | **Research tree — reports** | `research/**/report_*.md` | Write only when explicitly assigned report authorship | Self-contained clean analyses; worker-authored or worker-originated; closed artifacts, not living nodes |
 | **Research tree — checks** | `research/**/checks/*.md` | Read-only, except curator and critic Target B | Node-local verification records with YAML front matter: note.md critic reviews, reproducibility summaries, and check results supporting provenance links |
-| **Research tree — plan** | `research/**/plan.md` | Read-only | Strategy: decomposition rationale, approach decisions, children's roles |
+| **Research tree — plan** | `research/**/plan.md` | Read-only | Decomposition and planner-supplied strategy: children roles, approach decisions, success criteria |
 | **Research tree — state** | `research/**/state.md` | Read-only | Graph-structured current board and absorbed evidence ledger; kind/status frontmatter |
 | **Research tree — backlog** | `research/**/backlog.md` | Read-only | Optional parked executable reminders; no claims, evidence, or durable strategy |
 | **Convention ledger** | `research/**/conventions.md` | Read-only | Current notation, sign, ordering, normalization, and symbol-reservation choices, scoped to the node/subtree |
@@ -504,14 +507,15 @@ research/
 | **Computation — source** | `research/**/src/` | Write (simulator, researcher; curator archive moves only) | Source code tied to a node: measurement / analysis / plot / verification scripts, each with a companion `{slug}.md` |
 | **Computation — data** | `research/**/data/` | Write (simulator) | Simulation data (TSV with metadata headers) |
 | **Computation — figures** | `research/**/images/` | Write (simulator) | Visualizations |
+| **Retired research memory** | `research/archive/**` | Read only during explicit archaeology; curator writes archive moves | Retired nodes removed from active planning context after reusable value was extracted |
 | **Raw audit archive** | `.logs/*_{type}_*.md` | Write (own deliverables only) | Worker/session intermediate outputs for audit, archaeology, contamination tracing, and workflow improvement. Not linked from durable research prose |
 | **Session cursor** | `research/focus.md` | Not relevant to workers | Research planner's current focus position in the tree |
 | **Session context** | `.logs/last_session.md` | Not relevant to workers | Volatile work context for session handoff, written by session-wrap-up |
 
-**Tree navigation**: `ls research/{path}/` to see children (subfolders). Read `note.md` for draft facts, `sources.md` for node-local source maps, `report_*.md` for clean analyses, `checks/` for node-local verification records, `state.md` for current board and absorbed evidence, `plan.md` for strategy and decomposition, `story.md` for narrative structure, `principles.md` for constraints, and `conventions.md` for notation / convention choices. Read `backlog.md` only when looking for parked executable reminders; do not treat it as a source for claims, evidence, strategy, or state.
+**Tree navigation**: `ls research/{path}/` to see active children (subfolders). Ignore `research/archive/` during ordinary context loading. Read `note.md` for draft facts, `sources.md` for node-local source maps, `report_*.md` for clean analyses, `checks/` for node-local verification records, `state.md` for current board and absorbed evidence, `plan.md` for strategy and decomposition, `story.md` for narrative structure, `principles.md` for constraints, and `conventions.md` for notation / convention choices. Read `backlog.md` only when looking for parked executable reminders; do not treat it as a source for claims, evidence, strategy, or state.
 
 Each node has a `kind` and `status` in its **state.md** frontmatter (not note.md). Node status is set by curator, based on research planner's Tree Directives and evidence accumulated in state.md (see `.claude/agents/curator.md` and `.claude/agents/research-planner.md`).
 
-- Writes to the research tree are split by authority, not just by file path: **research planner** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator / graph authority** owns node folders, placement, status, lifecycle, reparenting, report-to-subnode promotion, state.md absorption, and plan.md graph consistency; **fact-maintenance authority** owns note.md synthesis and provenance-link closure; **critic** may write only Target B review files under `research/**/checks/`; simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`; workers may write `report_*.md` only when explicitly assigned clean-report authorship in an existing node. If research planner or a worker notices a tactical item worth preserving in `backlog.md`, they propose it; the maintenance path decides whether it belongs there.
+- Writes to the research tree are split by authority, not just by file path: **research planner** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator / graph authority** owns node folders, placement, status, lifecycle, reparenting, node archival, report-to-subnode promotion, state.md absorption, and plan.md graph consistency; **fact-maintenance authority** owns note.md synthesis and provenance-link closure; **critic** may write only Target B review files under `research/**/checks/`; simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`; workers may write `report_*.md` only when explicitly assigned clean-report authorship in an existing node. If research planner or a worker notices a tactical item worth preserving in `backlog.md`, they propose it; the maintenance path decides whether it belongs there.
 - To propose a status change, describe the rationale in your deliverable file
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified

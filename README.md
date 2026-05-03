@@ -50,7 +50,7 @@ If you are using Claude Code, `.claude/settings.json` runs `node .scripts/config
 
 1. Run `/meeting` to define the topic and direction
 2. Run `/run 2` to test a short autonomous research session
-3. Inspect generated artifacts such as `project.yaml`, `research/plan.md`, and `logs/last_session.md`
+3. Inspect generated artifacts such as `project.yaml`, `research/plan.md`, and `.logs/last_session.md`
 4. Use larger `/run N` sessions once the direction is stable
 5. Try `/write 2` only with the understanding that it is currently much less validated than `/run`
 
@@ -62,7 +62,7 @@ This repository aims to be honest about maturity rather than claiming that all w
 
 - `/meeting`
 - `/run`
-- The project-state and research-artifact workflow around `project.yaml`, `research/`, and `logs/`
+- The project-state and research-artifact workflow around `project.yaml`, `research/`, and `.logs/`
 
 ### Less validated today
 
@@ -113,8 +113,8 @@ During actual research and writing sessions, the project creates working files i
 - `research/work/`: worker deliverables produced during `/run`
 - `paper/`: outlines, section drafts, and integrated drafts produced during `/write`
 - `simulations/`: code, data, and figures for numerical work
-- `logs/last_session.md`: handoff summary for the next `/run`
-- `logs/last_write_session.md`: handoff summary for the next `/write`
+- `.logs/last_session.md`: handoff summary for the next `/run`
+- `.logs/last_write_session.md`: handoff summary for the next `/write`
 
 ## Configuration
 

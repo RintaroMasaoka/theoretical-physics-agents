@@ -102,7 +102,10 @@ const TARGETS = {
 function buildRuntimeConfig(target) {
   const rootDir = relative(ROOT, target.outputDir).replace(/\\/g, "/");
   const instructionFile = `${rootDir}/${target.rootInstructionFileName}`;
-  const agentInvocation = `${target.tools.agent}(${target.tools.agentTypeField}="{name}", prompt="...")`;
+  const agentInvocation =
+    target.name === "codex"
+      ? `${target.tools.agent}(prompt="Read and follow \`${rootDir}/agents/{name}.md\` as your role definition. Treat the rest of this prompt as task-specific input.\\n\\n...")`
+      : `${target.tools.agent}(${target.tools.agentTypeField}="{name}", prompt="...")`;
 
   return {
     runtime: {
@@ -323,6 +326,51 @@ function render(template, config) {
   });
 }
 
+function validateConditionalStructure(content, relPath) {
+  const warnings = [];
+  const stack = [];
+  const tokenPattern = /\{\{\s*(#(if|unless)\s+[\w.]+|else|\/(if|unless))\s*\}\}/g;
+
+  for (const match of content.matchAll(tokenPattern)) {
+    const token = match[1];
+    const line = content.slice(0, match.index).split("\n").length;
+
+    if (token.startsWith("#")) {
+      if (stack.length > 0) {
+        warnings.push(`Nested template conditional in ${relPath}:${line}; configure.mjs supports only non-nested {{#if}}/{{#unless}} blocks`);
+      }
+      stack.push({ kind: token.split(/\s+/)[0].slice(1), line, sawElse: false });
+      continue;
+    }
+
+    if (token === "else") {
+      const current = stack[stack.length - 1];
+      if (!current) {
+        warnings.push(`Template {{else}} without open conditional in ${relPath}:${line}`);
+      } else if (current.sawElse) {
+        warnings.push(`Duplicate template {{else}} for conditional opened at ${relPath}:${current.line}`);
+      } else {
+        current.sawElse = true;
+      }
+      continue;
+    }
+
+    const closingKind = token.slice(1);
+    const current = stack.pop();
+    if (!current) {
+      warnings.push(`Template closing {{/${closingKind}}} without open conditional in ${relPath}:${line}`);
+    } else if (current.kind !== closingKind) {
+      warnings.push(`Template closing {{/${closingKind}}} in ${relPath}:${line} does not match {{#${current.kind}}} opened at line ${current.line}`);
+    }
+  }
+
+  for (const current of stack) {
+    warnings.push(`Unclosed template {{#${current.kind}}} in ${relPath}:${current.line}`);
+  }
+
+  return warnings;
+}
+
 // ── Recursive glob for .src.md files ────────────────────────────────
 
 function findTemplates(dir) {
@@ -369,6 +417,7 @@ function runCheck(target, config) {
     const keys = findPlaceholders(content);
     templateKeys[rel] = keys;
     for (const key of keys) allPlaceholders.add(key);
+    warnings.push(...validateConditionalStructure(content, rel));
 
     const rendered = render(content, config);
     for (const forbidden of forbiddenRenderedTerms) {

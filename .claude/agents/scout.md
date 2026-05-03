@@ -38,10 +38,10 @@ Scout output is limited to metadata transcription and direct quotes from abstrac
 This is the canonical machine-readable inventory. It is JSON Lines: one compact JSON object per paper, no Markdown tables, no prose paragraphs. Keep any long explanation in the scout deliverable, not in the catalog. The catalog exists so agents can parse status, deduplicate by identifier, and update one paper without reformatting a human document.
 
 ```jsonl
-{"id":"0804.4527","source":"arxiv","title":"Paper Title","authors":["Author One","Author Two"],"year":2008,"status":"unread","reading_notes":[],"selection_sources":[{"kind":"query","value":"search terms","abstract_quote":"short direct quote from the abstract"}],"fetch":{"status":"fetched","path":"literature/papers/0804.4527/"}}
+{"id":"0804.4527","source":"arxiv","title":"Paper Title","authors":["Author One","Author Two"],"year":2008,"status":"unread","reading_notes":[],"source_note":null,"selection_sources":[{"kind":"query","value":"search terms","abstract_quote":"short direct quote from the abstract"}],"fetch":{"status":"fetched","path":"literature/papers/0804.4527/"}}
 ```
 
-Required fields: `id`, `source`, `title`, `authors`, `year`, `status`, `reading_notes`, `selection_sources`, `fetch`.
+Required fields: `id`, `source`, `title`, `authors`, `year`, `status`, `reading_notes`, `source_note`, `selection_sources`, `fetch`.
 
 Status: `unread` / `read` / `skipped`.
 

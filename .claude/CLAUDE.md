@@ -8,7 +8,7 @@ Users run `/run` to advance research, `/write` to draft papers, `/meeting` for p
 All user-facing output is written in **japanese**. This covers:
 
 - Conversational responses to the user
-- Any file the system writes into the project — research tree (`research/**` such as `note.md`, `.log.md`, `story.md`, `plan.md`, …), session records (`.logs/**` such as launch and meeting summaries), and any other prose file
+- Any file the system writes into the project — research tree (`research/**` such as `note.md`, `state.md`, `story.md`, `plan.md`, …), session records (`.logs/**` such as launch and meeting summaries), and any other prose file
 - Deliverables produced by worker sub-agents (see `.claude/common.md`)
 - Commit messages
 
@@ -24,12 +24,12 @@ The system uses different orchestration models in `/run` and `/write`.
 
 | Role | Agent | Owns |
 |---|---|---|
-| **Direction audit** | `direction-auditor` | Pre-direction failure-mode questions for physicist: local loop smell, external-knowledge smell, suspect premise, goal-lock risk |
-| **Direction** | `physicist` | `research/focus.md` — chooses cursor, formulates worker dispatches, issues tree directives. Thinks as a physicist (curiosity + critical thinking + narrative coherence) |
-| **Record** | `curator` | All tree writes: `.log.md`, `plan.md`, `.todo.md`, `note.md`, `conventions.md`, `dead_ends.md`, `report_*.md`, `story.md`, `principles.md`. Executes physicist's tree directives and absorbs worker evidence |
+| **Direction challenge** | `direction-challenger` | Pre-direction opposition for research planner: challenges value, goal, necessity, frame, scale, authority, and inertia anchors before the direction hardens |
+| **Direction** | `research-planner` | `research/focus.md` — chooses cursor, formulates worker dispatches, issues tree directives. Thinks as a research planner (curiosity + critical thinking + narrative coherence) |
+| **Tree transaction** | `curator` | Graph/lifecycle/placement, state.md absorbed evidence, plan.md consistency, conventions/checks placement, report placement/promotion, retraction, `dead_ends.md`, and current-runtime note.md fact transactions. Executes research planner's tree directives and absorbs worker evidence |
 | **Verification** | `critic` | Independent review of every worker deliverable (Target A, auto-attached by the scheduler) and of every curator-lifted note.md derivation (Target B) |
 | **Execution** | workers (researcher, simulator, reader, scout, engine-builder, concept-checker, self-check) | Bounded tasks — their deliverables stay provisional until critic has verified them |
-| **Session finalisation** | `session-wrap-up` | Mechanical transcription of physicist's session-end wrap-up input into `research/focus.md`, `.logs/last_session.md`, and the session log; commits and pushes |
+| **Session finalisation** | `session-wrap-up` | Mechanical transcription of research planner's session-end wrap-up input into `research/focus.md`, `.logs/last_session.md`, node-scoped `backlog.md`, and the session log; commits and pushes |
 
 ### `/write` — PI-led writing
 

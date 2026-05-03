@@ -79,7 +79,7 @@ Example: `bash .scripts/sync.sh pull .templates/skills/improve/SKILL.src.md .tem
 
 If you discover additional targets mid-rewrite, pull each before touching it.
 
-**Residual risk (flagged as a fallback after climbing stopped here).** This protocol is convention-based: safety depends on every concurrent session also using path-scoped sync. A peer session that bulk-pulls or bulk-pushes can still clobber your in-flight work; commit often and inspect `git log upstream/main` before relying on local state when peers may have run. A stronger fix (lock file, dirty-path refusal in `sync.sh`, session registry) is deferred.
+**Residual risk.** This protocol is convention-based: safety depends on every concurrent session also using path-scoped sync. A peer session that bulk-pulls or bulk-pushes can still clobber your in-flight work; commit often and inspect `git log upstream/main` before relying on local state when peers may have run. Stronger locking is outside this skill's current scope.
 
 Paired with the path-scoped push in "Commit & Upstream Sync", this completes a per-file round-trip: pull → edit → push.
 
@@ -93,11 +93,15 @@ After the Prerequisite:
 1. Frame the problem          — stay in problem-space until the integrated picture is explicit
 2. Propose a solution         — check external prior art, present one best case grounded in the frame
 3. Rewrite                    — edit .src.md at a scope that preserves coherence
-4. Regenerate & verify        — configure.mjs, then prompt-reviewer agent
+4. Regenerate & verify        — configure.mjs, blind prompt-reviewer, then fit-to-complaint check
 5. User confirmation & commit — push to upstream
 ```
 
-If an argument is given, treat it as the complaint and go to step 1. If no argument is given, open with a single AskUserQuestion to establish the entry point (review the whole system / a specific target / a specific complaint), load only the files implied, then proceed to step 1.
+If an argument is given, treat it as the starting complaint, not as a complete problem statement, and go to step 1. If no argument is given, open with a single AskUserQuestion to establish the entry point (review the whole system / a specific target / a specific complaint), load only the files implied, then proceed to step 1.
+
+**Gate between steps 2 and 3.** For any improvement that involves conceptual design — changing responsibilities, workflow, abstraction level, authority boundaries, verification policy, or behavior tradeoffs — do not enter Rewrite until the user explicitly approves the problem frame and proposed solution. The AI may judge that a frame is coherent enough to present, but may not treat that judgment as implementation permission. Ambiguous agreement, silence, or the user adding another concern means continue discussion, not edit.
+
+Narrow exception: purely mechanical fixes may proceed without this approval gate when they do not require problem framing, such as typo fixes, placeholder syntax repairs, generated/source path corrections, or an obvious runtime-conditional omission after the user has already accepted the underlying rule. If a fix changes what an agent should value, decide, prioritise, or ask, it is conceptual and needs approval.
 
 ---
 
@@ -105,13 +109,27 @@ If an argument is given, treat it as the complaint and go to step 1. If no argum
 
 Jumping to a solution before understanding almost always produces a symptomatic fix. A root-cause fix needs root-cause understanding.
 
+**The user's complaint may be pre-problem, not a spec.** The user often arrives with a discomfort, an example, or a proposed move before they have organised the problem for themselves. In that state, implementation is the wrong thinking tool: it turns the AI's first diagnosis into a concrete artifact, which then makes the user react to the artifact ("maybe change this, maybe that") instead of jointly discovering the underlying problem. That loop feels productive but is usually patch churn. Treat the discussion phase as the place where the user's observation is converted into a problem frame; do not use edits as the medium for doing that conversion.
+
 **Do not treat the first plausible fix as progress.** In `/improve`, premature implementation is usually a reasoning failure, not decisiveness: it spends the user's trust before the system has proved it understands the complaint. The right early output is an integrated problem frame, not a patch. If the user challenges your framing, that is useful data; if the user challenges a patch you already made, you have forced them into code-reviewing your misunderstanding.
+
+**Discussion has its own deliverable.** Before proposing an edit, produce a shared problem understanding that is valuable even if no file changes. It should explain: what the user observed, why it bothered them, what hidden expectation or workflow model it violated, what concept abstracts the issue beyond this example, and what would count as improvement. If the user cannot yet answer one of those, keep asking; the inability to answer is itself evidence that the problem is not ready for implementation.
 
 **Division of labor by where information lives.** Information **inside the user** (motivation, constraints, what they've tried, values, judgment criteria) must be asked. Information **outside the user** (prior solutions to similar prompt-design problems, general prompt-engineering principles, adjacent-domain knowledge) is AI's job to fetch via web search and background knowledge. Sending the user to look up external information is a division-of-labor failure. Equally, prompt-design implementation choices — naming a concept, deciding what to foreground, predicting how an LLM will read wording, drawing the line between a specific instruction and a general principle — are AI's domain. Returning them to the user dumps a decision the user lacks material to make. If the user volunteers vocabulary, take it as data; do not invite them to decide.
 
 **Broaden before narrowing.** Before choosing a target or edit, inspect adjacent axes that could change the diagnosis: whether the problem is about timing, authorship, authority, context loading, persistence, user visibility, lifecycle, evaluation, or handoff. A complaint often names the place where pain surfaced, not the place where the design is wrong. For example, "this file should exist here" may actually be about memory durability, write ownership, reader audience, or task-local versus project-global scope. If a proposed fix would be different under one of these framings, the framing is not settled yet.
 
 **How-language is a danger signal.** Users often express a deep dissatisfaction in the language of an implementation move: "put X here", "make Y do Z", "rename this", "add a file", "forbid that". Treat such `how` wording as a hypothesis about the problem, not the problem itself. The missing information is usually the `why`: what observation triggered the proposal, what responsibility boundary looked wrong, what workflow pressure made the current design feel distorted, or what value tradeoff the user is trying to protect. Do not hard-code a single question like "why do you think that?"; choose the least distorting move for the situation — ask for the originating observation, restate a likely hidden concern and invite correction, or compare two plausible framings. The rule is: if the user gave a `how` without enough `why`, recover the `why` before editing.
+
+**Minimum inquiry loop.** In ambiguous complaints, cycle through these facets before leaving problem-space:
+
+1. **Originating observation** — what concrete behaviour, output, or interaction made the user dissatisfied?
+2. **Felt mismatch** — why did that behaviour feel wrong; what expectation did it violate?
+3. **Cost of the mismatch** — what work did the user have to do because of it, or what risk did it create?
+4. **Abstraction** — what general concept explains this instance and nearby likely failures?
+5. **Success test** — how would the user recognise that future behaviour changed?
+
+Do not run this as a questionnaire when one answer naturally covers several facets. The point is not form completion; it is preventing the AI from substituting its own tidy diagnosis for the user's still-forming judgment. If the user corrects the abstraction, treat that as progress and revise the frame before discussing edits.
 
 **Every reply is a partial verbalization.** A single answer captures one facet, in one vocabulary, at one level of detail — not because the user is inarticulate but because verbalizing any internal state forces a choice that leaves other facets out. So questions do not end in one round: ask the same target from different facets, at different concreteness, under different hypotheses, and refine the integrated picture as precision grows. Start with a direct question. Read the reply as a partial verbalization — notice what facet it missed, where precision is thin, where it looks generated on the spot rather than genuine — and pick the next question: ask directly, name a facet and ask about it ("is it for this purpose?"), present a hypothesis and have the user evaluate it, raise concreteness, or surface a relevant area the user did not bring up. Not a lookup table — pick based on the texture of the reply. When a reply does not mesh with the stated complaint, hides in generalities, or looks like an ad-hoc answer, switch to hypothesis-presenting to re-ground it.
 
@@ -128,13 +146,15 @@ Jumping to a solution before understanding almost always produces a symptomatic 
 - **Success criterion**: how the user would tell the behavior has changed
 - **Edit lever**: why a prompt change, and this prompt location, is the right lever
 
+The checkpoint must be explicit in the conversation before editing. If the user gave only a target file or a desired edit, that does not satisfy the checkpoint. For conceptual changes, user confirmation of the frame and proposed solution is the permission boundary: do not proceed because the AI believes enough correction has been gathered. Ask for approval plainly after presenting the frame and proposal; if the user does not approve, keep discussing.
+
 **Stopping rule.** Not "understanding is complete" (unreachable — every reply is partial) but "the marginal precision from one more question is no longer worth the solution-quality gain". If a solution written now would miss a facet the user obviously cares about, ask one more. When in doubt, ask.
 
 ---
 
 ## 2. Propose a solution
 
-**Check external prior art first.** Before generating a solution from scratch, see whether similar prompt-design problems have well-tested answers — web search, prompt-engineering best practices, adjacent-domain knowledge. This is the "outside the user" side of the division-of-labor rule, at the design step.
+**Check external prior art for conceptual changes.** Before generating a conceptual prompt-design solution from scratch, see whether similar problems have well-tested answers — web search, prompt-engineering best practices, adjacent-domain knowledge. Mechanical repairs do not need this step unless the local convention is unclear. This is the "outside the user" side of the division-of-labor rule, at the design step.
 
 **Start the proposal with the problem frame.** The first paragraph of the proposal should say what problem you believe you are solving and why the obvious local fix is insufficient or sufficient. This makes the proposal falsifiable before implementation. If you cannot state the frame crisply, return to Section 1; do not compensate with a longer solution.
 
@@ -164,6 +184,7 @@ Climbing sometimes fails. When it does, add the specific instruction and **mark 
 - **Always give a reason.** With a reason, the LLM extrapolates correctly to edge cases. Without one, "do this" freezes into dogma that breaks in new contexts. Writing "why" is the smallest unit of universality — it pulls you toward the root cause.
 - **No contradictions or premise mismatches.** Two places in the same file must not prescribe incompatible things; one instruction must not implicitly rely on a condition another instruction undermines.
 - **Scope must be explicit.** "When to apply / when not to" — if ambiguous, the instruction leaks outside its intended range or fails inside it. Scope ambiguity is especially dangerous for prohibitions: a prohibition detached from its cause mechanically over-applies and chills legitimate behavior. Write the cause next to the prohibition.
+- **Runtime neutrality in templates.** A `.src.md` file is a multi-runtime contract, not the current agent's private prompt. Do not write the source as if the runtime you are currently using is the only reader. If Claude and Codex need different operational instructions, express the shared principle once and put the runtime-specific mechanics inside ` ... ` blocks (or the corresponding runtime config placeholder). This prevents a Codex `/improve` session from accidentally making the Claude output worse, and vice versa.
 - **Length proportional to importance, within what remains after universalization.** First, universality pulls total length *down* by removing derived items. Within what remains, length reflects relative importance — don't spend a paragraph on a one-line fix, don't bury a central instruction. A distilled root-cause principle can be short and still central; emphasis comes from position and framing, not raw word count alone.
 - **Preserve `{{ placeholder }}` syntax** — config variables resolved by `configure.mjs`.
 
@@ -177,16 +198,32 @@ Choose the scope of the rewrite so that no contradictions or duplications remain
 
 **Regenerate.** After writing the `.src.md`, run `node .scripts/configure.mjs` and confirm the generated output looks right.
 
-**prompt-reviewer agent.** Dispatch `prompt-reviewer` through Agent on the rewritten file, using `subagent_type: "prompt-reviewer"` where the runtime requires an agent-type field. The fixer knows the problem's history and overlooks residues and imbalance; a context-less reader catches that. Prompt:
+**Blind prompt-reviewer.** Run the prompt-reviewer as a blind coherence check on the rewritten file. The reviewer is the guard against the fixer flattering the user's complaint by overfitting the prompt, over-emphasising the incident, or leaving debate traces that feel responsive but weaken the document.
+
+The reviewer must receive only the target file and the review instructions, not the complaint, conversation history, problem frame, or intended fix. Its value comes from not knowing what the edit was trying to satisfy.
+
+
+Dispatch `prompt-reviewer` through Agent on the rewritten file, using `subagent_type: "prompt-reviewer"` where the runtime requires an agent-type field.
+
 
 ```
 Target file: {path}
-Pay special attention to: {areas changed in this fix}
+Review only the target file. Apply the prompt-reviewer checklist as a blind coherence review. Do not inspect the conversation, diff, complaint, problem frame, intended fix, or changed areas.
 ```
 
 The agent's verification criteria live in its own prompt. It will report quoted passages, issue types, and suggested improvements.
 
-**Reflect and confirm.** Apply valid findings and re-run `configure.mjs` if changes were made. Then present the final change to the user via AskUserQuestion for approval.
+**Fit-to-complaint check.** After the blind review, run a separate fit check yourself before asking for user approval. Use only the explicit problem frame from step 1, the success criterion, and the diff; do not re-open the whole conversation to mine extra justification. The check must answer:
+
+- Does the change address the user's originating observation, not merely the latest wording?
+- Is the success criterion represented as an operational prompt constraint?
+- Is the fix phrased at the abstract concept level rather than as an incident patch?
+- Did the blind reviewer find coherence issues that would make the fit illusory? If the reviewer was not run because the runtime/user did not permit agent launch, what residual coherence risk remains?
+- Did the change overreact by adding weight, ceremony, or prohibitions beyond the problem frame?
+
+If the fit check fails, return to problem framing or rewrite as appropriate. Do not ask the user to approve a change that only passed blind coherence.
+
+**Reflect and confirm.** Apply valid blind-review findings and fit-check findings, then re-run `configure.mjs` if changes were made. Then present the final change to the user via AskUserQuestion for approval.
 
 ---
 

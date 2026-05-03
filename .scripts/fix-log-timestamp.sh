@@ -1,5 +1,5 @@
 #!/bin/bash
-# PostToolCall hook for Write: auto-correct timestamps in logs/
+# PostToolCall hook for Write: auto-correct timestamps in .logs/
 # Receives tool call JSON on stdin; renames the file with the real timestamp.
 
 INPUT=$(cat)
@@ -9,9 +9,9 @@ data = json.load(sys.stdin)
 print(data.get('tool_input', {}).get('file_path', ''))
 " 2>/dev/null)
 
-# Only process files matching logs/YYMMDD_HHMM_agent.md or logs/_DRAFT_agent.md
+# Only process files matching .logs/YYMMDD_HHMM_agent.md or .logs/_DRAFT_agent.md
 case "$FILE_PATH" in
-  */logs/[0-9_]*_*.md | */logs/_DRAFT_*.md)
+  */.logs/[0-9_]*_*.md | */.logs/_DRAFT_*.md)
     BASENAME=$(basename "$FILE_PATH" .md)
     # Extract agent type: strip the timestamp/draft prefix
     AGENT_TYPE=$(echo "$BASENAME" | sed -E 's/^([0-9]{6}_[0-9]{4}|_DRAFT)_//')

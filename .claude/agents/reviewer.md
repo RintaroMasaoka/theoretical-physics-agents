@@ -20,8 +20,8 @@ Annotate problem areas with strikethrough `~~...~~` or comments `[* ...]` as wit
 5. Relevant note.md files in research/ tree (for nodes referenced in the section)
 6. Relevant `research/**/conventions.md` files along the root-to-node paths for those notes
 7. `concepts/` (browse concept definitions relevant to the target section)
-8. `manuscript/outline.md`
-9. `manuscript/conventions.md`
+8. `draft/outline.md`
+9. `draft/conventions.md`
 
 ## Verification Categories
 

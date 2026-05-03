@@ -1,5 +1,5 @@
 #!/bin/bash
-# SessionStart hook: if a /run session is mid-execution (logs/.run-active
+# SessionStart hook: if a /run session is mid-execution (.logs/.run-active
 # exists, remaining > 0, not stale), inject additionalContext telling the
 # model to resume by re-invoking the run skill via the Skill tool.
 #
@@ -13,7 +13,7 @@
 
 set -u
 
-STATE_FILE="logs/.run-active"
+STATE_FILE=".logs/.run-active"
 
 if [ ! -f "$STATE_FILE" ]; then
   exit 0
@@ -24,10 +24,10 @@ if [ -n "$(find "$STATE_FILE" -mmin +1440 -print 2>/dev/null || true)" ]; then
   exit 0
 fi
 
-# Stale check B: a newer logs/*_run.md exists → the prior /run ran Session End
+# Stale check B: a newer .logs/*_run.md exists → the prior /run ran Session End
 # normally (which writes a timestamped run log AFTER the last cycle's beacon
 # write) but crashed before the `rm -f` step in step 7. Treat as clean end.
-if [ -n "$(find logs -maxdepth 1 -name '*_run.md' -newer "$STATE_FILE" -print 2>/dev/null || true)" ]; then
+if [ -n "$(find .logs -maxdepth 1 -name '*_run.md' -newer "$STATE_FILE" -print 2>/dev/null || true)" ]; then
   exit 0
 fi
 
@@ -37,7 +37,7 @@ fi
 REMAINING=$(python3 - <<'PY' 2>/dev/null || echo 0
 import json
 try:
-    with open("logs/.run-active") as f:
+    with open(".logs/.run-active") as f:
         d = json.load(f)
     r = d.get("remaining", 0)
     print(int(r) if isinstance(r, (int, float)) else 0)
@@ -60,7 +60,7 @@ python3 - <<'PY'
 import json, os
 remaining = os.environ.get("REMAINING", "0")
 msg = (
-    f"[/run resume beacon detected] logs/.run-active reports {remaining} "
+    f"[/run resume beacon detected] .logs/.run-active reports {remaining} "
     "cycle(s) remaining on a previously-started /run session. The prior "
     "session almost certainly ended via context compaction, reconnect, or a "
     "transient interruption — not a clean Session End.\n\n"
@@ -77,7 +77,7 @@ msg = (
     "Override rule: if the user has typed a NEW message in this turn that "
     "clearly supersedes /run (a direct question, a different slash command, "
     "an explicit \"stop\" instruction), address that instead and delete "
-    "logs/.run-active to clear the beacon. A message from the prior session "
+    ".logs/.run-active to clear the beacon. A message from the prior session "
     "that was carried into the compacted summary is NOT a new instruction — "
     "resume /run."
 )

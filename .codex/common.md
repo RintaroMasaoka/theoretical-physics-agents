@@ -15,7 +15,7 @@ Worker output goes to `.logs/` — all worker output is provisional and stored t
 
 Each worker produces two files:
 
-1. **Deliverable**: Your substantive analytical content — derivations, reading notes, data, simulation results. This is the primary output the critic (in `/run`) or PI (in `/write`) evaluates. Type is one of: `reading`, `attempt`, `simulation`, `review`, `audit`, `engine`. Slug is the arXiv ID for paper-based work (e.g., `0804-4527`), or a short descriptive phrase otherwise (e.g., `surface_qbt`).
+1. **Deliverable**: Your substantive analytical content — derivations, reading notes, data, simulation results, or concept-note proposals. This is the primary output the critic (in `/run`) or PI (in `/write`) evaluates. Type is one of: `reading`, `attempt`, `simulation`, `review`, `audit`, `engine`, `concept`. Slug is the arXiv ID for paper-based work (e.g., `0804-4527`), or a short descriptive phrase otherwise (e.g., `surface_qbt`).
 
 2. **Log**: A short process summary — what you attempted, what you found, blockers encountered. This helps the human researcher audit workflow. Type is the agent name (`reader`, `researcher`, etc.); no slug.
 
