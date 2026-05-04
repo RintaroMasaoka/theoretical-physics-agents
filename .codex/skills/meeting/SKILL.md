@@ -21,7 +21,7 @@ English headings and labels in this prompt are structural examples, not literal 
 
 ## Role
 
-`/meeting` is the human approval gate for AI research outputs. The main object of review is not the AI's summary of progress; it is the actual `research/**/note.md` fact-layer prose that downstream writing would rely on. The meeting presents those artifacts to the user, records explicit approval or requested revision, and captures research-direction instructions that should shape the next `/run`.
+`/meeting` is the human approval gate for AI research outputs. The main object of review is not the AI's summary of progress; it is the actual `research/**/note.md` fact-layer prose that downstream writing would rely on. The meeting points the user to the artifact by clear file links, records explicit approval or requested revision, and captures research-direction instructions that should shape the next `/run`.
 
 This differs from `/run` and `/write`:
 - `/run` may create, verify, and maintain `note.md`, but it cannot make a result human-authorized
@@ -30,7 +30,7 @@ This differs from `/run` and `/write`:
 
 ## Flow
 
-**Principle: present artifacts before asking for decisions.** Meetings are real-time review sessions; the user needs the actual artifact in front of them before approval has meaning. Load the minimal state needed to identify candidate `note.md` deliverables, present their contents verbatim, then ask for approval, revision, or direction. Use request_user_input for questions (text output questions risk missed responses).
+**Principle: put artifacts in front of the user before asking for decisions.** Meetings are real-time review sessions, but dumping whole source files into the chat makes review harder and turns the meeting transcript into a second, noisy copy of the research tree. Load the minimal state needed to identify candidate `note.md` deliverables, present clickable file links plus a short orientation and review status, then ask for approval, revision, or direction. Use request_user_input for questions (text output questions risk missed responses).
 
 ```
 Initialization
@@ -38,7 +38,7 @@ Initialization
     ▼ Context-dependent start
         ├─ No theme set (research/state.md missing) → Tell user to run /launch first
         └─ Theme already set → Present deliverable review packet
-    ▼ User reviews note.md artifacts
+    ▼ User opens/reviews linked note.md artifacts
         ├─ Approved → Record authorization and prepare manuscript handoff
         ├─ Revision requested → Record required changes and route back to /run or meeting rewrite
         └─ Direction change → Reflect direction decisions
@@ -82,7 +82,7 @@ Data loading: research/note.md + research/state.md + research/story.md + researc
     ▼ Navigate the tree: ls research/ to see top-level children, read their state.md for status (note.md if exists)
     ▼ If agenda.md exists (agenda accumulated by research planner during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
     ▼ Identify candidate note.md deliverables for user review
-    ▼ Present deliverable review packet: note.md contents verbatim + minimal orientation
+    ▼ Present deliverable review packet: file links + minimal orientation
     ▼ If loaded agenda items exist, display and discuss them as well
     ▼ Ask for approval / revision / direction
     ▼ Reflect authorizations and decisions
@@ -94,21 +94,20 @@ Data loading: research/note.md + research/state.md + research/story.md + researc
 {candidate deliverables label in japanese}:
   - {path to note.md} — {one-line reason this is ready for review}
 
-{artifact heading in japanese}: {path to note.md}
+{artifact heading in japanese}: {clickable path to note.md}
 {orientation in japanese}: {short context only; not a substitute for the artifact}
-
-```markdown
-{copy the note.md body verbatim}
-```
+{review note in japanese}: Open the linked file for the approval target. Mention any short caveat or section anchor needed to focus review.
 
 {requested decision label in japanese}: approve as manuscript input / request revision / redirect research
 ```
 
-**Do not summarize instead of presenting.** A summary may orient the user, but it is not the approval target. If a `note.md` is being considered for authorization, copy its body verbatim in full. If it is too long for one response, split it across consecutive responses and do not ask for approval until the whole artifact has been shown. Do not paraphrase away limitations, scopes, check links, caveats, or source/project boundary language.
+**Do not replace artifact review with a summary.** A summary may orient the user, but it is not the approval target. If a `note.md` is being considered for authorization, provide a clickable path to the file and make clear that the linked file, not the orientation paragraph, is what is being approved. Do not paste the whole body into chat by default. Only quote a short excerpt when it is necessary to discuss a specific sentence or ambiguity. Do not paraphrase away limitations, scopes, check links, caveats, or source/project boundary language when describing what the user is about to review.
 
 **Candidate selection:** Prefer `note.md` files that are stable, recently changed since the last meeting, central to `research/story.md`, or directly blocking manuscript progress. If there are many, present the highest-impact few first and say what was deferred. Do not make the user approve a hidden batch.
 
-**Self-contained presentation:** Throughout the meeting, completely explain any technical term, mathematical object, internal label, or named entity (e.g. matrix, operator, algorithm, node name, abbreviation, theorem) on its first mention in this conversation. Never assume the user remembers a term from prior meetings — the current conversation must stand on its own.
+**Self-contained orientation:** Throughout the meeting, briefly explain any technical term, mathematical object, internal label, or named entity (e.g. matrix, operator, algorithm, node name, abbreviation, theorem) on its first mention in this conversation when it is needed for the decision. Never assume the user remembers a term from prior meetings, but keep explanations proportional so the chat remains a review surface rather than a rewritten source file.
+
+**Research note hygiene:** A `note.md` is durable fact-layer synthesis, not a meeting transcript or process log. User-facing notes should read as the current understanding: avoid embedding meeting-history markers, session chronology, or approval provenance in the prose unless the historical fact itself is part of the scientific claim. Put provenance, approvals, agenda, and route history in `.logs/`, `state.md`, `story.md`, or authorization snapshots. Meeting-confirmed revisions to `note.md` should remove stale labels and over-specific framing that the user rejects, so downstream `/write` sees a clean notebook rather than a log.
 
 ## Authorization Gate
 
@@ -122,11 +121,11 @@ When the user approves a `note.md` artifact:
    - source `note.md` path
    - approval scope stated by the user
    - any exclusions, limitations, or requested manuscript framing
-   - the exact `note.md` body that was shown to the user
+   - the exact `note.md` body from the linked file at the time of approval
 3. Record the path to that authorization snapshot in the meeting log
 4. Treat the snapshot, not the mutable `note.md`, as the authorized handoff to manuscript writing
 
-Reason: `note.md` can continue to evolve under `/run`; authorization must attach to the artifact the user actually reviewed. The snapshot is the bridge from agent-maintained draft facts to human-authorized manuscript authority.
+Reason: `note.md` can continue to evolve under `/run`; authorization must attach to the linked artifact version the user actually reviewed. The snapshot is the bridge from agent-maintained draft facts to human-authorized manuscript authority.
 
 If the user requests revision instead of approval, record the requested changes under decisions, update `research/focus.md` or relevant `state.md` / `principles.md` as appropriate, and do not create an authorization snapshot. If the user collaboratively rewrites `note.md` during the meeting and then approves the rewritten artifact, show the final rewritten text before recording authorization.
 
@@ -148,7 +147,7 @@ If the user requests revision instead of approval, record the requested changes 
 
 The goal is not AI reporting and ending, but user judgment over artifacts and direction. Actively seek the user's judgment in the following situations.
 
-**Deliverable approval:** After presenting a candidate `note.md` verbatim, ask whether it is approved as manuscript input, needs revision, or should redirect the research. If approval is partial, restate the approved scope and exclusions before writing the authorization snapshot.
+**Deliverable approval:** After linking a candidate `note.md` as the approval target, ask whether it is approved as manuscript input, needs revision, or should redirect the research. If approval is partial, restate the approved scope and exclusions before writing the authorization snapshot.
 
 **Turning points in direction:** Get user approval before reflecting structural changes to the narrative structure in `research/story.md` (step additions/deletions/reordering). Present the content, reason, and the option to maintain the status quo.
 
