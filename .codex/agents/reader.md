@@ -38,7 +38,7 @@ If all source acquisition methods (see "Paper Acquisition Flow" below) fail:
 
 1. Keep the status in `literature/catalog.jsonl` as `unread`
 2. Do not call `new-log.sh reading {id}` and do not write any reading deliverable file (if the file exists, downstream agents will treat its content as fact)
-3. Return `FAILED: source acquisition failed (arXiv:{id})` as the task result and terminate
+3. For arXiv papers, return `FAILED: source acquisition failed (arXiv:{id})` as the task result and terminate. For non-arXiv papers, return `FAILED: full body text unavailable ({source}:{id})`
 
 Do not: use web search as a substitute, complete from training data, repurpose other reading notes, or partially create "what you know."
 
@@ -55,25 +55,37 @@ Do not read `research/**`, `manuscript/`, `draft/`, or node-local `sources.md` u
 
 - Reading priority: LaTeX source > ar5iv HTML > PDF (LaTeX preserves equations and proofs completely with the highest AI reading accuracy. PDF text conversion can garble equations)
 - Paper data is stored locally in `literature/papers/{id}/`. AI reads `.tex` files directly
-- Full paper text is acquired only from arXiv (paywalled content cannot be read)
-- For papers not on arXiv, cite metadata only — it is dishonest to base arguments on sources whose full text has not been verified, and it can lead to incorrect claims
+- arXiv papers require arXiv-originated body text. Acceptable surfaces are local arXiv source/PDF fetched from arXiv or ar5iv HTML rendering of the same arXiv paper. Paywalled content cannot be read
+- Non-arXiv papers require full body text explicitly provided in the workspace. Otherwise do not create a reading note or source record; keep only catalog metadata. It is dishonest to base arguments on sources whose full text has not been verified, and it can lead to incorrect claims
 
 ## Paper Acquisition Flow
 
-Confirm the arXiv ID of the assigned paper and check if local data exists in `literature/papers/{id}/`. If not, try acquiring in the following order.
+Confirm the assigned paper source. If `source != arxiv`, skip arXiv acquisition and proceed only if full body text is explicitly present in the workspace; otherwise follow Source Requirement failure handling. For arXiv papers, confirm the arXiv ID and check whether readable local body text is already verified in `literature/papers/{id}/`. Existing local data must satisfy the same validation as newly acquired data: TeX source with an identifiable main `.tex`, PDF readable as body text, or ar5iv HTML captured as body text. If not, try acquiring in the following order.
 
 ### Step 1: arXiv Direct (curl)
 
 ```bash
 mkdir -p literature/papers/{id}
-curl -sL -o literature/papers/{id}/source "https://arxiv.org/e-print/{id}"
+curl -fL -o literature/papers/{id}/source "https://arxiv.org/e-print/{id}"
 ```
 
-On success, use `file` command to determine type and extract (gzip/tar/plain text). The main `.tex` file contains `\documentclass`. Also fetch PDF: `curl -sL -o literature/papers/{id}/paper.pdf "https://arxiv.org/pdf/{id}"`
+Success means more than "a file exists": the HTTP request must succeed, and `file` / extraction must verify TeX source. Identify a main `.tex` file containing `\documentclass`; otherwise direct source acquisition has not succeeded. Also fetch PDF for fallback use: `curl -fL -o literature/papers/{id}/paper.pdf "https://arxiv.org/pdf/{id}"`. PDF-only availability is not enough to skip ar5iv; use PDF reading only after TeX and ar5iv are unavailable.
 
-### Step 2: ar5iv HTML (WebFetch)
+### Step 2: GitHub Actions relay
 
-If curl fails (HTTP 403, timeout, empty file, etc.), try ar5iv.
+If direct arXiv acquisition fails for network, sandbox, archive extraction, empty-file, rate-limit, or other transient acquisition reasons, run the project relay. If the ID is confirmed invalid, skip the relay and follow failure handling.
+
+```bash
+bash .scripts/fetch-arxiv.sh {id}
+```
+
+
+This relay is a fixed acquisition path and uses Git object writes, push/fetch, and local writes under `literature/`. If the normal command fails with `Operation not permitted`, `.git/FETCH_HEAD`, `.git/objects`, `git hash-object`, `git mktree`, `git commit-tree`, `git push`, or another likely sandbox-related Git permission error, immediately rerun the same command with `sandbox_permissions="require_escalated"` and propose `prefix_rule=["bash", ".scripts/fetch-arxiv.sh"]`. If approval is unavailable in the current runtime, record that the relay was permission-gated and continue to the ar5iv fallback; do not continue from abstracts or memory.
+
+
+### Step 3: ar5iv HTML (WebFetch)
+
+If both direct arXiv acquisition and the relay fail, try ar5iv.
 
 ```
 WebFetch: https://ar5iv.labs.arxiv.org/html/{id}
@@ -81,7 +93,7 @@ WebFetch: https://ar5iv.labs.arxiv.org/html/{id}
 
 ar5iv is an HTML rendering of the arXiv paper — it is the paper's body text itself.
 
-### Step 3: All Methods Failed
+### Step 4: All Methods Failed
 
 Follow the failure procedure in the "Source Requirement" section and terminate immediately.
 
@@ -91,10 +103,13 @@ Follow the failure procedure in the "Source Requirement" section and terminate i
 2. Write a raw reading deliverable in `.logs/` recording what you inspected and any unresolved source-reading issues
 3. Create or update the durable source record at `literature/notes/{id}.md`
 4. Update the assigned paper in `literature/catalog.jsonl`: set `status` to `read`, append the raw extraction file path to `reading_notes`, and set `source_note` to `literature/notes/{id}.md`
-5. If related papers are discovered only because they are directly cited around inspected passages, record them in the raw deliverable under `Citation-chain candidates`. Do not recommend them for project reasons
-6. For proposed papers not already in `literature/catalog.jsonl`:
+5. If related papers are discovered only because they are directly cited around inspected passages, record them in the raw deliverable under `Citation-chain candidates`. This is an audit trail of direct citations you happened to inspect, not a recommendation channel. Do not do extra citation-chain exploration, catalog addition, or fetch unless the dispatch explicitly asks for citation-chain discovery
+6. If and only if the dispatch explicitly asks for citation-chain discovery, process proposed papers not already in `literature/catalog.jsonl`:
    - Add one JSON object per paper with `status: "unread"` and selection metadata
    - Before returning, run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` for every newly added arXiv paper. Unlike the Paper Acquisition Flow above (which is for the assigned paper with fallback steps), this is a batch admission step for newly discovered papers: do not leave accepted arXiv IDs unfetched for a later agent
+
+   - For Codex sandbox-related Git permission failures from this batch fetch, rerun the same command with `sandbox_permissions="require_escalated"` and `prefix_rule=["bash", ".scripts/fetch-arxiv.sh"]` when the runtime allows approval requests
+
    - If fetch-arxiv fails for some papers, construct bib entries manually from metadata
 7. Run `node .scripts/render-reading-list.mjs` after catalog updates. `literature/reading_list.md` is a generated linked view for humans; never edit it directly
 
@@ -137,7 +152,7 @@ Do not add other top-level sections without a source-facing reason. In particula
 
 ### Raw reading deliverable
 
-**Deliverable**: type `reading`, slug = arXiv ID with dots replaced by hyphens (e.g., `0804-4527`). Obtain the path via `bash .scripts/new-log.sh reading {id}` per `common.md` § Deliverables and Logs. The raw deliverable is an audit record for the source note; downstream agents should normally cite `literature/notes/{id}.md`, not this log.
+**Deliverable**: type `reading`. Pass the raw paper ID to `bash .scripts/new-log.sh reading {id}` per `common.md` § Deliverables and Logs; the script constructs the filename slug. The raw deliverable is an audit record for the source note; downstream agents should normally cite `literature/notes/{id}.md`, not this log.
 
 ```markdown
 # {Title}

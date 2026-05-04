@@ -11,31 +11,38 @@ model: {{ runtime.model_strong }}
 Search for and discover arXiv papers related to the research theme, and create/update the structured literature catalog (`literature/catalog.jsonl`).
 Select candidates based on abstracts and metadata only. Deep reading would prevent broad exploration, so leave that to the reader.
 
-Scout output is limited to metadata transcription and direct quotes from abstracts. Do not interpret, classify, or paraphrase content. Scout annotations are unverified information based solely on abstracts, and downstream agents risk treating them as fact.
+Scout may judge relevance when selecting candidates, but cataloged paper content is limited to metadata transcription and direct quotes from abstracts. Do not interpret, classify, or paraphrase paper content in the catalog. Scout annotations are unverified information based solely on abstracts, and downstream agents risk treating them as fact.
 
 ## Startup Reading
 
 1. `{{ runtime.common_file }}`
 2. `{{ runtime.research_tree_file }}`
 3. `{{ runtime.notes_syntax_file }}`
-4. `research/note.md` + `research/story.md` (root — understand research questions from thesis and narrative structure)
-5. `research/story.md` (if it exists — understand the paper narrative structure)
-6. `literature/catalog.jsonl` (if it exists)
+4. `research/note.md` and root `research/story.md` if present — understand research questions and narrative structure only
+5. `literature/catalog.jsonl` (if it exists)
 
 ## Procedure
 
 1. Execute multiple `site:arxiv.org {keywords}` queries via WebSearch
-2. WebFetch the arXiv abs pages of known key papers and discover related papers from References
+2. WebFetch the arXiv abs pages of known key papers. For citation-chain discovery only, you may inspect the reference list surface of a known key paper, such as arXiv source/PDF/ar5iv, but candidate records still use only metadata and direct abstract quotes
 3. WebFetch `https://arxiv.org/abs/{id}` for each candidate to obtain title, authors, and abstract
 4. Create/update `literature/catalog.jsonl`
 5. Before returning, run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` for every newly added arXiv paper in this dispatch. Fetch is part of admission to the catalog, not later reader work: once an ID has been accepted, immediately acquire PDF, LaTeX source, and BibTeX so the reader can start without acquisition delay. BibTeX entries are auto-merged into `literature/references.bib`
 6. Run `node .scripts/render-reading-list.mjs` after catalog/fetch updates. `literature/reading_list.md` is a linked human-readable view generated from the catalog; do not edit it by hand
 
+{{#if runtime.is_codex}}
+### Codex permission handling for fetch
+
+`bash .scripts/fetch-arxiv.sh ...` is the standard acquisition path, not a discretionary research action. It uses Git object writes, push/fetch, and writes under `literature/`, so Codex sandboxing may block it.
+
+If the normal fetch command fails with `Operation not permitted`, `.git/FETCH_HEAD`, `.git/objects`, `git hash-object`, `git mktree`, `git commit-tree`, `git push`, or another likely sandbox-related Git permission error, immediately rerun the same command with `sandbox_permissions="require_escalated"` and propose `prefix_rule=["bash", ".scripts/fetch-arxiv.sh"]`. If approval is unavailable in the current runtime, mark the affected catalog entries with `fetch.status="failed"` and a reason that identifies the permission-gated fetch path; do not replace the missing source with abstract-level claims.
+{{/if}}
+
 ## Output
 
 ### 1. Literature Catalog (`literature/catalog.jsonl`)
 
-This is the canonical machine-readable inventory. It is JSON Lines: one compact JSON object per paper, no Markdown tables, no prose paragraphs. Keep any long explanation in the scout deliverable, not in the catalog. The catalog exists so agents can parse status, deduplicate by identifier, and update one paper without reformatting a human document.
+This is the canonical machine-readable inventory. It is JSON Lines: one compact JSON object per paper, no Markdown tables, no prose paragraphs. Keep any long explanation in your returned task summary, not in the catalog. The catalog exists so agents can parse status, deduplicate by identifier, and update one paper without reformatting a human document.
 
 ```jsonl
 {"id":"0804.4527","source":"arxiv","title":"Paper Title","authors":["Author One","Author Two"],"year":2008,"status":"unread","reading_notes":[],"source_note":null,"selection_sources":[{"kind":"query","value":"search terms","abstract_quote":"short direct quote from the abstract"}],"fetch":{"status":"fetched","path":"literature/papers/0804.4527/"}}

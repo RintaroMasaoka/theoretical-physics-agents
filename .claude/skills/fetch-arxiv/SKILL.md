@@ -38,11 +38,13 @@ bash .scripts/fetch-arxiv.sh $ARGUMENTS
 
 **Important**: This command takes 1-3 minutes (GitHub Actions execution + polling). The script handles everything automatically: push request, poll for completion, extract results.
 
+
+
 Upper limit: 20 papers per fetch (GitHub Actions artifact size and arXiv rate limits). If more are needed, split into multiple fetches.
 
 ## After Fetch
 
-1. Report the list of fetched files to the user (the script prints this)
+1. If user-invoked, report the list of fetched files to the user; if called by a sub-agent, return the fetched file list to the caller. The script prints this list.
 2. Papers are placed in `literature/papers/{id}/`:
    - `paper.pdf` — PDF file
    - `*.tex`, `*.bib`, `*.sty`, etc. — LaTeX source files
@@ -58,11 +60,14 @@ bash .scripts/fetch-arxiv.sh {arxiv_id}
 
 The script manages the `arxiv-fetch` branch internally; callers do not need to switch branches or manage git state.
 
+
+
 ## Error Cases
 
 - **Timeout**: If the script times out, suggest the user check GitHub Actions status
 - **Paper not found**: If the arXiv ID is invalid, the result will show no files for that ID
 - **Network failure**: The script retries git fetch on failure. If persistent, retry the whole command
+- **Permission failure**: In Codex, follow the permission-handling rule above before recording fetch failure
 
 ## Cleanup
 
