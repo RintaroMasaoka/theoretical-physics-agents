@@ -13,21 +13,21 @@ The team and who owns what:
 | Role | Agent | Owns |
 |---|---|---|
 | **Direction challenge** | `direction-challenger` | Pre-direction opposition: challenges value, goal, necessity, frame, scale, authority, and inertia anchors before the direction hardens |
-| **Direction** | `research-planner` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives |
-| **Tree transaction** | `curator` | Graph/lifecycle/placement, state.md absorbed evidence, plan.md consistency, conventions/checks placement, report placement/promotion, retraction, `dead_ends.md`, and current-runtime note.md fact transactions |
+| **Direction** | `research-planner` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives; may create a minimal child node when immediate dispatch needs that structure |
+| **Tree transaction** | `curator` | Graph/lifecycle/placement, structural closure for planner-created children, state.md absorbed evidence, plan.md consistency, child presentation transactions, conventions/checks placement, report placement/promotion, retraction, `dead_ends.md`, and current-runtime note.md fact transactions |
 | **Verification** | `critic` | Independent review of every worker deliverable and of note.md fact-layer lifts |
 | **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing provisional deliverables in `.logs/` or direct review output as specified by their agent prompt |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of research planner's wrap-up-input file into session log / focus / last_session / node-scoped backlog.md / agenda; commit + push |
 
-`/auto` itself owns only: the cycle loop, the resume beacon, pre-direction challenge dispatch, parallel worker dispatch, auto-attaching critic to each worker, dispatching curator once per cycle with the right inputs, and handing session end to `session-wrap-up`.
+`/auto` itself owns only: the cycle loop, the resume beacon, pre-direction challenge dispatch, parallel worker dispatch, auto-attaching critic to each worker, dispatching curator with the right inputs, detecting parent-ascent presentation boundaries, and handing session end to `session-wrap-up`. It does not create nodes itself; if research planner creates a minimal child before returning `focus.md`, the scheduler simply parses the new cursor/worker target and curator closes the structure later in the cycle.
 
 ## Constraints
 
 - **Write all prose in {{ language }}.** Applies to `research/focus.md`, `.logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `{{ runtime.research_tree_file }}` and here may stay in English. The rule is about body prose, not structural tokens.
-- `{{ runtime.tool_ask_user_question }}` and all other user-input solicitations are prohibited. Users are often away during `/auto`; asking blocks the session. Text output to the user is limited to the final report emitted at Session End.
-- If the user initiates communication mid-session, respond and continue. Corrections from the user take precedence over scheduled dispatches.
+- `{{ runtime.tool_ask_user_question }}` and all other user-input solicitations are prohibited. Users are often away during `/auto`; asking blocks the session.
+- Do not initiate user-facing progress messages during a valid active run. The only scheduler-initiated user-facing message during an active run is the final report emitted at Session End. Startup precondition failures may emit their specified stop message. If the user initiates communication mid-session, respond briefly and continue. Corrections from the user take precedence over scheduled dispatches.
 - **`{{ runtime.tool_shell }}("sleep ...")` is prohibited; polling via `{{ runtime.tool_shell }}("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
-- Full paper text is acquired only from arXiv.
+- Full paper text is acquired only from arXiv so source provenance stays reproducible and full-text licensing/source drift does not enter the research tree. Metadata, bibliographic records, abstracts, and non-full-text discovery may use other sources when the relevant agent prompt allows it.
 - **Paper writing is NOT `/auto`'s responsibility.** Writing is handled by the `/write` skill. `/auto` drives research only.
 
 ## Turn-Yielding Discipline
@@ -50,6 +50,9 @@ The team and who owns what:
 | **Session** | One `/auto` execution — from start to final report |
 | **Cycle** | One iteration of the scheduler loop (direction-challenger → research planner → workers → critic → curator) |
 | **Task** | One `{{ runtime.tool_agent }}` tool call |
+| **Presentation Boundary** | A child-to-parent cursor ascent where parent-level worker dispatch is paused until the child is made readable as a parent component |
+| **Child Presentation Judgment** | Research planner's meaning judgment at the boundary: what the child was for, what it achieved or failed to achieve, and what the parent should now see |
+| **Child Presentation Transaction** | Curator's tree update at the boundary: applying the judgment to status, Current Board, parent plan/state, durable surfaces, archive/reframe mechanics, and link hygiene |
 
 One session = up to `MAX_CYCLES` cycles. Multiple tasks can run in parallel within a cycle.
 
@@ -102,11 +105,11 @@ This is the resume beacon read at Session Start (see `phases/session-lifecycle.m
 Read and follow `{{ runtime.agents_dir }}/direction-challenger.md` as your role definition. Treat the rest of this prompt as task-specific input.
 
 ## Task
-Write the pre-direction challenge for this cycle. Obtain a path via `bash .scripts/log-path.sh direction-challenge` and return it as `DONE: {path}`.
+Obtain a path via `bash .scripts/log-path.sh direction-challenge`, write the pre-direction challenge for this cycle to that file, and return it as `DONE: {path}`.
 {{else}}
 {{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="direction-challenger", prompt="""
 ## Task
-Write the pre-direction challenge for this cycle. Obtain a path via `bash .scripts/log-path.sh direction-challenge` and return it as `DONE: {path}`.
+Obtain a path via `bash .scripts/log-path.sh direction-challenge`, write the pre-direction challenge for this cycle to that file, and return it as `DONE: {path}`.
 {{/if}}
 
 ## Previous-Cycle Material
@@ -119,11 +122,11 @@ Session cycle: {cycle_number} of {MAX_CYCLES}
 """)
 ```
 
-The challenger reads only its narrow local scope and returns `DONE: {path}`. If it returns `FAILED:`, continue to research planner with `Direction Challenge: unavailable — {failure}`. The challenge is helpful but not load-bearing; research planner owns the decision.
+The challenger reads only its narrow local scope and returns `DONE: {path}`. Append each returned direction-challenge path to the session's in-memory evidence list for Session End. If it returns `FAILED:`, continue to research planner with `Direction Challenge: unavailable — {failure}`. The challenge is helpful but not load-bearing; research planner owns the decision.
 
 ### 2. Research planner Dispatch — Direction
 
-Before dispatching research planner, run `node .scripts/literature-status.mjs --limit=8` if `literature/catalog.jsonl` exists. Pass the output verbatim in `## Literature Status`. This is scheduler-owned context condensation: research planner should see unread/read/fetch pressure automatically without spending direction-setting attention parsing the full catalog unless the summary makes literature decisive.
+Before dispatching research planner, read the current `research/focus.md` if it exists and capture the **Previous cursor** from its `Cursor:` line. Also run `node .scripts/literature-status.mjs --limit=8` if `literature/catalog.jsonl` exists. Pass the output verbatim in `## Literature Status`. This is scheduler-owned context condensation: research planner should see unread/read/fetch pressure automatically without spending direction-setting attention parsing the full catalog unless the summary makes literature decisive.
 
 ```
 {{#if runtime.is_codex}}
@@ -161,8 +164,6 @@ Research planner returns `DONE: research/focus.md`. If it returns `FAILED:`, re-
 
 ### 3. Parse `research/focus.md`
 
-Before overwriting, remember the **previous cursor** (the `Cursor:` line in the focus.md that research planner just replaced). The scheduler reads focus.md twice in the cycle: once before the research planner dispatch (step 2) to capture the previous cursor, and once after to parse the new directives.
-
 Read the new `research/focus.md`. Extract:
 
 - **Cursor** — the path into the tree (for context when forming worker prompts)
@@ -175,6 +176,45 @@ Read the new `research/focus.md`. Extract:
 If `Status: session_complete` → proceed to Session End (skip remaining cycles).
 
 The scheduler does not auto-remediate cursor jumps. If research planner violates its one-edge cursor discipline, the next research planner dispatch must repair the direction; the scheduler only parses fields and continues.
+
+### 3a. Presentation Boundary — Child Presentation Transaction
+
+If **Previous cursor** is a direct child of the new **Cursor**, the research planner has floated up from child to parent. Treat this as a presentation boundary, not as an ordinary parent work cycle.
+
+Run curator immediately, before launching any workers:
+
+```
+{{#if runtime.is_codex}}
+{{ runtime.tool_agent }}(prompt="""
+Read and follow `{{ runtime.agents_dir }}/curator.md` as your role definition. Treat the rest of this prompt as task-specific input.
+
+## Task
+Child Presentation Transaction. The cursor has just ascended from the child below to its parent. Apply research planner's Child Presentation Judgment from the Tree Directives, plus your normal transaction mechanics, so the child is readable from the parent before parent-level planning resumes: status, Current Board, parent plan/state, extracted durable surfaces, dead-end/report/note placement, archive/reframe needs, and link hygiene.
+{{else}}
+{{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="curator", prompt="""
+## Task
+Child Presentation Transaction. The cursor has just ascended from the child below to its parent. Apply research planner's Child Presentation Judgment from the Tree Directives, plus your normal transaction mechanics, so the child is readable from the parent before parent-level planning resumes: status, Current Board, parent plan/state, extracted durable surfaces, dead-end/report/note placement, archive/reframe needs, and link hygiene.
+{{/if}}
+
+## Boundary
+Parent cursor: {cursor path from focus.md}
+Child being presented: {previous cursor path}
+
+## Child Presentation Judgment / Tree Directives (from research planner, this cycle)
+{verbatim copy of focus.md § Tree Directives}
+
+## New Evidence This Cycle
+(none — this is a presentation-boundary transaction before parent-level planning resumes)
+
+## Context
+Session cycle: {cycle_number} of {MAX_CYCLES}
+Presentation boundary: true
+""")
+```
+
+This curator call executes the presentation-boundary transaction and returns a summary. Record that summary as the cycle's curator sweep. Then proceed directly to Cycle End; do **not** launch workers, auto-critic, or the ordinary curator dispatch in this cycle. The next cycle's direction-challenger and research planner will read the parent after the planner's judgment has landed in the tree.
+
+Research planner should leave `Worker Dispatches` empty on an ascent cycle. If it listed workers anyway, skip them and carry a scheduler warning into the next research planner prompt via the curator sweep summary: parent-level workers were not launched because child presentation must land before parent-level planning continues.
 
 ### 4. Worker Dispatch — Parallel
 
@@ -237,7 +277,7 @@ Increment `cycles_done`. If `cycles_done < MAX_CYCLES` and `Status` is still `ac
 Read `phases/session-lifecycle.md` § Session End. Summary:
 
 1. **Simulation housekeeping decision** — if simulator ran, research planner may identify superseded scripts in final `research/focus.md` Tree Directives. Do not move them in the scheduler.
-2. **Final curator sweep** — dispatch curator once more with the final Tree Directives and accumulated evidence, asking for a tree-wide coherence pass (per curator's own session-end mandate). Curator executes any `archive superseded script {path}` directives by moving the script and its companion `.md` to `src/archive/`.
+2. **Final curator sweep** — dispatch curator once more with the final Tree Directives plus a compact list of this session's deliverable/critic paths and prior curator summaries for coherence review. Do not ask curator to re-absorb already absorbed `.logs/` evidence. Curator executes any `archive superseded script {path}` directives by moving the script and its companion `.md` to `src/archive/`.
 3. **Final research planner dispatch (session-end mode)** — research planner writes the wrap-up-input file (path obtained via `bash .scripts/log-path.sh wrap-up-input` and returned as `DONE: {path}`), using the final curator sweep and this session's direction-challenge files as evidence for the next session's Focus and any `## Agenda` items. Capture the returned path for step 4.
 4. **`session-wrap-up` dispatch** — the agent consumes the wrap-up-input file (path passed in the dispatch prompt), writes `research/focus.md` / `.logs/last_session.md` / a session log file (path obtained via `bash .scripts/log-path.sh auto`) / node-scoped `backlog.md` files / `agenda.md`, deletes `.logs/.auto-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 5. **Final report to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.

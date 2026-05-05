@@ -25,7 +25,7 @@ Every node is a **folder**. File formats are defined in `{{ runtime.research_tre
 
 Children are subfolders. The tree can nest to arbitrary depth.
 
-- **Creating a node**: research planner requests the child in `research/focus.md § Tree Directives`, or curator creates it from structural-maintenance judgment. Curator runs `mkdir "research/{Topic Name}"`, writes `state.md`, and writes `plan.md` when the node has non-trivial strategic decisions (decomposition, approach choice). `backlog.md` is created only when there is durable pending work scoped to that node/subtree.
+- **Creating a node**: research planner may create a minimal child (`mkdir` + initial `state.md`) when the same cycle's cursor/worker target needs it. Otherwise research planner requests deferred creation in `research/focus.md § Tree Directives`, or curator creates it from structural-maintenance judgment. Curator performs structural closure: parent `plan.md` / `state.md` integration, evidence copy when appropriate, link hygiene, and child `plan.md` when the node has non-trivial strategic structure. `backlog.md` is created only when there is durable pending work scoped to that node/subtree.
 - **Recording a dead end**: research planner states the closure or retraction verdict in Tree Directives; curator appends `dead_ends.md` in the node folder when the closure carries a lesson
 - **Adding a directive**: write `directives.md` in the folder where the rule applies (typically project root; only through meetings)
 - **Seeing children**: `ls` the folder (subfolders = children)
@@ -88,9 +88,9 @@ The typed-surface model separates **human-authorized manuscript prose**, **draft
 ## Knowledge Lifecycle
 
 ```
-New node → research planner directive or curator structural-maintenance trigger
-    ↓ curator mkdir + state.md [status: open]
-Curator writes plan.md (decomposition, strategy) if non-trivial
+New node → research planner minimal child creation when immediate dispatch needs it, or curator structural-maintenance trigger/deferred creation
+    ↓ minimal state.md [status: open]
+Curator closes structure: parent plan/state integration, evidence copy, placement/link hygiene, child plan.md if non-trivial
     ↓ investigate
 Workers produce deliverables in .logs/ (raw audit archive: research notebooks with derivations)
     ↓ scheduler attaches critic (Target A — worker deliverable)
@@ -107,7 +107,7 @@ Fact-maintenance transaction updates note.md with new derivations; re-dispatches
 Research planner directs retraction → curator writes state.md + dead_ends.md and closes the fact-layer update
 ```
 
-**Graph authority is not ordinary authorship.** Research planner's direction authority is expressed in `focus.md`: cursor, worker dispatch plan, and Tree Directives naming what should change. Curator owns graph/lifecycle/placement transactions: state.md absorption, plan.md consistency, node folders, status, reparenting, report-to-subnode promotion, and structural splits. Clean report authorship may be assigned to workers, but workers do not change graph structure. Fact-layer authorship may later move to a dedicated role; until then, curator closes the transaction and enforces the file identity, verification, and link-governance rules.
+**Graph authority is not ordinary authorship.** Research planner's direction authority is expressed in `focus.md`: cursor, worker dispatch plan, and Tree Directives naming what should change. Research planner may also create a minimal child node (`mkdir` + initial state.md) when that structure is the immediate expression of its direction judgment and the same cycle's dispatch needs the child to exist. Curator owns structural closure and graph/lifecycle/placement transactions beyond that minimal surface: state.md absorption, plan.md consistency, parent integration, evidence copy, status, reparenting, archive, report-to-subnode promotion, and structural splits discovered from maintenance. Clean report authorship may be assigned to workers, but workers do not change graph structure. Fact-layer authorship may later move to a dedicated role; until then, curator closes the transaction and enforces the file identity, verification, and link-governance rules.
 
 Two narrow carve-outs preserve the above without friction: (i) trivial mechanical fixes to note.md (typo, broken Markdown-link rename) may be made directly by the acting maintenance/editor role since they change no semantics; (ii) user-present collaborative rewrites under `/meeting` or `/launch` are authoritative (the user serves as second reader in real time). Everything else — adding a section, rewording a claim, inserting a "status update" block, updating a provenance link or record — goes through a curator dispatch.
 

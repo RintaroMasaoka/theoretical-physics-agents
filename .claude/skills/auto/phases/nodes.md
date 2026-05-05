@@ -43,7 +43,7 @@ Node splitting is a structural-maintenance operation, not a cosmetic cleanup. A 
 
 Authority is deliberately split:
 
-- **Research planner** requests splits when the scientific direction needs a child node. It names the sub-question and why it now deserves independent focus.
-- **Curator** executes the split and may initiate one from the maintenance side when the evidence record already shows structural debt. Curator scans the whole tree every dispatch, so it is the agent positioned to notice broad overloaded nodes even when research planner is focused on the cursor's immediate direction.
+- **Research planner** decides splits when the scientific direction needs a child node. When the same cycle's dispatch needs that child as a cursor or worker target, research planner may create only the minimal child surface (`mkdir` + initial state.md) and name the structural-closure directive in `focus.md`.
+- **Curator** closes the split and may initiate one from the maintenance side when the evidence record already shows structural debt. Structural closure means parent plan/state integration, evidence copy when appropriate, child plan.md if warranted, placement/link hygiene, and lifecycle cleanup. Curator scans the whole tree every dispatch, so it is the agent positioned to notice broad overloaded nodes even when research planner is focused on the cursor's immediate direction.
 
 Typical triggers: repeated attempts on the same sub-problem, several Evidence entries sharing a sub-target, a compound construction with separable phases or artifacts, three or more open angles in Current Board, or repeated recent evidence that the parent's plan.md does not account for.
