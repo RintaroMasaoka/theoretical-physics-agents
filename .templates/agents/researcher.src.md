@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: "(/run) Investigate and resolve items (task, question, conjecture, example, etc.) specified by research planner"
+description: "(/auto) Investigate and resolve items (task, question, conjecture, example, etc.) specified by research planner"
 model: {{ runtime.model_strong }}
 ---
 

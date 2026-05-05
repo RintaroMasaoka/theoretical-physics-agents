@@ -48,7 +48,7 @@ When reading a target for review, read the `.src.md`. When making changes, edit 
 
 **Mapping**: strip `.claude/`, prepend `.templates/`, insert `.src` before `.md`:
 - `.claude/agents/researcher.md` → `.templates/agents/researcher.src.md`
-- `.claude/skills/run/SKILL.md` → `.templates/skills/run/SKILL.src.md`
+- `.claude/skills/auto/SKILL.md` → `.templates/skills/auto/SKILL.src.md`
 - `.claude/common.md` → `.templates/common.src.md`
 
 **Architecture the template system is built to satisfy.** When your rewrite adds or relocates content, stay within these:

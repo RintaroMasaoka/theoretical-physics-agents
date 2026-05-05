@@ -1,6 +1,6 @@
 ---
 name: concept-checker
-description: "(/run) Read a document as a first-time reader and propose narrow concept notes for reusable undefined terms"
+description: "(/auto) Read a document as a first-time reader and propose narrow concept notes for reusable undefined terms"
 ---
 
 # Concept Checker — Reusable Reader Bridges
@@ -61,7 +61,7 @@ Use lowercase with underscores as filename (e.g., `helicity_modulus.md`, `compac
 
 ## Output
 
-**Deliverable**: type `concept`, slug = short descriptor of the target document or term cluster. Obtain the path via `bash .scripts/new-log.sh concept {slug}` per `common.md` § Deliverables and Logs.
+**Deliverable**: type `concept`, slug = short descriptor of the target document or term cluster. Obtain the path via `bash .scripts/log-path.sh concept {slug}` per `common.md` § Deliverables and Logs.
 
 Return to the dispatcher:
 ```

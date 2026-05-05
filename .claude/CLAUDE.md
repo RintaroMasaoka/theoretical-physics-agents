@@ -1,7 +1,7 @@
 # Theoretical Physics Research Agents
 
-A system that autonomously generates academic papers with minimal human intervention.
-Users run `/run` to advance research, `/write` to draft papers, `/meeting` for progress review and course correction, and `/improve` to enhance agent behavior.
+A system that advances theoretical-physics research with either autonomous or human-steered agent orchestration.
+Users run `/auto` to advance research autonomously, `/steer` to choose the next research direction before one semi-automatic cycle, `/write` to draft papers, `/meeting` for progress review and course correction, and `/improve` to enhance agent behavior.
 
 ## Output Language
 
@@ -16,11 +16,11 @@ Technical terms, proper nouns, and LaTeX mathematics may remain in their origina
 
 ## Roles
 
-The system uses different orchestration models in `/run` and `/write`.
+The system uses different orchestration models in `/auto`, `/steer`, and `/write`.
 
-### `/run` — peer-agent team
+### `/auto` — peer-agent team
 
-`/run` is a thin scheduler dispatching a team of peer agents. No single "PI" — research judgment, record-keeping, and verification are split across independent agents.
+`/auto` is a thin scheduler dispatching a team of peer agents. No single "PI" — research judgment, record-keeping, and verification are split across independent agents.
 
 | Role | Agent | Owns |
 |---|---|---|
@@ -30,6 +30,10 @@ The system uses different orchestration models in `/run` and `/write`.
 | **Verification** | `critic` | Independent review of every worker deliverable (Target A, auto-attached by the scheduler) and of every curator-lifted note.md derivation (Target B) |
 | **Execution** | workers (researcher, simulator, reader, scout, engine-builder, concept-checker, self-check) | Bounded tasks — their deliverables stay provisional until critic has verified them |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of research planner's session-end wrap-up input into `research/focus.md`, `.logs/last_session.md`, node-scoped `backlog.md`, and the session log; commits and pushes |
+
+### `/steer` — human-steered cycle
+
+`/steer` uses the same peer-agent execution machinery as `/auto`, but inserts a human steering gate at the start of the cycle. The AI presents direction options with their worker consequences; the human chooses or revises the research direction; then the scheduler executes one cycle through workers, critic, curator, and wrap-up.
 
 ### `/write` — PI-led writing
 
@@ -42,12 +46,12 @@ The system uses different orchestration models in `/run` and `/write`.
 
 ### User
 
-The human researcher is the collaborator for both skills — sets direction via `/meeting`, oversees decisions, and overrides when needed.
+The human researcher is the collaborator for all skills — sets broad direction via `/launch` and `/meeting`, steers individual cycles via `/steer`, and overrides when needed.
 
 ## Operational Rules
 
-- Do not request user input during `/run` or `/write` execution (all forms prohibited, including AskUserQuestion and tool permission requests). Users are often away during execution, and prompting them interrupts the session and wastes time
-- `/meeting` and `/improve` are the venues for user interaction
+- Do not request user input during `/auto` or `/write` execution (all forms prohibited, including AskUserQuestion and tool permission requests). Users are often away during execution, and prompting them interrupts the session and wastes time
+- `/steer`, `/meeting`, `/launch`, and `/improve` are the venues for user interaction
 - No writing outside the project directory (to prevent contaminating the user's environment)
 - Do not pollute the global environment (to prevent interference with other projects and loss of reproducibility)
 

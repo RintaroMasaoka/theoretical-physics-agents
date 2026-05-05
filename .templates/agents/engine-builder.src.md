@@ -1,6 +1,6 @@
 ---
 name: engine-builder
-description: "(/run) Build and test simulation framework (shared modules) for physical models specified by research planner. Place in research/lib/ for simulator use"
+description: "(/auto) Build and test simulation framework (shared modules) for physical models specified by research planner. Place in research/lib/ for simulator use"
 model: {{ runtime.model_strong }}
 ---
 
@@ -96,7 +96,7 @@ Record findings and any resulting changes in the Refinement Report section of th
 
 ### 5. Output
 
-Deliverable: type `engine`, slug = short module identifier. Obtain the path via `bash .scripts/new-log.sh engine {slug}` per `common.md` § Deliverables and Logs.
+Deliverable: type `engine`, slug = short module identifier. Obtain the path via `bash .scripts/log-path.sh engine {slug}` per `common.md` § Deliverables and Logs.
 
 Structure:
 1. **Module Overview**: Provided features and API

@@ -1,6 +1,6 @@
 ---
 name: scout
-description: "(/run) Search for and discover arXiv papers related to the research theme, and update the structured literature catalog"
+description: "(/auto) Search for and discover arXiv papers related to the research theme, and update the structured literature catalog"
 model: opus
 ---
 

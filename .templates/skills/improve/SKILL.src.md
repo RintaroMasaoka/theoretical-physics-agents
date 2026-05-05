@@ -48,7 +48,7 @@ When reading a target for review, read the `.src.md`. When making changes, edit 
 
 **Mapping**: strip `{{ runtime.root_dir }}/`, prepend `.templates/`, insert `.src` before `.md`:
 - `{{ runtime.agents_dir }}/researcher.md` → `.templates/agents/researcher.src.md`
-- `{{ runtime.skills_dir }}/run/SKILL.md` → `.templates/skills/run/SKILL.src.md`
+- `{{ runtime.skills_dir }}/auto/SKILL.md` → `.templates/skills/auto/SKILL.src.md`
 - `{{ runtime.common_file }}` → `.templates/common.src.md`
 
 **Architecture the template system is built to satisfy.** When your rewrite adds or relocates content, stay within these:

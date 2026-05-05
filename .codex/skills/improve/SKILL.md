@@ -48,7 +48,7 @@ When reading a target for review, read the `.src.md`. When making changes, edit 
 
 **Mapping**: strip `.codex/`, prepend `.templates/`, insert `.src` before `.md`:
 - `.codex/agents/researcher.md` → `.templates/agents/researcher.src.md`
-- `.codex/skills/run/SKILL.md` → `.templates/skills/run/SKILL.src.md`
+- `.codex/skills/auto/SKILL.md` → `.templates/skills/auto/SKILL.src.md`
 - `.codex/common.md` → `.templates/common.src.md`
 
 **Architecture the template system is built to satisfy.** When your rewrite adds or relocates content, stay within these:

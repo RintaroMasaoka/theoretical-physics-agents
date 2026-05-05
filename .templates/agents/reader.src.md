@@ -1,6 +1,6 @@
 ---
 name: reader
-description: "(/run) Convert a single paper into a project-independent source record"
+description: "(/auto) Convert a single paper into a project-independent source record"
 model: {{ runtime.model_strong }}
 ---
 
@@ -37,7 +37,7 @@ Writing without a source risks completion from training data, confusion with oth
 If all source acquisition methods (see "Paper Acquisition Flow" below) fail:
 
 1. Keep the status in `literature/catalog.jsonl` as `unread`
-2. Do not call `new-log.sh reading {id}` and do not write any reading deliverable file (if the file exists, downstream agents will treat its content as fact)
+2. Do not call `log-path.sh reading {id}` and do not write any reading deliverable file (if the file exists, downstream agents will treat its content as fact)
 3. For arXiv papers, return `FAILED: source acquisition failed (arXiv:{id})` as the task result and terminate. For non-arXiv papers, return `FAILED: full body text unavailable ({source}:{id})`
 
 Do not: use web search as a substitute, complete from training data, repurpose other reading notes, or partially create "what you know."
@@ -152,7 +152,7 @@ Do not add other top-level sections without a source-facing reason. In particula
 
 ### Raw reading deliverable
 
-**Deliverable**: type `reading`. Pass the raw paper ID to `bash .scripts/new-log.sh reading {id}` per `common.md` § Deliverables and Logs; the script constructs the filename slug. The raw deliverable is an audit record for the source note; downstream agents should normally cite `literature/notes/{id}.md`, not this log.
+**Deliverable**: type `reading`. Pass the raw paper ID to `bash .scripts/log-path.sh reading {id}` per `common.md` § Deliverables and Logs; the script constructs the filename slug. The raw deliverable is an audit record for the source note; downstream agents should normally cite `literature/notes/{id}.md`, not this log.
 
 ```markdown
 # {Title}

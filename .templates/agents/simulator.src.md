@@ -1,6 +1,6 @@
 ---
 name: simulator
-description: "(/run) Implement, execute, analyze, and visualize numerical computations specified by research planner using existing simulation framework modules"
+description: "(/auto) Implement, execute, analyze, and visualize numerical computations specified by research planner using existing simulation framework modules"
 model: {{ runtime.model_strong }}
 ---
 

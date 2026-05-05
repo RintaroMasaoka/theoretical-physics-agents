@@ -61,7 +61,7 @@ Step 2: ...
 {Cross-cutting research constraints that apply to the whole project. Leave empty if none yet}
 ```
 
-`research/focus.md` is a lightweight pointer that tells `/run` where to resume work. `/launch` initializes it; `/run` updates it each session.
+`research/focus.md` is a lightweight pointer that tells `/auto` where to resume work. `/launch` initializes it; `/auto` updates it each session.
 
 **Session cursor (`research/focus.md`):**
 
@@ -72,7 +72,7 @@ Working on: research/{first_active_child}/
 {Why starting here}
 
 ## This Session
-- (to be filled by /run)
+- (to be filled by /auto)
 ```
 
 **Principle:** The user decides "what" and "why." AI decides "how." AI drafts the wording and confirms with the user.
@@ -105,7 +105,7 @@ Data loading: research/note.md + research/state.md + research/story.md
 - Recontextualized results → update affected note.md files in the subtree
 - Full pivot → update all root files, restructure children as needed
 - Session cursor → update `research/focus.md` if the current focus node was moved, removed, or is no longer the logical next step
-- Leave `> [Launch YYYY-MM-DD] {reason}` markers in affected files at structural changes so `/run` can understand why the tree changed
+- Leave `> [Launch YYYY-MM-DD] {reason}` markers in affected files at structural changes so `/auto` can understand why the tree changed
 
 **Scope of changes:** Match the scale of edits to the scale of the change — a minor refinement doesn't require restructuring the tree, and a full pivot doesn't preserve stale nodes.
 
@@ -123,14 +123,14 @@ Draw out the user's perspective rather than just accepting instructions.
 
 ## Recording
 
-Capture ISO timestamp at session start via `exec_command("date '+%Y-%m-%dT%H:%M'")` for traceability markers. Obtain the launch log path via `bash .scripts/new-log.sh launch` — the script returns a timestamped path of the form `.logs/{YYMMDD_HHMM}_launch.md`; write the launch log to that path.
+Capture ISO timestamp at session start via `exec_command("date '+%Y-%m-%dT%H:%M'")` for traceability markers. Obtain the launch log path via `bash .scripts/log-path.sh launch` — the script returns a timestamped path of the form `.logs/{YYMMDD_HHMM}_launch.md`; write the launch log to that path.
 
 | Timing | Action |
 |---|---|
 | After theme is agreed | Write/update research/ tree (including focus.md) |
 | After files are written | Write launch log + Commit (see below) |
 
-**Launch log:** Obtain the path via `bash .scripts/new-log.sh launch` (returns `.logs/{YYMMDD_HHMM}_launch.md`); write to that path (permanent record):
+**Launch log:** Obtain the path via `bash .scripts/log-path.sh launch` (returns `.logs/{YYMMDD_HHMM}_launch.md`); write to that path (permanent record):
 
 ```markdown
 # Launch YYYY-MM-DD HH:MM

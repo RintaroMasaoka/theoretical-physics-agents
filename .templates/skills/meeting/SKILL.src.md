@@ -21,10 +21,10 @@ English headings and labels in this prompt are structural examples, not literal 
 
 ## Role
 
-`/meeting` is the human approval gate for AI research outputs. The main object of review is not the AI's summary of progress; it is the actual `research/**/note.md` fact-layer prose that downstream writing would rely on. The meeting points the user to the artifact by clear file links, records explicit approval or requested revision, and captures research-direction instructions that should shape the next `/run`.
+`/meeting` is the human approval gate for AI research outputs. The main object of review is not the AI's summary of progress; it is the actual `research/**/note.md` fact-layer prose that downstream writing would rely on. The meeting points the user to the artifact by clear file links, records explicit approval or requested revision, and captures research-direction instructions that should shape the next `/auto`.
 
-This differs from `/run` and `/write`:
-- `/run` may create, verify, and maintain `note.md`, but it cannot make a result human-authorized
+This differs from `/auto` and `/write`:
+- `/auto` may create, verify, and maintain `note.md`, but it cannot make a result human-authorized
 - `/write` may draft from the research tree, but it may promote content into `manuscript/` only from meeting-authorized material
 - `/meeting` is where the user sees the artifact, approves it, rejects it, asks for revision, or redirects the research
 
@@ -40,7 +40,7 @@ Initialization
         └─ Theme already set → Present deliverable review packet
     ▼ User opens/reviews linked note.md artifacts
         ├─ Approved → Record authorization and prepare manuscript handoff
-        ├─ Revision requested → Record required changes and route back to /run or meeting rewrite
+        ├─ Revision requested → Record required changes and route back to /auto or meeting rewrite
         └─ Direction change → Reflect direction decisions
     ▼ Reflect approvals and decisions as they are made
 ```
@@ -80,7 +80,7 @@ Review AI research deliverables first, then discuss direction.
 ```
 Data loading: research/note.md + research/state.md + research/story.md + research/principles.md + research/focus.md + latest meeting log
     ▼ Navigate the tree: ls research/ to see top-level children, read their state.md for status (note.md if exists)
-    ▼ If agenda.md exists (agenda accumulated by research planner during /run), load → immediately delete (prevents stale items from carrying over to the next meeting)
+    ▼ If agenda.md exists (agenda accumulated by research planner during /auto), load → immediately delete (prevents stale items from carrying over to the next meeting)
     ▼ Identify candidate note.md deliverables for user review
     ▼ Present deliverable review packet: file links + minimal orientation
     ▼ If loaded agenda items exist, display and discuss them as well
@@ -125,19 +125,19 @@ When the user approves a `note.md` artifact:
 3. Record the path to that authorization snapshot in the meeting log
 4. Treat the snapshot, not the mutable `note.md`, as the authorized handoff to manuscript writing
 
-Reason: `note.md` can continue to evolve under `/run`; authorization must attach to the linked artifact version the user actually reviewed. The snapshot is the bridge from agent-maintained draft facts to human-authorized manuscript authority.
+Reason: `note.md` can continue to evolve under `/auto`; authorization must attach to the linked artifact version the user actually reviewed. The snapshot is the bridge from agent-maintained draft facts to human-authorized manuscript authority.
 
 If the user requests revision instead of approval, record the requested changes under decisions, update `research/focus.md` or relevant `state.md` / `principles.md` as appropriate, and do not create an authorization snapshot. If the user collaboratively rewrites `note.md` during the meeting and then approves the rewritten artifact, show the final rewritten text before recording authorization.
 
 **Where to reflect:**
 - Changes to the paper's narrative structure (add/remove/reorder steps) → Edit `research/story.md`. Leave a `> [Meeting YYYY-MM-DD] {reason}` marker
-- User-confirmed fact-layer understanding changes → Edit `research/note.md` only when the user has explicitly confirmed the understanding or approved the wording during the meeting. Unresolved factual changes go to `research/focus.md`, `state.md`, or `agenda.md` for `/run`
+- User-confirmed fact-layer understanding changes → Edit `research/note.md` only when the user has explicitly confirmed the understanding or approved the wording during the meeting. Unresolved factual changes go to `research/focus.md`, `state.md`, or `agenda.md` for `/auto`
 - Background / working state changes → Edit `research/state.md`
 - User-approved manuscript input → Write `manuscript/authorizations/{timestamp}_{slug}.md` with the exact approved artifact
 - Cross-cutting constraints → Edit `research/principles.md` with a `> [Meeting YYYY-MM-DD]` marker
 - Direction changes scoped to a specific branch → Edit that branch's `state.md` or the global `research/focus.md`; edit `note.md` only when the direction also changes user-confirmed fact-layer understanding
-- Next `/run` session's focus changed → Edit `research/focus.md` (the session cursor that tells `/run` where to resume). Set the `Working on:` path to the new focus node and update context accordingly
-- **Significance rewrite**: When the discussion explicitly recontextualizes results and the user confirms the synthesis, rewrite affected note.md files to reflect that fact-layer understanding. Meetings produce understanding that won't propagate to documents unless explicitly written, but unresolved factual questions must be routed back to `/run` rather than recorded as established facts
+- Next `/auto` session's focus changed → Edit `research/focus.md` (the session cursor that tells `/auto` where to resume). Set the `Working on:` path to the new focus node and update context accordingly
+- **Significance rewrite**: When the discussion explicitly recontextualizes results and the user confirms the synthesis, rewrite affected note.md files to reflect that fact-layer understanding. Meetings produce understanding that won't propagate to documents unless explicitly written, but unresolved factual questions must be routed back to `/auto` rather than recorded as established facts
 
 **Principle:** Focus on artifact approval and overall direction, not individual node management. Alignment on "what is now authorized to become the paper, and what should research do next."
 

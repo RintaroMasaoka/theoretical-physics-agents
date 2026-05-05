@@ -4,24 +4,24 @@
 
 The dispatcher provides file paths rather than inline data. Read only the sections you need from those files — this keeps both your caller's and your context windows efficient.
 
-("Dispatcher" = the agent that launched you. In `/run` this is the scheduler; in `/write` this is PI. You do not need to distinguish them — the dispatch prompt tells you what to do.)
+("Dispatcher" = the agent that launched you. In `/auto` this is the scheduler; in `/write` this is PI. You do not need to distinguish them — the dispatch prompt tells you what to do.)
 
 - **Input**: Receive task instructions and file paths from the dispatcher; use Read to load the necessary data yourself
 - **Output**: Write deliverables to files and return `DONE: {deliverable path}` as the task return value. (The log file is written alongside but does not need to be returned.)
 
 ## Deliverables and Logs
 
-Worker output goes to `.logs/` — all worker output is provisional and stored there until downstream agents verify it (auto-critic in `/run`, PI review in `/write`) and incorporate the verified result into the research tree or paper.
+Worker output goes to `.logs/` — all worker output is provisional and stored there until downstream agents verify it (auto-critic in `/auto`, PI review in `/write`) and incorporate the verified result into the research tree or paper.
 
 Each worker produces two files:
 
-1. **Deliverable**: Your substantive analytical content — derivations, reading notes, data, simulation results, or concept-note proposals. This is the primary output the critic (in `/run`) or PI (in `/write`) evaluates. Type is one of: `reading`, `attempt`, `simulation`, `review`, `audit`, `engine`, `concept`. Slug is the arXiv ID for paper-based work (e.g., `0804-4527`), or a short descriptive phrase otherwise (e.g., `surface_qbt`).
+1. **Deliverable**: Your substantive analytical content — derivations, reading notes, data, simulation results, or concept-note proposals. This is the primary output the critic (in `/auto`) or PI (in `/write`) evaluates. Type is one of: `reading`, `attempt`, `simulation`, `review`, `audit`, `engine`, `concept`. Slug is the arXiv ID for paper-based work (e.g., `0804-4527`), or a short descriptive phrase otherwise (e.g., `surface_qbt`).
 
 2. **Log**: A short process summary — what you attempted, what you found, blockers encountered. This helps the human researcher audit workflow. Type is the agent name (`reader`, `researcher`, etc.); no slug.
 
-**Filename creation.** Run `bash .scripts/new-log.sh <type> [<slug>]` through Bash and capture stdout — it returns an absolute path of the form `.logs/{YYMMDD_HHMM}_{type}[_{slug}].md`. Then use Write to put your content at that path. Do not run `date` yourself; do not pre-name the file. The timestamp is fixed at the moment of the script call, so naming is authoritative from creation — there is no downstream rename step that can fail and leave an orphan file behind.
+**Filename creation.** Run `bash .scripts/log-path.sh <type> [<slug>]` through Bash and capture stdout — it returns an absolute path of the form `.logs/{YYMMDD_HHMM}_{type}[_{slug}].md`. Then use Write to put your content at that path. Do not run `date` yourself; do not pre-name the file. The timestamp is fixed at the moment of the script call, so naming is authoritative from creation — there is no downstream rename step that can fail and leave an orphan file behind.
 
-Deliverables and logs are provisional. In `/run`, the scheduler auto-dispatches a critic on every deliverable, and curator then absorbs the verified evidence into the research tree (see `.claude/research-tree.md`). In `/write`, PI independently verifies deliverables before integrating them into the paper.
+Deliverables and logs are provisional. In `/auto`, the scheduler auto-dispatches a critic on every deliverable, and curator then absorbs the verified evidence into the research tree (see `.claude/research-tree.md`). In `/write`, PI independently verifies deliverables before integrating them into the paper.
 
 ## Heartbeat — Preventing Stream Idle Timeout
 
@@ -43,5 +43,5 @@ Rationale: idle timeouts fire on silent gaps in the output stream, not on total 
     - Display: `$$...$$`. Multi-line environments (`align`, `aligned`, `cases`, `matrix`, …) must sit **inside** the `$$...$$` wrapper
     - Do not use `\(...\)` or `\[...\]` as delimiters
     - Do not write a bare `\begin{env}...\end{env}` at the top level without wrapping it in `$$...$$`
-- Do not request user input in any form (users are often away during `/run` and `/write`. However, you may respond if the user initiates communication)
+- Do not request user input in any form (users are often away during `/auto` and `/write`. However, you may respond if the user initiates communication)
 - No writing outside the project directory

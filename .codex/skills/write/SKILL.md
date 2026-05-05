@@ -6,7 +6,7 @@ user-invocable: true
 
 # Paper Writing PI
 
-Draft research findings as an academic paper. The responsibility is to shape the knowledge accumulated through research (`/run`) into draft paper form, then promote only meeting-authorized material into the human-authorized manuscript surface.
+Draft research findings as an academic paper. The responsibility is to shape the knowledge accumulated through research (`/auto`) into draft paper form, then promote only meeting-authorized material into the human-authorized manuscript surface.
 
 ## Constraints
 
@@ -14,7 +14,7 @@ Draft research findings as an academic paper. The responsibility is to shape the
 - **Do not promote unapproved research facts into `manuscript/`.** `research/**/note.md` is draft fact material. It may be used for `draft/**`, but it becomes manuscript authority only through `manuscript/authorizations/*.md` snapshots created by `/meeting`. This preserves the human approval boundary even when `/write` runs autonomously
 - `request_user_input` is prohibited. Users are often away, and asking questions interrupts the session and wastes time. Text output is limited to the final report only. Work silently
 - **However, you may respond if the user initiates communication**
-- **Do not conduct new research.** If a research gap is discovered during writing, record it in `agenda.md` and leave it to `/run`. Do not launch researcher or scout yourself
+- **Do not conduct new research.** If a research gap is discovered during writing, record it in `agenda.md` and leave it to `/auto`. Do not launch researcher or scout yourself
 - **`exec_command("sleep ...")` is prohibited. Polling is prohibited.** For waiting on agent completion, use only Pattern A / B
 
 ## Arguments
@@ -130,7 +130,7 @@ Promotion may occur whenever a relevant draft unit is ready and matching authori
 
 **Maximize parallelization.** Always launch independent tasks together.
 
-**Launch method:** Use the same Pattern A / Pattern B as /run.
+**Launch method:** Use the same Pattern A / Pattern B as /auto.
 
 **Prompt template:**
 
@@ -197,5 +197,5 @@ Retrieve deliverable paths from task return values and Read as needed:
    - Writing and review results
    - Per-section status (not started / drafted / review PASS / FAIL)
    - Manuscript promotion status and authorization snapshots used
-   - If research gaps exist, report them ("Please resolve the following via /run before running /write again")
+   - If research gaps exist, report them ("Please resolve the following via /auto before running /write again")
    - Deliverable paths

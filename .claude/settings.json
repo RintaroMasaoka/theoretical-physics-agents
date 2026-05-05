@@ -80,8 +80,8 @@
           },
           {
             "type": "command",
-            "command": "bash .scripts/check-run-resume.sh",
-            "statusMessage": "Checking /run resume beacon..."
+            "command": "bash .scripts/check-auto-resume.sh",
+            "statusMessage": "Checking /auto resume beacon..."
           }
         ]
       }

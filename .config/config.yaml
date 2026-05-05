@@ -12,7 +12,7 @@ simulation:
   language: julia
   visualization: cairomakie
 
-# Default cycle counts (overridden by /run N or /write N)
+# Default cycle counts (overridden by /auto N or /write N)
 cycles:
-  run: 5
+  auto: 5
   write: 5

@@ -6,17 +6,17 @@ The system is organized like a small research lab: a PI agent drives the project
 
 ## Current Status
 
-This project is useful now, but the validation level is different for `/run` and `/write`.
+This project is useful now, but the validation level is different for `/auto` and `/write`.
 
-- As of 2026-03-25, `/run` is the more battle-tested path. In test research sessions, it has been exercised repeatedly at substantial scale, on the order of roughly 200 cycles in total.
+- As of 2026-03-25, `/auto` is the more battle-tested path. In test research sessions, it has been exercised repeatedly at substantial scale, on the order of roughly 200 cycles in total.
 - As of 2026-03-25, `/write` is still much less validated. It has not yet been used in a real end-to-end project, so the writing workflow should be treated as experimental and expected to need further iteration.
 
-If you want the most reliable part of the system today, use `/meeting` and `/run` first, and treat `/write` as an early-stage workflow that still needs practical feedback.
+If you want the most reliable part of the system today, use `/meeting` and `/auto` first, and treat `/write` as an early-stage workflow that still needs practical feedback.
 
 ## What This Repository Does
 
 - `/meeting` sets or revises the research direction with the user
-- `/run [N]` advances the research autonomously for up to `N` cycles
+- `/auto [N]` advances the research autonomously for up to `N` cycles
 - `/write [N]` turns accumulated research artifacts into paper drafts
 - `/improve` is used to refine prompts, workflows, and agent behavior
 
@@ -24,7 +24,7 @@ Core operating model:
 
 - The PI agent owns direction, prioritization, verification, and integration
 - Worker agents perform bounded tasks such as reading, research, critique, outlining, reviewing, or simulation
-- During `/run` and `/write`, the system is designed to continue without asking the user for clarification
+- During `/auto` and `/write`, the system is designed to continue without asking the user for clarification
 
 ## Quick Start
 
@@ -49,10 +49,10 @@ If you are using Claude Code, `.claude/settings.json` runs `node .scripts/config
 ### Minimal Workflow
 
 1. Run `/meeting` to define the topic and direction
-2. Run `/run 2` to test a short autonomous research session
+2. Run `/auto 2` to test a short autonomous research session
 3. Inspect generated artifacts such as `project.yaml`, `research/plan.md`, and `.logs/last_session.md`
-4. Use larger `/run N` sessions once the direction is stable
-5. Try `/write 2` only with the understanding that it is currently much less validated than `/run`
+4. Use larger `/auto N` sessions once the direction is stable
+5. Try `/write 2` only with the understanding that it is currently much less validated than `/auto`
 
 ## Validation and Expectations
 
@@ -61,7 +61,7 @@ This repository aims to be honest about maturity rather than claiming that all w
 ### More validated today
 
 - `/meeting`
-- `/run`
+- `/auto`
 - The project-state and research-artifact workflow around `project.yaml`, `research/`, and `.logs/`
 
 ### Less validated today
@@ -77,7 +77,7 @@ That means the main current value of the repository is autonomous research progr
 | Command | Purpose | Maturity |
 |---|---|---|
 | `/meeting` | Interactive progress review and course correction | Usable |
-| `/run [N]` | Autonomous research cycles led by the PI | Most validated |
+| `/auto [N]` | Autonomous research cycles led by the PI | Most validated |
 | `/write [N]` | Draft and refine the paper from accumulated artifacts | Experimental |
 | `/improve` | Improve prompts, workflows, and behavior | Usable |
 
@@ -110,10 +110,10 @@ During actual research and writing sessions, the project creates working files i
 - `project.yaml`: central state file for topic, items, and statuses
 - `research/plan.md`: current research plan, story arc, and approach principles
 - `research/notes/`: PI-owned research notes and contribution assessments
-- `research/work/`: worker deliverables produced during `/run`
+- `research/work/`: worker deliverables produced during `/auto`
 - `paper/`: outlines, section drafts, and integrated drafts produced during `/write`
 - `simulations/`: code, data, and figures for numerical work
-- `.logs/last_session.md`: handoff summary for the next `/run`
+- `.logs/last_session.md`: handoff summary for the next `/auto`
 - `.logs/last_write_session.md`: handoff summary for the next `/write`
 
 ## Configuration
@@ -130,7 +130,7 @@ Current supported top-level values include:
 | `language` | User-facing response language |
 | `simulation.language` | Preferred language for simulation code |
 | `simulation.visualization` | Preferred visualization backend for simulation plots |
-| `cycles.run` | Default cycle count for `/run` |
+| `cycles.auto` | Default cycle count for `/auto` |
 | `cycles.write` | Default cycle count for `/write` |
 
 Prompt content lives in `.templates/`, and generated files are rebuilt from those templates.
@@ -178,10 +178,10 @@ underlying script:
 ```bash
 bash .scripts/sync.sh doctor
 bash .scripts/sync.sh status
-bash .scripts/sync.sh pull .templates/skills/run/SKILL.src.md
+bash .scripts/sync.sh pull .templates/skills/auto/SKILL.src.md
 # edit, regenerate, test
 node .scripts/configure.mjs
-bash .scripts/sync.sh push .templates/skills/run/SKILL.src.md --yes
+bash .scripts/sync.sh push .templates/skills/auto/SKILL.src.md --yes
 ```
 
 Use the smallest coherent path set when syncing. Path-scoped operations avoid
@@ -214,7 +214,7 @@ literature/papers/hep-th/0506213/paper.pdf
 
 The system is intentionally opinionated.
 
-- During `/run` and `/write`, do not block on user questions
+- During `/auto` and `/write`, do not block on user questions
 - Keep all writes inside the project directory
 - Avoid global installs and other machine-level side effects
 - Prefer file-based state and handoff over large prompt-only context
