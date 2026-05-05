@@ -141,8 +141,8 @@ Mechanics:
    ## Background
    {one or two sentences: why this child exists, what parent's sub-target this addresses}
 
-	   ## Current Board
-	   {if directive specified, paraphrase; else "open — investigation starting"}
+   ## Current Board
+   {if directive specified, paraphrase; else "open — investigation starting"}
 
    ## Evidence
    ```
@@ -494,7 +494,7 @@ Every principal claim carries an explicit Markdown link to a `checks/*.md` recor
 
 - **Claim prose in note.md/report** — normal paper prose plus a normal Markdown link, e.g. `[verification](checks/check_projector_identity.md)`
 - **Record front matter** — `confidence`, `evidence`, `review`, `scope`, and `supports_project_central_claim`
-- **Record body** — what was checked, how, result, limitations, and links to scripts/data/literature/critic files
+- **Record body** — what was checked, how, result, limitations, and source anchors. The body is the terminal project-internal provenance endpoint, not a link router
 
 Runs on **every** dispatch touching note.md — not only when critic-layering fires.
 
@@ -504,6 +504,12 @@ To assign accurately:
 - Scope description mandatory when restricted: write a concrete `scope` value, never vague `special-case`
 - **Never elevate to `confidence: confirmed`** when (a) only review channels cover the claim, (b) `scope` is not `full`, or (c) `literature` is the only evidence channel **and** no independent review has examined the citation's applicability for a project-central claim. Max allowed is `strong-conjecture` in those cases. Pure external citations framed as such may carry `confidence: confirmed` with `evidence: [literature]` and `supports_project_central_claim: false`
 - When provenance is unclear, use the lower confidence value in the checks record and flag back — do not guess
+
+To write the body accurately:
+- Do not delegate the basis of the check to a project-internal grandchild link. If state.md, a report, a critic file, another check record, or a worker deliverable is the source you used, copy the relevant claim/procedure/result/scope into this check record in your own compact prose. A project-internal link may remain as optional traceability, but the reader must not need it to understand or audit the judgment
+- `.logs/` paths remain raw audit archive paths and must not be linked from durable prose. Absorb what matters instead
+- For literature evidence, include a precise source anchor: paper id plus section/equation/theorem/page or other stable locator, and state exactly what the source passage says that supports the claim. Use a short quotation only when exact wording matters; otherwise summarize faithfully with enough detail to prevent "paper says so" from becoming a blank stamp
+- If you cannot state the check target, evidence inspected, procedure/result, source anchor, or residual limitation inside the record body, do not write an accepted-looking record. Lower confidence/scope as justified and flag the missing evidence or procedure for research planner
 
 ### Retraction
 

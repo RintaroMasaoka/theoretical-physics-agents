@@ -132,11 +132,11 @@ For Target B: you are reviewing a note.md derivation as reusable draft fact pros
 
 **Oversights**
 - Are there overlooked angles or approaches?
-- If relevant known literature is not referenced, point it out
+- In contextual mode, or when the target itself claims literature coverage, point out missing relevant literature that is knowable from the allowed context
 
 ## Notation Check
 
-Verify that equations in the target are written in `$...$` / `$$...$$` notation. Raw variable names or expressions embedded in prose are a finding in both targets; the reporting surface follows § Annotation Method — for Target A, mark the occurrence inline with a comment; for Target B, list the occurrence in the § Derivation-level findings section of the separate critique file (issue type: notation), since note.md is never annotated inline.
+Verify that equations in the target are written in `$...$` / `$$...$$` notation. Mathematical symbols or formulas used as notation in prose should also be math-delimited; code identifiers, file paths, front matter keys, and quoted source text are exceptions. The reporting surface follows § Annotation Method — for Target A, mark the occurrence inline with a comment; for Target B, list the occurrence in the § Derivation-level findings section of the separate critique file (issue type: notation), since note.md is never annotated inline.
 
 ## Verdict
 
@@ -230,6 +230,8 @@ Do **not** edit note.md itself. note.md is clean fact prose for the context-free
 **Deliverable path**: `research/{node path}/checks/critic_note_{node-slug}_{YYMMDD_HHMM}.md`, where `{node-slug}` is a short identifier for the target node (e.g., `jordan-block-mpo`, `torus-ground-state-multiplicity`). If `checks/` does not exist, create it. This is a narrow exception to curator's normal sole-writer rule: curator dispatched you specifically to write this verification record. The dispatcher (curator) reads this file and applies fixes to note.md.
 
 Do not put Target B critique files in `.logs/`. `.logs/` is the raw audit archive; note.md-level verification is part of the node's durable record and must remain inspectable without leaving the research tree.
+
+Because Target B critique files live under `checks/`, they follow the verification-endpoint rule in `.codex/research-tree.md` § Verification Provenance Records. Do not make the critique depend on project-internal grandchild links for its substance: if a report, state entry, previous check, or worker deliverable matters to your judgment, state the relevant claim, procedure, result, or limitation in this file. Project-internal links may support traceability, but the reader should not have to open them to know what you checked or why you accepted/revised/rejected. Literature references are allowed, but name the section/equation/theorem/page or equivalent source location and quote briefly only when exact wording matters.
 
 **File format**:
 

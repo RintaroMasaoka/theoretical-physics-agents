@@ -323,7 +323,11 @@ Fields:
 | `scope` | `full` when the full declared scope is verified, otherwise a concrete description of the restricted instance |
 | `supports_project_central_claim` | `true` when the project is staking this claim as its own contribution; `false` for external results cited as premises |
 
-The body of the check file then explains the same metadata in prose: target claim, method, result, scope restrictions, links to scripts/data/literature, and the critic or curator judgment. Front matter is the index; the body is the inspectable record.
+The body of the check file then explains the same metadata in prose: target claim, method, result, scope restrictions, and the critic or curator judgment. Front matter is the index; the body is the inspectable record.
+
+**Terminal provenance endpoint.** A `checks/*.md` file is the project-internal endpoint of a provenance link, not a routing page to more project documents. When `note.md` or `report_*.md` links to a check record, a reader must be able to evaluate the verification judgment from that record itself. The record may mention project artifacts it absorbed, but it must not make the reader open `state.md`, `report_*.md`, another `checks/*.md`, or `.logs/` to discover the actual evidence, procedure, result, scope, or limitation. If a project-internal artifact matters, absorb the relevant claim, calculation, procedure, result, and limitation into the check body in compact prose.
+
+External literature is different because the paper is a first-order source. Literature references are allowed and often required, but a bare paper link or arXiv ID is not enough: the check body must name the section/equation/theorem/page or similarly precise source location and state the specific source claim being used, with a short quotation when wording matters or an accurate summary when it does not. Long quotation is not the goal; the goal is that the reader knows exactly what passage supports what part of the check.
 
 ### Confidence
 
