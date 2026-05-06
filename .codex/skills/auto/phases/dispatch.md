@@ -1,6 +1,6 @@
 # Phase: Dispatch
 
-This phase file is a reference that `/auto` Reads when launching workers and critic, and when dispatching curator. It covers the two allowed launch patterns, the prompt template, the auto-critic rule, and agent-specific dynamic data.
+This phase file is a reference that `/auto` Reads when launching workers and critic, and when dispatching curator. It covers the two allowed launch patterns, the prompt template, Provisional Artifact Review, Durable Surface Review, and agent-specific dynamic data.
 
 ---
 
@@ -22,7 +22,7 @@ spawn_agent(prompt="Read and follow `.codex/agents/simulator.md` as your role de
 
 ```
 
-This is the default for the Worker Dispatch step and for Auto-Critic.
+This is the default for the Worker Dispatch step and for Provisional Artifact Review.
 
 ### Pattern B — Background + Continued Work
 
@@ -71,15 +71,15 @@ Each entry is what the scheduler extracts from research planner's `### Worker Di
 - **concept-checker**: Document path to read + focus area for concept extraction.
 - **self-check**: Target file path (a note.md or plan.md) + what to check for.
 
-The research planner's focus.md entries are written concretely enough that these fields can be extracted mechanically. If a required field listed above cannot be extracted (e.g., a researcher entry with no `Target: research/{path}/` line, or a simulator entry missing the `Deliverable number`), the scheduler re-dispatches research planner once, echoing the exact missing field(s); it does not "decide" whether an entry looks underspecified — structural field-absence is the only trigger. If the second attempt is still missing fields, exit to Session End.
+The research planner's focus.md entries are written concretely enough that these fields can be extracted mechanically. If a required field listed above cannot be extracted (e.g., a researcher entry with no `Target: research/{path}/` line, or a simulator entry missing the `Deliverable number`), the scheduler re-dispatches research planner once, echoing the exact missing field(s); it does not "decide" whether an entry looks underspecified — structural field-absence is the only trigger. If the second attempt is still missing fields, stop the current cycle before worker launch and proceed to Session End with a failure note that worker dispatch was blocked by missing structural fields; preserve any outputs already produced earlier in the session.
 
-## Auto-Critic Rule
+## Provisional Artifact Review Rule
 
-"Worker" here means the execution-tier agents listed in the Worker row of `.codex/AGENTS.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Direction-support agents (`direction-challenger`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no auto-critic — the challenger's narrow opposition format and research planner's required response are its integrity mechanism.
+"Worker" here means the execution-tier agents listed in the Worker row of `.codex/AGENTS.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Direction-support agents (`direction-challenger`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no Provisional Artifact Review — the challenger's narrow opposition format and research planner's required response are its integrity mechanism.
 
-Every worker deliverable returned from Cycle step 4 is critiqued by a critic dispatch in Cycle step 5 — this is automatic, not something research planner requests. The rule is fixed:
+Every review-eligible worker deliverable returned from Cycle step 4 is critiqued by a critic dispatch in Cycle step 5 — this is automatic, not something research planner requests. The rule is fixed:
 
-- **Target**: A (worker deliverable inline annotation) — the critic annotates the worker's deliverable file directly.
+- **Review kind**: Provisional Artifact Review — the critic reviews a worker deliverable, writes a separate `.logs/*_critic_*.md` review artifact, and does not edit the worker deliverable inline.
 - **Mode**: blind by default for deliverables whose soundness is mechanical/mathematical (researcher attempts that prove / compute / derive, simulator runs, engine-builder module tests). Source-audit for reader deliverables, because the question is fidelity to the paper rather than fit to the project. Contextual for deliverables whose soundness depends on the research narrative (scout surveys, concept proposals). The mode selection rule:
 
   | Worker | Deliverable type | Default critic mode |
@@ -94,15 +94,48 @@ Every worker deliverable returned from Cycle step 4 is critiqued by a critic dis
 
   The rule of thumb matches critic's own: *"What is the target faithful to?" — internal mathematics → blind; source text → source-audit; research narrative → contextual.*
 
-- **Dispatch in parallel** with the worker deliverables already in hand: one critic call per deliverable, all launched together in a single message (Pattern A). Critic reads only the context allowed by its mode: target file plus paper/source-note files for source-audit, target file plus ancestor chain for contextual, and target file only for blind.
+- **Dispatch in parallel** with the worker deliverables already in hand: one critic call per deliverable, all launched together in a single message (Pattern A). Critic reads only the context allowed by its mode: target file plus paper/source-note files for source-audit, target file plus ancestor chain for contextual, and target file only for blind. Each critic returns `DONE: {critic review path}`.
 
-- **No-critic exceptions.** Research planner may mark a worker dispatch as `no-critic` in focus.md § Worker Dispatches — legitimate for engine-builder refactors with no substantive claim, or for exploratory scout surveys where the deliverable is framed as "what exists, not what is true". Honour the marking. All other deliverables receive auto-critic.
+- **No-critic exceptions.** Research planner may mark a worker dispatch as `no-critic` in focus.md § Worker Dispatches — legitimate for engine-builder refactors with no substantive claim, or for exploratory scout surveys where the deliverable is framed as "what exists, not what is true". Honour the marking. All other deliverables receive Provisional Artifact Review.
 
-The scheduler does not read critic's output before proceeding to curator — critic writes the verdict inline into the deliverable (Target A), and curator reads both the deliverable and its inline critique together when it runs in Cycle step 6. This is the critic-before-record guarantee: no worker deliverable enters the tree (via curator's lift) without having been independently reviewed.
+The scheduler reads only enough of the critic return to pair each worker deliverable path with its critic review path and verdict summary for curator. It does not interpret the review. Curator reads the worker deliverable and the separate review artifact together when it runs in Cycle step 6. This is the critic-before-record guarantee for raw artifacts: no review-eligible worker deliverable enters the tree (via state absorption, report promotion, or note lift) without having been independently reviewed. Self-check and explicit `no-critic` deliverables may be absorbed only under their exception rationale and must not be described as independently critic-verified.
 
-## Critic on note.md (Target B) — NOT scheduler-dispatched
+## Durable Surface Review Rule
 
-The scheduler never dispatches critic on a note.md directly. That second-order dispatch is curator's internal step: after lifting a derivation into note.md, curator dispatches critic with Target B (separate critique file, not inline annotation). See `.codex/agents/curator.md` § note.md critic layering.
+Durable Surface Review is scheduler-dispatched from curator's request. Curator owns note/report promotion and provenance closure, but the scheduler owns agent orchestration. This boundary is load-bearing: sub-agent to sub-agent dispatch is harness-dependent, so a curator-internal critic launch can silently fail in some runtimes. Curator therefore returns a `Durable Surface Review needed:` block instead of launching critic itself.
+
+The scheduler reads curator's return after each curator dispatch. If the return contains one or more durable review requests, dispatch critic once per request using Pattern A. Critic writes the review under the target node's `checks/` directory, never under `.logs/` and never inline into the target surface.
+
+Expected curator block:
+
+```text
+Durable Surface Review needed:
+- path: research/{path}/note.md or research/{path}/reports/{slug}.md
+  surface: note | report
+  mode: contextual | blind
+  scope: {sections / claims touched}
+  reason: {why independent durable-surface review is required}
+```
+
+Critic prompt shape:
+
+```
+
+Read and follow `.codex/agents/critic.md` as your role definition. Treat the rest of this prompt as task-specific input.
+
+
+## Task
+Review kind: Durable Surface Review
+path: research/{path}/note.md or research/{path}/reports/{slug}.md
+surface: note | report
+mode: contextual | blind
+scope pointer: {scope copied from curator request}
+reason from curator: {reason copied from curator request}
+```
+
+Use curator's requested mode unless it is missing; default to `contextual`. Use `blind` only when curator says the touched derivation/report calculation is purely mechanical and the question is internal consistency. Contextual Durable Surface Review is the only checkpoint that can see cross-tree provenance honesty: whether durable prose, linked checks metadata, source/project boundaries, declared scope, and ancestor context still agree after curator's synthesis.
+
+After the critic returns `DONE: {checks/... critic path}`, re-dispatch curator with the review result so curator can apply findings, compose provenance metadata, demote or rewrite claims, and request a follow-up review if its fixes materially changed the durable surface. One scheduler follow-up round is mandatory in the same cycle when possible. If curator requests another Durable Surface Review after applying the first review, carry that pending request into the next cycle's `Curator Sweep`; at Session End, drain pending durable reviews before `session-wrap-up` unless a review/fix loop exceeds two rounds on the same surface, in which case flag the unresolved verification gap for research planner and do not treat the affected claim as confirmed.
 
 ## Curator Dispatch Input
 
@@ -116,9 +149,13 @@ Execute the tree directives below and absorb the new evidence into the tree per 
 {verbatim copy of research/focus.md § Tree Directives — each line is an imperative curator should apply}
 
 ## New Evidence This Cycle
-- {deliverable path} — critic: {ACCEPT / REVISE / REJECT}, critic verdict in same file's end section
-- {deliverable path} — critic: ...
+- {deliverable path} — critic review: {critic review path}; verdict: {ACCEPT / REVISE / REJECT}
+- {deliverable path} — critic review: {critic review path}; verdict: ...
 - ({blank if no worker dispatches this cycle — structural-review cycle})
+
+## Durable Surface Reviews
+- {note/report path} — critic review: {checks/critic_... path}; verdict: {ACCEPT / REVISE / REJECT}; requested scope: {scope}
+- ({blank if this curator dispatch is the first pass and no durable-surface reviews are ready})
 
 ## Context
 Cursor: research/{path}/
@@ -134,7 +171,7 @@ Exception — session-end sweep: the scheduler still does not enumerate candidat
 
 ## Re-dispatch on Critic REVISE / REJECT
 
-Curator's output includes flags for deliverables whose critic verdict was REVISE or REJECT. The scheduler does NOT auto-re-dispatch the worker. The flagged deliverables are surfaced to direction-challenger and research planner in the next cycle's prompts; research planner decides:
+Curator's output includes flags for deliverables whose critic review was REVISE or REJECT. The scheduler does NOT auto-re-dispatch the worker. The flagged deliverables are surfaced to direction-challenger and research planner in the next cycle's prompts; research planner decides:
 
 - *Re-dispatch the worker* — include a new Worker Dispatch entry citing the previous attempt path + critic file (researcher resubmission pattern).
 - *Pivot direction* — the critic's REJECT exposed that the question was wrong; research planner reframes in `## Context` and issues a different direction.

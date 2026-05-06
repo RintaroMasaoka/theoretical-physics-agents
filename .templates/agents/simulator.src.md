@@ -44,7 +44,7 @@ research/
       archive/                      # Retired/superseded data
     images/                         # Figures and visualizations
       {figure}.png                  # Analysis figures
-    report_{slug}.md                # Simulation report (directly in node)
+    reports/{slug}.md                # Curator-promoted simulation report (only after review/provenance transaction)
 ```
 
 ### Simulator-Specific Placement (Data, Images, Reports)
@@ -55,7 +55,7 @@ The general `src/` rules (placement at lowest common ancestor, companion `{slug}
 
 **Images (`images/`)**: Place in the same node as the data they visualize.
 
-**Reports**: Place `report_{slug}.md` directly at the node root (it is a narrative file, not source code). Summary reports covering multiple child simulations go in the parent node.
+**Reports**: Do not create `reports/{slug}.md` by default. Reports are durable clean analysis artifacts in the research tree and require curator placement plus review/provenance closure. Put report-ready narrative, figures, reproduction commands, and reliability assessment in your `.logs/` simulation deliverable. Curator promotes it to `research/{path}/reports/{slug}.md` when the analysis is worth preserving and admissible. Only write directly under `reports/` if the task prompt explicitly assigns clean-report authorship.
 
 **Companion `.md` content for measurement scripts**: A measurement script is a long-lived artifact, so its companion `{slug}.md` must explain the algorithm, key parameters, and how to run it — at a level readable by someone unfamiliar with the implementation language. This is a stricter standard than the canonical-spec baseline (a short blurb), because the script is intended to be re-run and extended over the lifetime of the node.
 
@@ -151,9 +151,9 @@ Output analysis results as figures that humans can grasp intuitively. Visualizat
 
 ### 6. Results Report
 
-Write `report_{slug}.md` directly in the target research node — a self-contained explanation of this simulation for the human researcher (the user). When browsing the research tree, this file is their primary entry point for understanding the computation. Write in **{{ language }}**.
+Write a report-ready section in your `.logs/` simulation deliverable — a self-contained explanation of this simulation for the human researcher (the user). This is the material curator can promote into `reports/{slug}.md` after critic review and provenance closure. Write in **{{ language }}**.
 
-For summary reports covering multiple simulations across child nodes, place the report in the parent node.
+For summary reports covering multiple simulations across child nodes, state the proposed parent placement in the deliverable; curator decides and performs the placement.
 
 **Content and structure** (section names are examples — adapt to {{ language }}):
 
@@ -172,7 +172,7 @@ For summary reports covering multiple simulations across child nodes, place the 
 
 ## Output
 
-**Report** (`report_{slug}.md` in the assigned research node) is a concise, user-facing summary for long-term reference in the tree. This report authorship is part of the simulator assignment; it does not authorize node creation, reparenting, status changes, or note.md/state.md edits. **Deliverable** (type `simulation`, slug matches the report slug; obtain the path via `bash .scripts/log-path.sh simulation {slug}` per `common.md` § Deliverables and Logs) is a detailed operational log capturing verification steps, execution commands, and implementation decisions — it serves audit and future agents.
+**Deliverable** (type `simulation`, slug matches the report slug; obtain the path via `bash .scripts/log-path.sh simulation {slug}` per `common.md` § Deliverables and Logs) is the authoritative simulator output for this task. It must include the report-ready narrative plus the detailed operational record capturing verification steps, execution commands, and implementation decisions. A durable `reports/{slug}.md` file is created later by curator when the analysis is admitted to the research tree; direct report authorship requires an explicit task assignment and still does not authorize node creation, reparenting, status changes, or note.md/state.md edits.
 
 Deliverables often serve as the sole record of a simulation campaign, so they must be readable independently. Embed figures inline so the document reads as a complete narrative, not a collection of file references.
 

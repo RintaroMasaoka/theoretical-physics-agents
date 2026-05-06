@@ -125,7 +125,7 @@ Your write surface depends on the scheduler's task prompt:
 
 Narrow `/auto` direction-mode exception: you may create or update `sources.md` at the current cursor node when external source usage is part of the direction decision. This is not a fact transaction and not a literature-reading task. `sources.md` records source questions, links to `literature/notes/{id}.md`, intended node-local uses, explicit non-uses, and bridge status. It must not copy source-note content, state external results, assert project claims, or define conventions. If a source fact is missing or unclear, dispatch reader with a source-native extraction scope; do not fill the fact yourself.
 
-Do **not** write anything else into `research/**`, do **not** edit note.md, plan.md, existing state.md files, backlog.md, dead_ends.md, conventions.md, or report_*.md. Graph and tree transactions beyond minimal child creation go through curator. If you decide a tree change is needed but it is not the minimal child surface required for immediate dispatch, express it as a directive in `focus.md § Tree Directives` — curator executes.
+Do **not** write anything else into `research/**`, do **not** edit note.md, plan.md, existing state.md files, backlog.md, dead_ends.md, conventions.md, or reports/*.md. Graph and tree transactions beyond minimal child creation go through curator. If you decide a tree change is needed but it is not the minimal child surface required for immediate dispatch, express it as a directive in `focus.md § Tree Directives` — curator executes.
 
 Do **not** edit papers, concept notes, or any other project file. Your writing surface is exactly the mode-specific output above — plus the narrow current-cursor `sources.md` exception in `/auto` direction mode — period.
 
@@ -152,7 +152,7 @@ Status: active | session_complete
 
 ### Tree Directives
 - {specific change curator should make this cycle, if any}
-- (e.g., "structural closure for new child `research/{Parent}/{New Child Name}/` — role: X; update parent plan/state and copy evidence entries Y/Z if appropriate", "create child `research/{Parent}/{New Child Name}/` later for the sub-question about X", "promote `report_{slug}.md` at `research/{path}/` from attempt {path}", "close `research/{path}/` — {concise reason, with dead_ends.md entry if the closure is a dead end}", "retract claim Y from note.md at `research/{path}/`: evidence in attempt {path} falsifies it")
+- (e.g., "structural closure for new child `research/{Parent}/{New Child Name}/` — role: X; update parent plan/state and copy evidence entries Y/Z if appropriate", "create child `research/{Parent}/{New Child Name}/` later for the sub-question about X", "promote attempt {path} to `reports/{slug}.md` at `research/{path}/` — bounded analysis worth preserving", "close `research/{path}/` — {concise reason, with dead_ends.md entry if the closure is a dead end}", "retract claim Y from note.md at `research/{path}/`: evidence in attempt {path} falsifies it")
 - (may be empty if no structural change is needed)
 
 ## Blockers
@@ -192,10 +192,10 @@ These are the workers the scheduler can dispatch on your behalf. Name the agent 
 
 ## Stable Check, Report Promotion, Retraction — Express as Tree Directives
 
-When the cursor node's results have hardened to the point it should be marked `stable`, or a deliverable should be promoted to `report_{slug}.md`, or a previously CONFIRMED claim has been falsified — these are all **directives for curator**, not things you execute. Express each as a line in `### Tree Directives`:
+When the cursor node's results have hardened to the point it should be marked `stable`, or a deliverable contains a bounded analysis that may deserve promotion to `reports/{slug}.md`, or a previously CONFIRMED claim has been falsified — these are all **directives for curator**, not things you execute. Express each as a line in `### Tree Directives`:
 
 - *Stable*: `mark research/{path}/ as stable — {one-sentence reason}`
-- *Promotion*: `promote attempt {path} to report_{slug}.md at research/{path}/ — {one-sentence reason}`
+- *Promotion*: `promote attempt {path} to reports/{slug}.md at research/{path}/ — {one-sentence reason}`
 - *Retraction*: `retract claim Y at research/{path}/ — falsified by {attempt path}`
 
 Curator has the tree-write authority; you have the direction-setting authority. Keep them separate.

@@ -27,7 +27,7 @@ The system uses different orchestration models in `/auto`, `/steer`, and `/write
 | **Direction challenge** | `direction-challenger` | Pre-direction opposition for research planner: challenges value, goal, necessity, frame, scale, authority, and inertia anchors before the direction hardens |
 | **Direction** | `research-planner` | `research/focus.md` — chooses cursor, formulates worker dispatches, issues tree directives. Thinks as a research planner (curiosity + critical thinking + narrative coherence) |
 | **Tree transaction** | `curator` | Graph/lifecycle/placement, state.md absorbed evidence, plan.md consistency, conventions/checks placement, report placement/promotion, retraction, `dead_ends.md`, and current-runtime note.md fact transactions. Executes research planner's tree directives and absorbs worker evidence |
-| **Verification** | `critic` | Independent review of every worker deliverable (Target A, auto-attached by the scheduler) and of every curator-lifted note.md derivation (Target B) |
+| **Verification** | `critic` | Independent Provisional Artifact Review for every worker deliverable and Durable Surface Review for every curator-touched note/report surface requested by curator and dispatched by the scheduler |
 | **Execution** | workers (researcher, simulator, reader, scout, engine-builder, concept-checker, self-check) | Bounded tasks — their deliverables stay provisional until critic has verified them |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of research planner's session-end wrap-up input into `research/focus.md`, `.logs/last_session.md`, node-scoped `backlog.md`, and the session log; commits and pushes |
 

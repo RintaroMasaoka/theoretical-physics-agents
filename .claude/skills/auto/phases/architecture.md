@@ -93,19 +93,21 @@ New node → research planner minimal child creation when immediate dispatch nee
 Curator closes structure: parent plan/state integration, evidence copy, placement/link hygiene, child plan.md if non-trivial
     ↓ investigate
 Workers produce deliverables in .logs/ (raw audit archive: research notebooks with derivations)
-    ↓ scheduler attaches critic (Target A — worker deliverable)
+    ↓ scheduler attaches critic (Provisional Artifact Review — separate provisional review)
 Reader deliverables also update literature/notes/{id}.md as source records; critic reviews them in source-audit mode against the paper, not against project relevance
     ↓
-Curator absorbs critic-reviewed evidence into state.md without log links and, when directed, places or promotes clean analyses → report_{slug}.md in the node (self-contained, derivation preserved)
+Curator absorbs critic-reviewed evidence into state.md without log links and, when directed, promotes clean bounded analyses → reports/{slug}.md in the node (self-contained, derivation preserved, review/provenance closed)
 Curator updates conventions.md when a promoted result introduces or depends on a load-bearing symbolic choice
     ↓ node reaches stable
 Fact-maintenance transaction lifts derivations (not just claims) from reports + absorbed state → writes note.md
-Curator then dispatches critic (Target B — note.md) to verify the lifted derivation
+Curator requests Durable Surface Review; scheduler dispatches critic on the touched note/report surface, then re-dispatches curator to apply findings
     ↓ understanding deepens
-Fact-maintenance transaction updates note.md with new derivations; re-dispatches critic on touched sections
+Fact-maintenance transaction updates note.md with new derivations; curator requests Durable Surface Review on touched sections
     ↓ later found wrong
 Research planner directs retraction → curator writes state.md + dead_ends.md and closes the fact-layer update
 ```
+
+The two critic passes have different identities. Provisional Artifact Review asks whether a raw worker artifact contains claims admissible to any higher surface. Durable Surface Review asks whether the claim as written on `note.md` or `reports/{slug}.md` satisfies that durable surface's truth contract. The latter is contextual by default because it is the checkpoint for cross-tree provenance honesty: linked checks metadata, declared scope, source/project boundaries, and ancestor context can disagree even when the original raw artifact passed blind review.
 
 **Graph authority is not ordinary authorship.** Research planner's direction authority is expressed in `focus.md`: cursor, worker dispatch plan, and Tree Directives naming what should change. Research planner may also create a minimal child node (`mkdir` + initial state.md) when that structure is the immediate expression of its direction judgment and the same cycle's dispatch needs the child to exist. Curator owns structural closure and graph/lifecycle/placement transactions beyond that minimal surface: state.md absorption, plan.md consistency, parent integration, evidence copy, status, reparenting, archive, report-to-subnode promotion, and structural splits discovered from maintenance. Clean report authorship may be assigned to workers, but workers do not change graph structure. Fact-layer authorship may later move to a dedicated role; until then, curator closes the transaction and enforces the file identity, verification, and link-governance rules.
 

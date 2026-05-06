@@ -42,7 +42,7 @@ research/                 # Read-only — research tree
   {branch}/note.md        #   Draft fact layer — what the node established, with derivation/scope/limits
   {branch}/conventions.md #   Subtree-local notation / convention ledger when needed
   {branch}/state.md         #   Research process (ladder — kind/status in frontmatter)
-  {branch}/report_*.md    #   Clean self-contained analyses
+  {branch}/reports/*.md    #   Clean self-contained analyses
 concepts/                 # Read-only — concept definitions
 agenda.md                 # Writable — destination for reporting research gaps
 draft/                    # Paper-draft workspace, not human-authorized manuscript authority

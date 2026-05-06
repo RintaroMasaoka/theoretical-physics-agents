@@ -95,6 +95,8 @@ The sweep is **not optional** and **not skippable** on the grounds that "nothing
 
 Curator returns `DONE: {summary}`. If it returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so the next session picks it up; do not block Session End on a curator failure.
 
+If the final curator sweep returns `Durable Surface Review needed:`, drain those reviews before proceeding to research planner session-end mode: dispatch critic per `phases/dispatch.md` § Durable Surface Review Rule, then re-dispatch curator with the resulting `## Durable Surface Reviews` so it can apply findings and close or demote provenance. Repeat at most two review/fix rounds per same durable surface. If the same surface still needs review after two rounds, record the unresolved verification gap in the session evidence and ensure the affected claim is not reported as confirmed.
+
 ### 3. Final Research planner Dispatch (Session-End Mode)
 
 ```
@@ -114,7 +116,7 @@ Obtain a wrap-up-input path via `bash .scripts/log-path.sh wrap-up-input` and wr
 
 ## This Session's Evidence (summary)
 - Deliverables: {list of paths produced this session}
-- Critic verdicts: {list of critic files or inline-annotated paths}
+- Critic verdicts: {list of Provisional Artifact Review and Durable Surface Review files}
 - Curator sweeps: {list of curator deliverables / summaries}
 - Direction-challenge outputs: {list of timestamped direction-challenge paths captured from direction-challenger DONE returns this session, if any}
 - Node changes: {new nodes, closes, status changes, report promotions — enumerate}

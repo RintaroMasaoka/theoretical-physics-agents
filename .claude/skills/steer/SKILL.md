@@ -40,7 +40,7 @@ Reuse `/auto`'s mechanics rather than duplicating them:
 
 | File | Loaded when | Purpose |
 |---|---|---|
-| `.claude/skills/auto/phases/dispatch.md` | After the Steering Gate, when launching workers and critic | Pattern A / B launch methods, prompt template, auto-critic rule, per-agent dynamic data |
+| `.claude/skills/auto/phases/dispatch.md` | After the Steering Gate, when launching workers and critic | Pattern A / B launch methods, prompt template, Provisional Artifact Review, Durable Surface Review, per-agent dynamic data |
 | `.claude/skills/auto/phases/session-lifecycle.md` | For sanity checks and Session End mechanics | Initial gates, final curator sweep, research planner wrap-up input, `session-wrap-up` handoff |
 
 The research information model is canonical in `.claude/research-tree.md`. `/steer` reads enough of the tree to present direction options; workers, critic, curator, and research planner keep their normal ownership boundaries.
@@ -181,12 +181,13 @@ If the approved direction requires no worker dispatches and only tree maintenanc
 
 ## 5. Execute One Cycle
 
-From this point, follow `/auto`'s Cycle Loop steps 3-6 for exactly one cycle:
+From this point, follow `/auto`'s Cycle Loop steps 3-6b for exactly one cycle:
 
 1. Parse `research/focus.md`
 2. Launch Worker Dispatches in parallel using `.claude/skills/auto/phases/dispatch.md`
-3. Auto-attach critic to every worker deliverable per the Auto-Critic Rule
+3. Auto-attach critic to every worker deliverable per the Provisional Artifact Review Rule
 4. Dispatch curator once with the Tree Directives and the new evidence
+5. If curator requests Durable Surface Review, dispatch critic on the requested note/report surface and re-dispatch curator to apply the review
 
 If the approved steering decision is explicitly a no-op or session-close decision, materialize `Status: session_complete`, skip worker dispatch, and proceed to Session End. Otherwise materialize `Status: active`.
 

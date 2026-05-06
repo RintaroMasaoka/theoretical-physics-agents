@@ -11,7 +11,7 @@ The dispatcher provides file paths rather than inline data. Read only the sectio
 
 ## Deliverables and Logs
 
-Worker output goes to `.logs/` — all worker output is provisional and stored there until downstream agents verify it (auto-critic in `/auto`, PI review in `/write`) and incorporate the verified result into the research tree or paper.
+Worker output goes to `.logs/` — all worker output is provisional and stored there until downstream agents verify it (Provisional Artifact Review in `/auto`, PI review in `/write`) and incorporate the verified result into the research tree or paper.
 
 Each worker produces two files:
 
@@ -21,7 +21,7 @@ Each worker produces two files:
 
 **Filename creation.** Run `bash .scripts/log-path.sh <type> [<slug>]` through Bash and capture stdout — it returns an absolute path of the form `.logs/{YYMMDD_HHMM}_{type}[_{slug}].md`. Then use Write to put your content at that path. Do not run `date` yourself; do not pre-name the file. The timestamp is fixed at the moment of the script call, so naming is authoritative from creation — there is no downstream rename step that can fail and leave an orphan file behind.
 
-Deliverables and logs are provisional. In `/auto`, the scheduler auto-dispatches a critic on every deliverable, and curator then absorbs the verified evidence into the research tree (see `.claude/research-tree.md`). In `/write`, PI independently verifies deliverables before integrating them into the paper.
+Deliverables and logs are provisional. In `/auto`, the scheduler auto-dispatches Provisional Artifact Review on every worker deliverable. Critic writes a separate `.logs/*_critic_*.md` review artifact rather than editing the worker deliverable inline, and curator reads the producer artifact and verifier artifact together before absorbing any evidence into the research tree. When curator later requests Durable Surface Review for touched note/report surfaces, the scheduler dispatches critic on that durable surface and returns the review to curator for provenance closure (see `.claude/research-tree.md`). In `/write`, PI independently verifies deliverables before integrating them into the paper.
 
 ## Heartbeat — Preventing Stream Idle Timeout
 

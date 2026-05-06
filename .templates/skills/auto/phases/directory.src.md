@@ -19,7 +19,8 @@ research/                 # Research tree — draft facts, state, strategy, grap
     plan.md               #     (optional) Strategy and approach for this branch
     backlog.md            #     (optional) Parked work scoped to this subtree
     state.md              #     Current board + absorbed evidence
-    report_{slug}.md      #     (optional) Clean analysis artifact (format: see {{ runtime.research_tree_file }})
+    reports/              #     (optional) Promoted clean analysis artifacts
+      {slug}.md           #       Format: see {{ runtime.research_tree_file }}
     dead_ends.md          #     (optional) Failed approaches and lessons
     directives.md         #     (optional) Subtree-specific rules from meetings
     src/                  #     Measurement scripts and descriptions (simulator)
