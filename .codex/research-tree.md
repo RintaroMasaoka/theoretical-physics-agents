@@ -1,51 +1,57 @@
 # Research Tree
 
-Research information is organized into typed surfaces. The active `research/` tree is working research memory; `research/archive/` preserves retired nodes; `manuscript/` is the human-authorized paper surface. Every file has an identity, authority level, and link boundary. These distinctions are not cosmetic: later agents reconstruct context from these files, so mixing fact, state, strategy, backlog, raw audit records, and process-heavy retired nodes lets local mistakes propagate as durable assumptions.
+Research information is organized into typed surfaces. The active `research/` tree is working research memory; `research/archive/` preserves retired nodes; `manuscript/` is reserved for future human-authorized paper surfaces and is frozen in the current research workflow. Every file has an identity, authority level, and link boundary. These distinctions are not cosmetic: later agents reconstruct context from these files, so mixing fact, state, strategy, backlog, provisional review transactions, raw audit records, semantically placed materials, and process-heavy retired nodes lets local mistakes propagate as durable assumptions.
 
-**Language.** Body prose in every durable file described here (manuscript prose, note.md, state.md Current Board / Evidence entries, plan.md, backlog.md, story.md, reports/*.md, checks/*.md, principles.md, conventions.md, focus.md, dead_ends.md, …) is written in **japanese**. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current Board`, `## Evidence`, `## Background`), frontmatter keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. The English examples below illustrate structure, not language.
+**Language.** Body prose in every durable file described here (manuscript prose, findings.md, state.md Current Board / Evidence entries, plan.md, backlog.md, story.md, _materials/analyses/*.md, checks/*.md, principles.md, conventions.md, focus.md, dead_ends.md, …) is written in **japanese**. Provisional review transaction prose under `_reviews/` is also written in **japanese** unless it quotes source/code. Exceptions: the structural `##` headings shown in English in this document (e.g., `## Current Board`, `## Evidence`, `## Background`), frontmatter keys, schema keys, folder slugs, technical terms, proper nouns, and LaTeX mathematics may stay in their original form. Field labels shown in examples such as `Scope:`, `Principle:`, or `Reason:` name semantic fields, not fixed English literals; localize them in authored prose unless a frontmatter/schema contract explicitly fixes the key. The English examples below illustrate structure, not language.
 
 ## Authority Layers
 
-`manuscript/` is the highest authority layer: human-authorized, fully self-contained, paper-quality prose. It is not a research log, not a claim registry, and not a link index into the research tree. Its narrow non-prose exception is `manuscript/authorizations/*.md`: meeting-created approval snapshots that record exactly which `note.md` artifact the user approved for manuscript use. If manuscript prose conflicts with `research/**/note.md`, agents follow `manuscript/` and flag the conflict rather than silently reconciling it.
+`manuscript/` is reserved for the future highest authority layer: human-authorized, fully self-contained, paper-quality prose. In the current workflow it is frozen: `/auto`, `/steer`, `/meeting`, and the current `/write` flow do not create, update, or promote into `manuscript/`. If existing manuscript prose conflicts with `research/**/findings.md`, agents follow `manuscript/` and flag the conflict rather than silently reconciling it. Future write-skill work may define the promotion protocol, but this research-tree contract does not use manuscript authorization as a substitute for research-memory quality.
 
-`draft/` is different: it is the `/write` paper-draft workspace (`draft/outline.md`, `draft/conventions.md`, `draft/sections/*.md`, `draft/versions/*.md`). It is not human-authorized authority and does not override `manuscript/` or `research/**/note.md`. A draft only becomes authoritative when a human promotes or rewrites it into `manuscript/`.
+`draft/` is different: it is the `/write` paper-draft workspace (`draft/outline.md`, `draft/conventions.md`, `draft/sections/*.md`, `draft/versions/*.md`). It is not human-authorized authority and does not override `manuscript/` or `research/**/findings.md`.
 
-`research/**/note.md` is the draft fact layer: agent-maintained, derivation-bearing, and self-contained for established facts at that node, but lower authority than `manuscript/`. It may be newer than the manuscript and is the main surface for reusable research facts, not for current workflow state.
+`research/**/findings.md` is the draft fact layer: agent-maintained, derivation-bearing, and self-contained for established facts at that node. It may be newer than frozen manuscript material and is the main surface for reusable research facts, not for current workflow state or human oversight.
+
+`research/**/guide.md` is the human oversight entrypoint for a node or subtree. It helps the human researcher manage direction, verification doubts, and understanding without turning the meeting into line-by-line fact-layer QA. It is not an authority layer and must point to `findings.md`, `checks/`, `_materials/analyses/*.md`, `story.md`, or `state.md` for the surfaces that carry substance.
+
+`research/**/_materials/` is a visible non-authority material layer inside the node. It is durable because code, data, figures, shared modules, and clean analyses must be reusable by semantic location rather than lost in chronological logs. It is not claim authority. A claim becomes reusable research memory only when the fact-maintenance transaction admits it into `findings.md` with appropriate provenance, or records its state honestly in `state.md`. In the current agent set, curator carries that fact-maintenance transaction responsibility as part of research-memory maintenance; this is a context-management role, not a claim that curator independently re-derives specialist truth.
+
+`research/**/_reviews/` is a visible provisional review-transaction layer inside a node. It is where review-eligible worker submissions and critic judgments meet before curator decides what enters interpreted memory or durable materials. It is not raw process history, not claim authority, not durable support, and not normal reading context. Its identity is transaction state: "what was submitted for review, what critic judged, whether one repair was attempted, and what curator may now absorb or block." Source-reading review transactions that are not node-scoped live under `literature/_reviews/{id}/` with the same identity.
 
 `literature/notes/{id}.md` is a paper-level source record: reader-authored, source-facing, and project-independent. It records what an external paper states in its own notation and convention. It is not a project fact layer and not a bridge surface. Research nodes cite it when they use external results, but the source record itself does not decide how the project should use the paper.
 
-Authority order:
+Authority order for claim-bearing interpreted-memory surfaces:
 
 ```text
 manuscript/
-  > research/**/note.md
-  > research/**/reports/*.md
+  > research/**/findings.md
   > research/**/state.md
   > literature/notes/{id}.md
-  > .logs/
 ```
 
-This is an authority order, not a link chain. Reports have bounded-analysis authority for the closed analysis they contain, but they do not override `note.md` as the integrated node fact layer; when a report claim becomes reusable node knowledge, curator distills or cites it from note.md with provenance. `literature/notes/{id}.md` is authoritative only for what the source record says about the external paper; the paper itself remains the ultimate source. `research/**/checks/*.md` is not a standalone claim-authority layer in this ladder; it is the verification/provenance authority attached to linked claims in note.md or reports/*.md. A check record can force demotion, revision, or retraction of a claim, but it does not become an independent fact surface. Durable research prose does not link to `.logs/`; `.logs/` is a raw audit archive used only when a workflow explicitly enters audit / archaeology / contamination-tracing mode.
+This is an authority order, not a link chain. `_materials/` is intentionally absent: its contents may be durable and semantically placed, but they are materials, not interpreted research memory. `_reviews/` is also absent: it is a provisional transaction layer, not reusable memory. Analyses under `_materials/analyses/` may contain claims as authored materials; later agents may inspect them as support material, but may not treat them as adopted node facts until `findings.md`, `state.md`, or a `checks/` record says what was admitted, rejected, limited, or still unverified. `literature/notes/{id}.md` is authoritative only for what the source record says about the external paper; the paper itself remains the ultimate source. `research/**/checks/*.md` is not a standalone claim-authority layer in this ladder; it is the verification/provenance authority attached to linked claims in findings.md or analysis materials. A check record can force demotion, revision, or retraction of a claim, but it does not become an independent fact surface. `.logs/` is outside the ladder: it is a raw audit fallback used only when a workflow explicitly enters audit / archaeology / contamination-tracing mode.
 
 | File | Layer | Role |
 |---|---|---|
-| `note.md` | Fact layer | **Established node facts.** Agent-maintained prose for claims, definitions, derivations or derivation skeletons, scope, limitations, and source/project boundaries. Not final human authority, not current research state, not a report index. No frontmatter. Does not link to `.logs/` or any dot surface |
-| `reports/{slug}.md` | Clean analysis artifact | **Promoted bounded analysis.** A closed, self-contained argument artifact placed in the node whose scope it serves after the maintenance path has enough review/provenance support to keep it in the tree. It has authority only over its bounded analysis; it is not the integrated fact layer and not a living workspace. A report may later trigger a subnode, but the graph change is a separate authority action |
-| `checks/` | Durable verification surface | **Node-local verification records.** Critic verdicts, reproduction records, report reviews, and note reviews. A check file states target, method, result, scope, and limitations in its own prose. It does not link to `.logs/`, is not a substitute for the derivation in note.md/report prose, and is not a standalone fact surface |
+| `findings.md` | Fact layer | **Established node facts.** Agent-maintained prose for claims, definitions, derivations or derivation skeletons, scope, limitations, and source/project boundaries. Not final human authority, not current research state, not a draft index. No frontmatter. Does not link to `.logs/` or hidden workflow/config surfaces as research evidence |
+| `guide.md` | Human oversight entrypoint | **Node-local guide for human research management.** Explains what the node is for, why it matters, what to read first, what is trusted or suspicious, and which verification/direction questions deserve human attention. Not fact authority, not a replacement for findings.md/checks/_materials/analyses, not meeting minutes |
+| `_reviews/{slug}/` | Provisional review transaction | **Bounded worker-critic transaction.** Contains `worker.md`, `critic.md`, optional `repair.md`, and optional `critic_rereview.md`. Not raw log, not durable support, not normal context |
+| `_materials/analyses/{slug}.md` | Material | **Clean analysis material.** A closed, self-contained analysis placed in the node whose scope it serves. Not claim authority, not the integrated fact layer, and not a living workspace. Fact-maintenance may later distill admitted claims into findings.md or use the analysis as inspectable support |
+| `checks/` | Durable verification surface | **Node-local verification records.** Critic verdicts, reproduction records, analysis reviews, and findings reviews. A check file states target, method, result, scope, and limitations in its own prose. It does not link to `.logs/`, is not a substitute for the derivation in findings.md/analysis prose, and is not a standalone fact surface |
 | `state.md` | Research state layer | **Graph-structured current board and absorbed evidence ledger.** Has frontmatter (`kind`, `status`). Records what is known, unknown, active, blocked, or disputed at this node, plus compact evidence entries. It is not the fact layer. It absorbs `.logs/` content but does not link to `.logs/` |
 | `plan.md` | Decomposition / strategy layer | **Recorded node decomposition and planner-supplied strategy.** Children roles, decomposition rationale, approach choices, and success criteria when they are needed to understand the active graph. Not current evidence, not tactical reminders, not an append-only history |
 | `sources.md` | Source map (optional) | **Node-local map of external sources.** States which `literature/notes/{id}.md` records matter to this node, what source-side questions remain, what each source is used for, what it is explicitly not used for, and whether any bridge is absent, candidate, or established elsewhere. It is not a source record, not a fact layer, and not a convention ledger |
 | `backlog.md` | Backlog layer (optional) | **Parked executable reminders.** Pending work that should survive beyond `research/focus.md` but is not immediate dispatch, not strategy rationale, not evidence, and not fact. Prune stale items during session-end maintenance |
 | `story.md` | — | Narrative structure of children (optional). At root: the paper's overall narrative structure |
-| `principles.md` | — | Constraints specific to this subtree (optional). At root: cross-cutting research constraints |
+| `principles.md` | Research principles | **Current reusable research judgment principles (optional).** Principles that repeatedly constrain how agents compare routes, promote claims, separate roles, or decide what would count as evidence across this subtree. At root: project-wide research principles. See § principles.md — Research Principles |
 | `conventions.md` | Convention ledger | **Notation and convention source of truth (optional, root by default; subtree-local when needed).** Records choices that change how formulas are read — sign conventions, orderings, normalizations, index names, Fourier transforms, tensor leg orientation, symbol reservations, and terminology-to-symbol mappings. See § conventions.md — Notation and Convention Ledger |
 | `dead_ends.md` | Outside fact layer | **Rejected-direction register (optional).** Approaches shown wrong, with the reason and the evidence (counterexample, falsifying computation, or critic-rejected derivation). Free-form prose. Pairs with `asides.md` — together they form the two outside-fact-layer registers (rejected vs parked). At root by default; a node may carry its own when the rejection is clearly subtree-local |
-| `asides.md` | Outside fact layer | **Parked off-thread items (optional).** Items not committed to the active thread but worth not forgetting — spare-capacity questions, side curiosities, loose details left unpinned, items of unclear project scope. Free-form prose, no derivation requirement. At root by default; a node may carry its own when the items are clearly subtree-local. Three exits: promoted into a node's note.md (becomes load-bearing), moved to `dead_ends.md` (shown wrong), or stays parked indefinitely. Capture path: workers surface candidate items in their deliverables; curator absorbs them. The user may also append directly during `/meeting`, mirroring the user-collaborative exception for `note.md` (the file is informal, so the second-reader rationale that locks `note.md` to curator does not bind here) |
-| `src/` | Computation | Source code tied to a node (measurement, analysis, plot, or verification scripts), each with a companion `{slug}.md` |
-| `data/` | Computation | Simulation data (TSV format with metadata headers) |
-| `images/` | Computation | Figures and visualizations |
-| `lib/` | Computation (root only) | Shared simulation framework modules (managed by engine-builder) |
-| `research/archive/` | Retired research memory | **Archived nodes.** Process-heavy, duplicated, superseded, or scaffold-like nodes removed from the active planning surface after their reusable residue has been extracted into active state.md, note.md, reports/*.md, dead_ends.md, concepts/, or conventions.md. Archive is history, not normal context |
+| `asides.md` | Outside fact layer | **Parked off-thread items (optional).** Items not committed to the active thread but worth not forgetting — spare-capacity questions, side curiosities, loose details left unpinned, items of unclear project scope. Free-form prose, no derivation requirement. At root by default; a node may carry its own when the items are clearly subtree-local. Three exits: promoted into a node's findings.md (becomes load-bearing), moved to `dead_ends.md` (shown wrong), or stays parked indefinitely. Capture path: workers surface candidate items in their submissions; curator absorbs them. The user may also append directly during `/meeting`; the file is intentionally informal and carries no fact authority |
+| `_materials/src/` | Material | Source code tied to a node (measurement, analysis, plot, or verification scripts), each with a companion `{slug}.md`; not claim authority |
+| `_materials/data/` | Material | Simulation data (TSV format with metadata headers); not claim authority |
+| `_materials/images/` | Material | Figures and visualizations; not claim authority |
+| `_materials/lib/` | Material (root only) | Shared simulation framework modules (managed by engine-builder); not claim authority |
+| `research/archive/` | Retired research memory | **Archived nodes.** Process-heavy, duplicated, superseded, or scaffold-like nodes removed from the active planning surface after their reusable residue has been extracted into active state.md, findings.md, _materials/analyses/*.md, dead_ends.md, concepts/, or conventions.md. Archive is history, not normal context |
 
 ## Literature Surfaces
 
@@ -82,10 +88,47 @@ Not used in this node for:
 - {project object, convention, or bridge this source does not establish}
 
 Bridge status:
-- absent | candidate | established in [conventions.md](conventions.md) / [note.md](note.md)
+- absent | candidate | established in [conventions.md](conventions.md) / [findings.md](findings.md)
 ```
 
-`sources.md` is managed by the project-side direction workflow, not by reader. Reader may be dispatched because a `sources.md` source question exists, but reader does not update `sources.md`; reader updates only `literature/notes/{id}.md`, `literature/catalog.jsonl`, `literature/reading_list.md`, and its raw `.logs/` deliverable. This separation prevents a source-reading agent from deciding how the project should use the source.
+`sources.md` is managed by the project-side direction workflow, not by reader. Reader may be dispatched because a `sources.md` source question exists, but reader does not update `sources.md`; reader updates only `literature/notes/{id}.md`, `literature/catalog.jsonl`, `literature/reading_list.md`, and its `literature/_reviews/{id}/worker.md` source-reading submission plus raw process log. This separation prevents a source-reading agent from deciding how the project should use the source.
+
+## principles.md — Research Principles
+
+`principles.md` is the ledger of currently active research judgment principles for a node or subtree. A principle is not an important fact, not the project thesis, not a route priority, not a source to read next, not a notation choice, and not a transient instruction. It is a reusable criterion that changes future research judgment: what kind of inference is allowed, which roles must stay separate, what evidence threshold prevents overclaiming, or what comparison may not be promoted without an explicit bridge.
+
+**Why this file exists.** Some mistakes recur across many nodes because they are not local facts: analogy gets treated as identification, diagnostic routes get promoted as theorem evidence, source-native statements get rewritten as project-side claims, or a temporary route priority becomes a hidden premise. If those constraints live only in `story.md` or `plan.md`, they look like local strategy and are forgotten when the cursor moves. If they live in `findings.md`, they pollute the fact layer. A research-principles ledger gives agents a compact current rule set for judgment without turning the tree into a transcript.
+
+**What belongs here.**
+- A criterion that should be applied repeatedly across the subtree when promoting, rejecting, comparing, or routing claims.
+- A role-separation rule, such as keeping a diagnostic route distinct from a positive theorem route unless an explicit bridge is established.
+- An evidence threshold that prevents a known class of overclaiming across multiple future decisions.
+- A project-local research norm whose reason and consequence remain active beyond the meeting or cycle that produced it.
+
+**What does not belong here.**
+- The project thesis, narrative success condition, or paper storyline — put that in `story.md`.
+- Decomposition, route priority, approach choice, or active strategy — put that in `plan.md` or `research/focus.md`.
+- Source priority, source questions, intended uses, or non-uses — put that in `sources.md` or `backlog.md`.
+- Established facts, derivations, or limitations — put those in `findings.md`, `_materials/analyses/*.md`, `checks/`, or `state.md` according to their authority.
+- Notation, sign, normalization, symbol reservation, or convention bridges — put those in `conventions.md`.
+- Framework-level file contracts or agent workflow rules — improve the framework prompt rather than recording them as project research principles.
+
+**Entry shape.** Free-form prose is allowed, but each entry must make these facts recoverable:
+
+```markdown
+# Research Principles
+
+## {Principle name}
+Scope: {project-wide | research/{subtree}/ | specific recurring judgment}
+Principle: {the reusable judgment rule}
+Reason: {why this principle exists}
+Consequence: {what future agents should accept, reject, separate, or route differently because of it}
+Origin: > [Launch|Meeting|Cycle YYYY-MM-DD] {short reason}
+```
+
+The reason and consequence are load-bearing. Without a reason, a principle becomes dogma; without a consequence, it becomes a vague slogan that later agents cannot apply or cleanly retire.
+
+**Maintenance rule.** `/launch` and `/meeting` perform the write-time routing check before adding a principle. Curator performs the maintenance check when touching `principles.md` and during session-end sweep: entries that are really story, plan, source priority, notation, fact prose, or framework workflow rules should be moved to the right surface when the move is mechanical, or flagged for human/research-planner judgment when the scientific meaning would change.
 
 ## Folder Names
 
@@ -97,37 +140,144 @@ A reader who sees only the folder name should be able to guess the node's conten
 
 `research/archive/` is the exception to active-node naming. Archived nodes are stored under `research/archive/{YYYY-MM-DD}/{relative-node-path}/` so the original path and archive date remain recoverable. Agents do not browse archive during ordinary context loading; open it only for explicit archaeology, contamination tracing, or when an active file intentionally links to archived process history.
 
-## Computation Artifacts
+## `_materials/` — Durable Non-Authority Materials
 
-Research nodes may contain computation subdirectories alongside their text files. This section is the canonical spec — agents that write here (simulator, researcher) follow these rules and cite this section rather than restating them.
+Research nodes may contain `_materials/` alongside interpreted-memory files. This section is the canonical spec for durable materials — agents that write here follow these rules and cite this section rather than restating them.
 
-### `src/` — Source code tied to a node
+`_materials/` exists because `.logs/` is chronological audit memory. Chronology is correct for audit, but it is the wrong ordering principle for code, data, figures, shared modules, and clean analyses: those need to be found by node, observable, and API. Placing them under `_materials/` preserves semantic locality without giving them the authority aura of node-root memory files.
 
-Any source code tied to a node lives in `src/`: simulator's measurement / analysis / plot scripts, and researcher's ad-hoc verification scripts for conjectures and examples. Both writers follow the same rules below.
+Everything under `_materials/` is a material. It may be read, rerun, cited by a check, or distilled into findings, but it is not itself an adopted node fact. Companions and analysis materials may describe what a material computes or argues; conclusions become research memory only through `state.md`, `checks/`, or `findings.md` transactions.
 
-**Node-root prohibition.** Never place source files (`.py`, `.jl`, …) directly in the node folder. Node roots are reserved for narrative files (`state.md`, `plan.md`, `sources.md`, `backlog.md`, `note.md`, `story.md`, `principles.md`, `conventions.md`) plus named artifact directories such as `reports/`, `checks/`, `src/`, `data/`, and `images/`. Loose scripts in node roots break the tree's legibility and bypass the `src/` reuse rule, so creating `src/` (even for a single script) is mandatory.
+### `_materials/` context-loading rule
 
-**Placement — lowest common ancestor.** Place a script at the lowest node that is an ancestor of every node that uses it. Common cases: a script used only in node `X` lives in `X/src/`; a script shared across siblings of a parent `P` lives in `P/src/`; if two cousins share a script, it lives in their nearest common ancestor's `src/`. This avoids duplication and makes scripts discoverable from the research context.
+`_materials/` is visible so agents can discover that durable material exists, not so every agent loads the material by default. Normal tree orientation may list `_materials/` directories and filenames, but content loading is gated by task relevance. This keeps durable materials from becoming a second chronological context dump.
 
-**Companion `{slug}.md` required.** Every script `{slug}.{ext}` carries a companion `{slug}.md` in the same `src/` directory — this is the script's permanent label in the tree, so a reader browsing `src/` knows what each file computes without opening the code or grepping `.logs/`. Minimum content: what the script computes, key parameters, and how to run it. For simulator's long-lived measurement scripts the companion expands into a full implementation description (see simulator agent). For researcher's one-off attempt scripts a short blurb (a paragraph or two) is enough while the work is provisional. Once a script supports a note.md / reports/*.md claim, the reproducibility summary belongs in the node's `checks/` record or in the promoted report; `.logs/` remains the raw notebook, not the durable verification surface.
+Use `node .scripts/material-index.mjs research/{path}` as the default discovery tool for a node or subtree. It prints only `_materials/**/*.md` front matter and a short description, not material bodies. This index output is safe ordinary context; it tells an agent what materials exist and why they might matter without loading derivations, code, data, or figure payloads.
 
-**Retirement.** Superseded scripts move to `src/archive/` rather than being deleted, so the reasoning history stays searchable.
+Read full `_materials/` contents when one of these conditions holds:
+- **Assigned ownership**: simulator/researcher is writing or rerunning node-local `_materials/src|data|images`; engine-builder is writing or refactoring `research/_materials/lib/`.
+- **Explicit target**: the dispatcher, a Tree Directive, or a Durable Surface Review names a specific `_materials/analyses/{slug}.md`, script, data file, image, or lib module.
+- **Durable link/provenance**: `findings.md`, `guide.md`, `state.md`, a `checks/*.md` record, or an analysis material links the material and the current task needs to understand that support.
+- **Promotion, retraction, or archival decision**: curator must decide whether a reviewed worker transaction should become `_materials/analyses/`, whether an analysis material supports findings.md, whether a script is superseded, or whether a node can be archived.
+- **Writing support**: `/write` roles need a linked clean analysis, figure, or check to write a paper section faithfully.
+
+Do not read full `_materials/` contents when the task is ordinary direction-setting, cursor navigation, sibling overview, tree-shape discovery, or narrative orientation and the interpreted surfaces already carry the relevant state. In those cases, read `findings.md`, `guide.md`, `state.md`, `plan.md`, `story.md`, `conventions.md`, and `checks/` summaries first, then use the material index if `_materials/` exists or an interpreted surface mentions supporting material. Open the material only if the decision actually depends on its content.
+
+Granularity matters. Prefer material-index output, `_materials/src/{slug}.md` companions, check records, and TSV metadata headers before opening code bodies or full data. Prefer image filenames/captions or the analysis/check that cites a figure before inspecting binary image files. Code/data/image bulk reads are for simulator, engine-builder, reproducibility checks, or explicit audit — not for ordinary research-tree context.
+
+### Material index metadata
+
+Markdown files under `_materials/` carry YAML front matter for context indexing. This is **not claim metadata** and does not confer authority. It is a lightweight label so ordinary context loading can decide whether to open the artifact body.
+
+Minimum front matter for `_materials/analyses/{slug}.md` and `_materials/src/{slug}.md` companions:
+
+```yaml
+---
+material_kind: analysis | script-companion | lib-note
+description: "{one sentence: what this material is for}"
+scope: "research/{node path}/"
+status: active | superseded
+---
+```
+
+Optional fields may include `created_from`, `produces`, `consumes`, `related_checks`, or `review_state`. Keep them descriptive and non-authoritative: they help route context, but the verification truth still lives in `checks/`, and adopted claims still live in `findings.md` or `state.md`.
+
+### `_materials/src/` — Source code tied to a node
+
+Any source code tied to a node lives in `_materials/src/`: simulator's measurement / analysis / plot scripts, and researcher's ad-hoc verification scripts for conjectures and examples. Both writers follow the same rules below.
+
+**Node-root prohibition.** Never place source files (`.py`, `.jl`, …), data, figures, or clean analyses directly in the node folder. Node roots are reserved for interpreted-memory files (`state.md`, `plan.md`, `sources.md`, `backlog.md`, `findings.md`, `guide.md`, `story.md`, `principles.md`, `conventions.md`, `dead_ends.md`, `asides.md`) plus authority-support directories such as `checks/` and the single material directory `_materials/`. Loose materials in node roots make them look adopted as research memory, so creating `_materials/` (and the relevant child such as `_materials/src/`) is mandatory.
+
+**Placement — lowest common ancestor.** Place a script at the lowest node that is an ancestor of every node that uses it. Common cases: a script used only in node `X` lives in `X/_materials/src/`; a script shared across siblings of a parent `P` lives in `P/_materials/src/`; if two cousins share a script, it lives in their nearest common ancestor's `_materials/src/`. This avoids duplication and makes scripts discoverable from the research context.
+
+**Companion `{slug}.md` required.** Every script `{slug}.{ext}` carries a companion `{slug}.md` in the same `_materials/src/` directory — this is the script's permanent label in the tree, so material-index output tells a reader what each file computes without opening the code or grepping `.logs/`. The companion starts with material index metadata, then states what the script computes, key parameters, and how to run it. For simulator's long-lived measurement scripts the companion expands into a full implementation description (see simulator agent). For researcher's one-off attempt scripts a short blurb (a paragraph or two) is enough while the work is provisional. Once a script supports a findings.md claim or an `_materials/analyses/*.md` analysis, the reproducibility summary belongs in the node's `checks/` record or in the analysis material; `.logs/` remains the raw notebook, not the durable verification surface.
+
+**Retirement.** Superseded scripts move to `_materials/src/archive/` rather than being deleted, so the reasoning history stays searchable.
 
 **Hygiene.** Do not commit `__pycache__/`, `.ipynb_checkpoints/`, or any per-machine bytecode generated by running scripts.
 
-### `data/`, `images/`, and root `lib/`
+### `_materials/data/`, `_materials/images/`, and root `_materials/lib/`
 
-- **`data/`**: Simulation data in TSV format with structured metadata headers. Placement: the node that **owns the investigation** — data belongs to the node where the measured observable is studied. Managed by simulator (see simulator agent for TSV metadata-header format and archival rules)
-- **`images/`**: Figures and visualizations. Placement: same node as the data they visualize. Managed by simulator
-- **`research/lib/`** (root only): Shared simulation framework modules managed by engine-builder. `lib/test/` contains module tests
+- **`_materials/data/`**: Simulation data in TSV format with structured metadata headers. Placement: the node that **owns the investigation** — data belongs to the node where the measured observable is studied. Managed by simulator (see simulator agent for TSV metadata-header format and archival rules)
+- **`_materials/images/`**: Figures and visualizations. Placement: same node as the data they visualize. Managed by simulator
+- **`research/_materials/lib/`** (root only): Shared simulation framework modules managed by engine-builder. `_materials/lib/test/` contains module tests
 
-Agents that are not simulator, researcher, or engine-builder treat all of `src/`, `data/`, `images/`, and `lib/` as read-only context.
+Agents that are not simulator, researcher, or engine-builder treat all of `_materials/src/`, `_materials/data/`, `_materials/images/`, and `_materials/lib/` as read-only context, except that curator may perform planner-directed archival moves from `_materials/src/` to `_materials/src/archive/`. That exception is move-only: curator does not edit code, data, figures, or companion descriptions while moving superseded scripts under the lifecycle protocol.
+
+## `_reviews/{slug}/` — Provisional Worker-Critic Transactions
+
+`_reviews/` is the bounded review-transaction layer. It exists because critic should review a **submitted candidate**, not raw chronological process. The worker submission is the review packet; no separate review-packet surface is needed.
+
+Node-scoped transactions live at:
+
+```text
+research/{node path}/_reviews/{slug}/
+  worker.md
+  critic.md
+  repair.md            # optional, at most one worker repair
+  critic_rereview.md   # optional, at most one critic re-review
+```
+
+Source-reading transactions that are not node-scoped live at `literature/_reviews/{id}/` with the same file names.
+
+### Identity
+
+- `worker.md` is the worker's bounded candidate: the claim, derivation, computation, source extraction, scope, evidence, and intended destination that critic should review.
+- `critic.md` is the verifier's separate judgment on `worker.md`.
+- `repair.md` is the worker's one allowed repair when the orchestrator decides that a `REVISE-BLOCKING` or `OPAQUE` verdict is cheap and worth retrying.
+- `critic_rereview.md` is critic's final judgment on the repair.
+- `.logs/` remains raw process trace and audit fallback. A transaction may point to a raw log path in front matter, but ordinary review should not require opening it.
+
+### Worker submission shape
+
+Every review-eligible worker writes `worker.md` with a review contract:
+
+```markdown
+---
+transaction_kind: worker-submission
+intended_destination: state | findings | _materials/analyses | dead_ends | checks | source_record | none
+review_focus: "{the claim, derivation, computation, extraction, or construction critic should check}"
+scope: "{claimed scope}"
+evidence: [proof | mechanical | numerical | literature]
+raw_log: ".logs/{...}.md"
+---
+
+# Worker submission — {slug}
+
+{Bounded candidate prose. It should be sufficient for critic to judge the submitted claim without reading raw process chronology. Include links to source records, scripts, data, figures, or literature files when those are part of the evidence.}
+```
+
+The worker still writes a short raw process log under `.logs/` for audit and human workflow inspection. That raw log is not the critic target by default.
+
+### Critic verdicts and loop budget
+
+Critic uses these verdicts for provisional transactions:
+
+- `ACCEPT` — curator may decide whether and where to absorb the admitted content.
+- `REJECT` — the submitted claim should not enter durable memory.
+- `REVISE-NONBLOCKING` — the submission has issues, but curator may still absorb a narrowed state.md entry, a lower-confidence note, or a limited lesson without worker repair.
+- `REVISE-BLOCKING` — the submitted claim cannot be absorbed as intended until the worker repairs the candidate.
+- `OPAQUE` — the submission failed as a review packet; critic cannot identify what to judge or what evidence supports it.
+
+The orchestrator may run at most one repair loop:
+
+```text
+worker.md -> critic.md -> optional repair.md -> critic_rereview.md -> stop
+```
+
+If the second critic judgment is still blocking or opaque, stop the worker-critic loop and pass the blocked transaction to curator/research planner. Do not let local repair churn consume the research cycle.
+
+### Context-loading rule
+
+Ordinary direction-setting and tree navigation do not read `_reviews/`. Curator reads transactions listed by the scheduler, transactions named in Tree Directives, and recent transactions needed for session-end coherence. Research planner reads only curator's absorbed summaries and flags unless a blocked transaction is explicitly handed back for direction judgment. Critic reads `worker.md` or `repair.md` as the target, plus only the context allowed by its mode.
+
+Raw `.logs/` are opened from a review transaction only when the submission is opaque, the provenance contract appears inconsistent, the scheduler explicitly requests audit mode, or curator needs audit fallback to understand a blocked transaction. Durable prose must still absorb the substance and never link to `.logs/`.
 
 ## conventions.md — Notation and Convention Ledger
 
 `conventions.md` is the tree's ledger for choices that determine how symbols, formulas, and technical phrases are read. It is distinct from `concepts/`: a concept note defines what an object is; a convention entry fixes how this project denotes, orders, or normalizes that object. For example, "Grassmann variable" belongs in `concepts/`; "the site integration measure is ordered as ..." belongs in `conventions.md`.
 
-**Why this file exists.** Notational drift is not a local typo. A sign convention, Fourier convention, tensor-leg order, or symbol reservation can silently change the meaning of claims across siblings. Keeping these choices in ordinary prose inside one note.md makes them invisible to the next branch; scattering them across logs makes the reader reconstruct the project's language archaeologically. A convention ledger gives curator one place to reconcile the tree's symbolic language before the inconsistency reaches note.md or the manuscript.
+**Why this file exists.** Notational drift is not a local typo. A sign convention, Fourier convention, tensor-leg order, or symbol reservation can silently change the meaning of claims across siblings. Keeping these choices in ordinary prose inside one findings.md makes them invisible to the next branch; scattering them across logs makes the reader reconstruct the project's language archaeologically. A convention ledger gives curator one place to reconcile the tree's symbolic language before the inconsistency reaches findings.md or the manuscript.
 
 **Placement and scope.**
 - Root `research/conventions.md` carries project-wide conventions and symbol reservations.
@@ -142,7 +292,7 @@ Agents that are not simulator, researcher, or engine-builder treat all of `src/`
 
 **What does not belong here.**
 - General definitions of technical concepts — put those in `concepts/` and link them.
-- Derivations proving a claim — put those in note.md or a promoted report; the convention ledger may link to the derivation.
+- Derivations proving a claim — put those in findings.md or a clean analysis draft; the convention ledger may link to the derivation.
 - Process history or "we changed this on date X" narrative — put the evidence trail in state.md if needed. The ledger states the current convention.
 
 **Entry shape.** Free-form prose is allowed, but each entry must make these four facts recoverable:
@@ -152,22 +302,22 @@ Agents that are not simulator, researcher, or engine-builder treat all of `src/`
 Scope: {project-wide | research/{subtree}/ | specific linked claims}
 Convention: {the actual notation / order / sign / normalization rule}
 Reason: {why this choice is used, or which external convention it matches}
-Consequences: {symbols reserved, formulas affected, links to note.md / reports/*.md / checks/*.md that rely on it}
+Consequences: {symbols reserved, formulas affected, links to findings.md / _materials/analyses/*.md / checks/*.md that rely on it}
 ```
 
 The reason is load-bearing: without it, later agents treat the entry as arbitrary dogma and may "simplify" it away. Consequences are also load-bearing: they define the impact surface for a future convention change.
 
-**Maintenance rule.** When curator promotes or rewrites a note.md/report claim that introduces, depends on, or changes a convention, curator must update the nearest applicable `conventions.md` in the same dispatch, then scan affected ancestor/sibling note.md files for inconsistent usage. If the convention is still provisional, state the scope honestly and do not let note.md use it as if project-wide. If two live conventions conflict, curator does not silently choose: keep the narrower convention scoped, add a compatibility note if possible, and flag the conflict to research planner when scientific judgment is needed.
+**Maintenance rule.** When curator preserves or rewrites a findings.md/analysis claim that introduces, depends on, or changes a convention, curator must update the nearest applicable `conventions.md` in the same dispatch, then scan affected ancestor/sibling findings.md files for inconsistent usage. If the convention is still provisional, state the scope honestly and do not let findings.md use it as if project-wide. If two live conventions conflict, curator does not silently choose: keep the narrower convention scoped, add a compatibility note if possible, and flag the conflict to research planner when scientific judgment is needed.
 
 ## concepts/ — Reusable Reader Bridges
 
 `concepts/` contains reusable explanations for terms that recur across nodes or would otherwise force repeated local definitions. A concept note is a reader bridge, not a project-fact authority and not a convention ledger. It should help a neighbouring-field researcher understand vocabulary; it must not smuggle in unaccepted project claims, workflow state, or provisional constructions.
 
-**Creation bias.** When a reusable undefined term is discovered, prefer creating a small concept note immediately rather than waiting for a later tree crawl. The later crawl still exists as hygiene, but relying on it as the primary trigger lets jargon accumulate in note.md before anyone notices.
+**Creation bias.** When a reusable undefined term is discovered, prefer creating a small concept note immediately rather than waiting for a later tree crawl. The later crawl still exists as hygiene, but relying on it as the primary trigger lets jargon accumulate in findings.md before anyone notices.
 
-**Pollution control.** A concept note is dangerous when it becomes vague shared doctrine. Keep it narrow: define the term, state the scope, name standard variants if relevant, and point to durable non-dot notes/reports only when needed. Do not place project-specific sign conventions in concepts; use `conventions.md`. Do not place project claims or evidence summaries in concepts; use note.md, reports/*.md, checks/, or state.md according to their identities.
+**Pollution control.** A concept note is dangerous when it becomes vague shared doctrine. Keep it narrow: define the term, state the scope, name standard variants if relevant, and point to durable non-dot notes or `_materials/analyses/` only when needed. Do not place project-specific sign conventions in concepts; use `conventions.md`. Do not place project claims or evidence summaries in concepts; use findings.md, `_materials/analyses/*.md`, checks/, or state.md according to their identities.
 
-**Reading rule.** note.md may link to concepts for reusable explanation, but note.md must remain understandable at the level of its principal claim, scope, derivation skeleton, and limitation without requiring the concept file to carry hidden project substance.
+**Reading rule.** findings.md may link to concepts for reusable explanation, but findings.md must remain understandable at the level of its principal claim, scope, derivation skeleton, and limitation without requiring the concept file to carry hidden project substance.
 
 ## Epistemic Boundaries — Prose-First Discipline
 
@@ -175,134 +325,157 @@ Research drift often begins before verification: prose quietly stops distinguish
 
 **Principal claim unit.** A principal claim is any statement that later work could rely on: a mathematical result, a source reading, a convention, a compatibility bridge, a scope restriction, a negative result, a diagnostic-to-object distinction, or a stable interpretation. Expository restatements, local derivation steps, and reader-guidance sentences are not principal claims unless deleting them would change what future work is allowed to assume.
 
-**Boundary types are meanings, not output labels.** Agents may reason about these distinctions internally, but ordinary claim prose should express them in natural language rather than emitting schema headings such as `Role:`, `Status:`, `Scope:`, or claim IDs. Good prose says "the cited equation is being read in the source's own convention" or "this projector is only a project-side diagnostic here"; it does not turn the research note into a registry. This restriction targets ordinary prose surfaces such as note.md, reports/*.md, state.md, story.md, and user-facing summaries. Explicit ledger/metadata surfaces such as `conventions.md` and `checks/*.md` may use their required fields because their identity is to record scoped convention or verification metadata. Machine-readable state may exist in tooling later, but the LLM-facing and user-facing claim surface remains prose.
+**Boundary types are meanings, not output labels.** Agents may reason about these distinctions internally, but ordinary claim prose should express them in natural language rather than emitting schema headings such as `Role:`, `Status:`, `Scope:`, or claim IDs. Good prose says "the cited paper's Eq. (n) is being read on its own source convention" or "the projector is only a project-side diagnostic here"; it does not turn the research note into a registry. This restriction targets ordinary prose surfaces such as findings.md, _materials/analyses/*.md, state.md, story.md, and user-facing summaries. Explicit ledger/metadata surfaces such as `conventions.md` and `checks/*.md` may use their required fields because their identity is to record scoped convention or verification metadata. Machine-readable state may exist in tooling later, but the LLM-facing and user-facing claim surface remains prose.
 
 **Where the boundary is carried.**
 - Reader extracts what is written in the source and does not translate it into project convention unless the paper itself gives the translation.
 - Researcher states, in ordinary prose, which parts of an argument are source readings, project constructions, compatibility bridges, internal diagnostics, or unresolved discrepancies.
 - Critic checks whether a claim changed category while being summarized or lifted: source statements gaining project interpretation, diagnostics becoming target objects, bridge claims missing the explicit map, or restricted results being phrased as unconditional.
-- Curator adopts only the principal claims that survive review, writes them as prose in state.md / note.md / reports/*.md, and records notation-changing bridges or conventions in `conventions.md`.
+- Curator adopts only the principal claims that survive review, writes them as prose in state.md / findings.md / _materials/analyses/*.md, and records notation-changing bridges or conventions in `conventions.md`.
 - Research planner specifies the intended work mode when dispatching tasks if a confusion is likely: source-native reading, project-side construction, bridge construction, diagnostic audit, or discrepancy resolution.
 
 This is deliberately prose-first. The framework does not require line-by-line claim tagging, and it does not introduce hidden IDs into normal agent context. It requires enough explicit wording that the next agent does not have to infer whether two formulas are being identified, compared through a map, or merely placed side by side.
 
 ## Link Governance and `.logs/`
 
-`.logs/` is the raw chronological audit archive: worker/session intermediate outputs, failed attempts, provisional critic reviews, and workflow traces. It is used for deep research archaeology, contamination-source tracing, prompt/process improvement, and reconstructing how a durable statement was produced when normal tree context is insufficient.
-
-Worker deliverables and critic reviews are separate artifacts. A worker deliverable is the candidate artifact as submitted: it may contain mistakes, overclaims, dead ends, and working-note prose. A Provisional Artifact Review is a separate `.logs/` critic artifact that evaluates which candidate claims, if any, are admissible to which destination surface. Do not edit the worker deliverable inline to add the critic's judgment. Mixing the producer's claim and the verifier's predicate in one file makes later promotion ambiguous: curator must be able to tell what was claimed, what was reviewed, and what surface contract failed.
+`.logs/` is the raw chronological audit archive: worker/session intermediate outputs, failed attempts, annotated critiques, and workflow traces. It is used for deep research archaeology, contamination-source tracing, prompt/process improvement, and reconstructing how a durable statement was produced when normal tree context is insufficient.
 
 It is **not** part of normal research-tree reading and is **not** a durable citation target. Durable research prose must absorb the necessary content instead of linking to raw logs. This keeps the tree closed as a shared context surface and prevents raw intermediate wording from being reread as durable authority.
 
-**Hard rule:** no durable Markdown surface described here links to `.logs/` or other dot surfaces. This includes manuscript prose, paper-draft prose, concept notes, root-level durable files, and node-local variants such as `draft/**/*.md`, `research/**/note.md`, `research/**/state.md`, `research/**/plan.md`, `research/**/backlog.md`, `research/**/reports/*.md`, `research/**/checks/*.md`, `research/**/conventions.md`, `research/**/story.md`, `research/**/principles.md`, `research/**/dead_ends.md`, `research/**/asides.md`, and `concepts/**/*.md`.
+**Hard rule:** durable research and manuscript prose must not link to `.logs/` as evidence or provenance. This includes manuscript prose, paper-draft prose, concept notes, root-level durable files, and node-local variants such as `draft/**/*.md`, `research/**/findings.md`, `research/**/state.md`, `research/**/plan.md`, `research/**/backlog.md`, `research/**/_materials/analyses/*.md`, `research/**/checks/*.md`, `research/**/conventions.md`, `research/**/story.md`, `research/**/principles.md`, `research/**/dead_ends.md`, `research/**/asides.md`, and `concepts/**/*.md`. Hidden workflow/config surfaces such as the runtime instruction directory, `.templates/`, and `.scripts/` are likewise not research evidence; reference them only from framework documentation, prompts, or workflow-improvement notes, not as support for research claims.
 
 Agents may read `.logs/` only when the workflow explicitly asks for audit, archaeology, contamination tracing, or when a maintenance agent is absorbing raw outputs into durable surfaces. After absorption, the durable file states the relevant content in its own prose.
 
-## note.md — Draft Fact Layer
+## findings.md — Draft Fact Layer
 
-**What note.md is.** `note.md` is the node's draft fact surface: established claims, definitions, derivations or derivation skeletons, scope, limitations, and source/project boundaries written as reusable research prose. It is agent-maintained and can update faster than the manuscript, but it is not the human-authorized final authority. `manuscript/` is the paper-quality highest-authority layer.
+**What findings.md is.** `findings.md` is the node's draft fact surface: established claims, definitions, derivations or derivation skeletons, scope, limitations, and source/project boundaries written as reusable research prose. It is agent-maintained and can update faster than the manuscript, but it is not the human-authorized final authority. `manuscript/` is the paper-quality highest-authority layer.
 
-**What note.md is not.** It is not current research state, not a chronological log, not a plan, not a backlog, not a report index, and not a stamp registry. A reader should not need `state.md`, `plan.md`, `backlog.md`, `.logs/`, or session memory to know what fact is being stated and why the node currently treats it as established or limited.
+**What findings.md is not.** It is not current research state, not a chronological log, not a plan, not a backlog, not a draft index, and not a stamp registry. A reader should not need `state.md`, `plan.md`, `backlog.md`, `.logs/`, or session memory to know what fact is being stated and why the node currently treats it as established or limited.
 
-**Draft fact means derivation-bearing.** A reader who accepts a claim in note.md must be able to check *why* within note.md itself or through a durable non-dot link whose target is also self-contained for its role. Provenance references are Markdown links to node-local `checks/*.md` records whose front matter summarizes confidence, evidence channels, review channels, and scope; they are **not** a substitute for the derivation. A CONFIRMED claim accompanied only by a linked record gives the reader a stamp and nothing to check. The dividing line between note.md as a fact layer and note.md as an index is exactly this: derivations live in the note, not in `.logs/` or behind metadata.
+**Draft fact means derivation-bearing.** A reader who accepts a claim in findings.md must be able to check *why* within findings.md itself or through a durable non-dot link whose target is also self-contained for its role. Provenance references are Markdown links to node-local `checks/*.md` records whose front matter summarizes confidence, evidence channels, review channels, and scope; they are **not** a substitute for the derivation. A high-confidence claim accompanied only by a linked record gives the reader metadata and nothing to check. The dividing line between findings.md as a fact layer and findings.md as an index is exactly this: derivations live in findings.md, not in `.logs/` or behind metadata.
 
 **Scope of "derivation".** What counts satisfies one of:
-- *Inline derivation* — a proof sketch, symbolic / numerical computation with its setup and conclusion, or worked-out argument. Full textbook detail is not required; what is required is that a reader in a neighbouring field can follow the logical chain from premises to conclusion without leaving note.md (modulo Markdown links to concept notes or sibling nodes that supply definitions, referenced lemmas, or derivations covered at another node).
-- *Cited external result* — when the claim is a result from external literature used as a premise, cite the source (with section / theorem number where reasonable) in the note itself. The citation *is* the derivation pointer, and the linked provenance record will include `evidence: [literature]`. This route is acceptable for results the project *uses*; it is **not** acceptable for project-central claims (those this project is staking as its own contribution) — project-central claims must carry an inline derivation.
+- *Inline derivation* — a proof sketch, symbolic / numerical computation with its setup and conclusion, or worked-out argument. Full textbook detail is not required; what is required is that a reader in a neighbouring field can follow the logical chain from premises to conclusion without leaving findings.md (modulo Markdown links to concept notes or sibling nodes that supply definitions, referenced lemmas, or derivations covered at another node).
+- *Cited external result* — when the claim is a result from external literature used as a premise, cite the source (with section / theorem number where reasonable) in findings.md itself. The citation *is* the derivation pointer, and the linked provenance record will include `evidence: [literature]`. This route is acceptable for results the project *uses*; it is **not** acceptable for project-central claims (those this project is staking as its own contribution) — project-central claims must carry an inline derivation.
 
-**All confidence levels carry derivation, not only CONFIRMED.** STRONG CONJECTURE, CONJECTURE, and OPEN claims that appear in note.md carry the partial argument, special-case verification, or motivating evidence that *is* available — with explicit scope — rather than being stated as bare tagged sentences. An OPEN claim appears in note.md only when its formulation is itself established knowledge (i.e., the node knows *what* the question is and *why* it is the right question); the answer being unknown is stated, but the framing is substance.
+**All confidence levels carry derivation.** Claims that appear in findings.md carry the argument, special-case verification, motivating evidence, or established problem formulation that *is* available — with explicit scope — rather than being stated as bare status sentences. An unresolved claim appears in findings.md only when its formulation is itself established knowledge (i.e., the node knows *what* the question is and *why* it is the right question); the answer being unknown is stated, but the framing is substance.
 
-**Audience — the context-free fact reader.** note.md is written for a reader who knows nothing about the research process: no memory of attempts, critic verdicts, revision rounds, session history, `state.md`, `plan.md`, `backlog.md`, or `.logs/`; no prior exposure to this project's internal vocabulary. The reader is presumed to be a working researcher in a neighbouring field, so standard terminology of that field can be used — but project-specific labels, internal diagnostics, and local jargon need a local bridge before use. A concept link is allowed as a reusable explainer, but note.md must still make the claim, scope, derivation skeleton, and limitations understandable without making the concept file the hidden authority.
+**Audience — the context-free fact reader.** findings.md is written for a reader who knows nothing about the research process: no memory of attempts, critic verdicts, revision rounds, session history, `state.md`, `plan.md`, `backlog.md`, or `.logs/`; no prior exposure to this project's internal vocabulary. The reader is presumed to be a working researcher in a neighbouring field, so standard terminology of that field can be used — but project-specific labels, internal diagnostics, and local jargon need a local bridge before use. A concept link is allowed as a reusable explainer, but findings.md must still make the claim, scope, derivation skeleton, and limitations understandable without making the concept file the hidden authority.
 
 This audience, combined with the derivation-bearing requirement, is the file's strongest constraint. The prose must read cleanly **in isolation** — not merely "in principle understandable given enough context."
 
-**Fact-layer test (run after any substantive edit).** Ask: *can a future agent safely use this node's established facts without reading process state or raw logs?* If the only way to reconstruct the derivation, scope, or limitation of a claim is by reading `state.md` or `.logs/`, the note is still an index, not a fact surface. The correct response is to either (i) lift the derivation or derivation skeleton into note.md, (ii) replace the bare claim with an honest lower-confidence formulation together with the partial argument that is available, or (iii) remove the claim from note.md pending more work.
+**Fact-layer test (run after any substantive edit).** Ask: *can a future agent safely use this node's established facts without reading process state or raw logs?* If the only way to reconstruct the derivation, scope, or limitation of a claim is by reading `state.md` or `.logs/`, findings.md is still an index, not a fact surface. The correct response is to either (i) lift the derivation or derivation skeleton into findings.md, (ii) replace the bare claim with an honest lower-confidence formulation together with the partial argument that is available, or (iii) remove the claim from findings.md pending more work.
 
 **No template.** The content and structure emerge from the research itself. A node studying a mathematical structure will naturally differ from one resolving a paradox or surveying a field. Prescribed sections constrain the researcher's thinking — the prose should take whatever form best captures the established knowledge together with its derivation.
 
-**Content rules (enforced on every curator dispatch):**
+**Content rules (enforced on every findings.md / fact-maintenance dispatch):**
 
 1. *No frontmatter* — fact files are clean prose.
 2. *Derivation or citation for every principal claim* — per "Scope of derivation" above. A claim stated with a provenance reference but without an inline derivation or a cited source is incomplete and must be completed or demoted before the dispatch closes.
 3. *Provenance link alongside every principal claim* — per the Verification Provenance Records section below. The link points to the `checks/*.md` record that summarises the verification chain in front matter and explains it in prose; it does not replace the derivation required by rule 2 and never points to `.logs/`.
-4. *No chronology, no process-status phrasing.* The rule excludes **session history** from note.md, not **substance**. A proof, a symbolic computation with its setup and conclusion, or a worked-out argument is the content of a claim; rule 2 requires it to be there. What rule 4 rules out is the state of the investigation — dated status blocks (`Status update YYYY-MM-DD`, `Progress 2026-…`), Current-State / Evidence sections copied from state.md, cycle references (`r2`, `r3 stage`, `latest cycle`), review-state markers (`critic pending`, `REVISE minor`, `awaiting resubmission`), and workflow words (`resubmission`, `previous attempt`). These decay on the next cycle; the confidence information they try to convey is exactly what the linked provenance record encodes. Write the derivation in timeless prose and let the link carry the reader to verification metadata. Conflating substance with session history — treating a derivation as a "process artifact" and stripping it — produces the failure mode this whole section is written to prevent.
+4. *No chronology, no process-status phrasing.* The rule excludes **session history** from findings.md, not **substance**. A proof, a symbolic computation with its setup and conclusion, or a worked-out argument is the content of a claim; rule 2 requires it to be there. What rule 4 rules out is the state of the investigation — dated status blocks (`Status update YYYY-MM-DD`, `Progress 2026-…`), Current-State / Evidence sections copied from state.md, cycle references (`r2`, `r3 stage`, `latest cycle`), review-state markers (`critic pending`, `REVISE minor`, `awaiting resubmission`), and workflow words (`resubmission`, `previous attempt`). These decay on the next cycle; the confidence information they try to convey is exactly what the linked provenance record encodes. Write the derivation in timeless prose and let the link carry the reader to verification metadata. Conflating substance with session history — treating a derivation as a "process artifact" and stripping it — produces the failure mode this whole section is written to prevent.
 5. *No undefined project-internal labels* — ad-hoc identifiers that index items in a working list but have no stable definition elsewhere (e.g., open-question IDs, informal candidate/hypothesis tags, attempt slugs, cycle references) may appear only if they are either (a) introduced with a one-sentence explanation where first used, or (b) replaced by a self-contained description. Preferably just describe the thing in plain prose. A reader should never have to grep the repo to learn what an internal label means.
 6. *Every non-common technical term is gated* — for each term that a reader in a neighbouring field would not immediately recognise, use one of two gates:
-   - *Markdown link*: `[display text](relative/path.md)` or `[display text](<relative/path with spaces.md>)` pointing to a concept note in `concepts/` or a sibling/ancestor node's note.md. Link targets are relative to the file containing the link. Follow the link to verify it resolves.
+   - *Markdown link*: `[display text](relative/path.md)` or `[display text](<relative/path with spaces.md>)` pointing to a concept note in `concepts/` or a sibling/ancestor node's findings.md. Link targets are relative to the file containing the link. Follow the link to verify it resolves.
    - *Inline definition*: one sentence introducing the term before it is used.
    
    When in doubt, define locally first. Create a concept note in `concepts/` when the term is reusable across nodes or its explanation would otherwise be repeated; concept notes are reader bridges, not authority for project facts.
-7. *Every load-bearing convention is either stated or linked* — if a claim depends on a nonstandard notation, sign, order, normalization, or symbol reservation, note.md must either state the convention before use or link to the applicable `conventions.md` entry. Do not rely on a convention being "known from earlier attempts" or buried in state.md. This rule is the convention analogue of rule 6: technical terms need definitions; symbolic choices need convention anchors.
+7. *Every load-bearing convention is either stated or linked* — if a claim depends on a nonstandard notation, sign, order, normalization, or symbol reservation, findings.md must either state the convention before use or link to the applicable `conventions.md` entry. Do not rely on a convention being "known from earlier attempts" or buried in state.md. This rule is the convention analogue of rule 6: technical terms need definitions; symbolic choices need convention anchors.
 
 *How rules 5 and 6 divide the work*: rule 5 targets *labels* (no stable definition exists to link to, so the cleanest fix is to describe the thing in prose); rule 6 targets *technical vocabulary* (a stable definition exists or should exist, so the cleanest fix is to link to a concept note).
 
-**Root note.md** captures the project's overall draft fact layer — the core claims, their derivations (or citations), scope, limitations, and how they connect. It may be newer or rougher than `manuscript/`, but when the two conflict `manuscript/` wins.
+**Root findings.md** captures the project's overall draft fact layer — the core claims, their derivations (or citations), scope, limitations, and how they connect. It may be newer or rougher than `manuscript/`, but when the two conflict `manuscript/` wins.
 
-**Child note.md** captures what that specific investigation established, with derivations.
+**Child findings.md** captures what that specific investigation established, with derivations.
 
-**When to create**: when a node has derivation-bearing or partially derivation-bearing facts worth reusing as facts. Leaf nodes doing pure computation may remain state/report/check-only until a reusable fact emerges.
+**When to create**: when a node has derivation-bearing or partially derivation-bearing facts worth reusing as facts. Leaf nodes doing pure computation may remain state/draft/check-only until a reusable fact emerges.
 
-**Authorship and authority.** Authorship, write authority, promotion authority, verification authority, and graph authority are separate axes. `note.md` authorship may be carried by a dedicated synthesis role or by a curator-like maintenance role in a given runtime, but it is never ordinary worker-local authorship and never graph authority. The author of a note edit must act as a second reader: lift only reviewed or honestly scoped material, preserve source/project boundaries, and make the prose self-contained.
+**Authorship and authority.** Authorship, write authority, promotion authority, verification authority, and graph authority are separate axes. `findings.md` authorship may be carried by a dedicated synthesis role or by a curator-like maintenance role in a given runtime, but it is never ordinary worker-local authorship and never graph authority. The author of a findings.md edit must act as a second reader: lift only reviewed or honestly scoped material, preserve source/project boundaries, and make the prose self-contained.
 
-Research planner never writes note.md directly; its directives live in `research/focus.md § Tree Directives`. Workers may propose facts or structural pressure in their deliverables, but they do not promote claims into note.md by themselves. Curator or the runtime's fact-maintenance role closes the transaction: decides placement, ensures checks exist, applies audits, and flags scientific ambiguity upward.
+Research planner never writes findings.md directly; its directives live in `research/focus.md § Tree Directives`. Workers may propose facts or structural pressure in their submissions, but they do not promote claims into findings.md by themselves. Curator or the runtime's fact-maintenance role closes the transaction: decides placement, ensures checks exist, applies audits, and flags scientific ambiguity upward.
 
 Two narrow exceptions to the normal fact-maintenance path:
 
 1. **Trivial mechanical fixes.** Typo corrections, fixing a broken Markdown link, renaming a term after a concept note is renamed. The rule of thumb: if the replacement is uniquely determined — any competent reader would produce the same correction, with no judgment about phrasing or structure — the edit is mechanical. If there is any judgment about wording, ordering, or what claim to state, it is not mechanical and must go through curator
-2. **User-present collaborative rewrites (`/meeting`, `/launch`).** When the user is actively collaborating — during a meeting discussion, or during the initial project launch — the main agent and user may rewrite note.md together to reflect synthesis produced in the conversation. The user acts as the second reader in real time.
+2. **User-present collaborative rewrites (`/meeting`, `/launch`).** When the user is actively collaborating — during a meeting discussion, or during the initial project launch — the main agent and user may rewrite findings.md together to reflect synthesis produced in the conversation. The user acts as the second reader in real time.
 
-Anything beyond these two categories — adding a section, rewording a claim, updating a provenance link, restructuring prose, inserting a "status update" block — goes through the fact-maintenance transaction. The Durable Surface Review exception is only for separate `checks/` review files, never for note.md prose. A note.md edit written by another channel is legitimate input to the tree, but the next maintenance pass should rewrite it if needed to restore fact-layer quality.
+Anything beyond these two categories — adding a section, rewording a claim, updating a provenance link, restructuring prose, inserting a "status update" block — goes through the fact-maintenance transaction. The critic Durable Surface Review exception is only for separate `checks/` review files, never for findings.md prose. A findings.md edit written by another channel is legitimate input to the tree, but the next maintenance pass should rewrite it if needed to restore fact-layer quality.
 
-This rule has a failure mode to watch for: note.md drifting into a log-like chronicle with time-stamped "Status update YYYY-MM-DD" sections stacked on top of each other. That shape is the footprint of non-curator appending and signals that curator dispatches have been skipped; the next curator run should consolidate such stacks into a single, present-tense statement of the node's established knowledge.
+This rule has a failure mode to watch for: findings.md drifting into a log-like chronicle with time-stamped "Status update YYYY-MM-DD" sections stacked on top of each other. That shape is the footprint of non-curator appending and signals that curator dispatches have been skipped; the next curator run should consolidate such stacks into a single, present-tense statement of the node's established knowledge.
 
-### Durable Surface Review on note.md and reports
+### Critic layering on findings.md
 
-The derivations written into note.md and the principal analyses promoted into reports are durable research-tree surfaces. They must pass independent scrutiny **as they appear on that surface**, not merely inherit the scrutiny of an upstream raw attempt. Fact-layer synthesis and report promotion can introduce new failure modes that the provisional artifact critic never saw — simplifications that glossed a gap, notational drift, a step that was obvious to the researcher being compressed past legibility, a composed argument spanning several attempts whose joint soundness was never checked, or provenance metadata that no longer matches the promoted prose.
+The derivations written into findings.md are reusable draft facts. They must pass independent scrutiny **as they appear in findings.md**, not merely inherit the scrutiny of an upstream raw attempt. Fact-layer synthesis can introduce new failure modes that the attempt-level critic never saw — simplifications that glossed a gap, notational drift, a step that was obvious to the researcher being compressed past legibility, a composed argument spanning several attempts whose joint soundness was never checked.
 
 The maintenance chain is therefore:
 
 1. Researcher produces a raw attempt in `.logs/` with working-note derivation
-2. Critic performs Provisional Artifact Review on the attempt (blind, source-audit, or contextual)
-3. The fact-maintenance role lifts the derivation into note.md as reusable fact prose, or promotes a bounded analysis into `reports/{slug}.md`, consolidating across attempts as needed
-4. **The maintenance role requests Durable Surface Review** by returning the touched path, scope, and mode to the scheduler. The scheduler dispatches critic from the orchestration root; the maintenance role does not launch critic itself
-5. Critic reviews the note/report surface itself. Mode is contextual by default because the critic needs the surrounding note.md + ancestor chain to judge whether the durable claim, scope, provenance record, and source/project boundary agree. Blind mode may be chosen when the derivation is purely mechanical
-6. The maintenance role applies the critic's findings (fixing the note/report prose, not annotating it in place — durable surfaces are clean prose, so critic writes findings to a separate file under `checks/`)
-7. Over repeated maintenance cycles, this layers multiple critic passes over the same durable claim. That accretion is the mechanism by which durable memory earns its property of surviving many critic eyes
+2. Critic reviews the attempt (blind or contextual) — the first-layer review
+3. The fact-maintenance role lifts the derivation into findings.md as reusable fact prose, consolidating across attempts as needed
+4. **The maintenance role requests scheduler-dispatched Durable Surface Review on the findings.md derivation itself** as a separate pass, targeting the derivations touched in this dispatch. Mode is contextual by default (the critic needs the surrounding findings.md + ancestor chain to judge whether the lifted derivation suffices for its role in the fact layer); blind mode may be chosen when the derivation is purely mechanical. In the current scheduler model, the maintenance pass may return a `Durable Surface Review needed:` block; the scheduler launches critic and then re-dispatches curator to apply the returned review.
+5. The maintenance role applies the critic's findings after the review returns (fixing the findings.md prose, not annotating it in place — findings.md is clean fact prose, so critic writes findings to a separate file under `checks/`)
+6. Over repeated maintenance cycles, this layers multiple critic passes over the same findings.md section. That accretion is the mechanism by which findings.md earns its property of surviving many critic eyes
 
-Each such review is composed into the affected claims' linked provenance records (adding the appropriate review channel to the record's front matter and preserving the critic file in `checks/`). A claim whose **durable-surface** derivation or report analysis has been critic-reviewed links to a record that reflects *this* review layer, distinct from whatever review the upstream attempt already had.
+Each such review is composed into the affected claims' linked provenance records (adding the appropriate review channel to the record's front matter and preserving the critic file in `checks/`). A claim whose **findings.md-level** derivation has been critic-reviewed links to a record that reflects *this* review layer, distinct from whatever review the upstream attempt already had.
 
-This layering is not optional decoration — when note.md carries substantive new derivations or a report carries newly promoted principal analysis (not just prose polish on an already-reviewed derivation), Durable Surface Review is part of closing the promotion transaction. Skipping it reproduces the failure mode the derivation-bearing fact-layer design is meant to prevent.
+This layering is not optional decoration — when a findings.md carries substantive new derivations (not just prose polish on an already-reviewed derivation), a findings.md-level critic pass is part of closing the dispatch. Skipping it reproduces the failure mode the derivation-bearing fact-layer design is meant to prevent.
+
+## guide.md — Human Oversight Entrypoint
+
+`guide.md` is the node's human-facing control surface. It exists because a human meeting should not become exhaustive fact-layer QA. The guide helps the human researcher manage the research: understand the node's purpose, interrogate suspicious verification, ask for missing explanations, and decide whether the direction still serves the project.
+
+**What guide.md is.** A short, maintained orientation to the node or subtree for human oversight. It tells a reader what the node is for, why it matters, what the main findings are at a high level, how to inspect the evidence, what remains doubtful, and what questions are worth bringing to `/meeting` or `/steer`.
+
+**What guide.md is not.** It is not a fact authority, not a substitute for findings.md, not a meeting transcript, not a progress log, and not a second copy of derivations. If a statement would later be reused as a research fact, it belongs in `findings.md` with provenance; if it is current operational state, it belongs in `state.md`; if it is paper narrative, it belongs in `story.md`; if it is verification substance, it belongs in `checks/`.
+
+**Required stance.** The guide is allowed to be explanatory and suspicious. It should help the human ask good oversight questions rather than reassure them. A good guide points to uncertainty, weak links, unreviewed derivations, reliance on external literature, and places where the AI may have overfit a route or hidden a premise.
+
+**Typical content.** No rigid template is required, but a useful guide usually makes these recoverable:
+- The node's role in the project or parent subtree
+- The shortest reading path for a human returning to the topic
+- The main reusable findings, with links to `findings.md` sections rather than copied derivations
+- Verification map: which `checks/*.md` or `_materials/analyses/*.md` support the main findings, and what kind of doubt remains
+- Oversight questions: what the human should challenge, ask to be taught, or redirect next
+
+**Maintenance rule.** Curator updates guide.md when touched findings, checks, analysis materials, state, or structure would otherwise leave the human oversight surface stale. `/meeting` may also update guide.md live when the user asks for a different explanation, records a recurring doubt, or reframes what they need to monitor. Updating guide.md must not be treated as authorization of findings.md; if the meeting exposes a fact-layer defect, route it back to curator/critic as readiness debt.
 
 ### `checks/` — Node-local verification record
 
-`checks/` is the node's durable verification ledger. It exists because `.logs/` is a raw chronological audit archive: useful for reconstructing what happened during an explicit audit, but not a normal citation surface. When a verification result is important enough to justify a provenance reference on note.md or reports/*.md, the inspectable review artifact lives with the node.
+`checks/` is the node's durable verification ledger. It exists because `.logs/` is a raw chronological audit archive: useful for reconstructing what happened during an explicit audit, but not a normal citation surface. When a verification result is important enough to justify a provenance reference on findings.md or an analysis material, the inspectable review record lives with the node.
 
 Typical contents:
-- `critic_note_{slug}_{YYMMDD_HHMM}.md` — Durable Surface Reviews of note.md sections, written as separate files so note.md stays clean fact prose
-- `check_{slug}.md` — curator-written reproducibility summaries for scripts / computations that support a promoted claim, with links to the relevant `src/`, `data/`, or `images/` artifacts and the exact claim checked
+- `critic_findings_{slug}_{YYMMDD_HHMM}.md` — critic Durable Surface Reviews of findings.md sections, written as separate files so findings.md stays clean fact prose
+- `check_{slug}.md` — curator-written reproducibility summaries for scripts / computations that support a promoted claim, with links to the relevant `_materials/src/`, `_materials/data/`, or `_materials/images/` artifacts and the exact claim checked
 
-What belongs here is verification substance, not process chronology. A `checks/` file states the target claim, the method, the result, scope restrictions, and provenance contribution in its own prose. It must not link to `.logs/`, and it must not require the reader to open raw notebooks to know what was checked. Conversely, `checks/` is not a loophole around note.md self-containment: note.md still carries the derivation or cited external result. `checks/` records how that derivation was reviewed or reproduced.
+What belongs here is verification substance, not process chronology. A `checks/` file states the target claim, the method, the result, scope restrictions, and provenance contribution in its own prose. It must not link to `.logs/`, and it must not require the reader to open raw notebooks to know what was checked. Conversely, `checks/` is not a loophole around findings.md self-containment: findings.md still carries the derivation or cited external result. `checks/` records how that derivation was reviewed or reproduced.
 
-**When to create**: when a note.md-level critic pass runs, when a mechanical / numerical check supports a promoted claim, or when a report under `reports/` needs a stable review record.
+**When to create**: when a findings.md-level critic pass runs, when a mechanical / numerical check supports a promoted claim, or when an `_materials/analyses/*.md` analysis needs a stable review record before curator can use it as support.
 
-**Naming**: descriptive, lowercase-ish slugs with the check type first, e.g. `critic_note_surface_dispersion_260430_1430.md`, `check_sign_convention.md`. Timestamp Durable Surface Review critic files so repeated review layers do not overwrite each other.
+**Naming**: descriptive, lowercase-ish slugs with the check type first, e.g. `critic_findings_surface_dispersion_260430_1430.md`, `check_sign_convention.md`. Timestamp Durable Surface Review files so repeated review layers do not overwrite each other.
 
 ## Verification Provenance Records
 
-Claims in note.md carry a **Markdown link** to a node-local `checks/*.md` record so readers can assess **how** each fact was established, **whether it has been independently reviewed**, and **at what scope**. Claims in reports/{slug}.md carry such links once the report is designated as a verified durable artifact or once a report claim is used as support for note.md. A newly worker-authored report may be clean but still unverified; curator/critic close the provenance-link transaction before the report is treated as verified support. The metadata lives in YAML front matter at the top of the linked check file; the note.md/report prose remains ordinary Markdown rather than acquiring a project-specific inline tag syntax.
+Claims in findings.md carry a **Markdown link** to a node-local `checks/*.md` record so readers can assess **how** each fact was established, **whether it has been independently reviewed**, and **at what scope**. Analysis materials may also link to checks when the analysis itself has been reviewed, but the link does not turn the material into node fact authority. A newly worker-authored analysis may be clean but still unverified; curator/critic close the provenance-link transaction before curator cites the analysis as support or distills it into findings.md. The metadata lives in YAML front matter at the top of the linked check file; the findings.md/analysis prose remains ordinary Markdown rather than acquiring a project-specific inline tag syntax.
 
-**Why links plus front matter.** Verification metadata is structured data about a claim, not part of the mathematical sentence itself. YAML front matter is a widely used Markdown convention for document metadata; keeping the axes there makes them machine-readable and keeps note.md clean fact prose. The inline surface should therefore be a normal link such as `[verification](checks/check_projector_identity.md)`, while the target file carries the confidence/evidence/review/scope fields.
+**Why links plus front matter.** Verification metadata is structured data about a claim, not part of the mathematical sentence itself. YAML front matter is a widely used Markdown convention for document metadata; keeping the axes there makes them machine-readable and keeps findings.md clean fact prose. The inline surface should therefore be a normal link such as `[verification](checks/check_projector_identity.md)`, while the target file carries the confidence/evidence/review/scope fields.
 
-**Records accompany, not replace, the derivation.** Every claim linking to a provenance record in note.md must also carry the derivation that supports it (inline or cited — see § note.md — Draft Fact Layer, "Scope of derivation"). The record summarises the verification chain so a reader can decide how much trust to invest; the derivation is what the reader actually checks. A linked claim without an accompanying derivation is the failure mode the whole § note.md — Draft Fact Layer is written to prevent, and no refinement of the record schema repairs it.
+**Records accompany, not replace, the derivation.** Every claim linking to a provenance record in findings.md must also carry the derivation that supports it (inline or cited — see § findings.md — Draft Fact Layer, "Scope of derivation"). The record summarises the verification chain so a reader can decide how much trust to invest; the derivation is what the reader actually checks. A linked claim without an accompanying derivation is the failure mode the whole § findings.md — Draft Fact Layer is written to prevent, and no refinement of the record schema repairs it.
 
-### Front Matter Schema
+### Check Record Kinds and Front Matter
 
-Every `checks/*.md` file that supports a note.md or reports/{slug}.md claim starts with YAML front matter of this shape:
+Every `checks/*.md` file starts with YAML front matter. The required fields depend on the check record kind. A `provenance` record is the metadata endpoint linked from a findings.md or _materials/analyses/{slug}.md claim. A `durable-surface-review` record is critic's review record for a findings.md section or analysis material; it may later be composed into one or more provenance records by curator. Curator-written reproducibility summaries use `record_kind: reproducibility` and include the checked material, method, result, scope, and any claim path they support.
+
+All check bodies explain their front matter in prose: target claim or surface, method, result, scope restrictions, and the critic or curator judgment. Front matter is the index; the body is the inspectable record.
+
+### Provenance Front Matter Schema
+
+Every `checks/*.md` file that supports a findings.md or _materials/analyses/{slug}.md claim uses `record_kind: provenance` and starts with YAML front matter of this shape:
 
 ```yaml
 ---
+record_kind: provenance
 claim: "projector identity"
-claim_path: "../note.md#optional-heading-or-claim-anchor"
+claim_path: "../findings.md#optional-heading-or-claim-anchor"
 confidence: confirmed
 evidence:
   - proof
@@ -318,17 +491,16 @@ Fields:
 
 | Field | Meaning |
 |---|---|
+| `record_kind` | `provenance` for a claim-linked provenance endpoint |
 | `claim` | Short identifier for the claim being certified; enough to disambiguate within the node |
-| `claim_path` | Relative Markdown link target to the note.md/report location whose claim this record supports |
+| `claim_path` | Relative Markdown link target to the findings.md/analysis location whose claim this record supports |
 | `confidence` | One of `confirmed`, `strong-conjecture`, `conjecture`, `open` |
 | `evidence` | First-order evidence channels: `proof`, `mechanical`, `numerical`, `literature`. One or more when multiple derivations agree |
 | `review` | Independent review channels: `critic-blind`, `critic-contextual`. Empty list if no independent review has been accepted |
 | `scope` | `full` when the full declared scope is verified, otherwise a concrete description of the restricted instance |
 | `supports_project_central_claim` | `true` when the project is staking this claim as its own contribution; `false` for external results cited as premises |
 
-The body of the check file then explains the same metadata in prose: target claim, method, result, scope restrictions, and the critic or curator judgment. Front matter is the index; the body is the inspectable record.
-
-**Terminal provenance endpoint.** A `checks/*.md` file is the project-internal endpoint of a provenance link, not a routing page to more project documents. When `note.md` or `reports/*.md` links to a check record, a reader must be able to evaluate the verification judgment from that record itself. The record may mention project artifacts it absorbed, but it must not make the reader open `state.md`, `reports/*.md`, another `checks/*.md`, or `.logs/` to discover the actual evidence, procedure, result, scope, or limitation. If a project-internal artifact matters, absorb the relevant claim, calculation, procedure, result, and limitation into the check body in compact prose.
+**Terminal provenance endpoint.** A `checks/*.md` file is the project-internal endpoint of a provenance link, not a routing page to more project documents. When `findings.md` or `_materials/analyses/*.md` links to a check record, a reader must be able to evaluate the verification judgment from that record itself. The record may mention project artifacts it absorbed, but it must not make the reader open `state.md`, `_materials/analyses/*.md`, another `checks/*.md`, or `.logs/` to discover the actual evidence, procedure, result, scope, or limitation. If a project-internal artifact matters, absorb the relevant claim, calculation, procedure, result, and limitation into the check body in compact prose.
 
 External literature is different because the paper is a first-order source. Literature references are allowed and often required, but a bare paper link or arXiv ID is not enough: the check body must name the section/equation/theorem/page or similarly precise source location and state the specific source claim being used, with a short quotation when wording matters or an accurate summary when it does not. Long quotation is not the goal; the goal is that the reader knows exactly what passage supports what part of the check.
 
@@ -348,7 +520,7 @@ These describe the **evidence chain itself**. A claim may rest on more than one 
 | Value | Meaning |
 |---|---|
 | `proof` | Formal mathematical proof — hand-checked or machine-checked derivation closing the claim at its declared scope |
-| `mechanical` | Symbolic / exact computation (SymPy, SageMath, exact enumeration). Reduces arithmetic/algebra execution error, while still requiring review of setup, assumptions, code, and interpretation |
+| `mechanical` | Symbolic / exact computation (SymPy, SageMath, exact enumeration). Computer output is unaffected by LLM reasoning biases |
 | `numerical` | Finite-tolerance numerical check with stated convergence criteria |
 | `literature` | Established in cited external literature. Being cited as a premise — not yet independently re-derived in this project |
 
@@ -361,23 +533,23 @@ These describe **who checked the evidence**. Independent review **composes with*
 | `critic-blind` | Independent adversarial critique by the critic agent in **blind mode** (no research context loaded). Removes expectation bias. The strongest review tier when the claim is mechanical or self-contained |
 | `critic-contextual` | Critic agent in **contextual mode** (ancestor chain loaded). Used when soundness genuinely depends on the claim's role in the overall narrative — e.g., "does this argument suffice for its intended position in the story?" |
 
-When critic runs its own SymPy/numerical computation during review, that adds first-order evidence too — e.g., `evidence: [mechanical]` plus `review: [critic-blind]`. A standalone review channel with no first-order evidence is rare — it indicates the critic's evidence was purely logical (just a soundness review of the researcher's argument structure) — and per the rules below such a record can attach only to confidence levels at or below `strong-conjecture`.
+When critic runs its own SymPy/numerical computation during review, that adds first-order evidence too — e.g., `evidence: [mechanical]` plus `review: [critic-blind]`. A review channel never means "the evidence exists"; it means an independent agent checked evidence stated elsewhere. If the target contains an actual proof argument, record `evidence: [proof]` and the critic channel that reviewed it. A review-only record with no first-order evidence is allowed only for non-principal orientation or coherence judgments and cannot support confidence above `conjecture`.
 
 ### Scope
 
-By default `scope: full` means the claim is verified over its **full declared scope**. When that is not the case, write a concrete scope description — never leave scope implicit. A vague value such as `scope: special-case` is forbidden because readers cannot otherwise evaluate what was covered.
+`scope` means **verified coverage**, not the intended breadth of the claim. `scope: full` means the evidence verifies the claim over its full declared scope. When verification covers less than the claim says or when the claim is still open, write a concrete restricted coverage such as `smallest parameter instance`, `one concrete example`, or `not yet verified beyond formulation`. A vague value such as `scope: special-case` is forbidden because readers cannot otherwise evaluate what was covered.
 
 ### Rules
 
 - Every `confidence: confirmed` record must carry at least one first-order `evidence` value. Bare confirmation with no first-order evidence is forbidden because readers cannot then evaluate the claim. A `review` value alone does not count as first-order evidence
 - Evidence and review channels compose freely when both apply. Always declare every applicable channel — omitting a true channel understates the verification chain
 - A record whose `scope` is not `full` **cannot** use `confidence: confirmed` — the strongest allowed value is `strong-conjecture`, because full-scope verification is missing by definition
-- `evidence: [literature]` alone (no independent review, no local re-derivation) does not suffice for **project-central claims** — meaning a claim this project is staking out as its own contribution, as opposed to a premise cited from external work. A citation-only record with `confidence: confirmed`, `evidence: [literature]`, and `supports_project_central_claim: false` is fine when the claim is explicitly framed as the external result itself — e.g., "Theorem X of {Author et al.} holds" — and no project contribution is being attested. To reach `confirmed` on a project-central claim, pair `literature` with an independent channel: either a first-order re-derivation (`proof`, `mechanical`, `numerical`) or an independent review (`critic-blind` / `critic-contextual`) that examined the citation's applicability to the specific use being made of it
+- `evidence: [literature]` alone (no local re-derivation) does not suffice for **project-central claims** — meaning a claim this project is staking out as its own contribution, as opposed to a premise cited from external work. A citation-only record with `confidence: confirmed`, `evidence: [literature]`, and `supports_project_central_claim: false` is fine when the claim is explicitly framed as the external result itself — e.g., "Theorem X of {Author et al.} holds" — and no project contribution is being attested. To reach `confirmed` on a project-central claim, findings.md must carry a local derivation or bridge and the record must include a first-order evidence channel (`proof`, `mechanical`, or `numerical` as applicable). Independent review of citation applicability strengthens that bridge, but it does not replace the local derivation requirement
 - If provenance is unclear from the available documents, use the lower confidence value and flag back to research planner rather than guessing
 
 ### Strength Guide (informal)
 
-Strength grows monotonically along two separate axes: (i) stronger or more numerous first-order evidence channels when independent channels agree, and (ii) independent review added on top of that evidence. Among first-order evidence, a full-scope proof is the strongest single channel; mechanical evidence is strong for exactly encoded claims but depends on setup and interpretation; numerical evidence is limited by tolerance and parameter coverage; literature alone is weakest for project-central claims unless applicability has been independently examined. Review channels are a separate axis: `critic-blind` is strongest for self-contained mechanical claims because it removes expectation bias, while `critic-contextual` is appropriate when the claim's role in the research narrative is load-bearing. Review strengthens evidence but does not replace it. Any non-`full` scope weakens the combined record by restricting the verified region.
+Strength grows monotonically along two directions: (i) more first-order evidence channels when independent channels agree, (ii) addition of independent review on top of first-order evidence. Rough ordering of individual contributions — `proof` is the strongest single first-order channel; `mechanical` and `critic-blind` are comparably strong second tiers; `numerical` below those; `literature` alone is weakest as first-order support for project claims. `critic-contextual` adds a soundness check but does not by itself close a mechanical question. Any non-`full` scope weakens the combined record by restricting the verified region.
 
 ### Examples (illustrative shapes)
 
@@ -389,31 +561,52 @@ These are shape-examples showing how the record fields compose; the specific cla
 | A structural lemma derived by hand and independently read by critic with ancestor context loaded | `confidence: confirmed`; `evidence: [proof]`; `review: [critic-contextual]`; `scope: full` |
 | An explicit matrix or closed-form expression checked by the researcher's symbolic script and re-verified by the critic's independent blind symbolic script | `confidence: confirmed`; `evidence: [mechanical]`; `review: [critic-blind]`; `scope: full` |
 | A cited external theorem used as-is, not re-derived here — framed as citing the external result itself, not as a project contribution | `confidence: confirmed`; `evidence: [literature]`; `review: []`; `supports_project_central_claim: false` |
-| A dictionary/identification between an external result and this project's own objects, where critic has reviewed coherence but full re-derivation is pending | `confidence: strong-conjecture`; `evidence: [literature]`; `review: [critic-contextual]`; `scope: full` |
+| A dictionary/identification between an external result and this project's own objects, where critic has reviewed coherence but full re-derivation is pending | `confidence: strong-conjecture`; `evidence: [literature]`; `review: [critic-contextual]`; `scope: "bridge coherence reviewed; full local re-derivation pending"` |
 | A counting/dimension claim established symbolically only on the smallest parameter instance | `confidence: strong-conjecture`; `evidence: [mechanical]`; `review: []`; `scope: "smallest parameter instance"` |
 | A structural separation tested on one small concrete example | `confidence: strong-conjecture`; `evidence: [mechanical]`; `review: []`; `scope: "one concrete example"` |
 | A numerical agreement with prediction on a specific parameter choice, checked by critic in blind mode | `confidence: strong-conjecture`; `evidence: [numerical]`; `review: [critic-blind]`; `scope: "specific parameter choice"` |
-| The same claim extended to the full declared scope, not yet verified | `confidence: open`; `evidence: []`; `review: []`; `scope: full` |
+| The same claim extended to the full declared scope, not yet verified | `confidence: open`; `evidence: []`; `review: []`; `scope: "not yet verified beyond formulation"` |
 
-## reports/{slug}.md — Clean Analysis Artifacts
+## `_materials/analyses/{slug}.md` — Clean Analysis Materials
 
-`reports/{slug}.md` exists because `note.md` and `.logs/` have incompatible identities. Some bounded analyses are too large, figure-heavy, or procedurally detailed to dissolve into `note.md`, but too important to leave only in the raw audit archive. A report is the promoted clean artifact for that case: it preserves one analysis at the node whose scope it serves, with enough self-contained argumentation that a future reader can inspect it without opening `.logs/`.
-
-A report is a closed argument artifact, not the node's integrated fact layer, not a living workspace, and not graph authority. `note.md` may cite or distill report claims after verification, but the report itself remains the bounded analysis rather than becoming the node's current state.
+Self-contained analyses authored by a worker or rewritten from a reviewed worker submission into clean form. An analysis material is a closed material object: it preserves one analysis at the node whose scope it serves so the analysis can be inspected without opening `_reviews/` or `.logs/`. It is not the node's fact layer, not adopted claim authority, not a living workspace, and not graph authority.
 
 **Relationship to other files:**
-- Worker deliverables in `.logs/` are raw candidate artifacts. Reports are clean durable analyses promoted from, or explicitly authored alongside, those records only after the maintenance path can state their review/provenance basis
-- `note.md` is the node's integrated draft fact layer. Reports are individual analyses that note.md may draw from after verification
-- `checks/` stores the stable verification record for reviews and reproducibility checks supporting note.md / reports/*.md claims
-- Not every deliverable becomes a report. Not every node has reports
+- `_reviews/{slug}/worker.md` is the provisional candidate critic reviewed. `_materials/analyses/{slug}.md` is the durable clean material curator preserves after the transaction.
+- `.logs/` is raw audit process. Analysis materials are clean durable analyses produced from reviewed submissions, not copied process chronology.
+- `findings.md` is the node's integrated fact layer. Analysis materials are individual support objects that findings.md may draw from after verification and curator synthesis.
+- `checks/` stores the stable verification record for reviews and reproducibility checks supporting findings.md / _materials/analyses/*.md claims.
+- Not every worker submission becomes an analysis material. Not every node has `_materials/analyses/`.
 
-**When to create**: when a worker deliverable or assigned report-writing task contains a significant bounded analysis worth preserving as a clean artifact, and either (a) the support is too long or coherent to inline into `note.md` without overloading the fact layer, or (b) multiple current or future note claims need the same inspectable analysis as support. If the result can be stated directly as a reusable fact with a short derivation, write `note.md` instead. If the material is only chronology, uncertainty, or a failed attempt, absorb it into `state.md` and leave the raw artifact in `.logs/`.
+**When to create**: create an analysis material only when the analysis is worth preserving as a closed material object, not merely because a worker produced text. Strong signals:
+- The analysis is self-contained and reusable, but too long, computational, figure-heavy, or locally scoped to belong in findings.md.
+- A simulation or construction needs reproducibility details, figures, parameters, or worked examples that future readers may inspect without opening `.logs/`.
+- The result is not yet integrated into findings.md, but it is a meaningful support object that curator/critic can review, cite, limit, or reject.
+- Multiple future tasks would otherwise need to reread the same review transaction or rerun the same setup from logs.
 
-**Admissibility requirement**: because reports live inside the research tree, they are not raw worker outputs. A report's principal claims must have enough review/provenance support for the report's intended use. If the report is meant to support `note.md` or be cited by later work, create or update `checks/*.md` records for the principal claims. If review is still pending or the argument is only provisional, keep the candidate in `.logs/` and record the state in `state.md` instead of placing an accepted-looking report in the tree.
+Do not create an analysis material when the material is only attempt chronology, a scratch derivation with unresolved gaps, a short fact that belongs directly in findings.md/state.md, a tactical TODO for backlog.md, or a living research scope that should become a node.
 
-**Naming**: `reports/{slug}.md` where `{slug}` is a descriptive identifier without a repeated `report_` prefix (e.g., `reports/surface_dispersion.md`, `reports/magnetic_c4t.md`).
+A worker may author the analysis material directly when explicitly assigned, but this is authorship only: the worker does not decide node placement beyond the assigned existing node, fact-layer promotion, status, or whether the material should become a node. Curator does not re-judge the specialist conclusion from scratch; curator manages whether the material has enough review, scope, and provenance to be cited, distilled, limited, or rejected in interpreted memory.
 
-**Report vs subnode.** `reports/{slug}.md` is a closed artifact. `research/{Topic}/` is a living scope: future attempts, state.md, plan.md, checks, conventions, and multiple reports may accumulate there. Avoid `X/report.md` because it makes the node and artifact identities collapse into each other. If a report starts to require follow-up attempts, multiple checks, competing variants, or its own strategy, the graph authority creates or proposes a subnode and places future work there; the original report remains a report.
+**Minimum shape**:
+
+```markdown
+---
+material_kind: analysis
+description: "{one sentence: what analysis this material preserves}"
+scope: "research/{node path}/"
+status: active
+review_state: unreviewed | reviewed | partial
+---
+
+# {Analysis Title}
+
+{Self-contained analysis prose. Include the setup, method, result, limitations, and links to checks or artifacts needed to inspect it. Do not require `.logs/` to understand the claim, method, result, or limitation.}
+```
+
+**Naming**: `_materials/analyses/{slug}.md` where `{slug}` is a descriptive identifier (e.g., `_materials/analyses/surface_dispersion.md`, `_materials/analyses/magnetic_c4t.md`).
+
+**Analysis vs subnode.** `_materials/analyses/{slug}.md` is a closed material object. `research/{Topic}/` is a living scope: future attempts, state.md, plan.md, checks, conventions, and multiple analysis materials may accumulate there. Avoid `X/analysis.md` because it makes the node and material identities collapse into each other. If an analysis starts to require follow-up attempts, multiple checks, competing variants, or its own strategy, the graph authority creates or proposes a subnode and places future work there; the original analysis remains material.
 
 ## plan.md — Decomposition and Planner-Supplied Strategy
 
@@ -433,7 +626,7 @@ structural dependencies, planner-supplied approach decisions, planner-supplied s
 
 ## state.md — Research State
 
-The node's graph-structured research state: current board plus absorbed evidence ledger. It is durable enough for later agents to reconstruct where the node stands, but it is not the fact layer and not a raw chronological log. Every node starts with state.md. plan.md is added when strategic decisions need recording. note.md appears when reusable facts emerge.
+The node's graph-structured research state: current board plus absorbed evidence ledger. It is durable enough for later agents to reconstruct where the node stands, but it is not the fact layer and not a raw chronological log. Every node starts with state.md. plan.md is added when strategic decisions need recording. findings.md appears when reusable facts emerge.
 
 ```markdown
 ---
@@ -442,15 +635,22 @@ status: {status}
 ---
 # {description}
 
+## Background
+{Why this node exists, what parent/project context it isolates, and any stable references needed to understand the current board.}
+
 ## Current Board
 {What is known, what is unknown, active hypotheses, disputed points, blockers, and current status.}
 
 ## Evidence
 - {entry}: {what was attempted or checked, what was absorbed, what confidence/scope changed, and whether critic accepted/revised/rejected it}
 {append-only — never delete evidence entries}
+
+## Revisions
+- {entry}: {retractions, reframes, reparenting notes, scope changes, and other durable changes to the node's interpretation}
+{append-only — never delete revision entries}
 ```
 
-Root state.md additionally carries `last_meeting` in frontmatter and a `## Background` section for key references and prior work.
+Root state.md additionally carries `last_meeting` in frontmatter. Its `## Background` section is project-wide: key references, prior work, and launch-level context.
 
 Evidence entries summarize raw outputs; they do not link to `.logs/`. Raw paths may appear in dispatcher prompts and audit tooling, but authored state.md prose is a graph-structured absorption of what matters, not a citation index into the audit archive.
 
@@ -458,45 +658,50 @@ Evidence entries summarize raw outputs; they do not link to `.logs/`. Raw paths 
 
 ```
 research/
-  note.md              (project-level draft facts)
+  findings.md              (project-level draft facts)
+  guide.md              (human oversight entrypoint)
   plan.md              (root-level strategy and decomposition)
   state.md               (background, working state — ladder)
   focus.md            (session cursor: "work here now")
   story.md             (paper narrative structure)
-  principles.md        (cross-cutting research constraints)
+  principles.md        (research judgment principles)
   conventions.md       (project-wide notation and convention ledger)
   dead_ends.md         (rejected-direction register — outside fact layer)
   asides.md            (parked off-thread items — outside fact layer)
-  lib/                 (shared simulation framework — engine-builder manages)
+  _materials/lib/                 (shared simulation framework — engine-builder manages)
     ClockModel.jl
     XYModel.jl
     test/
   Paradox Resolution/
-    note.md            (derivation-bearing: the paradox stated, and the derivation resolving it)
+    findings.md            (derivation-bearing: the paradox stated, and the derivation resolving it)
+    guide.md            (what to inspect and what remains suspicious)
     plan.md            (approach strategy)
-    state.md             (research process: current state, evidence)
-    reports/
-      symmetry_analysis.md  (curator-promoted verified report on symmetry constraints)
+    state.md             (background, current state, evidence, revisions)
+    _materials/analyses/
+      symmetry_analysis.md  (curator-preserved verified analysis on symmetry constraints)
     checks/
-      critic_note_symmetry_analysis_260430_1430.md
+      critic_findings_symmetry_analysis_260430_1430.md
+    conventions.md       (optional subtree-local notation/convention choices)
+    asides.md            (optional parked off-thread items scoped to this subtree)
   Lattice BKT/
-    note.md            (derivation-bearing knowledge of this direction)
+    findings.md            (derivation-bearing knowledge of this direction)
+    guide.md            (human-facing reading and oversight map)
     plan.md            (children decomposition and strategy)
     state.md             (working state, evidence trail)
-    src/               (scripts relevant to this branch)
+    _materials/src/               (scripts relevant to this branch)
       winding_decay.jl           (simulator's long-lived measurement script)
       winding_decay.md           (companion: algorithm + params + how to run)
       archive/                   (superseded scripts kept for history)
     Coulomb Escape/
-      state.md           (leaf: may only have state.md, no note.md yet)
-      src/             (scripts specific to this leaf)
+      state.md           (leaf: may only have state.md, no findings.md yet)
+      _materials/src/             (scripts specific to this leaf)
         escape_rate.jl           (simulator's measurement)
         escape_rate.md
         check_sign_convention.py (researcher's one-off verification)
         check_sign_convention.md (short blurb; promoted checks live under checks/)
-      data/            (simulation data for this investigation)
-      images/          (figures generated from this data)
-      reports/
+      _materials/data/            (simulation data for this investigation)
+      _materials/images/          (figures generated from this data)
+      _materials/analyses/
         escape_rate.md
       checks/
         check_sign_convention.md
@@ -504,31 +709,38 @@ research/
 
 ## Data Layers Summary
 
-| Layer | Location | Worker access | What it contains |
-|---|---|---|---|
-| **Manuscript** | `manuscript/` | Read-only except human-authorized writing workflows | Highest-authority, fully self-contained, human-authorized paper prose; `manuscript/authorizations/*.md` stores meeting approval snapshots that authorize promotion from note.md |
-| **Paper draft workspace** | `draft/` | Write only through `/write` draft workflows | Paper outline, draft conventions, section drafts, and integrated draft versions. Not human-authorized authority; does not override manuscript or note.md |
-| **Research tree — facts** | `research/**/note.md` | Read-only except fact-maintenance transactions and human-present rewrites | Draft fact layer — established claims + derivation/derivation skeleton + scope + limitations + Markdown provenance link |
-| **Research tree — reports** | `research/**/reports/*.md` | Curator writes/promotes; workers only when explicitly assigned clean-report authorship | Self-contained promoted bounded analyses; closed artifacts, not living nodes |
-| **Research tree — checks** | `research/**/checks/*.md` | Read-only, except curator and critic Durable Surface Review | Node-local verification records with YAML front matter: note.md critic reviews, reproducibility summaries, and check results supporting provenance links |
-| **Research tree — plan** | `research/**/plan.md` | Read-only | Decomposition and planner-supplied strategy: children roles, approach decisions, success criteria |
-| **Research tree — state** | `research/**/state.md` | Read-only | Graph-structured current board and absorbed evidence ledger; kind/status frontmatter |
-| **Research tree — backlog** | `research/**/backlog.md` | Read-only | Optional parked executable reminders; no claims, evidence, or durable strategy |
-| **Convention ledger** | `research/**/conventions.md` | Read-only | Current notation, sign, ordering, normalization, and symbol-reservation choices, scoped to the node/subtree |
-| **Concept explainers** | `concepts/` | Read-only, except concept-maintenance transactions | Reusable reader bridges. Not authority for project facts, claims, or conventions |
-| **Computation — framework** | `research/lib/` | Read-only (engine-builder writes) | Shared simulation modules |
-| **Computation — source** | `research/**/src/` | Write (simulator, researcher; curator archive moves only) | Source code tied to a node: measurement / analysis / plot / verification scripts, each with a companion `{slug}.md` |
-| **Computation — data** | `research/**/data/` | Write (simulator) | Simulation data (TSV with metadata headers) |
-| **Computation — figures** | `research/**/images/` | Write (simulator) | Visualizations |
-| **Retired research memory** | `research/archive/**` | Read only during explicit archaeology; curator writes archive moves | Retired nodes removed from active planning context after reusable value was extracted |
-| **Raw audit archive** | `.logs/*_{type}_*.md` | Write (own deliverables/reviews only) | Worker/session intermediate outputs and Provisional Artifact Reviews for audit, archaeology, contamination tracing, and workflow improvement. Not linked from durable research prose |
-| **Session cursor** | `research/focus.md` | Not relevant to workers | Research planner's current focus position in the tree |
-| **Session context** | `.logs/last_session.md` | Not relevant to workers | Volatile work context for session handoff, written by session-wrap-up |
+| Layer | Location | Worker access | Write authority / exceptions | What it contains |
+|---|---|---|---|---|
+| **Manuscript** | `manuscript/` | No write access in current workflow | Frozen until a future human-authorized manuscript protocol exists | Reserved future highest-authority, fully self-contained, human-authorized paper prose. Current `/auto`, `/steer`, `/meeting`, and `/write` do not create or promote into it |
+| **Paper draft workspace** | `draft/` | No direct write access from research workers | `/write` draft workflows only | Paper outline, draft conventions, section drafts, and integrated draft versions. Not human-authorized authority; does not override manuscript or findings.md |
+| **Research tree — facts** | `research/**/findings.md` | Read-only | Fact-maintenance transactions; user-present `/launch` and `/meeting` collaborative rewrites | Draft fact layer — established claims + derivation/derivation skeleton + scope + limitations + Markdown provenance link |
+| **Research tree — guides** | `research/**/guide.md` | Read-only | Curator maintenance; human-present meeting updates | Human oversight entrypoint; orientation, reading path, verification map, and challenge questions. Not fact authority |
+| **Analysis materials** | `research/**/_materials/analyses/*.md` | Write only when explicitly assigned clean-analysis authorship | Worker assigned by planner, or curator preservation transaction from a reviewed `_reviews/` submission | Self-contained clean analyses; worker-authored or worker-originated; material support, not node fact authority |
+| **Research tree — checks** | `research/**/checks/*.md` | Read-only | Critic Durable Surface Review; curator reproducibility/provenance records | Node-local verification records with YAML front matter: findings.md critic reviews, reproducibility summaries, and check results supporting provenance links |
+| **Research tree — sources** | `research/**/sources.md` | Read-only | Research planner source-map transactions | Node-local map of external source records, intended uses, explicit non-uses, and bridge status |
+| **Research tree — plan** | `research/**/plan.md` | Read-only | Curator graph-consistency maintenance from planner directives and absorbed evidence | Decomposition and planner-supplied strategy: children roles, approach decisions, success criteria |
+| **Research tree — state** | `research/**/state.md` | Read-only | Curator evidence absorption, board rewrite, status/kind frontmatter | Graph-structured current board and absorbed evidence ledger; kind/status frontmatter |
+| **Research tree — backlog** | `research/**/backlog.md` | Propose items in submissions | Curator maintenance | Optional parked executable reminders; no claims, evidence, or durable strategy |
+| **Research story** | `research/**/story.md` | Read-only | `/launch`, `/meeting`, or curator maintenance | Narrative structure and paper-story positioning; not fact proof or verification surface |
+| **Research principles** | `research/**/principles.md` | Read-only | `/launch`, `/meeting`, or curator maintenance | Current reusable research judgment principles; not thesis, strategy, sources, notation, fact prose, or framework workflow rules |
+| **Convention ledger** | `research/**/conventions.md` | Read-only | Curator/fact-maintenance when touched claims introduce or depend on conventions; human-present oversight flows | Current notation, sign, ordering, normalization, and symbol-reservation choices, scoped to the node/subtree |
+| **Rejected directions** | `research/**/dead_ends.md` | Propose lessons in submissions | Curator maintenance | Lessons from rejected or falsified approaches; outside the fact layer |
+| **Parked asides** | `research/**/asides.md` | Propose items in submissions | `/meeting` or curator maintenance | Off-thread items worth not forgetting; outside the fact layer |
+| **Concept explainers** | `concepts/` | Read-only | Concept-maintenance transactions | Reusable reader bridges. Not authority for project facts, claims, or conventions |
+| **Operational artifacts — framework** | `research/_materials/lib/` | Read-only unless assigned engine-builder role | Engine-builder | Shared simulation modules; material, not claim authority |
+| **Operational artifacts — source** | `research/**/_materials/src/` | Write only when assigned simulator/researcher source work | Simulator/researcher for assigned node-local code; curator archive moves only | Source code tied to a node: measurement / analysis / plot / verification scripts, each with a companion `{slug}.md`; material, not claim authority |
+| **Operational artifacts — data** | `research/**/_materials/data/` | Write only when assigned simulator data work | Simulator | Simulation data (TSV with metadata headers); material, not claim authority |
+| **Operational artifacts — figures** | `research/**/_materials/images/` | Write only when assigned simulator figure work | Simulator | Visualizations; material, not claim authority |
+| **Retired research memory** | `research/archive/**` | Read only during explicit archaeology | Curator archive moves | Retired nodes removed from active planning context after reusable value was extracted |
+| **Review transactions** | `research/**/_reviews/{slug}/` and `literature/_reviews/{id}/` | Write only the assigned transaction file | Worker writes `worker.md`/`repair.md`; critic writes `critic.md`/`critic_rereview.md`; curator reads and absorbs | Provisional worker-critic transactions. Not durable authority and not linked from durable research prose |
+| **Raw audit archive** | `.logs/*_{type}_*.md` | Write own raw process logs only | Producing worker/session role; session-wrap-up for session context | Chronological process traces for audit, archaeology, contamination tracing, and workflow improvement. Not critic targets by default and not linked from durable research prose |
+| **Session cursor** | `research/focus.md` | Read-only | Research planner | Research planner's current focus position in the tree |
+| **Session context** | `.logs/last_session.md` | Read-only when provided as startup context | Session-wrap-up | Volatile work context for session handoff |
 
-**Tree navigation**: `ls research/{path}/` to see active children (subfolders). Ignore `research/archive/` during ordinary context loading. Read `note.md` for draft facts, `sources.md` for node-local source maps, `reports/*.md` for clean analyses, `checks/` for node-local verification records, `state.md` for current board and absorbed evidence, `plan.md` for strategy and decomposition, `story.md` for narrative structure, `principles.md` for constraints, and `conventions.md` for notation / convention choices. Read `backlog.md` only when looking for parked executable reminders; do not treat it as a source for claims, evidence, strategy, or state.
+**Tree navigation**: `ls research/{path}/` to see active children (subfolders). Ignore `research/archive/` during ordinary context loading. Read `findings.md` for draft facts, `guide.md` for human oversight orientation, `sources.md` for node-local source maps, `_materials/analyses/*.md` for clean analyses as material support rather than adopted facts, `checks/` for node-local verification records, `state.md` for current board and absorbed evidence, `plan.md` for strategy and decomposition, `story.md` for narrative structure, `principles.md` for reusable research judgment principles, and `conventions.md` for notation / convention choices. Read `backlog.md` only when looking for parked executable reminders; do not treat it as a source for claims, evidence, strategy, or state.
 
-Each node has a `kind` and `status` in its **state.md** frontmatter (not note.md). Node status is set by curator, based on research planner's Tree Directives and evidence accumulated in state.md (see `.codex/agents/curator.md` and `.codex/agents/research-planner.md`).
+Each node has a `kind` and `status` in its **state.md** frontmatter (not findings.md). Node status is set by curator, based on research planner's Tree Directives and evidence accumulated in state.md (see `.codex/agents/curator.md` and `.codex/agents/research-planner.md`).
 
-- Writes to the research tree are split by authority, not just by file path: **research planner** writes only `research/focus.md` (cursor + directives + worker dispatch plan); **curator / graph authority** owns node folders, placement, status, lifecycle, reparenting, node archival, report-to-subnode promotion, state.md absorption, and plan.md graph consistency; **fact-maintenance authority** owns note.md synthesis and provenance-link closure; **critic** may write only Durable Surface Review files under `research/**/checks/`; simulator writes under `data/`, `images/`, and `src/`; engine-builder writes under `lib/`; workers may write `reports/*.md` only when explicitly assigned clean-report authorship in an existing node, and curator still closes placement/review/provenance. If research planner or a worker notices a tactical item worth preserving in `backlog.md`, they propose it; the maintenance path decides whether it belongs there.
-- To propose a status change, describe the rationale in your deliverable file
+- Writes to the research tree are split by authority and transaction, not just by file path. **Research planner** normally writes `research/focus.md` (cursor + directives + worker dispatch plan); in `/auto` direction mode it also has two narrow current-direction exceptions: minimal child-node creation when needed for immediate dispatch, and current-cursor `sources.md` creation/update when external source usage is part of the direction decision. **Curator / graph authority** owns node folders, placement, status, lifecycle, reparenting, node archival, analysis-to-subnode promotion when warranted, state.md absorption, guide.md maintenance, and plan.md graph consistency. **Fact-maintenance authority** owns findings.md synthesis and provenance-link closure; in the current agent set curator carries this transaction role, but the authority is the transaction contract, not a claim that broad-context curator re-evaluates specialist truth from scratch. User-present `/launch` and `/meeting` collaborative rewrites are explicit exceptions when the user is acting as the second reader in real time. **Critic** writes provisional review files only inside the same `_reviews/` transaction and Durable Surface Review files under `research/**/checks/`. Simulator writes operational materials under `_materials/data/`, `_materials/images/`, and `_materials/src/`; engine-builder writes shared operational materials under `_materials/lib/`; workers may write `_materials/analyses/*.md` only when explicitly assigned clean-analysis authorship in an existing node. Those material writes do not authorize fact-layer adoption, graph placement beyond the assigned node, or status changes. If research planner or a worker notices a tactical item worth preserving in `backlog.md`, they propose it; the maintenance path decides whether it belongs there.
+- To propose a status change, describe the rationale in your worker submission
 - Honest reporting is paramount: never propose stable for something that has not been sufficiently verified

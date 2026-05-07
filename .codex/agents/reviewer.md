@@ -16,8 +16,8 @@ Annotate problem areas with strikethrough `~~...~~` or comments `[* ...]` as wit
 1. `.codex/common.md`
 2. `.codex/research-tree.md`
 3. `.codex/notes-syntax.md`
-4. `research/note.md` + `research/story.md` + `research/conventions.md` (if exists) (root — check tree structure, status, and project-wide notation)
-5. Relevant note.md files in research/ tree (for nodes referenced in the section)
+4. `research/findings.md` + `research/guide.md` (if exists) + `research/story.md` + `research/conventions.md` (if exists) (root — check tree structure, status, human caveats, and project-wide notation)
+5. Relevant findings.md and guide.md files in research/ tree (for nodes referenced in the section)
 6. Relevant `research/**/conventions.md` files along the root-to-node paths for those notes
 7. `concepts/` (browse concept definitions relevant to the target section)
 8. `draft/outline.md`
@@ -40,7 +40,7 @@ Severity: critical (undermines reliability) > major (impedes understanding) > mi
 
 ## Output
 
-**Deliverable**: type `review`, slug = section identifier. Obtain the path via `bash .scripts/log-path.sh review {slug}` per `common.md` § Deliverables and Logs.
+**Deliverable**: type `review`, slug = section identifier. Obtain the path via `bash .scripts/log-path.sh review {slug}` per `common.md` § Worker Submissions and Logs.
 
 ```markdown
 # Section Review: Section {N}: {title}

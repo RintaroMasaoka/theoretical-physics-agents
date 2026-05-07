@@ -15,12 +15,13 @@ Draft a single specified section as an academic paper.
 1. `.claude/common.md`
 2. `.claude/research-tree.md`
 3. `.claude/notes-syntax.md`
-4. `research/note.md` + `research/story.md` + `research/conventions.md` (if exists) (root — thesis, narrative structure, project-wide notation. Understand where the section fits)
-5. Relevant note.md files in research/ tree (check kind, status, and context of related nodes)
+4. `research/findings.md` + `research/guide.md` (if exists) + `research/story.md` + `research/conventions.md` (if exists) (root — thesis, human orientation, narrative structure, project-wide notation. Understand where the section fits)
+5. Relevant findings.md and guide.md files in research/ tree (check kind, status, context, and human-facing caveats of related nodes)
 6. Relevant `research/**/conventions.md` files along the root-to-node paths for those notes (project-wide and subtree-local notation)
-7. `concepts/` (browse concept definitions relevant to the assigned section)
-8. `draft/outline.md` (required)
-9. `draft/conventions.md` (required — unified terminology and notation standards)
+7. Material index for the relevant research nodes when `_materials/` exists: run `node .scripts/material-index.mjs {node path}` and use the descriptions to decide which clean analyses or figures matter for the assigned section
+8. `concepts/` (browse concept definitions relevant to the assigned section)
+9. `draft/outline.md` (required)
+10. `draft/conventions.md` (required — unified terminology and notation standards)
 
 ## Procedure
 
@@ -32,12 +33,12 @@ Draft a single specified section as an academic paper.
    - **question** (stable) → Write as a conclusion. Present the question and provide the answer
    - **active** → Write honestly showing gaps. Clearly state what is known and what remains unresolved
    - **Writing non-stable items as established results is prohibited**
-2. Read evidence files (`.logs/*_attempt_*.md`, `.logs/*_reading_*.md`) and reports (`research/**/reports/*.md`) directly
+2. Read evidence files (`.logs/*_attempt_*.md`, `.logs/*_reading_*.md`) and `_materials/analyses` directly only when PI/dispatcher names them or the material index shows they support the assigned section
 3. Also Read original sources (`literature/papers/` `.tex` files) as needed
 4. Write following the conventions in `draft/conventions.md`
 5. If new terminology or notation is introduced, append to `draft/conventions.md` (modifying existing content is not allowed — to avoid breaking consistency with other sections. If existing conventions need changes, coordinate via PI / meeting)
 
-**When gaps are discovered**: If insufficient evidence is found, note it in the deliverable file and report it in the Task return value.
+**When gaps are discovered**: If insufficient evidence is found, note it in the deliverable file and draft it in the Task return value.
 
 ## Output
 

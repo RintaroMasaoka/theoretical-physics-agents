@@ -14,18 +14,18 @@ The team and who owns what:
 |---|---|---|
 | **Direction challenge** | `direction-challenger` | Pre-direction opposition: challenges value, goal, necessity, frame, scale, authority, and inertia anchors before the direction hardens |
 | **Direction** | `research-planner` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives; may create a minimal child node when immediate dispatch needs that structure |
-| **Tree transaction** | `curator` | Graph/lifecycle/placement, structural closure for planner-created children, state.md absorbed evidence, plan.md consistency, child presentation transactions, conventions/checks placement, report placement/promotion, retraction, `dead_ends.md`, and current-runtime note.md fact transactions |
-| **Verification** | `critic` | Independent Provisional Artifact Review of every worker deliverable and Durable Surface Review of note/report surfaces requested by curator |
-| **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing provisional deliverables in `.logs/` or direct review output as specified by their agent prompt |
+| **Tree transaction** | `curator` | Graph/lifecycle/placement, structural closure for planner-created children, state.md absorbed evidence, plan.md consistency, child presentation transactions, conventions/checks placement, analysis-material preservation/promotion, retraction, `dead_ends.md`, and current-runtime findings.md fact transactions |
+| **Verification** | `critic` | Independent Provisional Review of every review-eligible worker submission and Durable Surface Review of findings/analysis surfaces requested by curator |
+| **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing provisional worker submissions in `_reviews/` plus raw process logs as specified by their agent prompt |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of research planner's wrap-up-input file into session log / focus / last_session / node-scoped backlog.md / agenda; commit + push |
 
-`/auto` itself owns only: the cycle loop, the resume beacon, pre-direction challenge dispatch, parallel worker dispatch, auto-attaching Provisional Artifact Review to each worker, dispatching curator with the right inputs, dispatching Durable Surface Review when curator requests it, detecting parent-ascent presentation boundaries, and handing session end to `session-wrap-up`. It does not create nodes itself; if research planner creates a minimal child before returning `focus.md`, the scheduler simply parses the new cursor/worker target and curator closes the structure later in the cycle.
+`/auto` itself owns only: the cycle loop, the resume beacon, pre-direction challenge dispatch, parallel worker dispatch, auto-attaching Provisional Review to each worker submission, running the optional one-repair loop, dispatching curator with the right inputs, dispatching Durable Surface Review when curator requests it, detecting parent-ascent presentation boundaries, and handing session end to `session-wrap-up`. It does not create nodes itself; if research planner creates a minimal child before returning `focus.md`, the scheduler simply parses the new cursor/worker target and curator closes the structure later in the cycle.
 
 ## Constraints
 
-- **Write all prose in japanese.** Applies to `research/focus.md`, `.logs/`, `agenda.md`, curator's tree writes, all worker deliverables. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `.claude/research-tree.md` and here may stay in English. The rule is about body prose, not structural tokens.
+- **Write all prose in japanese.** Applies to `research/focus.md`, `_reviews/`, `.logs/`, `agenda.md`, curator's tree writes, all worker submissions. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and the structural `##` headings documented in `.claude/research-tree.md` and here may stay in English. The rule is about body prose, not structural tokens.
 - `AskUserQuestion` and all other user-input solicitations are prohibited. Users are often away during `/auto`; asking blocks the session.
-- Do not initiate user-facing progress messages during a valid active run. The only scheduler-initiated user-facing message during an active run is the final report emitted at Session End. Startup precondition failures may emit their specified stop message. If the user initiates communication mid-session, respond briefly and continue. Corrections from the user take precedence over scheduled dispatches.
+- Do not initiate user-facing progress messages during a valid active run. The only scheduler-initiated user-facing message during an active run is the final draft emitted at Session End. Startup precondition failures may emit their specified stop message. If the user initiates communication mid-session, respond briefly and continue. Corrections from the user take precedence over scheduled dispatches.
 - **`Bash("sleep ...")` is prohibited; polling via `Bash("ls ...")` file-existence checks is prohibited.** For waiting on agent completion use only Pattern A or Pattern B as defined in `phases/dispatch.md`.
 - Full paper text is acquired only from arXiv so source provenance stays reproducible and full-text licensing/source drift does not enter the research tree. Metadata, bibliographic records, abstracts, and non-full-text discovery may use other sources when the relevant agent prompt allows it.
 - **Paper writing is NOT `/auto`'s responsibility.** Writing is handled by the `/write` skill. `/auto` drives research only.
@@ -34,8 +34,8 @@ The team and who owns what:
 
 `/auto` is an autonomous loop: the user is not present between cycles, and a closing-tone message mid-run stalls the run waiting for input that never arrives. Any mid-run message that summarizes progress and waits for user confirmation is a stall, regardless of the exact wording.
 
-- **Never end a turn mid-run with a user-facing progress report.** Between cycles, the next action is a tool call — the next direction-challenger dispatch, the next research planner dispatch, the next worker batch, or Session End. If you are tempted to draft "I have finished cycle N of M; continuing with cycle N+1?", that is the stall — replace it with the actual next dispatch.
-- The **only** user-facing closing message is the final Session End report, emitted when `MAX_CYCLES` is exhausted or research planner returns `Status: session_complete`.
+- **Never end a turn mid-run with a user-facing progress draft.** Between cycles, the next action is a tool call — the next direction-challenger dispatch, the next research planner dispatch, the next worker batch, or Session End. If you are tempted to draft "I have finished cycle N of M; continuing with cycle N+1?", that is the stall — replace it with the actual next dispatch.
+- The **only** user-facing closing message is the final Session End draft, emitted when `MAX_CYCLES` is exhausted or research planner returns `Status: session_complete`.
 - Compaction / reconnect / crash do not terminate a run. The `.logs/.auto-active` beacon (written at the start of every cycle) and the `SessionStart` hook jointly ensure the next session resumes the loop without a greeting. See `phases/session-lifecycle.md` § Resume for the mechanics and the fallback.
 - Progress summaries that genuinely belong somewhere go into `.logs/{timestamp}_auto.md` (session log, written by `session-wrap-up` from research planner's wrap-up input) or `research/focus.md § Context` (research planner's next-cycle direction). Neither is a yielded turn.
 
@@ -47,9 +47,9 @@ The team and who owns what:
 
 | Term | Meaning |
 |---|---|
-| **Session** | One `/auto` execution — from start to final report |
-| **Ordinary Cycle** | One iteration of the normal scheduler loop (direction-challenger → research planner → workers → Provisional Artifact Review → curator → optional Durable Surface Review → curator follow-up) |
-| **Presentation-Boundary Cycle** | A valid cycle variant where parent-ascent replaces workers / Provisional Artifact Review / ordinary curator dispatch with the child presentation transaction, plus Durable Surface Review if that transaction requests it |
+| **Session** | One `/auto` execution — from start to final draft |
+| **Ordinary Cycle** | One iteration of the normal scheduler loop (direction-challenger → research planner → workers → Provisional Review → optional one repair loop → curator → optional Durable Surface Review → curator follow-up) |
+| **Presentation-Boundary Cycle** | A valid cycle variant where parent-ascent replaces workers / Provisional Review / ordinary curator dispatch with the child presentation transaction, plus Durable Surface Review if that transaction requests it |
 | **Task** | One `Agent` tool call |
 | **Presentation Boundary** | A child-to-parent cursor ascent where parent-level worker dispatch is paused until the child is made readable as a parent component |
 | **Child Presentation Judgment** | Research planner's meaning judgment at the boundary: what the child was for, what it achieved or failed to achieve, and what the parent should now see |
@@ -65,7 +65,7 @@ Detail lives in two phase files; read on demand, not all at once.
 
 | File | Loaded when | Purpose |
 |---|---|---|
-| `phases/dispatch.md` | When launching workers or critic | Pattern A / B launch methods, prompt template, Provisional Artifact Review, Durable Surface Review, per-agent dynamic data |
+| `phases/dispatch.md` | When launching workers or critic | Pattern A / B launch methods, prompt template, Provisional Review, Durable Surface Review, per-agent dynamic data |
 | `phases/session-lifecycle.md` | Session Start and Session End | Resume check, initial sanity check, scheduler-owned session-end mechanical steps (simulation housekeeping, final sweeps), wrap-up input handoff |
 
 The research information model (tree structure, file roles, context scoping, convention ledger, provenance taxonomy) is canonical in `.claude/research-tree.md` — direction-challenger, research planner, and curator read it at every dispatch. `/auto` itself does not need it in working memory; `/auto` reads `research/focus.md` (the dispatch-spec file — treat it as the scheduler's interface with research planner, not as "tree content") only to extract the fields it dispatches on. `/auto` never reads node-level files directly. Node-level files are read by direction-challenger in its narrow local challenge scope, by research planner for direction-setting, and by curator for tree writing.
@@ -108,7 +108,7 @@ Obtain a path via `bash .scripts/log-path.sh direction-challenge`, write the pre
 
 
 ## Previous-Cycle Material
-Critic flags: {REVISE / REJECT flags from Provisional Artifact Review or Durable Surface Review in the previous cycle, if any; do not include raw deliverable paths unless needed to identify the flag}
+Critic flags: {REVISE-BLOCKING / OPAQUE / REJECT flags from Provisional Review or REVISE / REJECT flags from Durable Surface Review in the previous cycle, if any; do not include raw transaction paths unless needed to identify the flag}
 Curator flags: {flagged-for-research planner-review items from the previous curator sweep, including any pending Durable Surface Review requests not drained in-cycle}
 Curator sweep summary: {short summary or path, if available}
 
@@ -134,10 +134,10 @@ Update research/focus.md for the next cycle.
 {path returned by direction-challenger, or unavailable note}
 
 ## Recent Deliverables
-{paths to worker deliverables produced in the previous cycle, if any}
+{paths to worker submissions / review transactions produced in the previous cycle, if any}
 
 ## Critic Verdicts
-{paths to Provisional Artifact Review and Durable Surface Review outputs from the previous cycle, if any}
+{paths to Provisional Review and Durable Surface Review outputs from the previous cycle, if any}
 
 ## Curator Sweep
 {path to curator's output from the previous cycle, if any}
@@ -149,7 +149,7 @@ Update research/focus.md for the next cycle.
 
 On the very first cycle of a session, `Recent Deliverables` / `Critic Verdicts` / `Curator Sweep` are empty (no previous cycle); the research planner initialises from `research/focus.md` and the tree. If `research/focus.md` does not yet exist, include a note in the prompt: `focus.md missing — initialise at research/ root`.
 
-Research planner returns `DONE: research/focus.md`. If it returns `FAILED:`, re-dispatch once with the failure message appended to the prompt. If the second attempt also fails, exit to Session End with a partial report — deciding *why* a failure is recoverable is research judgment, so the scheduler bounds the loop mechanically rather than classifying the failure.
+Research planner returns `DONE: research/focus.md`. If it returns `FAILED:`, re-dispatch once with the failure message appended to the prompt. If the second attempt also fails, exit to Session End with a partial draft — deciding *why* a failure is recoverable is research judgment, so the scheduler bounds the loop mechanically rather than classifying the failure.
 
 ### 3. Parse `research/focus.md`
 
@@ -176,7 +176,7 @@ Run curator immediately, before launching any workers:
 
 Agent(subagent_type="curator", prompt="""
 ## Task
-Child Presentation Transaction. The cursor has just ascended from the child below to its parent. Apply research planner's Child Presentation Judgment from the Tree Directives, plus your normal transaction mechanics, so the child is readable from the parent before parent-level planning resumes: status, Current Board, parent plan/state, extracted durable surfaces, dead-end/report/note placement, archive/reframe needs, and link hygiene.
+Child Presentation Transaction. The cursor has just ascended from the child below to its parent. Apply research planner's Child Presentation Judgment from the Tree Directives, plus your normal transaction mechanics, so the child is readable from the parent before parent-level planning resumes: status, Current Board, parent plan/state, extracted durable surfaces, dead-end/draft/findings/guide placement, archive/reframe needs, and link hygiene.
 
 
 ## Boundary
@@ -195,9 +195,9 @@ Presentation boundary: true
 """)
 ```
 
-This curator call executes the presentation-boundary transaction and returns a summary. Record that summary as the cycle's curator sweep. Then proceed directly to Cycle End; do **not** launch workers, Provisional Artifact Review, or the ordinary curator dispatch in this cycle. The next cycle's direction-challenger and research planner will read the parent after the planner's judgment has landed in the tree.
+This curator call executes the presentation-boundary transaction and returns a summary. Record that summary as the cycle's curator sweep. Then proceed directly to Cycle End; do **not** launch workers, Provisional Review, or the ordinary curator dispatch in this cycle. The next cycle's direction-challenger and research planner will read the parent after the planner's judgment has landed in the tree.
 
-If the presentation-boundary curator return contains `Durable Surface Review needed:`, run Cycle steps 6a and 6b before Cycle End. Presentation-boundary note/report changes have the same durable-memory risk as ordinary curator changes; skipping the durable review here would leave a parent-facing synthesis unchecked.
+If the presentation-boundary curator return contains `Durable Surface Review needed:`, run Cycle steps 6a and 6b before Cycle End. Presentation-boundary findings/analysis changes have the same durable-memory risk as ordinary curator changes; skipping the durable review here would leave a parent-facing synthesis unchecked.
 
 Research planner should leave `Worker Dispatches` empty on an ascent cycle. If it listed workers anyway, skip them and carry a scheduler warning into the next research planner prompt via the curator sweep summary: parent-level workers were not launched because child presentation must land before parent-level planning continues.
 
@@ -209,13 +209,13 @@ Each worker's prompt follows the template in `phases/dispatch.md` § Prompt Temp
 
 If `Worker Dispatches` is empty, skip this step. A structural-review cycle (only Tree Directives) is legitimate.
 
-### 5. Critic — Provisional Artifact Review
+### 5. Critic — Provisional Review
 
-For every worker deliverable returned in step 4, dispatch a critic (Provisional Artifact Review — separate worker-deliverable review) per `phases/dispatch.md` § Provisional Artifact Review Rule. Critic runs in blind mode by default for deliverables that are mechanical/mathematical (researcher attempts, simulator runs), source-audit mode for reader deliverables, and contextual mode when the deliverable's soundness depends on the research narrative (scout surveys, concept proposals). The rule for mode selection is in `phases/dispatch.md`.
+For every review-eligible worker submission returned in step 4, dispatch a critic (Provisional Review — separate judgment in the same `_reviews/{slug}/` transaction) per `phases/dispatch.md` § Provisional Review Rule. Critic runs in blind mode by default for submissions that are mechanical/mathematical (researcher attempts, simulator runs), source-audit mode for reader submissions, and contextual mode when the submission's soundness depends on the research narrative (scout surveys, concept proposals). The rule for mode selection is in `phases/dispatch.md`.
 
-Worker deliverables skipped from critic: none by default. Research planner may in rare cases mark a dispatch as "no-critic" in `### Worker Dispatches` (e.g., an engine-builder refactor with no substantive claim to verify); honour such markings.
+Worker submissions skipped from critic: none by default. Research planner may in rare cases mark a dispatch as "no-critic" in `### Worker Dispatches` (e.g., an engine-builder refactor with no substantive claim to verify); honour such markings.
 
-Critic writes a separate `.logs/*_critic_*.md` review artifact. Collect the worker deliverable path, critic review path, and verdict for step 6.
+Critic writes `critic.md` in the same `_reviews/{slug}/` directory. For `REVISE-BLOCKING` or `OPAQUE`, apply the optional one-repair loop in `phases/dispatch.md` only when the repair is cheap and bounded. Collect the transaction directory, worker submission path, final critic review path, and final verdict for step 6.
 
 ### 6. Curator Dispatch — Execute Tree Changes
 
@@ -225,14 +225,14 @@ Dispatch curator once per cycle with:
 
 Agent(subagent_type="curator", prompt="""
 ## Task
-Execute the tree directives below and absorb the new evidence (worker deliverables + separate critic reviews) into the tree per your own operating rules.
+Execute the tree directives below and absorb the new evidence (worker review transactions) into the tree per your own operating rules.
 
 
 ## Tree Directives (from research planner, this cycle)
 {verbatim copy of focus.md § Tree Directives}
 
 ## New Evidence This Cycle
-- {worker deliverable path} — critic review: {critic review path}; verdict: {ACCEPT / REVISE / REJECT}
+- {transaction directory} — worker: {worker.md or repair.md}; critic review: {critic.md or critic_rereview.md}; verdict: {ACCEPT / REJECT / REVISE-NONBLOCKING / REVISE-BLOCKING / OPAQUE}
 - ...
 
 ## Durable Surface Reviews
@@ -244,13 +244,13 @@ Session cycle: {cycle_number} of {MAX_CYCLES}
 """)
 ```
 
-Curator reads the deliverables, critic reviews, and tree state; executes the directives; absorbs raw outputs into state.md without `.logs/` links; updates plan.md / conventions.md / note.md / status / reports/*.md / checks / dead_ends.md per its operating rules; returns `DONE: {summary}`.
+Curator reads the review transactions and tree state; executes the directives; absorbs admitted content into state.md without `_reviews/` or `.logs/` links; updates plan.md / conventions.md / findings.md / guide.md / status / _materials/analyses/*.md / checks / dead_ends.md per its operating rules; returns `DONE: {summary}`.
 
-If curator returns with unresolved REVISE or REJECT critic reviews, curator flags these in its return. The scheduler records the flag; direction-challenger and research planner see the flagged deliverables in the next cycle's prompts, and research planner decides whether to re-dispatch, pivot, or close.
+If curator returns with unresolved `REVISE-BLOCKING`, `OPAQUE`, or `REJECT` Provisional Reviews, curator flags these in its return. The scheduler records the flag; direction-challenger and research planner see the flagged transactions in the next cycle's prompts, and research planner decides whether to re-dispatch, pivot, or close.
 
 ### 6a. Critic — Durable Surface Review (curator-requested)
 
-Read curator's return. If it contains a `Durable Surface Review needed:` block, dispatch critic once per requested note/report surface per `phases/dispatch.md` § Durable Surface Review Rule. This is scheduler-owned orchestration; curator requested the review but does not launch critic itself.
+Read curator's return. If it contains a `Durable Surface Review needed:` block, dispatch critic once per requested findings/analysis surface per `phases/dispatch.md` § Durable Surface Review Rule. This is scheduler-owned orchestration; curator requested the review but does not launch critic itself.
 
 Collect each durable review path and verdict. Critic writes these review files under the target node's `checks/` directory, not under `.logs/`.
 
@@ -274,7 +274,7 @@ Apply the Durable Surface Reviews below. Fix, demote, remove, or close provenanc
 (none — worker evidence already absorbed in the first curator pass)
 
 ## Durable Surface Reviews
-- {note/report path} — critic review: {checks/critic_... path}; verdict: {ACCEPT / REVISE / REJECT}; requested scope: {scope}
+- {findings/analysis path} — critic review: {checks/critic_... path}; verdict: {ACCEPT / REVISE / REJECT}; requested scope: {scope}
 - ...
 
 ## Context
@@ -297,8 +297,8 @@ Increment `cycles_done`. If `cycles_done < MAX_CYCLES` and `Status` is still `ac
 Read `phases/session-lifecycle.md` § Session End. Summary:
 
 1. **Simulation housekeeping decision** — if simulator ran, research planner may identify superseded scripts in final `research/focus.md` Tree Directives. Do not move them in the scheduler.
-2. **Final curator sweep** — dispatch curator once more with the final Tree Directives plus a compact list of this session's deliverable/critic paths and prior curator summaries for coherence review. Do not ask curator to re-absorb already absorbed `.logs/` evidence. Curator executes any `archive superseded script {path}` directives by moving the script and its companion `.md` to `src/archive/`.
+2. **Final curator sweep** — dispatch curator once more with the final Tree Directives plus a compact list of this session's worker-submission / critic-review paths and prior curator summaries for coherence review. Do not ask curator to re-absorb already absorbed review transactions or raw logs. Curator executes any `archive superseded script {path}` directives by moving the script and its companion `.md` to `_materials/src/archive/`.
 3. **Drain pending Durable Surface Reviews** — if the final curator sweep or an earlier cycle carried pending durable review requests, dispatch those reviews and re-dispatch curator to apply them, subject to the two-round cap in `phases/dispatch.md`.
 4. **Final research planner dispatch (session-end mode)** — research planner writes the wrap-up-input file (path obtained via `bash .scripts/log-path.sh wrap-up-input` and returned as `DONE: {path}`), using the final curator sweep and this session's direction-challenge files as evidence for the next session's Focus and any `## Agenda` items. Capture the returned path for step 5.
 5. **`session-wrap-up` dispatch** — the agent consumes the wrap-up-input file (path passed in the dispatch prompt), writes `research/focus.md` / `.logs/last_session.md` / a session log file (path obtained via `bash .scripts/log-path.sh auto`) / node-scoped `backlog.md` files / `agenda.md`, deletes `.logs/.auto-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
-6. **Final report to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.
+6. **Final draft to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.

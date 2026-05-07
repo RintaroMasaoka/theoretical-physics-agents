@@ -1,8 +1,8 @@
 ---
 name: meeting
-description: "Review AI research deliverables with the user, record approvals, and set research direction."
+description: "Review research direction and AI reliability with the user, record oversight decisions, and update the next research focus."
 user-invocable: true
-argument-hint: "[theme (optional)]"
+argument-hint: "[agenda/question optional]"
 ---
 
 # Meeting
@@ -10,6 +10,8 @@ argument-hint: "[theme (optional)]"
 Arguments: $ARGUMENTS
 
 ---
+
+`$ARGUMENTS` is a meeting agenda or question focus. It never sets or changes the research theme by itself; if the theme has not been configured, `/meeting` still redirects to `/launch`.
 
 ## Language Contract
 
@@ -21,28 +23,32 @@ English headings and labels in this prompt are structural examples, not literal 
 
 ## Role
 
-`/meeting` is the human approval gate for AI research outputs. The main object of review is not the AI's summary of progress; it is the actual `research/**/note.md` fact-layer prose that downstream writing would rely on. The meeting points the user to the artifact by clear file links, records explicit approval or requested revision, and captures research-direction instructions that should shape the next `/auto`.
+`/meeting` is the human oversight venue for the research process. Its purpose is to keep the research from drifting, expose places where AI verification may be weak or dishonest, help the human researcher understand the current science, and record direction decisions for the next `/auto` or `/steer`.
 
-This differs from `/auto` and `/write`:
-- `/auto` may create, verify, and maintain `note.md`, but it cannot make a result human-authorized
-- `/write` may draft from the research tree, but it may promote content into `manuscript/` only from meeting-authorized material
-- `/meeting` is where the user sees the artifact, approves it, rejects it, asks for revision, or redirects the research
+It is **not** a manuscript authorization gate in the current framework. `manuscript/` is frozen until the future `/write` workflow defines a promotion protocol. Do not create `manuscript/authorizations/`, do not approve findings.md for manuscript use, and do not make the user certify fact-layer prose as a substitute for curator/critic quality control.
+
+This differs from `/auto`, `/steer`, and `/write`:
+- `/auto` advances research and maintains `findings.md`, `checks/`, `guide.md`, state, graph structure, and provenance through agents
+- `/steer` lets the user choose one executable cycle direction before workers run
+- `/write` drafts paper material under `draft/**`; manuscript promotion is frozen for now
+- `/meeting` is where the user interrogates direction, verification honesty, explanations, and priorities
 
 ## Flow
 
-**Principle: put artifacts in front of the user before asking for decisions.** Meetings are real-time review sessions, but dumping whole source files into the chat makes review harder and turns the meeting transcript into a second, noisy copy of the research tree. Load the minimal state needed to identify candidate `note.md` deliverables, present clickable file links plus a short orientation and review status, then ask for approval, revision, or direction. Use {{ runtime.tool_ask_user_question }} for questions (text output questions risk missed responses).
+**Principle: human oversight, not human fact-layer QA.** A meeting may inspect `findings.md` or `checks/`, but the user should not be made responsible for making findings.md self-contained. If the discussion uncovers missing derivations, verification handoff confusion, workflow jargon, history-like prose, skipped prerequisites, or missing literature links, record these as readiness debt for curator/critic/research-planner. Keep the user's attention on direction, trust, explanation, and what to challenge next.
 
 ```
 Initialization
-    ▼ Data loading: research/state.md + research/note.md (if exists) + research/story.md
+    ▼ Data loading: research/state.md (required) + research/guide.md / research/findings.md / research/story.md / research/focus.md if present
     ▼ Context-dependent start
         ├─ No theme set (research/state.md missing) → Tell user to run /launch first
-        └─ Theme already set → Present deliverable review packet
-    ▼ User opens/reviews linked note.md artifacts
-        ├─ Approved → Record authorization and prepare manuscript handoff
-        ├─ Revision requested → Record required changes and route back to /auto or meeting rewrite
-        └─ Direction change → Reflect direction decisions
-    ▼ Reflect approvals and decisions as they are made
+        └─ Theme already set → Present oversight packet
+    ▼ Discuss research control questions
+        ├─ Direction drift or poor question → record direction decision / focus update
+        ├─ Verification doubt or self-contained defect → record readiness debt for /auto
+        ├─ Human needs explanation → teach, then update guide.md if the explanation should persist
+        └─ Confirmed synthesis → update guide.md / story.md / state.md / findings.md by proper routing
+    ▼ Reflect decisions and debts as they are made
 ```
 
 ### Initialization
@@ -56,11 +62,11 @@ Execute the following at session start (→ incremental recording principle). If
 ```markdown
 # {meeting title in {{ language }}} YYYY-MM-DD HH:MM
 
-## {deliverables reviewed heading in {{ language }}}
-
-## {authorizations heading in {{ language }}}
+## {oversight packet heading in {{ language }}}
 
 ## {discussion items heading in {{ language }}}
+
+## {verification doubts and readiness debt heading in {{ language }}}
 
 ## {decisions heading in {{ language }}}
 
@@ -75,85 +81,68 @@ Research theme has not been configured (`research/state.md` does not exist). Tel
 
 ### When Theme Is Already Set
 
-Review AI research deliverables first, then discuss direction.
+Open with an oversight packet, then let the user's doubts and direction judgments drive the meeting.
 
 ```
-Data loading: research/note.md + research/state.md + research/story.md + research/principles.md + research/focus.md + latest meeting log
-    ▼ Navigate the tree: ls research/ to see top-level children, read their state.md for status (note.md if exists)
-    ▼ If agenda.md exists (agenda accumulated by research planner during /auto), load → immediately delete (prevents stale items from carrying over to the next meeting)
-    ▼ Identify candidate note.md deliverables for user review
-    ▼ Present deliverable review packet: file links + minimal orientation
-    ▼ If loaded agenda items exist, display and discuss them as well
-    ▼ Ask for approval / revision / direction
-    ▼ Reflect authorizations and decisions
+Minimum required file: `research/state.md`. Data loading after that: `research/guide.md`, `research/findings.md`, `research/story.md`, `research/principles.md`, `research/focus.md`, and latest previous meeting log when present, excluding the newly created current log. If an optional file is missing, note the absence in the oversight packet and continue from `state.md`.
+    ▼ Navigate the tree: ls research/ to see top-level children; read guide.md/state.md/findings.md where relevant
+    ▼ If project-root agenda.md exists, load it and record its contents in the meeting log before treating it as consumed. If items are consumed or dismissed, delete agenda.md and commit that deletion together with the meeting update
+    ▼ Present oversight packet: current direction, guide links, verification-risk links, likely drift points
+    ▼ Ask what the user wants to interrogate first: direction, verification honesty, explanation, or priority
+    ▼ Reflect decisions, readiness debt, guide updates, and next focus
 ```
 
-**Deliverable review packet:**
+**Oversight packet:**
 ```
-{theme label in {{ language }}}: {from research/note.md or research/state.md title}
-{candidate deliverables label in {{ language }}}:
-  - {path to note.md} — {one-line reason this is ready for review}
-
-{artifact heading in {{ language }}}: {clickable path to note.md}
-{orientation in {{ language }}}: {short context only; not a substitute for the artifact}
-{review note in {{ language }}}: Open the linked file for the approval target. Mention any short caveat or section anchor needed to focus review.
-
-{requested decision label in {{ language }}}: approve as manuscript input / request revision / redirect research
+{theme label in {{ language }}}: {from research/guide.md, research/story.md, or research/state.md}
+{current focus label in {{ language }}}: {research/focus.md Cursor + one-sentence context}
+{human guide label in {{ language }}}:
+  - {path to guide.md if present} — {why this is the best entrypoint}
+{verification-risk label in {{ language }}}:
+  - {path to findings/check/report/state item} — {short reason this deserves human suspicion or may need curator/critic follow-up}
+{direction questions label in {{ language }}}:
+  - {question about drift, priority, story fit, missing evidence, or explanation need}
 ```
 
-**Do not replace artifact review with a summary.** A summary may orient the user, but it is not the approval target. If a `note.md` is being considered for authorization, provide a clickable path to the file and make clear that the linked file, not the orientation paragraph, is what is being approved. Do not paste the whole body into chat by default. Only quote a short excerpt when it is necessary to discuss a specific sentence or ambiguity. Do not paraphrase away limitations, scopes, check links, caveats, or source/project boundary language when describing what the user is about to review.
+**Do not replace oversight with a summary.** A summary may orient the user, but the meeting's job is to surface the controls the user can exercise: asking why a claim is trusted, whether verification was real, whether the research question is still sensible, and what should be explained before continuing. Avoid dumping whole files into chat. Link the relevant `guide.md`, `findings.md`, `checks/`, `_materials/analyses/*.md`, `story.md`, or `state.md` section and quote only short excerpts needed for discussion.
 
-**Candidate selection:** Prefer `note.md` files that are stable, recently changed since the last meeting, central to `research/story.md`, or directly blocking manuscript progress. If there are many, present the highest-impact few first and say what was deferred. Do not make the user approve a hidden batch.
+**Use guide.md as the first human entrypoint.** Prefer linking `guide.md` when it exists. If no guide exists or it is stale, say so and use `state.md` / `story.md` / `findings.md` temporarily, then record a guide.md maintenance item for curator or update guide.md during the meeting if the needed guide content is now clear.
 
-**Self-contained orientation:** Throughout the meeting, briefly explain any technical term, mathematical object, internal label, or named entity (e.g. matrix, operator, algorithm, node name, abbreviation, theorem) on its first mention in this conversation when it is needed for the decision. Never assume the user remembers a term from prior meetings, but keep explanations proportional so the chat remains a review surface rather than a rewritten source file.
+**Self-contained defects are readiness debt.** When the user finds that findings.md is not self-contained, verification is hard to follow, prose is polluted by workflow jargon, history is written as fact, prerequisites are skipped, or external literature should have been cited but is missing, do not ask the user to finish the QA pass. Record the defect under readiness debt, route it to `research/focus.md`, project-root `agenda.md`, or a relevant `state.md` entry for `/auto`, and preserve the user's high-level judgment in guide.md if useful.
 
-**Research note hygiene:** A `note.md` is durable fact-layer synthesis, not a meeting transcript or process log. User-facing notes should read as the current understanding: avoid embedding meeting-history markers, session chronology, or approval provenance in the prose unless the historical fact itself is part of the scientific claim. Put provenance, approvals, agenda, and route history in `.logs/`, `state.md`, `story.md`, or authorization snapshots. Meeting-confirmed revisions to `note.md` should remove stale labels and over-specific framing that the user rejects, so downstream `/write` sees a clean notebook rather than a log.
+**Teach when the user asks.** If the user needs to understand the research to supervise it, explain the minimum prerequisite, derivation idea, or verification chain in the conversation. If the explanation is likely to be needed again, update guide.md rather than bloating findings.md. If the explanation is actually a missing derivation or premise, route it to findings.md maintenance instead of leaving it only in guide.md.
 
-## Authorization Gate
+## Reflection Routing
 
-Approval is explicit and scoped. Treat only a clear user statement of approval for a displayed artifact as authorization. Silence, ambiguous agreement, approval of a summary, or approval of a future revision does not authorize the underlying `note.md`.
+Route meeting outcomes by what kind of thing was learned.
 
-When the user approves a `note.md` artifact:
+- Human oversight orientation, reading path, recurring doubts, what to inspect next → `guide.md`
+- Project thesis, narrative success condition, or paper storyline → `research/story.md`
+- Decomposition, route priority, approach choice, or active strategy → relevant `plan.md` or `research/focus.md`
+- Verification doubt, self-containedness defect, missing source bridge, suspected AI overclaim, or unclear checks chain → project-root `agenda.md`, `research/focus.md`, or relevant `state.md` for curator/critic/research-planner follow-up
+- User-confirmed fact-layer wording or interpretation of already-supported content → `findings.md`; new or unverified factual claims go to `/auto`/curator/critic rather than being established by human agreement
+- Background / working state changes → `research/state.md`
+- Reusable research judgment principles → `research/principles.md` with a `> [Meeting YYYY-MM-DD]` origin marker, after the routing check below
+- Notation, sign, normalization, symbol reservation, or convention bridge → `conventions.md`
+- Framework-level file contract or agent workflow rule → record a project-root `agenda.md` item labelled `/improve`, or invoke `/improve` only if the user explicitly asks to handle it now
 
-1. Append the reviewed path and decision under the localized authorizations heading in the meeting log
-2. Create or update an authorization snapshot under `manuscript/authorizations/` containing:
-   - timestamp
-   - source `note.md` path
-   - approval scope stated by the user
-   - any exclusions, limitations, or requested manuscript framing
-   - the exact `note.md` body from the linked file at the time of approval
-3. Record the path to that authorization snapshot in the meeting log
-4. Treat the snapshot, not the mutable `note.md`, as the authorized handoff to manuscript writing
+**Manuscript freeze:** Do not write to `manuscript/`, do not create authorization snapshots, and do not ask the user to approve findings.md as manuscript input. If the user starts making paper-promotion decisions, record them as discussion/agenda for the future write workflow unless they also imply immediate research-tree changes above.
 
-Reason: `note.md` can continue to evolve under `/auto`; authorization must attach to the linked artifact version the user actually reviewed. The snapshot is the bridge from agent-maintained draft facts to human-authorized manuscript authority.
-
-If the user requests revision instead of approval, record the requested changes under decisions, update `research/focus.md` or relevant `state.md` / `principles.md` as appropriate, and do not create an authorization snapshot. If the user collaboratively rewrites `note.md` during the meeting and then approves the rewritten artifact, show the final rewritten text before recording authorization.
-
-**Where to reflect:**
-- Changes to the paper's narrative structure (add/remove/reorder steps) → Edit `research/story.md`. Leave a `> [Meeting YYYY-MM-DD] {reason}` marker
-- User-confirmed fact-layer understanding changes → Edit `research/note.md` only when the user has explicitly confirmed the understanding or approved the wording during the meeting. Unresolved factual changes go to `research/focus.md`, `state.md`, or `agenda.md` for `/auto`
-- Background / working state changes → Edit `research/state.md`
-- User-approved manuscript input → Write `manuscript/authorizations/{timestamp}_{slug}.md` with the exact approved artifact
-- Cross-cutting constraints → Edit `research/principles.md` with a `> [Meeting YYYY-MM-DD]` marker
-- Direction changes scoped to a specific branch → Edit that branch's `state.md` or the global `research/focus.md`; edit `note.md` only when the direction also changes user-confirmed fact-layer understanding
-- Next `/auto` session's focus changed → Edit `research/focus.md` (the session cursor that tells `/auto` where to resume). Set the `Working on:` path to the new focus node and update context accordingly
-- **Significance rewrite**: When the discussion explicitly recontextualizes results and the user confirms the synthesis, rewrite affected note.md files to reflect that fact-layer understanding. Meetings produce understanding that won't propagate to documents unless explicitly written, but unresolved factual questions must be routed back to `/auto` rather than recorded as established facts
-
-**Principle:** Focus on artifact approval and overall direction, not individual node management. Alignment on "what is now authorized to become the paper, and what should research do next."
+**Significance rewrite:** When the discussion explicitly recontextualizes results and the user confirms the synthesis, rewrite affected `guide.md`, `story.md`, or `findings.md` according to the routing rules. Meetings produce understanding that won't propagate unless written, but unresolved factual questions must be routed back to `/auto` rather than recorded as established facts.
 
 ---
 
 ## Deepening the Dialogue
 
-The goal is not AI reporting and ending, but user judgment over artifacts and direction. Actively seek the user's judgment in the following situations.
+The goal is not AI reporting and ending, but user control over research direction, verification trust, and understanding. Actively seek the user's judgment in the following situations.
 
-**Deliverable approval:** After linking a candidate `note.md` as the approval target, ask whether it is approved as manuscript input, needs revision, or should redirect the research. If approval is partial, restate the approved scope and exclusions before writing the authorization snapshot.
+**Direction drift:** Ask whether the current cursor, child decomposition, or next worker direction still serves the project. If the user redirects, reflect the decision in `research/focus.md`, `story.md`, or a relevant state/plan surface according to scope.
 
-**Turning points in direction:** Get user approval before reflecting structural changes to the narrative structure in `research/story.md` (step additions/deletions/reordering). Present the content, reason, and the option to maintain the status quo.
+**Verification suspicion:** If a claim looks too convenient, lacks a derivation, relies on an unclear check chain, or cites only AI-produced prose, ask what the user wants challenged. Record the target, suspected failure mode, and desired follow-up as readiness debt.
+
+**Human understanding gap:** If the user is trying to keep up, teach the missing concept or derivation path. Then decide whether the persistent artifact should be guide.md, findings.md, a concept note under `concepts/{term}.md`, or a source-reading task.
 
 **Ambiguous statements:** State AI's interpretation explicitly and confirm. Specify exactly what changes to which files before reflecting.
-
-**Interpreting results:** After the deliverable review packet, do not just state AI's assessment. Ask the user about the result's positioning in the storyline. If assessments differ, use that as discussion material and explore implications for tree structure and emphasis.
 
 ---
 
@@ -163,12 +152,20 @@ Users may leave at any natural stopping point. Post-processing that writes every
 
 | Timing | Action |
 |---|---|
-| Session start | Create meeting log file in `.logs/` + update `last_meeting` (→ see Initialization section) |
-| When a deliverable is presented | Append path and review status under the localized deliverables-reviewed heading |
-| When a deliverable is approved | Append under the localized authorizations heading + write `manuscript/authorizations/{timestamp}_{slug}.md` |
-| When a topic arises | Append under the localized discussion-items heading in the meeting log via Edit |
-| When a decision is made | Append under the localized decisions heading + immediately reflect in relevant files. Constraints go to `research/principles.md` |
-| When significance is discussed and confirmed | Rewrite affected note.md files to reflect the confirmed synthesis. Record under the localized changes-applied heading |
-| When a file is changed | Append under the localized changes-applied heading in the meeting log + git commit |
+| Session start | Create meeting log file in `.logs/` + update `last_meeting` |
+| When an oversight packet is presented | Append linked guide/findings/check/story/state paths under the localized oversight-packet heading |
+| When a topic arises | Append under the localized discussion-items heading in the meeting log. Log-only appends are not themselves listed under changes-applied |
+| When verification doubt or readiness debt is identified | Append under the localized readiness-debt heading + route to focus/state/agenda as appropriate |
+| When a decision is made | Append under the localized decisions heading + immediately reflect in relevant files. Before writing to `research/principles.md`, run the research-principle routing check below |
+| When an explanation should persist | Update guide.md, `concepts/{term}.md`, or findings.md by routing identity. Record under the localized changes-applied heading |
+| When a research artifact changes | Append under the localized changes-applied heading in the meeting log + git commit. A research artifact change means any non-log file change, or agenda.md consumption/deletion; ordinary meeting-log appends do not recursively require a changes-applied entry |
 
 **Git commits:** Specify changed files individually with `git add`. Keep the fixed `meeting:` prefix, and write the summary of changes in {{ language }}.
+
+## Research Principle Routing Check
+
+`research/principles.md` is not a general bucket for important meeting decisions. Write there only when the decision states a reusable research judgment principle: a criterion that future agents should repeatedly apply when comparing routes, promoting claims, separating roles, or deciding what evidence prevents overclaiming.
+
+Use the main Reflection Routing table above for all non-principle destinations. This check only decides whether a decision belongs in `research/principles.md`: write there only when it is a reusable research judgment criterion with active future consequences. If the decision is thesis/story, decomposition/strategy, source priority, established fact prose, human-facing explanation, notation/convention, or framework workflow, route it to the destination named above rather than duplicating it in `principles.md`.
+
+When adding a principle, use `# Research Principles` as the heading and include scope, principle, reason, consequence, and origin. If an existing `principles.md` entry is really story, plan, source priority, notation, fact prose, guide prose, or framework workflow, move it when the move is mechanical; if moving it would change scientific meaning, record the concern in the meeting log and leave a concrete agenda item for curator/research-planner follow-up.
