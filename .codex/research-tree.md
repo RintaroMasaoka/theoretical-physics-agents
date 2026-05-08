@@ -53,6 +53,30 @@ This is an authority order, not a link chain. `_materials/` is intentionally abs
 | `_materials/lib/` | Material (root only) | Shared simulation framework modules (managed by engine-builder); not claim authority |
 | `research/archive/` | Retired research memory | **Archived nodes.** Process-heavy, duplicated, superseded, or scaffold-like nodes removed from the active planning surface after their reusable residue has been extracted into active state.md, findings.md, _materials/analyses/*.md, dead_ends.md, concepts/, or conventions.md. Archive is history, not normal context |
 
+## Research-Memory Shape — Node Identity and Context Routing
+
+The active tree's folder shape is part of the research-memory contract, not a cosmetic filing scheme. The identity of `research/` is compressed working memory for future research judgment. Therefore node boundaries, parent-child relations, status, and archival placement are decided by how future agents should read the work: what belongs in the same judgment context, what needs a separate evidence stream, what has become reusable memory, and what should be removed from normal context after residue extraction.
+
+Research-memory shape decisions are rooted in file and node identity:
+
+- A **node** is a research object, question, construction, result, bridge, warning, gap, or component of a parent story. It is not a container for whatever happened while working nearby.
+- A **parent-child relation** says what the child supplies to the parent: evidence, a reusable component, a caution, a bridge, a still-live question, or a decomposed sub-problem. If that role is no longer true, the tree shape is stale even when every file is locally well written.
+- A **status** says how normal context loading should treat the node. `active` invites future work, `stable` allows reuse with remaining limitations, `closed` records that the line is no longer pursued, and archive removes process-heavy history from ordinary reading after its reusable residue has been extracted.
+- A **surface location** routes meaning. `findings.md` reads as adopted draft fact, `state.md` as working memory and evidence ledger, `plan.md` as decomposition/strategy, `_materials/` as inspectable non-authority material, `dead_ends.md` as rejected lesson, `guide.md` as human oversight route, and `archive/` as retired history.
+
+Good research-memory shape is tested by future reading, not by neatness. A future research planner, worker, critic, or human should be able to read the normal surfaces for a node and know why the node exists, what it supplies to its parent, what evidence stream supports it, what remains live, and whether opening its children or retired history is necessary. If a parent Current Board must track independent frontiers, if repeated evidence entries describe a sub-problem with its own success criterion, if a child has become process history after its result was extracted, or if a node's name/background no longer matches its role, the problem is research-memory shape before it is prose quality.
+
+The usual operations follow from this identity:
+
+- **Split** when an already-present evidence stream or live question needs its own reading context.
+- **Reframe** when a node's current role differs from its name/background but the work remains live.
+- **Reparent** when the node's natural parent has changed and future readers would otherwise load it in the wrong context.
+- **Close** when the line is no longer pursued, after recording any reusable lesson or remaining limitation.
+- **Archive** when the active value has been extracted and the remaining node mainly makes future agents reconstruct process history.
+- **No-op** when the node still carries a coherent single identity for its parent and its active surfaces route that identity correctly.
+
+These operations should be auditable. A research-memory shape change must leave enough rationale in state.md, plan.md, guide.md, or the relevant parent surface that the next agent can see which node identity, parent contract, evidence stream, or context route changed. This is the replacement for pre-approval: the tree manager acts autonomously inside the active-memory contract, records the reason, and leaves any future research-priority implication for the normal direction loop to read.
+
 ## Literature Surfaces
 
 External knowledge has two durable surfaces because source truth and project use are different responsibilities.
@@ -161,7 +185,7 @@ Read full `_materials/` contents when one of these conditions holds:
 - **Promotion, retraction, or archival decision**: curator must decide whether a reviewed worker transaction should become `_materials/analyses/`, whether an analysis material supports findings.md, whether a script is superseded, or whether a node can be archived.
 - **Writing support**: `/write` roles need a linked clean analysis, figure, or check to write a paper section faithfully.
 
-Do not read full `_materials/` contents when the task is ordinary direction-setting, cursor navigation, sibling overview, tree-shape discovery, or narrative orientation and the interpreted surfaces already carry the relevant state. In those cases, read `findings.md`, `guide.md`, `state.md`, `plan.md`, `story.md`, `conventions.md`, and `checks/` summaries first, then use the material index if `_materials/` exists or an interpreted surface mentions supporting material. Open the material only if the decision actually depends on its content.
+Do not read full `_materials/` contents when the task is ordinary direction-setting, cursor navigation, sibling overview, research-memory shape discovery, or narrative orientation and the interpreted surfaces already carry the relevant state. In those cases, read `findings.md`, `guide.md`, `state.md`, `plan.md`, `story.md`, `conventions.md`, and `checks/` summaries first, then use the material index if `_materials/` exists or an interpreted surface mentions supporting material. Open the material only if the decision actually depends on its content.
 
 Granularity matters. Prefer material-index output, `_materials/src/{slug}.md` companions, check records, and TSV metadata headers before opening code bodies or full data. Prefer image filenames/captions or the analysis/check that cites a figure before inspecting binary image files. Code/data/image bulk reads are for simulator, engine-builder, reproducibility checks, or explicit audit — not for ordinary research-tree context.
 
@@ -499,6 +523,58 @@ Fields:
 | `review` | Independent review channels: `critic-blind`, `critic-contextual`. Empty list if no independent review has been accepted |
 | `scope` | `full` when the full declared scope is verified, otherwise a concrete description of the restricted instance |
 | `supports_project_central_claim` | `true` when the project is staking this claim as its own contribution; `false` for external results cited as premises |
+
+### Durable Surface Review Front Matter Schema
+
+Critic-written reviews of findings.md sections or analysis materials use `record_kind: durable-surface-review`. They are review records, not claim-linked provenance endpoints. Curator may later compose an accepted review channel into one or more `record_kind: provenance` records.
+
+```yaml
+---
+record_kind: durable-surface-review
+target: "../findings.md#optional-heading-or-claim-anchor"
+surface: findings
+review_mode: contextual
+verdict: ACCEPT
+scope: "claim or section reviewed"
+---
+```
+
+Fields:
+
+| Field | Meaning |
+|---|---|
+| `record_kind` | `durable-surface-review` for critic review of a durable prose surface |
+| `target` | Relative Markdown link target to the reviewed findings.md section or `_materials/analyses/{slug}.md` material |
+| `surface` | `findings` or `analysis` |
+| `review_mode` | `blind` or `contextual` |
+| `verdict` | `ACCEPT`, `REVISE`, or `REJECT` |
+| `scope` | Concrete description of the reviewed claim, section, derivation, or analysis scope |
+
+### Reproducibility Front Matter Schema
+
+Curator-written reproduction or check summaries use `record_kind: reproducibility`. They record a first-order procedure/result that may support a later provenance record, but the reproducibility record itself is not automatically a claim endpoint unless findings.md or an analysis links it as such.
+
+```yaml
+---
+record_kind: reproducibility
+target: "../_materials/src/check_identity.py"
+method: "symbolic exact check"
+result: PASS
+scope: "finite N=4 instance"
+claim_path: "../findings.md#optional-heading-or-claim-anchor"
+---
+```
+
+Fields:
+
+| Field | Meaning |
+|---|---|
+| `record_kind` | `reproducibility` for curator-written reproduction/check summaries |
+| `target` | Relative Markdown link target to the checked material, claim, script, data, figure, or analysis |
+| `method` | Short method label: symbolic exact check, numerical reproduction, data/figure audit, source comparison, etc. |
+| `result` | `PASS`, `FAIL`, `MIXED`, or a similarly concrete result label when the check is not binary |
+| `scope` | Concrete coverage of the check |
+| `claim_path` | Optional relative Markdown link target to the findings.md or analysis claim this check supports |
 
 **Terminal provenance endpoint.** A `checks/*.md` file is the project-internal endpoint of a provenance link, not a routing page to more project documents. When `findings.md` or `_materials/analyses/*.md` links to a check record, a reader must be able to evaluate the verification judgment from that record itself. The record may mention project artifacts it absorbed, but it must not make the reader open `state.md`, `_materials/analyses/*.md`, another `checks/*.md`, or `.logs/` to discover the actual evidence, procedure, result, scope, or limitation. If a project-internal artifact matters, absorb the relevant claim, calculation, procedure, result, and limitation into the check body in compact prose.
 
