@@ -80,7 +80,7 @@ Review AI research deliverables first, then discuss direction.
 ```
 Data loading: research/note.md + research/state.md + research/story.md + research/principles.md + research/focus.md + latest meeting log
     ▼ Navigate the tree: ls research/ to see top-level children, read their state.md for status (note.md if exists)
-    ▼ If agenda.md exists (agenda accumulated by research planner during /auto), load → immediately delete (prevents stale items from carrying over to the next meeting)
+    ▼ If agenda.md exists (agenda accumulated by research planner during /auto), load → append its items to the meeting log → then delete it (prevents stale items from carrying over without losing them on interruption)
     ▼ Identify candidate note.md deliverables for user review
     ▼ Present deliverable review packet: file links + minimal orientation
     ▼ If loaded agenda items exist, display and discuss them as well
@@ -109,6 +109,53 @@ Data loading: research/note.md + research/state.md + research/story.md + researc
 
 **Research note hygiene:** A `note.md` is durable fact-layer synthesis, not a meeting transcript or process log. User-facing notes should read as the current understanding: avoid embedding meeting-history markers, session chronology, or approval provenance in the prose unless the historical fact itself is part of the scientific claim. Put provenance, approvals, agenda, and route history in `.logs/`, `state.md`, `story.md`, or authorization snapshots. Meeting-confirmed revisions to `note.md` should remove stale labels and over-specific framing that the user rejects, so downstream `/write` sees a clean notebook rather than a log.
 
+## Context-Route Invalidation
+
+Meetings are also where the user can reject how the research tree is routing an element to future agents. The issue is not only the element itself. In this workflow, an element's effective role is assigned by context routing: where it is stored, which durable surface contains it, and which handoff prompt will later read that surface. A term, method, claim, proof, figure, check, dataset, summary, convention, confidence label, or plan can become "current understanding", "evidence", "proof support", "canonical terminology", "manuscript input", or "next-cycle instruction" because it sits on a surface that future agents read in that role.
+
+When user feedback rejects an element in the role by which the tree is routing it, do not treat the feedback as a local edit or a future preference. Seed a curator-owned context-route invalidation transaction. The meeting owns capturing the user-confirmed rejection and scope; curator owns repairing durable context routes. If repair requires computation, broad regeneration, or worker execution, curator records the open transaction and routes it to the next `/auto` focus instead of leaving the rejected route active.
+
+Open this transaction when all three are true:
+- **Element**: the user rejects a term, method, claim, proof, artifact, convention, summary, data product, or framing in the role it is currently serving
+- **Route**: that element appears, or plausibly appears, on a durable surface or handoff path that future agents will read (`note.md`, `state.md`, `checks/`, `report_*.md`, `conventions.md`, `principles.md`, `research/focus.md`, active data/figure/script surfaces, or a linked archive)
+- **Risk**: leaving it in that route would let a future agent receive it as current understanding, evidence, proof, canonical method/term, validation support, or operational instruction
+
+First state your interpretation and confirm if the scope is ambiguous. Then write the decision under the localized decisions heading and dispatch curator with a transaction seed:
+
+```markdown
+Rejected routed role:
+- Element: {what is being rejected}
+- Rejected role: {the role the tree currently gives it — evidence, current understanding, proof support, canonical term, method, etc.}
+- Accepted replacement or unresolved: {replacement role/element if known, otherwise state unresolved}
+- Scope: {tree path(s) and surfaces in scope}
+- User-confirmed reason: {short reason in the user's terms}
+- Suspected routes: {surfaces or artifact classes likely to carry the rejected role}
+- Urgency: {why this must be closed now or why it can be routed to /auto}
+```
+
+Dispatch curator with that seed:
+
+```
+
+spawn_agent(prompt="""
+Read and follow `.codex/agents/curator.md` as your role definition. Treat the rest of this prompt as task-specific input.
+
+## Task
+Context-route invalidation transaction from /meeting. The user has rejected an element in the role by which durable research surfaces may be routing it. Capture the transaction, repair any durable context routes you are authorised to repair now, and record or route any regeneration/worker work needed before the rejected role can be considered closed.
+
+
+## Transaction Seed
+{the Rejected routed role block above}
+
+## Meeting Context
+{short meeting-log path and any file links already discussed}
+""")
+```
+
+Do not ask curator to decide whether the user's rejection is scientifically correct. The meeting has already established the user-facing decision; curator's job is context-route mechanics and transaction closure. If the rejection is unresolved or the user is still deciding, do not dispatch curator yet — record it as a discussion item or agenda item instead.
+
+When curator returns, append the curator summary and changed paths under the localized changes-applied heading, then commit the meeting log plus curator-touched files with the normal `meeting:` prefix. In `/meeting`, there is no `session-wrap-up`; meeting is responsible for recording and committing curator's returned tree changes. If curator reports an open regeneration or worker task, record it in `research/focus.md` or the relevant backlog/agenda exactly as curator specifies, so the next `/auto` sees the transaction before ordinary research resumes.
+
 ## Authorization Gate
 
 Approval is explicit and scoped. Treat only a clear user statement of approval for a displayed artifact as authorization. Silence, ambiguous agreement, approval of a summary, or approval of a future revision does not authorize the underlying `note.md`.
@@ -135,6 +182,7 @@ If the user requests revision instead of approval, record the requested changes 
 - Background / working state changes → Edit `research/state.md`
 - User-approved manuscript input → Write `manuscript/authorizations/{timestamp}_{slug}.md` with the exact approved artifact
 - Cross-cutting constraints → Edit `research/principles.md` with a `> [Meeting YYYY-MM-DD]` marker
+- User rejection of a routed element-role that could remain active in durable context → Seed a curator context-route invalidation transaction before continuing ordinary review
 - Direction changes scoped to a specific branch → Edit that branch's `state.md` or the global `research/focus.md`; edit `note.md` only when the direction also changes user-confirmed fact-layer understanding
 - Next `/auto` session's focus changed → Edit `research/focus.md` (the session cursor that tells `/auto` where to resume). Set the `Working on:` path to the new focus node and update context accordingly
 - **Significance rewrite**: When the discussion explicitly recontextualizes results and the user confirms the synthesis, rewrite affected note.md files to reflect that fact-layer understanding. Meetings produce understanding that won't propagate to documents unless explicitly written, but unresolved factual questions must be routed back to `/auto` rather than recorded as established facts
@@ -168,6 +216,7 @@ Users may leave at any natural stopping point. Post-processing that writes every
 | When a deliverable is approved | Append under the localized authorizations heading + write `manuscript/authorizations/{timestamp}_{slug}.md` |
 | When a topic arises | Append under the localized discussion-items heading in the meeting log via Edit |
 | When a decision is made | Append under the localized decisions heading + immediately reflect in relevant files. Constraints go to `research/principles.md` |
+| When a routed role is rejected | Append the transaction seed under decisions + dispatch curator or record why it is deferred |
 | When significance is discussed and confirmed | Rewrite affected note.md files to reflect the confirmed synthesis. Record under the localized changes-applied heading |
 | When a file is changed | Append under the localized changes-applied heading in the meeting log + git commit |
 
