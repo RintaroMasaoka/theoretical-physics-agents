@@ -71,7 +71,7 @@ spawn_agent(prompt="""
 Read and follow `.codex/agents/curator.md` as your role definition. Treat the rest of this prompt as task-specific input.
 
 ## Task
-Session-end tree-wide coherence pass. Apply your default operating rules (fact-layer creation when reusable facts have enough derivation/review support, state.md compression for files over ~150 lines, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree.
+Session-end tree-wide coherence pass. Apply your default operating rules (research-memory shape repair, admitted fact-layer materialisation, state.md compression, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree. Do not write guide.md; guide-writer runs after your sweep.
 
 
 ## Tree Directives
@@ -87,11 +87,41 @@ Session-end sweep: true
 """)
 ```
 
-The sweep is **not optional** and **not skippable** on the grounds that "nothing felt substantial this session". Its rationale: findings.md promotion and cross-tree coherence consistently fall off research planner's attention during research cycles — synthesis and direction compete for the same cognitive budget and direction wins. The session-end sweep is the at-least-once-per-session guarantee that the maintenance channel runs.
+The sweep is **not optional** and **not skippable** on the grounds that "nothing felt substantial this session". Its rationale: admitted findings.md materialisation, route repair, and cross-tree coherence consistently fall off research planner's attention during research cycles — synthesis and direction compete for the same cognitive budget and direction wins. The session-end sweep is the at-least-once-per-session guarantee that the maintenance channel runs.
 
 Curator returns `DONE: {summary}`. If it returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so the next session picks it up; do not block Session End on a curator failure.
 
-### 3. Final Research planner Dispatch (Session-End Mode)
+### 3. Drain Pending Durable Surface Reviews
+
+If the final curator sweep or an earlier cycle carried pending Durable Surface Review requests, dispatch those reviews and re-dispatch curator to apply them, subject to the two-round cap in `phases/dispatch.md`. The affected claims must not be treated as confirmed until the review is drained or explicitly flagged as unresolved. If the cap is hit, record the verification gap for research planner and proceed; do not loop indefinitely.
+
+### 4. Guide-writer Sweep — Human Oversight Guides
+
+After the final curator sweep and after pending Durable Surface Reviews have been drained, dispatch guide-writer with the scheduler's session-local guide target set. The scheduler builds this set mechanically from paths it already knows: `research/`, all cursors seen this session, worker target nodes, curator cursor nodes, presentation-boundary parent/child nodes, Durable Surface Review target nodes, and final-cursor ancestors. Do not inspect git, maintain a manifest, or ask curator whether a guide is stale.
+
+```
+
+spawn_agent(prompt="""
+Read and follow `.codex/agents/guide-writer.md` as your role definition. Treat the rest of this prompt as task-specific input.
+
+## Task
+Session-end guide sweep. For each target below, read the durable node surfaces and update guide.md only if the human oversight entrypoint is missing or stale. Do not decide research direction, claim admission, verification status, or graph placement.
+
+
+## Guide Sweep Targets
+- research/
+- {each node path in the session-local guide target set, de-duplicated}
+
+## Context
+Final cursor: {cursor from research/focus.md}
+Curator final sweep summary: {DONE summary from step 2, or failure note}
+Durable Surface Review summary: {final drained review summary, if any}
+""")
+```
+
+guide-writer returns `DONE: {summary}`. If it flags fact-layer, verification, or graph contradictions, include those flags in the final research planner dispatch. If guide-writer fails, record the failure in the wrap-up input's `## Last Session`; do not block Session End.
+
+### 5. Final Research planner Dispatch (Session-End Mode)
 
 ```
 
@@ -106,31 +136,32 @@ Obtain a wrap-up-input path via `bash .scripts/log-path.sh wrap-up-input` and wr
 
 ## This Session's Evidence (summary)
 - Deliverables: {list of paths produced this session}
-- Critic verdicts: {list of critic files or inline-annotated paths}
+- Critic verdicts: {list of Provisional Review and Durable Surface Review files}
 - Curator sweeps: {list of curator deliverables / summaries}
+- Guide-writer sweep: {guide-writer DONE summary and flags, if available}
 - Direction-challenge outputs: {list of timestamped direction-challenge paths captured from direction-challenger DONE returns this session, if any}
 - Node changes: {new nodes, closes, status changes, analysis preservations — enumerate}
 - Simulation-script archives: {moves from step 1, if any}
 """)
 ```
 
-Research planner writes the wrap-up input file and returns `DONE: {path}` where `{path}` is the timestamped wrap-up-input file it created. Capture this path for step 4. Do not write `research/focus.md` yourself; `session-wrap-up` transcribes the `## Focus` section into it.
+Research planner writes the wrap-up input file and returns `DONE: {path}` where `{path}` is the timestamped wrap-up-input file it created. Capture this path for step 6. Do not write `research/focus.md` yourself; `session-wrap-up` transcribes the `## Focus` section into it.
 
-If research planner returns `FAILED:`, the scheduler writes a minimal wrap-up input itself (cursor preserved as-is, `## Last Session` noting "research planner wrap-up failed: {reason}", commit message `run: session ended (research planner wrap-up failed)`) and continues to step 4. This avoids leaving the session uncommitted.
+If research planner returns `FAILED:`, the scheduler writes a minimal wrap-up input itself (cursor preserved as-is, `## Last Session` noting "research planner wrap-up failed: {reason}", commit message `auto: session ended (research planner wrap-up failed)`) and continues to step 6. This avoids leaving the session uncommitted.
 
-### 4. Dispatch `session-wrap-up`
+### 6. Dispatch `session-wrap-up`
 
 ```
 
-spawn_agent(prompt="Read and follow `.codex/agents/session-wrap-up.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\nWrap up the /auto session.\n\nWrap-up input: {wrap-up-input path captured from step 3}\n\nExecute per your own specification.")
+spawn_agent(prompt="Read and follow `.codex/agents/session-wrap-up.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\nWrap up the /auto session.\n\nWrap-up input: {wrap-up-input path captured from step 5}\n\nExecute per your own specification.")
 
 ```
 
 The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `.logs/last_session.md` / a session log file (created via `bash .scripts/log-path.sh auto`) / node-scoped `backlog.md` files (if the input had a Backlog section) / `agenda.md` (if the input had an Agenda section), deletes `.logs/.auto-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (research planner-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 
-If `git push` fails (network, auth, non-fast-forward), the commit is preserved locally; the final draft (step 5) notes the push failure so the user can retry.
+If `git push` fails (network, auth, non-fast-forward), the commit is preserved locally; the final draft (step 7) notes the push failure so the user can retry.
 
-### 5. Final Draft (to the user)
+### 7. Final Draft (to the user)
 
 The **only** user-facing closing message of the session (per Turn-Yielding Discipline in SKILL). Emit a concise summary covering:
 
@@ -150,6 +181,6 @@ After emitting the draft, yield the turn. Do not issue further tool calls.
 If a dispatch fails mid-cycle and the scheduler cannot recover, do **not** silently stall. Choose one:
 
 - *Recoverable* — the next cycle's research planner dispatch can work around it. Log the failure to be surfaced in `Recent Deliverables` for the next research planner dispatch, then loop normally.
-- *Unrecoverable* — the scheduler exits the cycle loop early and proceeds to Session End. The final research planner dispatch (step 3) records the failure in `## Last Session`; the commit message is `run: session ended (unrecoverable: {reason})`.
+- *Unrecoverable* — the scheduler exits the cycle loop early and proceeds to Session End. The final research planner dispatch (step 5) records the failure in `## Last Session`; the commit message is `auto: session ended (unrecoverable: {reason})`.
 
 Either way, never end a turn without either the next dispatch or the Session End final draft. Stalling mid-session is the failure mode the Turn-Yielding Discipline exists to prevent.

@@ -14,12 +14,13 @@ The team and who owns what:
 |---|---|---|
 | **Direction challenge** | `direction-challenger` | Pre-direction opposition: challenges value, goal, necessity, frame, scale, authority, and inertia anchors before the direction hardens |
 | **Direction** | `research-planner` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives; may create a minimal child node when immediate dispatch needs that structure |
-| **Tree transaction** | `curator` | Graph/lifecycle/placement, structural closure for planner-created children, state.md absorbed evidence, plan.md consistency, child presentation transactions, conventions/checks placement, analysis-material preservation/promotion, retraction, `dead_ends.md`, and current-runtime findings.md fact transactions |
+| **Tree transaction** | `curator` | Graph/lifecycle/placement, pre-worker readiness transactions, structural closure for planner-created children, state.md absorbed evidence, plan.md consistency, child presentation transactions, conventions/checks placement, analysis-material preservation/promotion, retraction, `dead_ends.md`, and admitted findings.md materialisation |
 | **Verification** | `critic` | Independent Provisional Review of every review-eligible worker submission and Durable Surface Review of findings/analysis surfaces requested by curator |
 | **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing provisional worker submissions in `_reviews/` plus raw process logs as specified by their agent prompt |
+| **Human oversight guide** | `guide-writer` | `research/**/guide.md` — session-end sweep over scheduler-supplied target nodes; writes human-facing oversight guides from durable surfaces without deciding research claims or direction |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of research planner's wrap-up-input file into session log / focus / last_session / node-scoped backlog.md / agenda; commit + push |
 
-`/auto` itself owns only: the cycle loop, the resume beacon, pre-direction challenge dispatch, parallel worker dispatch, auto-attaching Provisional Review to each worker submission, running the optional one-repair loop, dispatching curator with the right inputs, dispatching Durable Surface Review when curator requests it, detecting parent-ascent presentation boundaries, and handing session end to `session-wrap-up`. It does not create nodes itself; if research planner creates a minimal child before returning `focus.md`, the scheduler simply parses the new cursor/worker target and curator closes the structure later in the cycle.
+`/auto` itself owns only: the cycle loop, the resume beacon, pre-direction challenge dispatch, parallel worker dispatch, auto-attaching Provisional Review to each worker submission, running the optional one-repair loop, dispatching curator with the right inputs, dispatching Durable Surface Review when curator requests it, detecting parent-ascent presentation boundaries, maintaining an in-memory guide-target set from scheduler-known node paths, dispatching guide-writer at Session End, and handing session end to `session-wrap-up`. It does not create nodes itself; if research planner creates a minimal child before returning `focus.md`, the scheduler simply parses the new cursor/worker target and curator closes the structure later in the cycle. When research planner writes `### Pre-Worker Tree Directives`, `/auto` runs curator before workers as an inserted readiness transaction, then continues the ordinary cycle unless curator reports that the planned worker dispatch was invalidated.
 
 ## Constraints
 
@@ -48,12 +49,13 @@ The team and who owns what:
 | Term | Meaning |
 |---|---|
 | **Session** | One `/auto` execution — from start to final draft |
-| **Ordinary Cycle** | One iteration of the normal scheduler loop (direction-challenger → research planner → workers → Provisional Review → optional one repair loop → curator → optional Durable Surface Review → curator follow-up) |
+| **Ordinary Cycle** | One iteration of the normal scheduler loop (direction-challenger → research planner → optional pre-worker curator readiness transaction → workers → Provisional Review → optional one repair loop → curator → optional Durable Surface Review → curator follow-up) |
 | **Presentation-Boundary Cycle** | A valid cycle variant where parent-ascent replaces workers / Provisional Review / ordinary curator dispatch with the child presentation transaction, plus Durable Surface Review if that transaction requests it |
 | **Task** | One `{{ runtime.tool_agent }}` tool call |
 | **Presentation Boundary** | A child-to-parent cursor ascent where parent-level worker dispatch is paused until the child is made readable as a parent component |
 | **Child Presentation Judgment** | Research planner's meaning judgment at the boundary: what the child was for, what it achieved or failed to achieve, and what the parent should now see |
 | **Child Presentation Transaction** | Curator's tree update at the boundary: applying the judgment to status, Current Board, parent plan/state, durable surfaces, archive/reframe mechanics, and link hygiene |
+| **Guide target set** | In-memory Set of node paths the scheduler already touched or observed this session; used only at Session End to tell guide-writer which guides to inspect |
 
 One session = up to `MAX_CYCLES` cycles. Multiple tasks can run in parallel within a cycle.
 
@@ -97,6 +99,18 @@ Overwrite `.logs/.auto-active` with:
 ```
 
 This is the resume beacon read at Session Start (see `phases/session-lifecycle.md`). Writing it every cycle (not just at session start) means that after a mid-cycle compaction, `remaining` reflects what is owed.
+
+Maintain a session-local `guide_targets` Set throughout the loop. Add `research/` at session start. During each cycle, add every scheduler-known node path without doing research interpretation:
+
+- current `Cursor`
+- `Previous cursor` when present
+- every worker dispatch `Target: research/{path}/`
+- curator dispatch cursor
+- presentation-boundary parent and child
+- every Durable Surface Review target's owning node
+- final cursor ancestors at Session End
+
+This Set is not written to disk and is not a change detector. It is only the scheduler's mechanical record of where this session looked or acted, so guide-writer can refresh human oversight entrypoints at Session End without curator deciding guide staleness.
 
 ### 1. Direction-Challenger Dispatch — Pre-Direction Opposition
 
@@ -161,7 +175,7 @@ Update research/focus.md for the next cycle.
 
 On the very first cycle of a session, `Recent Deliverables` / `Critic Verdicts` / `Curator Sweep` are empty (no previous cycle); the research planner initialises from `research/focus.md` and the tree. If `research/focus.md` does not yet exist, include a note in the prompt: `focus.md missing — initialise at research/ root`.
 
-Research planner returns `DONE: research/focus.md`. If it returns `FAILED:`, re-dispatch once with the failure message appended to the prompt. If the second attempt also fails, exit to Session End with a partial draft — deciding *why* a failure is recoverable is research judgment, so the scheduler bounds the loop mechanically rather than classifying the failure.
+Research planner returns `DONE: research/focus.md`. If it returns `FAILED: cursor target {path} missing — scheduler must reinitialise focus.md`, re-dispatch once with the failure message appended and the instruction: `Recovery: initialise the cursor at research/ root; this scheduler recovery does not count as a research-planner cursor move.` If it returns any other `FAILED:`, re-dispatch once with the failure message appended to the prompt. If the second attempt also fails, exit to Session End with a partial draft — deciding *why* a failure is recoverable is research judgment, so the scheduler bounds the loop mechanically rather than classifying the failure.
 
 ### 3. Parse `research/focus.md`
 
@@ -170,9 +184,12 @@ Read the new `research/focus.md`. Extract:
 - **Cursor** — the path into the tree (for context when forming worker prompts)
 - **Previous cursor** — carried from the pre-dispatch read above
 - **Status** — `active` or `session_complete`
+- **Pre-Worker Tree Directives** — list of curator directives that must land before worker dispatch
 - **Worker Dispatches** — list of `{agent}: {task}` entries
 - **Tree Directives** — list of directives for curator
 - **Blockers** — informational
+
+If an older `focus.md` lacks `### Pre-Worker Tree Directives`, treat that section as empty for this cycle and let research planner regenerate the full format on its next write.
 
 If `Status: session_complete` → proceed to Session End (skip remaining cycles).
 
@@ -219,6 +236,43 @@ If the presentation-boundary curator return contains `Durable Surface Review nee
 
 Research planner should leave `Worker Dispatches` empty on an ascent cycle. If it listed workers anyway, skip them and carry a scheduler warning into the next research planner prompt via the curator sweep summary: parent-level workers were not launched because child presentation must land before parent-level planning continues.
 
+### 3b. Pre-Worker Curator Readiness Transaction
+
+If `### Pre-Worker Tree Directives` is non-empty, dispatch curator before launching workers:
+
+```
+{{#if runtime.is_codex}}
+{{ runtime.tool_agent }}(prompt="""
+Read and follow `{{ runtime.agents_dir }}/curator.md` as your role definition. Treat the rest of this prompt as task-specific input.
+
+## Task
+Pre-Worker Readiness Transaction. Execute the pre-worker tree directives below so workers read a valid active-memory context. Perform content-preserving routing work only: repair graph/lifecycle/context-route surfaces, compress residue, relocate/archive/demote/re-link material, create/close/reframe placement when authorized, and return whether the planned worker dispatch remains valid. Do not perform content audit, substantive findings/analysis edits, provenance closure, or Durable Surface Review requests in this pre-worker transaction.
+{{else}}
+{{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="curator", prompt="""
+## Task
+Pre-Worker Readiness Transaction. Execute the pre-worker tree directives below so workers read a valid active-memory context. Perform content-preserving routing work only: repair graph/lifecycle/context-route surfaces, compress residue, relocate/archive/demote/re-link material, create/close/reframe placement when authorized, and return whether the planned worker dispatch remains valid. Do not perform content audit, substantive findings/analysis edits, provenance closure, or Durable Surface Review requests in this pre-worker transaction.
+{{/if}}
+
+## Pre-Worker Tree Directives (from research planner, this cycle)
+{verbatim copy of focus.md § Pre-Worker Tree Directives}
+
+## Planned Worker Dispatches (for validity check only)
+{verbatim copy of focus.md § Worker Dispatches}
+
+## New Evidence This Cycle
+(none — this transaction prepares active memory before evidence-producing work)
+
+## Context
+Cursor: {cursor path from focus.md}
+Session cycle: {cycle_number} of {MAX_CYCLES}
+Pre-worker readiness: true
+""")
+```
+
+Record the returned summary as the cycle's pre-worker curator summary. The pre-worker pass must not request or launch Durable Surface Review. The normal path then continues to Worker Dispatch. Only if curator explicitly returns `Dispatch readiness: invalidated` should the scheduler skip worker dispatch, Provisional Review, and the ordinary curator pass for this cycle, then proceed to Cycle End; carry the curator summary into the next cycle's `Curator Sweep` so research planner can re-plan from the repaired tree. `Dispatch readiness: invalidated` means the memory repair showed that the planned worker target or task requires non-routing work before workers can honestly proceed, not that curator has chosen a new research direction.
+
+If there are no `Pre-Worker Tree Directives`, skip this step. Do not synthesize a readiness pass from ordinary `Tree Directives`; timing is research planner's judgment.
+
 ### 4. Worker Dispatch — Parallel
 
 If `Worker Dispatches` is non-empty, launch all workers in parallel per `phases/dispatch.md` (Pattern A by default).
@@ -231,7 +285,7 @@ If `Worker Dispatches` is empty, skip this step. A structural-review cycle (only
 
 For every review-eligible worker submission returned in step 4, dispatch a critic (Provisional Review — separate judgment in the same `_reviews/{slug}/` transaction) per `phases/dispatch.md` § Provisional Review Rule. Critic runs in blind mode by default for submissions that are mechanical/mathematical (researcher attempts, simulator runs), source-audit mode for reader submissions, and contextual mode when the submission's soundness depends on the research narrative (scout surveys, concept proposals). The rule for mode selection is in `phases/dispatch.md`.
 
-Worker submissions skipped from critic: none by default. Research planner may in rare cases mark a dispatch as "no-critic" in `### Worker Dispatches` (e.g., an engine-builder refactor with no substantive claim to verify); honour such markings.
+Worker submissions skipped from critic: `self-check` by fixed rule, because self-check is itself a review; otherwise none by default. Research planner may in rare cases mark a dispatch as "no-critic" in `### Worker Dispatches` (e.g., an engine-builder refactor with no substantive claim to verify); honour such markings.
 
 Critic writes `critic.md` in the same `_reviews/{slug}/` directory. For `REVISE-BLOCKING` or `OPAQUE`, apply the optional one-repair loop in `phases/dispatch.md` only when the repair is cheap and bounded. Collect the transaction directory, worker submission path, final critic review path, and final verdict for step 6.
 
@@ -255,6 +309,9 @@ Execute the tree directives below and absorb the new evidence (worker review tra
 ## Tree Directives (from research planner, this cycle)
 {verbatim copy of focus.md § Tree Directives}
 
+## Pre-Worker Curator Summary
+{DONE summary from step 3b, or "(none)"}
+
 ## New Evidence This Cycle
 - {transaction directory} — worker: {worker.md or repair.md}; critic review: {critic.md or critic_rereview.md}; verdict: {ACCEPT / REJECT / REVISE-NONBLOCKING / REVISE-BLOCKING / OPAQUE}
 - ...
@@ -268,7 +325,7 @@ Session cycle: {cycle_number} of {MAX_CYCLES}
 """)
 ```
 
-Curator reads the review transactions and tree state; executes the directives; absorbs admitted content into state.md without `_reviews/` or `.logs/` links; updates plan.md / conventions.md / findings.md / guide.md / status / _materials/analyses/*.md / checks / dead_ends.md per its operating rules; returns `DONE: {summary}`.
+Curator reads the review transactions and tree state; executes the directives; absorbs admitted content into state.md without `_reviews/` or `.logs/` links; updates plan.md / conventions.md / admitted findings.md materialisations / status / _materials/analyses/*.md / checks / dead_ends.md per its operating rules; returns `DONE: {summary}`. Curator does not write guide.md.
 
 If curator returns with unresolved `REVISE-BLOCKING`, `OPAQUE`, or `REJECT` Provisional Reviews, curator flags these in its return. The scheduler records the flag; direction-challenger and research planner see the flagged transactions in the next cycle's prompts, and research planner decides whether to re-dispatch, pivot, or close.
 
@@ -329,6 +386,7 @@ Read `phases/session-lifecycle.md` § Session End. Summary:
 1. **Simulation housekeeping decision** — if simulator ran, research planner may identify superseded scripts in final `research/focus.md` Tree Directives. Do not move them in the scheduler.
 2. **Final curator sweep** — dispatch curator once more with the final Tree Directives plus a compact list of this session's worker-submission / critic-review paths and prior curator summaries for coherence review. Do not ask curator to re-absorb already absorbed review transactions or raw logs. Curator executes any `archive superseded script {path}` directives by moving the script and its companion `.md` to `_materials/src/archive/`.
 3. **Drain pending Durable Surface Reviews** — if the final curator sweep or an earlier cycle carried pending durable review requests, dispatch those reviews and re-dispatch curator to apply them, subject to the two-round cap in `phases/dispatch.md`.
-4. **Final research planner dispatch (session-end mode)** — research planner writes the wrap-up-input file (path obtained via `bash .scripts/log-path.sh wrap-up-input` and returned as `DONE: {path}`), using the final curator sweep and this session's direction-challenge files as evidence for the next session's Focus and any `## Agenda` items. Capture the returned path for step 5.
-5. **`session-wrap-up` dispatch** — the agent consumes the wrap-up-input file (path passed in the dispatch prompt), writes `research/focus.md` / `.logs/last_session.md` / a session log file (path obtained via `bash .scripts/log-path.sh auto`) / node-scoped `backlog.md` files / `agenda.md`, deletes `.logs/.auto-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
-6. **Final draft to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.
+4. **Guide-writer sweep** — dispatch guide-writer with the session-local guide target set after curator has finished tree transactions and durable reviews. guide-writer updates `guide.md` only where the human oversight entrypoint is missing or stale.
+5. **Final research planner dispatch (session-end mode)** — research planner writes the wrap-up-input file (path obtained via `bash .scripts/log-path.sh wrap-up-input` and returned as `DONE: {path}`), using the final curator sweep, guide-writer sweep, and this session's direction-challenge files as evidence for the next session's Focus and any `## Agenda` items. Capture the returned path for step 6.
+6. **`session-wrap-up` dispatch** — the agent consumes the wrap-up-input file (path passed in the dispatch prompt), writes `research/focus.md` / `.logs/last_session.md` / a session log file (path obtained via `bash .scripts/log-path.sh auto`) / node-scoped `backlog.md` files / `agenda.md`, deletes `.logs/.auto-active`, commits, pushes. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
+7. **Final draft to user** — emit the session summary to the user. This is the **only** user-facing closing message (per Turn-Yielding Discipline). Yield after emitting.

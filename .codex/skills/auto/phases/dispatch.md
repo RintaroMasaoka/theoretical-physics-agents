@@ -11,14 +11,15 @@ Use only the two patterns below. Never `exec_command("sleep ...")` or `exec_comm
 ### Pattern A — Foreground Parallel (default)
 
 
-Call multiple `spawn_agent` tools in a single message using the normal dispatch form. All tasks execute in parallel and the scheduler blocks until every one completes.
+Launch all `spawn_agent` calls in one tool-use batch, capture every returned `agent_id`, then immediately wait on all of them with `wait_agent` before continuing. This is foreground from the scheduler's point of view: no later step may start until all returned agents have completed.
 
 
 ```
 
-spawn_agent(prompt="Read and follow `.codex/agents/researcher.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\n...")   ─┐
-spawn_agent(prompt="Read and follow `.codex/agents/researcher.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\n...")   ─┼─ Parallel, auto-block
-spawn_agent(prompt="Read and follow `.codex/agents/simulator.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\n...")    ─┘
+spawn_agent(prompt="Read and follow `.codex/agents/researcher.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\n...") → agent_id_1
+spawn_agent(prompt="Read and follow `.codex/agents/researcher.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\n...") → agent_id_2
+spawn_agent(prompt="Read and follow `.codex/agents/simulator.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\n...") → agent_id_3
+wait_agent(targets=[agent_id_1, agent_id_2, agent_id_3], timeout_ms=...)
 
 ```
 
@@ -27,7 +28,7 @@ This is the default for the Worker Dispatch step and for Provisional Review.
 ### Pattern B — Background + Continued Work
 
 
-Launch normally and capture the returned agent id; the scheduler continues other work, and the system notifies on completion. Retrieve via `wait_agent`.
+Launch normally and capture the returned agent id, but do not wait immediately. The scheduler continues other independent work, and the system notifies on completion. Retrieve via `wait_agent` before any dependent step.
 
 ```
 spawn_agent(prompt="Read and follow `.codex/agents/researcher.md` as your role definition. Treat the rest of this prompt as task-specific input.\n\n...") → agent_id
@@ -75,7 +76,7 @@ The research planner's focus.md entries are written concretely enough that these
 
 ## Provisional Review Rule
 
-"Worker" here means the execution-tier agents listed in the Worker row of `.codex/AGENTS.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Direction-support agents (`direction-challenger`) and scheduler-owned agents (`curator`, `session-wrap-up`) are not workers and receive no Provisional Review — the challenger's narrow opposition format and research planner's required response are its integrity mechanism.
+"Worker" here means the execution-tier agents listed in the Worker row of `.codex/AGENTS.md` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Direction-support agents (`direction-challenger`) and scheduler-owned agents (`curator`, `guide-writer`, `session-wrap-up`) are not workers and receive no Provisional Review — the challenger's narrow opposition format, guide-writer's read-only-from-durable-surfaces boundary, and research planner's required response are their integrity mechanisms.
 
 Every review-eligible `worker.md` submission returned from Cycle step 4 is critiqued by a critic dispatch in Cycle step 5 — this is automatic, not something research planner requests. The rule is fixed:
 
@@ -112,7 +113,7 @@ The repair prompt sends the original `worker.md`, `critic.md`, and the instructi
 
 ## Durable Surface Review Rule
 
-Durable Surface Review is scheduler-dispatched from curator's request. Curator owns findings/analysis promotion and provenance closure, but the scheduler owns agent orchestration. This boundary is load-bearing: sub-agent to sub-agent dispatch is harness-dependent, so a curator-internal critic launch can silently fail in some runtimes. Curator therefore returns a `Durable Surface Review needed:` block instead of launching critic itself.
+Durable Surface Review is scheduler-dispatched from curator's request. Curator owns admitted findings/analysis materialisation and provenance closure, but the scheduler owns agent orchestration. This boundary is load-bearing: sub-agent to sub-agent dispatch is harness-dependent, so a curator-internal critic launch can silently fail in some runtimes. Curator therefore returns a `Durable Surface Review needed:` block instead of launching critic itself.
 
 The scheduler reads curator's return after each curator dispatch. If the return contains one or more durable review requests, dispatch critic once per request using Pattern A. Critic writes the review under the target node's `checks/` directory, never under `.logs/` and never inline into the target surface.
 
@@ -149,7 +150,30 @@ After the critic returns `DONE: {checks/... critic path}`, re-dispatch curator w
 
 ## Curator Dispatch Input
 
-The scheduler passes curator a structured prompt containing **research planner's directives** and **this cycle's evidence**. Curator does not re-discover what changed; the scheduler states it:
+For pre-worker readiness transactions, the scheduler passes curator only the readiness directives, planned worker dispatches, and cursor context. This pass happens before evidence-producing work, so it must not be treated as evidence absorption:
+
+```text
+## Task
+Pre-Worker Readiness Transaction. Execute the pre-worker tree directives below so workers read a valid active-memory context. Perform content-preserving routing work only: repair graph/lifecycle/context-route surfaces, compress residue, relocate/archive/demote/re-link material, create/close/reframe placement when authorized, and return whether the planned worker dispatch remains valid. Do not perform content audit, substantive findings/analysis edits, provenance closure, or Durable Surface Review requests in this pre-worker transaction.
+
+## Pre-Worker Tree Directives
+{verbatim copy of research/focus.md § Pre-Worker Tree Directives}
+
+## Planned Worker Dispatches
+{verbatim copy of research/focus.md § Worker Dispatches — for validity check only}
+
+## New Evidence This Cycle
+(none — this transaction prepares active memory before evidence-producing work)
+
+## Context
+Cursor: research/{path}/
+Session cycle: {n} of {N}
+Pre-worker readiness: true
+```
+
+Curator returns either `Dispatch readiness: valid` or `Dispatch readiness: invalidated`. The pre-worker pass must not request or launch Durable Surface Review. The scheduler continues to worker dispatch only for `valid`; for `invalidated`, it records the curator summary for the next research-planner cycle and does not invent a replacement worker plan.
+
+For ordinary evidence absorption, the scheduler passes curator a structured prompt containing **research planner's post-worker directives** and **this cycle's evidence**. Curator does not re-discover what changed; the scheduler states it:
 
 ```
 ## Task
@@ -157,6 +181,9 @@ Execute the tree directives below and absorb the new evidence into the tree per 
 
 ## Tree Directives (from research planner, this cycle)
 {verbatim copy of research/focus.md § Tree Directives — each line is an imperative curator should apply}
+
+## Pre-Worker Curator Summary
+{DONE summary from the pre-worker readiness transaction, or "(none)"}
 
 ## New Evidence This Cycle
 - {transaction directory} — worker: {worker.md or repair.md}; critic review: {critic.md or critic_rereview.md}; verdict: {ACCEPT / REJECT / REVISE-NONBLOCKING / REVISE-BLOCKING / OPAQUE}

@@ -50,7 +50,7 @@ The discipline serves the mindset. An agent free to jump anywhere drifts into ta
 
 **Staying** is the default when the current node still has live work. You do not need to move every dispatch; many productive cycles keep the cursor fixed.
 
-**Node creation.** If a sub-question at the current cursor deserves its own child node (see criterion below), you may create the minimal child immediately when the child is needed as this cycle's cursor or worker target. This is not bookkeeping trivia: decomposition is part of scientific direction, because the tree shape determines what evidence is read together, what counts as a live frontier, and what workers receive as context. A large construction, proof, or calculation whose parts have begun to carry independent evidence streams should be split before the parent becomes a catch-all notebook.
+**Node creation and pre-worker context construction.** If a sub-question at the current cursor deserves its own child node (see criterion below), you may create the minimal child immediately when the child is needed as this cycle's cursor or worker target. This is not bookkeeping trivia: decomposition is part of scientific direction, because the tree shape determines what evidence is read together, what counts as a live frontier, and what workers receive as context. A large construction, proof, or calculation whose parts have begun to carry independent evidence streams should be split before the parent becomes a catch-all notebook.
 
 The rule is: **you may perform the smallest structural write needed to express your direction judgment before dispatch; curator owns structural closure.** Minimal creation means only:
 
@@ -59,15 +59,17 @@ The rule is: **you may perform the smallest structural write needed to express y
 3. set `Cursor:` to that new child and/or list worker dispatches targeting it, if the next work belongs there
 4. add a Tree Directive asking curator for structural closure: update the parent's plan/state, copy any named evidence cluster if needed, create child plan.md if warranted, repair links/placement, and check whether the node should instead be represented by a draft/dead_end/archive
 
-Do not edit the parent's `plan.md`, copy evidence entries, move _materials/analyses/checks/conventions, update links, close/archive/reparent nodes, or make lifecycle cleanup edits yourself. Those are exactly the administrative operations that would pollute your scientific context; curator performs them after worker/critic or at a presentation boundary.
+Do not edit the parent's `plan.md`, copy evidence entries, move _materials/analyses/checks/conventions, update links, close/archive/reparent nodes, or make lifecycle cleanup edits yourself. Those are exactly the administrative operations that would pollute your scientific context; curator performs them after worker/critic, at a presentation boundary, or in a pre-worker readiness transaction.
 
 If the child is not needed until a later cycle, or if its path/name/scope is not clear enough to create without administrative judgment, leave the cursor at the parent and express the split as a Tree Directive for curator/research-planner follow-up instead of forcing a folder.
+
+If the next workers would be misled by active-tree context before they start, use `### Pre-Worker Tree Directives` rather than creating local scaffolding or dispatching a worker to manage memory. This applies when earlier-scope results re-enter the current route with weaker authority than the route needs, when a planned worker target depends on node placement/closure/reframing/archive-residue extraction, when a stale or overloaded surface would be read in the wrong role, or when a material/source route must be demoted before workers can use the cursor honestly. Keep these directives to content-preserving routing work: relocate, archive, demote, re-link, close/reframe placement, and write only the minimal route consequence needed to prevent misuse. Do not use pre-worker curation to request content audit, derivation rewrite, new analysis preservation, provenance closure, schemas, guards, adapters, or other infrastructure around an under-authorized result unless that work is itself the next evidence-producing worker step.
 
 Minimal `state.md` shape:
 
 ```markdown
 ---
-kind: {question | task | subtask | conjecture | example | observation | gap | caution}
+kind: {narrative | question | task | subtask | conjecture | example | observation | gap | caution}
 status: open
 ---
 
@@ -147,6 +149,11 @@ Status: active | session_complete
 
 ## Next Session
 
+### Pre-Worker Tree Directives
+- {specific curator transaction that must land before worker dispatch, if any}
+- (e.g., "pre-worker readiness: compress earlier result X at `research/{path}/` into the current-route consequence that it does not support target Y; archive/move residue if appropriate; keep only the missing-evidence implication active", "create/close/reframe/archive `research/{path}/` before workers read this cursor because its current surface routes obsolete context", "repair child-node placement for the worker target below before dispatch")
+- (may be empty; an empty section means workers can read the current tree as-is)
+
 ### Worker Dispatches
 - **{agent}**: {target / task description, concrete enough that the scheduler can form the prompt}
 - **{agent}**: {…}
@@ -167,16 +174,18 @@ Status: active | session_complete
 - **Status**: `active` while the session should continue; `session_complete` when you judge the research has reached a natural stopping point (the scheduler exits the cycle loop without enforcing `MAX_CYCLES` further). Do not set `session_complete` lightly — a genuine complete is when the cursor's subtree is exhausted *and* the root-level argument has no outstanding next question you have framed.
 - **Context**: the research planner narrates the situation in compact prose. If you cannot fit it in 5 sentences, that is a signal your thinking is not yet sharp — iterate in your own reasoning before writing. Do not copy state.md's Current Board verbatim; restate what matters for the direction.
 - **Direction Challenge Response**: do not merely acknowledge the challenge. State which objection changes the direction, which is rejected, and which is held for later. If the challenge found no strong objection, write one bullet saying why the local board still supports the chosen direction.
+- **Pre-Worker Tree Directives**: use this only when worker dispatch would otherwise start from misleading, stale, overloaded, or authority-ambiguous active memory. The directive is still a curator transaction, but its timing matters: the scheduler runs it before workers and then continues to worker dispatch unless curator reports that the planned dispatch was invalidated by the repair. This section is for readiness of context, not for evidence production, content audit, fact-layer completion, or giving curator a new research priority.
 - **Worker Dispatches**: each entry names an agent and the concrete task. The scheduler uses this to form agent prompts; be specific enough that the agent itself could begin work from this line plus the cursor's context. For `reader`, write a source-native extraction scope only: named paper, source sections/equations/topics to inspect, and the source-side information needed. Do not ask reader to decide project relevance, possible use, bridge status, or integration into this node. See § Agent Menu below for what each agent does.
+- **Worker Dispatch parse contract**: include the labels the scheduler extracts. Researcher entries need `Target: research/{path}/`, `kind: {kind}`, and `Context:`. Simulator entries need `Target:`, `Physical setup`, `Mathematical definition of observables`, `Success criteria`, `Run number`, available `research/_materials/lib/` modules, and existing `_materials/src/` scripts when relevant. Reader entries need `Assigned paper: arXiv:{id}`, `Title:`, and `Extraction scope:`. Scout, engine-builder, concept-checker, and self-check entries must include the concrete fields described in § Agent Menu / `phases/dispatch.md`; do not rely on unlabeled natural prose when the scheduler expects a field.
 - **Boundary mode in dispatches**: when a task touches an external source, project construction, convention bridge, or internal diagnostic whose roles could be confused, say the intended mode in ordinary prose: source-native reading only, project-side construction, bridge construction, diagnostic audit, or discrepancy resolution. This is not a schema field; it is a guardrail so the worker does not translate a source claim too early or promote an internal diagnostic into the research target.
 - **Tree Directives**: each entry names a concrete graph/lifecycle/fact transaction curator should apply. Use imperative form ("structural closure for new child X", "create X later", "close Y", "preserve analysis Z", "retract W"). Curator decides mechanics and durable link boundaries; you decide the scientific what-and-why. When you created a minimal child yourself, include a structural-closure directive so curator can integrate it with the parent.
 - **Blockers**: use this field for real obstacles — missing prerequisite literature, a simulator that is not yet written, a critic failure that prevents even framing the next question. A failed or REVISE worker attempt is normally direction input, not a blocker: decide whether to re-dispatch, pivot, or close in `## Direction Challenge Response` and `### Worker Dispatches` / `### Tree Directives`.
 
 ### Cycles with no Worker Dispatches
 
-A legitimate cycle may have empty `Worker Dispatches` and only `Tree Directives` — this is the "structural review" cycle, typically entered after an ascent to a parent where the right action is to reorganise (close a stalled child, preserve a verified analysis, retract a falsified claim) rather than dispatch new work. The scheduler still runs curator that cycle to execute the directives; workers are simply skipped.
+A legitimate cycle may have empty `Worker Dispatches` and only `Tree Directives` — this is the "structural review" cycle, typically entered after an ascent to a parent where the right action is to reorganise (close a stalled child, preserve a verified analysis, retract a falsified claim) rather than dispatch new work. The scheduler still runs curator that cycle to execute the directives; workers are simply skipped. `Pre-Worker Tree Directives` alone do not make a structural-review cycle: they are inserted before worker dispatch, and the normal worker → critic → curator path still runs unless the pre-worker transaction invalidates the planned dispatch.
 
-A cycle with empty `Worker Dispatches` AND empty `Tree Directives` is either (a) a think-cycle where the only product is updated context in `focus.md` (legitimate, but rare — use sparingly) or (b) a symptom that `Status: session_complete` should be set. Check which.
+A cycle with empty `Pre-Worker Tree Directives`, empty `Worker Dispatches`, AND empty `Tree Directives` is either (a) a think-cycle where the only product is updated context in `focus.md` (legitimate, but rare — use sparingly) or (b) a symptom that `Status: session_complete` should be set. Check which.
 
 ## Agent Menu
 
@@ -190,7 +199,7 @@ These are the workers the scheduler can dispatch on your behalf. Name the agent 
 - **concept-checker** — Read a document and create concept notes for undefined terms. Use sparingly; curator's self-containment audit already creates concept notes on demand.
 - **self-check** — Read a findings.md, guide.md, or plan.md as a first-time reader and flag self-containedness or oversight-surface issues. Use when you suspect findings.md has drifted into project-internal jargon or guide.md no longer helps a human supervise the node.
 
-**Do not dispatch critic or curator yourself.** Critic is auto-attached by the scheduler to every review-eligible worker submission. Curator is dispatched by the scheduler every cycle to execute your tree directives and absorb new evidence. Requesting these in `### Worker Dispatches` is a mis-use — they are scheduler-level, not research planner-level.
+**Do not dispatch critic or curator yourself.** Critic is auto-attached by the scheduler to every review-eligible worker submission. Curator is dispatched by the scheduler for `### Pre-Worker Tree Directives`, for ordinary `### Tree Directives` and evidence absorption, and at presentation boundaries. Requesting curator or critic in `### Worker Dispatches` is a mis-use — they are scheduler-level, not research planner-level.
 
 ## Stable Check, Analysis Preservation, Retraction — Express as Tree Directives
 
