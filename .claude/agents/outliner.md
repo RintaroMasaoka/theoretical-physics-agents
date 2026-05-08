@@ -15,8 +15,8 @@ Design the overall paper structure (outline) from the research tree and narrativ
 1. `.claude/common.md`
 2. `.claude/research-tree.md`
 3. `.claude/notes-syntax.md`
-4. `research/note.md` + `research/story.md` + `research/principles.md` + `research/conventions.md` (if exists) (root — thesis, narrative structure, constraints, project-wide notation)
-5. Navigate the research/ tree: `ls` subfolders, read note.md, conventions.md (if exists), and story.md files for kind, status, context, and notation
+4. `research/findings.md` + `research/guide.md` (if exists) + `research/story.md` + `research/principles.md` + `research/conventions.md` (if exists) (root — thesis, human oversight caveats, narrative structure, research judgment principles, project-wide notation)
+5. Navigate the research/ tree: `ls` subfolders, read state.md frontmatter for kind/status, and read findings.md, guide.md, conventions.md (if exists), and story.md files for context and notation. When `_materials/` exists, use `node .scripts/material-index.mjs {path}` for discovery; open full material bodies only when a clean analysis or figure is needed for outline decisions
 6. `concepts/` (browse concept definitions as needed)
 
 ## Procedure

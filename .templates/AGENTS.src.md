@@ -8,8 +8,8 @@ Users run `/auto` to advance research autonomously, `/steer` to choose the next 
 All user-facing output is written in **{{ language }}**. This covers:
 
 - Conversational responses to the user
-- Any file the system writes into the project — research tree (`research/**` such as `note.md`, `state.md`, `story.md`, `plan.md`, …), session records (`.logs/**` such as launch and meeting summaries), and any other prose file
-- Deliverables produced by worker sub-agents (see `{{ runtime.common_file }}`)
+- Any file the system writes into the project — research tree (`research/**` such as `findings.md`, `state.md`, `story.md`, `plan.md`, …), session records (`.logs/**` such as launch and meeting summaries), and any other prose file
+- Worker submissions, raw logs, and other task outputs produced by sub-agents (see `{{ runtime.common_file }}`)
 - Commit messages
 
 Technical terms, proper nouns, and LaTeX mathematics may remain in their original language — the rule is about prose, not formulas or named objects.
@@ -26,9 +26,9 @@ The system uses different orchestration models in `/auto`, `/steer`, and `/write
 |---|---|---|
 | **Direction challenge** | `direction-challenger` | Pre-direction opposition for research planner: challenges value, goal, necessity, frame, scale, authority, and inertia anchors before the direction hardens |
 | **Direction** | `research-planner` | `research/focus.md` — chooses cursor, formulates worker dispatches, issues tree directives. Thinks as a research planner (curiosity + critical thinking + narrative coherence) |
-| **Tree transaction** | `curator` | Graph/lifecycle/placement, state.md absorbed evidence, plan.md consistency, conventions/checks placement, report placement/promotion, retraction, `dead_ends.md`, and current-runtime note.md fact transactions. Executes research planner's tree directives and absorbs worker evidence |
-| **Verification** | `critic` | Independent review of every worker deliverable (Target A, auto-attached by the scheduler) and of every curator-lifted note.md derivation (Target B) |
-| **Execution** | workers (researcher, simulator, reader, scout, engine-builder, concept-checker, self-check) | Bounded tasks — their deliverables stay provisional until critic has verified them |
+| **Tree transaction** | `curator` | Graph/lifecycle/placement, state.md absorbed evidence, guide.md maintenance, plan.md consistency, conventions/checks placement, `_materials/analyses/` material placement, retraction, `dead_ends.md`, and current-runtime findings.md fact transactions. Executes research planner's tree directives and absorbs reviewed worker transactions |
+| **Verification** | `critic` | Independent Provisional Review for every review-eligible `_reviews/{slug}/worker.md` submission and Durable Surface Review for every curator-touched findings/analysis surface requested by curator and dispatched by the scheduler |
+| **Execution** | workers (researcher, simulator, reader, scout, engine-builder, concept-checker, self-check) | Bounded tasks — their `_reviews/` submissions stay provisional until critic has verified them |
 | **Session finalisation** | `session-wrap-up` | Mechanical transcription of research planner's session-end wrap-up input into `research/focus.md`, `.logs/last_session.md`, node-scoped `backlog.md`, and the session log; commits and pushes |
 
 ### `/steer` — human-steered cycle

@@ -31,15 +31,16 @@ AskUserQuestion: Ask user to describe the research theme overview in Other
     ▼ AI presents several approach options → Refine direction (2-3 rounds)
     ▼ Present drafted structure and get confirmation before writing
     ▼ Create research/ tree:
-        1. research/note.md (project's initial understanding — free-form, no template)
-        2. research/state.md (background, working state — with frontmatter)
-        3. research/story.md (narrative structure)
-        4. research/principles.md (constraints, empty if none)
-        5. research/{step}/state.md for each step in the narrative structure (child nodes start with state.md)
-        6. research/focus.md (session cursor pointing to the first active child)
+        1. research/findings.md (project's initial understanding — free-form, no template)
+        2. research/guide.md (human oversight entrypoint — what to watch, ask, and read first)
+        3. research/state.md (background, working state — with frontmatter)
+        4. research/story.md (narrative structure)
+        5. research/principles.md (research principles, only if reusable principles are already known)
+        6. research/{step}/state.md for each step in the narrative structure (child nodes start with state.md)
+        7. research/focus.md (session cursor pointing to the first active child)
 ```
 
-File formats (note.md, state.md) are defined in `.claude/research-tree.md`. The content emerges from the research discussion — there are no prescribed section names. AI drafts the prose and confirms with the user.
+File formats (findings.md, guide.md, state.md) are defined in `.claude/research-tree.md`. The content emerges from the research discussion — findings.md captures reusable draft facts, guide.md captures the human oversight entrypoint, and state.md captures working state. AI drafts the prose and confirms with the user.
 
 **Child folder names** follow the tree-wide naming convention in `.claude/research-tree.md` (§ Folder Names): semantic slugs describing the node, not ordering-encoded paths.
 
@@ -53,13 +54,20 @@ Step 1: **{title}** — {why the reader needs this here} [open]
 Step 2: ...
 ```
 
-**Constraints (`research/principles.md`):**
+**Research principles (`research/principles.md`, optional):**
 
 ```markdown
-# Constraints
+# Research Principles
 
-{Cross-cutting research constraints that apply to the whole project. Leave empty if none yet}
+## {Principle name}
+Scope: project-wide
+Principle: {reusable judgment rule that will constrain future research decisions}
+Reason: {why this principle exists}
+Consequence: {what agents should accept, reject, separate, or route differently because of it}
+Origin: > [Launch YYYY-MM-DD] {short reason}
 ```
+
+Create this file only when the launch discussion has produced an actual reusable research judgment principle. Do not create an empty placeholder. Research goals, narrative success conditions, route priorities, source priorities, notation choices, and workflow/file-format rules belong in `story.md`, `plan.md`, `sources.md`/`backlog.md`, `conventions.md`, or the framework prompts instead.
 
 `research/focus.md` is a lightweight pointer that tells `/auto` where to resume work. `/launch` initializes it; `/auto` updates it each session.
 
@@ -68,23 +76,38 @@ Step 2: ...
 ```markdown
 # Focus
 
-Working on: research/{first_active_child}/
-{Why starting here}
+Cursor: research/{first_active_child}/
+Status: active
 
-## This Session
-- (to be filled by /auto)
+## Context
+{2-5 sentences: why starting here and what is live at the cursor}
+
+## Direction Challenge Response
+- Launch initialization: no prior direction challenge; starting from the first active child because {why this is the right first focus}
+
+## Next Session
+
+### Worker Dispatches
+- (to be filled by research planner or /auto)
+
+### Tree Directives
+- (empty unless launch created a structural cleanup directive)
+
+## Blockers
+{empty unless launch identified a blocker}
 ```
 
 **Principle:** The user decides "what" and "why." AI decides "how." AI drafts the wording and confirms with the user.
 
 ### Theme Change
 
-Modify the existing research direction. Read `research/note.md` (if exists), `research/state.md`, and `research/story.md` first, then present the current state. If the discussion touches specific nodes, navigate the tree and load relevant files before reflecting changes.
+Modify the existing research direction. Read `research/findings.md` (if exists), `research/guide.md` (if exists), `research/state.md`, and `research/story.md` first, then present the current state. If the discussion touches specific nodes, navigate the tree and load relevant files before reflecting changes.
 
 ```
-Data loading: research/note.md + research/state.md + research/story.md
+Data loading: research/findings.md + research/guide.md + research/state.md + research/story.md
     ▼ Present current theme summary:
-        Core understanding: {from note.md, abbreviated}
+        Core understanding: {from findings.md, abbreviated}
+        Human oversight: {from guide.md if present}
         Narrative Structure: {steps overview with status}
     ▼ AskUserQuestion: What aspect to change?
         - Research question / core claims
@@ -97,15 +120,16 @@ Data loading: research/note.md + research/state.md + research/story.md
 ```
 
 **Where to reflect:**
-- Verified understanding → edit `research/note.md`
+- Verified understanding → edit `research/findings.md`
+- Human-facing orientation / doubts / reading path → edit `research/guide.md`
 - Background / working state → edit `research/state.md`
 - Narrative Structure → edit `research/story.md`
-- Constraints → edit `research/principles.md`
+- Reusable research judgment principles → edit `research/principles.md`
 - New research directions → create child folders with state.md
-- Recontextualized results → update affected note.md files in the subtree
+- Recontextualized results → update affected findings.md files in the subtree
 - Full pivot → update all root files, restructure children as needed
 - Session cursor → update `research/focus.md` if the current focus node was moved, removed, or is no longer the logical next step
-- Leave `> [Launch YYYY-MM-DD] {reason}` markers in affected files at structural changes so `/auto` can understand why the tree changed
+- Leave `> [Launch YYYY-MM-DD] {reason}` markers only on structural/state surfaces where chronology belongs: `story.md`, `plan.md`, `state.md` Evidence/Revisions, and `principles.md` Origin fields. Never put launch markers in `findings.md` fact prose.
 
 **Scope of changes:** Match the scale of edits to the scale of the change — a minor refinement doesn't require restructuring the tree, and a full pivot doesn't preserve stale nodes.
 

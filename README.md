@@ -1,29 +1,23 @@
 # Research Agents Team for Theoretical Physics
 
-Autonomous research and paper-writing system for theoretical physics projects.
+Autonomous and human-steered research system for theoretical physics projects.
 
-The system is organized like a small research lab: a PI agent drives the project, specialized worker agents handle bounded tasks, and the human user steers direction through meetings. The repository is tool-agnostic at the instruction level, with shared template sources under `.templates/` and generated runtime-specific outputs under `.claude/` and `.codex/`.
-
-## Current Status
-
-This project is useful now, but the validation level is different for `/auto` and `/write`.
-
-- As of 2026-03-25, `/auto` is the more battle-tested path. In test research sessions, it has been exercised repeatedly at substantial scale, on the order of roughly 200 cycles in total.
-- As of 2026-03-25, `/write` is still much less validated. It has not yet been used in a real end-to-end project, so the writing workflow should be treated as experimental and expected to need further iteration.
-
-If you want the most reliable part of the system today, use `/meeting` and `/auto` first, and treat `/write` as an early-stage workflow that still needs practical feedback.
+The system is organized around file-based research memory. `/auto` runs a peer-agent team that separates direction-setting, execution, verification, and tree maintenance; `/steer` lets the human choose one executable cycle direction before the same machinery runs; `/write` turns accumulated research-tree facts into paper drafts. The repository is tool-agnostic at the instruction level, with shared template sources under `.templates/` and generated runtime-specific outputs under `.claude/` and `.codex/`.
 
 ## What This Repository Does
 
-- `/meeting` sets or revises the research direction with the user
+- `/launch` sets the initial research theme and creates the research tree
+- `/meeting` reviews direction, verification honesty, and human oversight decisions
+- `/steer` runs one human-steered research cycle
 - `/auto [N]` advances the research autonomously for up to `N` cycles
-- `/write [N]` turns accumulated research artifacts into paper drafts
+- `/write [N]` turns accumulated research-tree facts into paper drafts under `draft/**`
 - `/improve` is used to refine prompts, workflows, and agent behavior
 
 Core operating model:
 
-- The PI agent owns direction, prioritization, verification, and integration
-- Worker agents perform bounded tasks such as reading, research, critique, outlining, reviewing, or simulation
+- `/auto` is a thin scheduler; research judgment, worker execution, verification, and durable-memory maintenance are split across peer agents
+- `/write` drafts paper material by coordinating outline, section writing, review, integration, and reference checks
+- Worker agents perform bounded tasks such as reading, research, critique, outlining, reviewing, simulation, or source-record maintenance
 - During `/auto` and `/write`, the system is designed to continue without asking the user for clarification
 
 ## Quick Start
@@ -48,11 +42,12 @@ If you are using Claude Code, `.claude/settings.json` runs `node .scripts/config
 
 ### Minimal Workflow
 
-1. Run `/meeting` to define the topic and direction
-2. Run `/auto 2` to test a short autonomous research session
-3. Inspect generated artifacts such as `project.yaml`, `research/plan.md`, and `.logs/last_session.md`
-4. Use larger `/auto N` sessions once the direction is stable
-5. Try `/write 2` only with the understanding that it is currently much less validated than `/auto`
+1. Run `/launch` to define the research theme and initialize `research/`
+2. Run `/meeting` if you want to inspect or revise the direction before execution
+3. Run `/auto 2` to test a short autonomous research session, or `/steer` to choose the next cycle direction manually
+4. Inspect generated artifacts such as `research/focus.md`, `research/**/state.md`, `research/**/findings.md`, `research/**/checks/`, and `.logs/last_session.md`
+5. Use larger `/auto N` sessions once the direction and tree structure are behaving well
+6. Try `/write 2` only with the understanding that it is currently much less validated than `/auto`
 
 ## Validation and Expectations
 
@@ -61,8 +56,9 @@ This repository aims to be honest about maturity rather than claiming that all w
 ### More validated today
 
 - `/meeting`
+- `/steer`
 - `/auto`
-- The project-state and research-artifact workflow around `project.yaml`, `research/`, and `.logs/`
+- The research-tree workflow around `research/`, `literature/`, `concepts/`, and `.logs/`
 
 ### Less validated today
 
@@ -76,9 +72,11 @@ That means the main current value of the repository is autonomous research progr
 
 | Command | Purpose | Maturity |
 |---|---|---|
-| `/meeting` | Interactive progress review and course correction | Usable |
-| `/auto [N]` | Autonomous research cycles led by the PI | Most validated |
-| `/write [N]` | Draft and refine the paper from accumulated artifacts | Experimental |
+| `/launch` | Set or change the research theme and initialize the tree | Usable |
+| `/meeting` | Interactive oversight, explanation, verification review, and course correction | Usable |
+| `/steer` | Human-chosen direction for one semi-automatic research cycle | Usable |
+| `/auto [N]` | Autonomous peer-agent research cycles | Most validated |
+| `/write [N]` | Draft and refine the paper from accumulated research-tree facts | Experimental |
 | `/improve` | Improve prompts, workflows, and behavior | Usable |
 
 ## Repository Layout
@@ -107,12 +105,23 @@ README.md                 # Project overview and operational expectations
 
 During actual research and writing sessions, the project creates working files in the repository root. Typical artifacts include:
 
-- `project.yaml`: central state file for topic, items, and statuses
-- `research/plan.md`: current research plan, story arc, and approach principles
-- `research/notes/`: PI-owned research notes and contribution assessments
-- `research/work/`: worker deliverables produced during `/auto`
-- `paper/`: outlines, section drafts, and integrated drafts produced during `/write`
-- `simulations/`: code, data, and figures for numerical work
+- `research/state.md`: root research state with background, current board, and meeting metadata
+- `research/focus.md`: current session cursor and scheduler interface for the next research cycle
+- `research/story.md`: project narrative structure
+- `research/**/state.md`: node-local current board and absorbed evidence ledger
+- `research/**/findings.md`: derivation-bearing draft fact layer for reusable claims
+- `research/**/guide.md`: human oversight entrypoint for a node or subtree
+- `research/**/checks/`: durable verification and provenance records
+- `research/**/_reviews/`: provisional worker/critic transactions (`worker.md`, `critic.md`, optional repair loop)
+- `research/**/_materials/analyses/`: clean analyses kept as node-local material, not adopted fact authority
+- `research/**/_materials/src/`, `research/**/_materials/data/`, `research/**/_materials/images/`: node-local computation scripts, data, and figures
+- `research/_materials/lib/`: shared simulation framework modules
+- `research/archive/`: retired process-heavy nodes whose reusable value has been extracted
+- `literature/catalog.jsonl`, `literature/notes/`, `literature/papers/`: source metadata, durable source records, and fetched paper files
+- `concepts/`: reusable reader bridges for terms that recur across nodes
+- `draft/`: `/write` paper-draft workspace (`outline.md`, `sections/`, `versions/`)
+- `agenda.md`: items for future meetings or research follow-up
+- `.logs/*`: raw chronological process logs, session records, and audit history; not critic targets by default
 - `.logs/last_session.md`: handoff summary for the next `/auto`
 - `.logs/last_write_session.md`: handoff summary for the next `/write`
 

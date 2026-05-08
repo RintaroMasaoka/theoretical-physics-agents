@@ -36,9 +36,9 @@ The beacon is gitignored (see `.gitignore`) and deleted at Session End by `sessi
 
 The session log is created at Session End by `session-wrap-up`, which calls `bash .scripts/log-path.sh auto` to obtain a timestamped path of the form `.logs/{YYMMDD_HHMM}_auto.md`. The scheduler does not manage the filename directly.
 
-### 3. Directives Load (informational)
+### 3. Principles Load (informational)
 
-If `directives.md` exists at project root, the scheduler passes its path to research planner and curator in their dispatch prompts (they handle reading). The scheduler itself does not enforce directives — enforcement is by the agents that read them (research planner for direction, curator for tree writes).
+If `research/principles.md` exists at project root, research planner and curator read it through their normal root-context loading. The scheduler itself does not enforce research principles — enforcement is by the agents that read them (research planner for direction, curator for tree writes and identity maintenance).
 
 ---
 
@@ -51,11 +51,11 @@ Entered when `cycles_done == MAX_CYCLES`, or when research planner has returned 
 Research planner's final focus.md may include Tree Directives of the form `archive superseded script {path}`. Route these directives to curator during the final curator sweep; the scheduler does not move files inside `research/**`.
 
 ```
-mv research/{path}/src/{slug}.{ext} research/{path}/src/archive/
-mv research/{path}/src/{slug}.md research/{path}/src/archive/
+mv research/{path}/_materials/src/{slug}.{ext} research/{path}/_materials/src/archive/
+mv research/{path}/_materials/src/{slug}.md research/{path}/_materials/src/archive/
 ```
 
-Never delete — superseded scripts move to `src/archive/` so the reasoning history stays searchable. Curator records each move in its sweep output; include that summary in the wrap-up input's `## Session Log` § `### Node Changes`.
+Never delete — superseded scripts move to `_materials/src/archive/` so the reasoning history stays searchable. Curator records each move in its sweep output; include that summary in the wrap-up input's `## Session Log` § `### Node Changes`.
 
 These archive moves are tree maintenance, so curator executes them together with any accompanying `state.md` or `plan.md` updates. Keeping the move and the prose record in one role preserves the tree-write authority split.
 
@@ -91,7 +91,7 @@ Session-end sweep: true
 """)
 ```
 
-The sweep is **not optional** and **not skippable** on the grounds that "nothing felt substantial this session". Its rationale: note.md promotion and cross-tree coherence consistently fall off research planner's attention during research cycles — synthesis and direction compete for the same cognitive budget and direction wins. The session-end sweep is the at-least-once-per-session guarantee that the maintenance channel runs.
+The sweep is **not optional** and **not skippable** on the grounds that "nothing felt substantial this session". Its rationale: findings.md promotion and cross-tree coherence consistently fall off research planner's attention during research cycles — synthesis and direction compete for the same cognitive budget and direction wins. The session-end sweep is the at-least-once-per-session guarantee that the maintenance channel runs.
 
 Curator returns `DONE: {summary}`. If it returns `FAILED:`, record the failure in the wrap-up input's `## Last Session` so the next session picks it up; do not block Session End on a curator failure.
 
@@ -117,7 +117,7 @@ Obtain a wrap-up-input path via `bash .scripts/log-path.sh wrap-up-input` and wr
 - Critic verdicts: {list of critic files or inline-annotated paths}
 - Curator sweeps: {list of curator deliverables / summaries}
 - Direction-challenge outputs: {list of timestamped direction-challenge paths captured from direction-challenger DONE returns this session, if any}
-- Node changes: {new nodes, closes, status changes, report promotions — enumerate}
+- Node changes: {new nodes, closes, status changes, analysis preservations — enumerate}
 - Simulation-script archives: {moves from step 1, if any}
 """)
 ```
@@ -138,9 +138,9 @@ If research planner returns `FAILED:`, the scheduler writes a minimal wrap-up in
 
 The agent: reads the wrap-up input at the path provided, writes `research/focus.md` / `.logs/last_session.md` / a session log file (created via `bash .scripts/log-path.sh auto`) / node-scoped `backlog.md` files (if the input had a Backlog section) / `agenda.md` (if the input had an Agenda section), deletes `.logs/.auto-active`, `git add`s the touched paths, `git commit`s with the message supplied in the wrap-up input (research planner-authored), `git push`es. Returns `DONE: committed {hash}` or `FAILED: {reason}`.
 
-If `git push` fails (network, auth, non-fast-forward), the commit is preserved locally; the final report (step 5) notes the push failure so the user can retry.
+If `git push` fails (network, auth, non-fast-forward), the commit is preserved locally; the final draft (step 5) notes the push failure so the user can retry.
 
-### 5. Final Report (to the user)
+### 5. Final Draft (to the user)
 
 The **only** user-facing closing message of the session (per Turn-Yielding Discipline in SKILL). Emit a concise summary covering:
 
@@ -151,7 +151,7 @@ The **only** user-facing closing message of the session (per Turn-Yielding Disci
 - Agenda items recorded (if any)
 - Commit hash / push status (from `session-wrap-up` return)
 
-After emitting the report, yield the turn. Do not issue further tool calls.
+After emitting the draft, yield the turn. Do not issue further tool calls.
 
 ---
 
@@ -162,4 +162,4 @@ If a dispatch fails mid-cycle and the scheduler cannot recover, do **not** silen
 - *Recoverable* — the next cycle's research planner dispatch can work around it. Log the failure to be surfaced in `Recent Deliverables` for the next research planner dispatch, then loop normally.
 - *Unrecoverable* — the scheduler exits the cycle loop early and proceeds to Session End. The final research planner dispatch (step 3) records the failure in `## Last Session`; the commit message is `run: session ended (unrecoverable: {reason})`.
 
-Either way, never end a turn without either the next dispatch or the Session End final report. Stalling mid-session is the failure mode the Turn-Yielding Discipline exists to prevent.
+Either way, never end a turn without either the next dispatch or the Session End final draft. Stalling mid-session is the failure mode the Turn-Yielding Discipline exists to prevent.

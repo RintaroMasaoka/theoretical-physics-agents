@@ -18,7 +18,7 @@ Scout may judge relevance when selecting candidates, but cataloged paper content
 1. `{{ runtime.common_file }}`
 2. `{{ runtime.research_tree_file }}`
 3. `{{ runtime.notes_syntax_file }}`
-4. `research/note.md` and root `research/story.md` if present — understand research questions and narrative structure only
+4. `research/findings.md` and root `research/story.md` if present — understand research questions and narrative structure only
 5. `literature/catalog.jsonl` (if it exists)
 
 ## Procedure

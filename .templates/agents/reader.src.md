@@ -37,7 +37,7 @@ Writing without a source risks completion from training data, confusion with oth
 If all source acquisition methods (see "Paper Acquisition Flow" below) fail:
 
 1. Keep the status in `literature/catalog.jsonl` as `unread`
-2. Do not call `log-path.sh reading {id}` and do not write any reading deliverable file (if the file exists, downstream agents will treat its content as fact)
+2. Do not create `literature/_reviews/{id}/worker.md` and do not call `log-path.sh reading {id}` (if a worker submission exists, downstream agents will treat the source record as reviewable)
 3. For arXiv papers, return `FAILED: source acquisition failed (arXiv:{id})` as the task result and terminate. For non-arXiv papers, return `FAILED: full body text unavailable ({source}:{id})`
 
 Do not: use web search as a substitute, complete from training data, repurpose other reading notes, or partially create "what you know."
@@ -100,18 +100,19 @@ Follow the failure procedure in the "Source Requirement" section and terminate i
 ## Close-Reading and Output
 
 1. Read the `.tex` file (or ar5iv HTML, or PDF) and inspect only source passages needed by the extraction scope
-2. Write a raw reading deliverable in `.logs/` recording what you inspected and any unresolved source-reading issues
-3. Create or update the durable source record at `literature/notes/{id}.md`
-4. Update the assigned paper in `literature/catalog.jsonl`: set `status` to `read`, append the raw extraction file path to `reading_notes`, and set `source_note` to `literature/notes/{id}.md`
-5. If related papers are discovered only because they are directly cited around inspected passages, record them in the raw deliverable under `Citation-chain candidates`. This is an audit trail of direct citations you happened to inspect, not a recommendation channel. Do not do extra citation-chain exploration, catalog addition, or fetch unless the dispatch explicitly asks for citation-chain discovery
-6. If and only if the dispatch explicitly asks for citation-chain discovery, process proposed papers not already in `literature/catalog.jsonl`:
+2. Create `literature/_reviews/{id}/worker.md` as the source-reading worker submission for critic source-audit review
+3. Write a short raw reading log in `.logs/` recording acquisition details, inspected files, and unresolved process issues
+4. Create or update the durable source record at `literature/notes/{id}.md`
+5. Update the assigned paper in `literature/catalog.jsonl`: set `status` to `read`, append the worker submission path to `reading_notes`, and set `source_note` to `literature/notes/{id}.md`
+6. If related papers are discovered only because they are directly cited around inspected passages, record them in the worker submission under `Citation-chain candidates`. This is an audit trail of direct citations you happened to inspect, not a recommendation channel. Do not do extra citation-chain exploration, catalog addition, or fetch unless the dispatch explicitly asks for citation-chain discovery
+7. If and only if the dispatch explicitly asks for citation-chain discovery, process proposed papers not already in `literature/catalog.jsonl`:
    - Add one JSON object per paper with `status: "unread"` and selection metadata
    - Before returning, run `bash .scripts/fetch-arxiv.sh {id1} {id2} ...` for every newly added arXiv paper. Unlike the Paper Acquisition Flow above (which is for the assigned paper with fallback steps), this is a batch admission step for newly discovered papers: do not leave accepted arXiv IDs unfetched for a later agent
 {{#if runtime.is_codex}}
    - For Codex sandbox-related Git permission failures from this batch fetch, rerun the same command with `sandbox_permissions="require_escalated"` and `prefix_rule=["bash", ".scripts/fetch-arxiv.sh"]` when the runtime allows approval requests
 {{/if}}
    - If fetch-arxiv fails for some papers, construct bib entries manually from metadata
-7. Run `node .scripts/render-reading-list.mjs` after catalog updates. `literature/reading_list.md` is a generated linked view for humans; never edit it directly
+8. Run `node .scripts/render-reading-list.mjs` after catalog updates. `literature/reading_list.md` is a generated linked view for humans; never edit it directly
 
 ### Boundary discipline while extracting
 
@@ -150,16 +151,26 @@ This file is a source record, not project synthesis. It records what the paper s
 
 Do not add other top-level sections without a source-facing reason. In particular, do not add relevance, project use, bridge, comparison, or recommendation sections.
 
-### Raw reading deliverable
+### Source-reading worker submission
 
-**Deliverable**: type `reading`. Pass the raw paper ID to `bash .scripts/log-path.sh reading {id}` per `common.md` § Deliverables and Logs; the script constructs the filename slug. The raw deliverable is an audit record for the source note; downstream agents should normally cite `literature/notes/{id}.md`, not this log.
+Create `literature/_reviews/{id}/worker.md`. This is the critic target for source-audit mode; it is not durable source authority. The durable source record is still `literature/notes/{id}.md`.
 
 ```markdown
-# {Title}
-- **arXiv ID**: arXiv:{id}
+---
+transaction_kind: worker-submission
+intended_destination: source_record
+review_focus: "source fidelity for arXiv:{id}"
+scope: "{source-side extraction scope}"
+evidence: [literature]
+raw_log: ".logs/{timestamp}_reading_{id}.md"
+source_record: "literature/notes/{id}.md"
+---
+
+# Source-reading submission — arXiv:{id}
+- **Title**: {Title}
 - **Authors**: {authors}
 - **Year**: {year}
-- **Source**: literature/papers/{id}/
+- **Source files**: literature/papers/{id}/
 - **Durable source record**: literature/notes/{id}.md
 
 ## Extraction Scope
@@ -168,13 +179,34 @@ Do not add other top-level sections without a source-facing reason. In particula
 ## Source Passages Inspected
 - `{source file}` — {sections/equations/pages inspected}
 
-## Extraction Notes
-### {Source topic 1}
-[Preserve equations in LaTeX notation. Do not omit the source-level core of proofs or definitions. Do not fabricate.]
-
 ## Source Record Changes
 - {Created/updated `literature/notes/{id}.md`; list sections changed.}
 
+## Source-fidelity Risks
+- {Ambiguities, garbled equations, missing anchors, or "None observed."}
+
 ## Citation-chain Candidates
 - arXiv:{id} — "{Title}" — Source route: {where it was cited}. (Omit this section if none.)
+```
+
+Return `DONE: literature/_reviews/{id}/worker.md`.
+
+### Raw reading log
+
+**Raw log**: type `reading`. Pass the raw paper ID to `bash .scripts/log-path.sh reading {id}` per `common.md` § Worker Submissions and Logs; the script constructs the filename slug. The raw log is an audit record for acquisition/process details; downstream agents should normally cite `literature/notes/{id}.md`, not this log.
+
+```markdown
+# Raw reading log — {Title}
+- **arXiv ID**: arXiv:{id}
+- **Authors**: {authors}
+- **Year**: {year}
+- **Source**: literature/papers/{id}/
+- **Durable source record**: literature/notes/{id}.md
+
+## Process Trace
+- Acquisition route used: {TeX / ar5iv / PDF fallback}
+- Files inspected: {list}
+- Worker submission: literature/_reviews/{id}/worker.md
+- Source record: literature/notes/{id}.md
+- Process issues: {network/source/PDF/OCR/LaTeX issues or "None"}
 ```

@@ -28,7 +28,7 @@ Evaluating content quality or logical soundness is the role of reviewer / critic
 
 ## Output
 
-**Deliverable**: type `audit`, no slug. Obtain the path via `bash .scripts/log-path.sh audit` per `common.md` § Deliverables and Logs.
+**Deliverable**: type `audit`, no slug. Obtain the path via `bash .scripts/log-path.sh audit` per `common.md` § Worker Submissions and Logs.
 
 ```markdown
 # Reference Audit

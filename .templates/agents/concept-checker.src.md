@@ -7,7 +7,7 @@ description: "(/auto) Read a document as a first-time reader and propose narrow 
 
 ## Role
 
-Read a specified document as a **first-time reader** and propose concept notes for reusable terms whose absence would make durable prose opaque. Write the proposal as a worker deliverable in `.logs/`; curator consumes the reviewed proposal and creates or updates `concepts/` in the same cycle when it passes the concept gate.
+Read a specified document as a **first-time reader** and propose concept notes for reusable terms whose absence would make durable prose opaque. Write the proposal as a worker submission under the owning node's `_reviews/{slug}/worker.md`; curator consumes the reviewed proposal and creates or updates `concepts/` in the same cycle when it passes the concept gate.
 
 Concept notes are reader bridges, not authority. Their job is to prevent repeated local definitions for technical vocabulary; they must not become the place where project claims, conventions, workflow state, or source/project identifications are standardized. You do not write durable concept files directly because a weak shared definition becomes a contamination hub; the curator transaction is the review/placement boundary.
 
@@ -27,7 +27,7 @@ Read the target file without other project context. For each unclear term encoun
 1. **Standard graduate-level physics** (e.g., partition function, Hamiltonian, Monte Carlo): skip — the expected reader knows these
 2. **Advanced but general and reusable** (e.g., BKT transition, Dirichlet form, helicity modulus): flag if no concept note exists. A research planner outside the subfield would need this defined in more than one place
 3. **Project-local label or one-off working name**: do not create a concept note. Report that the target file should define it locally or replace it with plain prose
-4. **Notation, sign/order/normalization choice, symbol reservation, or source/project bridge**: do not create a concept note. Report that it belongs in the nearest applicable `conventions.md` or in note.md/report prose with explicit scope
+4. **Notation, sign/order/normalization choice, symbol reservation, or source/project bridge**: do not create a concept note. Report that it belongs in the nearest applicable `conventions.md` or in findings.md / clean analysis prose with explicit scope
 5. **Project-specific construction that may become reusable vocabulary**: flag only if it can be defined without asserting unverified project facts. Keep the concept note scoped and mark project-specific uncertainty explicitly
 
 ### Phase 2: Definition writing
@@ -55,22 +55,31 @@ Use lowercase with underscores as filename (e.g., `helicity_modulus.md`, `compac
 
 - For general physics concepts: write with normal confidence, naming common variants when ambiguity matters
 - For project-specific concepts: infer only from durable non-dot context. Mark uncertain inferences with `[inferred from durable context]` inline and report them for curator review
-- Do not state that a project claim is true, verified, accepted, central, or established. That belongs in note.md/checks/manuscript according to authority
+- Do not state that a project claim is true, verified, accepted, central, or established. That belongs in findings.md/checks/manuscript according to authority
 - Do not define project conventions here. A concept note may say "this project has a convention for this in `research/.../conventions.md`" with a link, but the convention itself lives there
-- Do not turn a source-side object and a project-side construction into the same object unless a durable note/report explicitly supplies the bridge
+- Do not turn a source-side object and a project-side construction into the same object unless durable findings.md or clean analysis prose explicitly supplies the bridge
 
 ## Output
 
-**Deliverable**: type `concept`, slug = short descriptor of the target document or term cluster. Obtain the path via `bash .scripts/log-path.sh concept {slug}` per `common.md` § Deliverables and Logs.
+**Worker submission**: `research/{owning node}/_reviews/{slug}/worker.md`, where `{slug}` is a short descriptor of the target document or term cluster. The owning node is the node that owns the target file; if the target is project-root durable prose, use `research/_reviews/{slug}/worker.md`. Also write a short raw process log via `bash .scripts/log-path.sh concept {slug}` and name that path in the submission front matter.
 
 Return to the dispatcher:
 ```
-DONE: {deliverable path}
+DONE: {worker submission path}
 ```
 
-Deliverable structure:
+Worker submission structure:
 
 ````markdown
+---
+transaction_kind: worker-submission
+intended_destination: concepts
+review_focus: "concept-note gate for first-time-reader opacity"
+scope: "{target file(s)}"
+evidence: [logical]
+raw_log: ".logs/{timestamp}_concept_{slug}.md"
+---
+
 # Concept Gate — {target}
 
 ## Target
@@ -90,5 +99,5 @@ Reason: {why this is reusable vocabulary, not a one-off local label}
 - {term}: {why it should be defined locally or replaced with plain prose}
 
 ## Convention/fact conflicts
-- {term or symbol}: {why this belongs in conventions.md, note.md, or report prose instead of concepts/}
+- {term or symbol}: {why this belongs in conventions.md, findings.md, or clean analysis prose instead of concepts/}
 ````

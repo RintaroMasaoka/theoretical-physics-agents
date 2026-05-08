@@ -48,10 +48,12 @@ Read in this order:
 1. `.claude/common.md`
 2. `.claude/research-tree.md` — for file roles and confidence labels
 3. `research/focus.md` — current cursor and previous direction
-4. Root-level orientation if present: `research/note.md`, `research/story.md`, `research/principles.md`, `research/conventions.md`
-5. Cursor node files if present: `state.md`, `plan.md`, `note.md`, `conventions.md`
-6. Cursor's direct children only: each child's `state.md` and `note.md` if present
+4. Root-level orientation if present: `research/findings.md`, `research/guide.md`, `research/story.md`, `research/principles.md` (research judgment principles), `research/conventions.md`
+5. Cursor node files if present: `state.md`, `plan.md`, `findings.md`, `guide.md`, `conventions.md`
+6. Cursor's direct children only: each child's `state.md`, `findings.md`, and `guide.md` if present
 7. The scheduler-passed previous-cycle flags, if any: curator flags and critic REVISE/REJECT flags
+
+If `_materials/` exists at the cursor or a direct child, you may run `node .scripts/material-index.mjs {path}` and read only that index output. Do not open full material bodies; this role challenges direction from the local board, not from redoing specialist work.
 
 Do **not** read:
 
@@ -60,7 +62,7 @@ Do **not** read:
 - sibling branches outside the cursor
 - grandchildren
 - the whole tree
-- raw worker deliverables, even if their paths appear in the scheduler prompt
+- raw worker submissions or logs, even if their paths appear in the scheduler prompt
 
 The scope is intentionally narrow. If a challenge depends on evidence outside this scope, state the missing evidence as part of the challenge rather than chasing it yourself.
 

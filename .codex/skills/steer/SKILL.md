@@ -17,8 +17,8 @@ The point is not manual worker management. Worker dispatches are an implementati
 
 ## Constraints
 
-- **Write all prose in japanese.** Applies to conversational text, questions, `.logs/`, `research/focus.md`, curator tree writes, worker deliverables, and commit messages. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and documented structural headings may stay in English.
-- When dispatching any subagent from `/steer`, include the active language requirement in the task-specific prompt so downstream deliverables follow the same prose language. The skill's language contract is not satisfied by the scheduler's own messages alone.
+- **Write all prose in japanese.** Applies to conversational text, questions, `_reviews/`, `.logs/`, `research/focus.md`, curator tree writes, worker submissions, and commit messages. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and documented structural headings may stay in English.
+- When dispatching any subagent from `/steer`, include the active language requirement in the task-specific prompt so downstream submissions and outputs follow the same prose language. The skill's language contract is not satisfied by the scheduler's own messages alone.
 - `/steer` is interactive only at the **Steering Gate**. After the user approves a direction, do not ask further worker-management questions unless execution becomes structurally impossible.
 - Run exactly one cycle. Do not loop into a second cycle; end with a concise report and leave the next direction for a later `/steer`, `/auto`, or `/meeting`.
 - Acquire new full-paper text only from arXiv, to keep provenance reproducible and avoid ingesting unverified copies. Metadata or citation checks may still use other sources when needed.
@@ -30,9 +30,9 @@ The point is not manual worker management. Worker dispatches are an implementati
 |---|---|---|
 | `/auto N` | Human sets broad direction outside the run; AI chooses each cycle's next direction | autonomous, multi-cycle |
 | `/steer` | Human chooses or revises the next cycle direction at cycle start | interactive gate, then one semi-automatic cycle |
-| `/meeting` | Human reviews artifacts, authorizes results, and sets durable direction outside execution | live review and recording |
+| `/meeting` | Human interrogates direction, verification honesty, and understanding, then records oversight decisions outside execution | live review and recording |
 
-`/steer` may use meeting-like judgment, but it is not a meeting. It does not approve `note.md` for manuscript use. It injects human research judgment into the next executable cycle.
+`/steer` may use meeting-like judgment, but it is not a meeting. It does not approve `findings.md` for manuscript use. It injects human research judgment into the next executable cycle.
 
 ## Phase References
 
@@ -75,7 +75,7 @@ Load only the state needed to explain the next decision:
 - `research/state.md`
 - `research/focus.md` if present
 - `research/story.md` if present
-- `research/principles.md` if present
+- `research/principles.md` if present (active research judgment principles)
 - `.logs/last_session.md` if present
 - `agenda.md` if present
 - top-level `research/*/state.md` files, and node-level files only when needed to make a candidate direction intelligible
@@ -158,28 +158,28 @@ Write the approved steering decision into `research/focus.md` in the normal sche
 ```markdown
 # Focus
 
-Working on: {cursor path}
-{brief context for the chosen direction}
-
-## This Session
+Cursor: research/{path}/
 Status: active
 
-### Human Steering
-Decision: {user-approved direction}
-Reason: {why this was chosen now}
-Source: /steer YYYY-MM-DD HH:MM
+## Context
+{2-5 sentences: current state, user-approved steering decision, and why this direction now}
+
+## Direction Challenge Response
+- Human steering: {user-approved direction; include how it accepts/rejects/overrides the direction challenge if relevant}
+
+## Next Session
 
 ### Worker Dispatches
-- {agent}: {concrete task}
+- **{agent}**: {concrete task}
 
 ### Tree Directives
 - {directive for curator}
 
 ### Blockers
-- {blocker, or "none"}
+{blocker, or empty}
 ```
 
-The steering record is not meeting authorization. It is durable execution rationale for the next agents.
+The steering record is not meeting approval or manuscript authorization. It is durable execution rationale for the next agents.
 
 If the approved direction requires no worker dispatches and only tree maintenance, write an empty Worker Dispatches section and concrete Tree Directives. A structural-review cycle is legitimate.
 
@@ -189,7 +189,7 @@ From this point, follow `/auto`'s Cycle Loop steps 3-6 for exactly one cycle:
 
 1. Parse `research/focus.md`
 2. Launch Worker Dispatches in parallel using `.codex/skills/auto/phases/dispatch.md`
-3. Auto-attach critic to every worker deliverable per the Auto-Critic Rule
+3. Auto-attach critic to every review-eligible worker submission per the Provisional Review Rule
 4. Dispatch curator once with the Tree Directives and the new evidence
 
 If the approved steering decision is explicitly a no-op or session-close decision, materialize `Status: session_complete`, skip worker dispatch, and proceed to Session End. Otherwise materialize `Status: active`.
@@ -208,6 +208,6 @@ Session logs should use `bash .scripts/log-path.sh steer` when the scheduler its
 ## Failure Handling
 
 - If a worker fails, continue to critic / curator with the failure path or failure note when possible; curator and the next planner need to see the failed attempt.
-- If critic returns REVISE or REJECT, do not auto-resubmit in the same `/steer` cycle. Curator records the flag, and the next `/steer` or `/auto` decides whether to retry, pivot, or close.
-- If curator fails once, re-dispatch once with the failure message appended. If it fails again, end with a partial report and leave `.logs/` deliverables untouched.
+- If critic returns `REVISE-BLOCKING`, `OPAQUE`, or `REJECT`, do not auto-resubmit beyond the one repair loop allowed by `/auto` dispatch rules. Curator records the flag, and the next `/steer` or `/auto` decides whether to retry, pivot, or close.
+- If curator fails once, re-dispatch once with the failure message appended. If it fails again, end with a partial report and leave `_reviews/` transactions and raw `.logs/` untouched.
 - If `session-wrap-up` fails, report the failure and the files that still need manual finalization.

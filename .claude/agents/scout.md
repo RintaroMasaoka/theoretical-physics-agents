@@ -18,7 +18,7 @@ Scout may judge relevance when selecting candidates, but cataloged paper content
 1. `.claude/common.md`
 2. `.claude/research-tree.md`
 3. `.claude/notes-syntax.md`
-4. `research/note.md` and root `research/story.md` if present — understand research questions and narrative structure only
+4. `research/findings.md` and root `research/story.md` if present — understand research questions and narrative structure only
 5. `literature/catalog.jsonl` (if it exists)
 
 ## Procedure

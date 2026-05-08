@@ -16,8 +16,8 @@ Do not have AI regenerate existing text. Concatenate via Bash, then AI applies o
 1. `.codex/common.md`
 2. `.codex/research-tree.md`
 3. `.codex/notes-syntax.md`
-4. `research/note.md` + `research/story.md` + `research/conventions.md` (if exists) (root — thesis, narrative structure, project-wide notation)
-5. Navigate research/ tree: read note.md files and applicable conventions.md files for context, status, and notation
+4. `research/findings.md` + `research/guide.md` (if exists) + `research/story.md` + `research/conventions.md` (if exists) (root — thesis, human caveats, narrative structure, project-wide notation)
+5. Navigate research/ tree: read findings.md, guide.md, and applicable conventions.md files for context, status, caveats, and notation. Use `node .scripts/material-index.mjs {path}` to discover relevant clean analyses/figures without loading all material bodies
 6. `draft/outline.md`
 7. `draft/conventions.md`
 8. Reference audit report (if it exists)
