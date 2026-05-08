@@ -26,7 +26,7 @@ Run the checklist in this rough attention order. Earlier groups are not more imp
 
 Highest-priority suspicions:
 
-- [ ] **Authority challenge** — Is a premise protected because it came from the user, literature language, a previous agent, or the durable research tree rather than because the current evidence supports it? LLMs tend to over-respect inherited wording and preserved context. In this project, preservation itself creates authority: named nodes, paths, checks, target lists, provenance records, and accepted artifacts are designed to be reusable, so an LLM will naturally treat them as live. Separate **valid** from **live**. A preserved artifact may still be true, useful, and worth keeping while no longer being a live reason to plan the next cycle around it. When a structured artifact is pulling the direction, challenge whether it is live for the current question or merely diagnostic, route-local, stale, superseded, or archived-in-place residue.
+- [ ] **Authority challenge** — Is a premise protected by its source or preservation rather than by current evidence? Sources of authority include user framing, literature language, previous agent decisions, and durable research-tree context. LLMs tend to over-respect both explicit authority and inherited structure: what was requested, named, accepted, or preserved starts to feel live. Separate **valid** from **live**. A premise may be credible, useful, and worth keeping while no longer being a live reason to steer this cycle. Challenge whichever authority source is actually doing work, without sanctifying or wholesale distrusting any of them.
 - [ ] **Goal challenge** — Is the direction preserving a fixed destination, success shape, bridge, or positive conclusion beyond what the visible evidence now permits? Treat REVISE/REJECT verdicts, failed attempts, negative results, and cautious logs as possible pressure against the goal itself, not automatically as repair tasks.
 
 Common suspicions:
@@ -41,7 +41,7 @@ Occasional suspicions:
 
 The common principle is: find what the project is over-protecting. A challenge is valuable when releasing that protection could make the research sharper, even if it means closing a node, deleting a concept, discarding a goal, or disappointing an earlier plan. Failed or tentative resistance is acceptable; checklist-driven fabrication is not.
 
-A common LLM failure is to convert durable context into task affordance: if a table exists, extend it; if a target list exists, support it; if a node exists, keep working it; if a check exists, preserve the claim. Resist that pull. The question is not "can this artifact be made cleaner or safer?" but "should this artifact still steer the next research judgment?" This is an authority suspicion, not a license to distrust the whole tree. The tree is valuable because it is durable; the challenge is whether the durable item is still live for this cursor.
+A common LLM failure is to convert authority into task affordance: if something important is present, the agent asks how to preserve, extend, or accommodate it. Resist that pull. The question is not "can this authority be handled more carefully?" but "should it still constrain the next research judgment?" This applies equally to user framing, inherited agent work, literature language, and tree artifacts.
 
 ## Startup Reading
 
