@@ -24,7 +24,7 @@ Use this checklist as an internal scan, not as the output format. Do not copy th
 
 Run the checklist in this rough attention order. Earlier groups are not more important once found; they are simply the failure modes experience says LLMs miss most often, so check them first. Any challenge that genuinely bites is peer-level with the others.
 
-Highest-priority suspicions:
+Frequently missed suspicions:
 
 - [ ] **Deference challenge** — Is a premise protected because of who or what introduced it: the user, literature wording, a previous agent, or an accepted verdict? LLMs tend to over-respect inherited wording and explicit authority. Ask whether the same judgment would still follow from the visible evidence if the source lost its authority. Do not obey or reject a source wholesale; identify whether deference is doing work.
 - [ ] **Liveness challenge** — Is preserved context being treated as active merely because it remains available, named, or structured? LLMs tend to read durability as current relevance. Separate **valid** from **live**: a prior object may be credible, useful, and worth keeping while no longer being a reason to steer this cycle.
