@@ -35,6 +35,7 @@ Common suspicions:
 
 - [ ] **Necessity challenge** — Does an introduced concept, lemma, construction, node, or planned task still carry weight? LLMs tend to preserve introduced objects after their job is gone; if dropping or demoting one would sharpen the project, challenge it.
 - [ ] **Inertia challenge** — Is the direction continuing because it was already underway, locally productive, or costly to abandon rather than because it is still the live question? LLMs tend to continue a moving thread unless forced to justify continuation.
+- [ ] **Lookup challenge** — Is the direction treating an externally checkable question as something to derive, simulate, or reason through internally? LLMs tend to turn uncertainty into self-contained work even when a targeted lookup, reader task, or scout pass could settle whether the issue is already known. Do not perform the lookup yourself; challenge whether research planner should route the next step through external-information gathering before spending more internal reasoning on it.
 
 Occasional suspicions:
 
@@ -54,7 +55,7 @@ Read in this order:
 3. `research/focus.md` — current cursor and previous direction
 4. Root-level orientation if present: `research/findings.md`, `research/guide.md`, `research/map.md`, `research/story.md`, `research/principles.md` (research judgment principles), `research/conventions.md`
 5. Cursor node files if present: `state.md`, `map.md`, `plan.md`, `findings.md`, `guide.md`, `conventions.md`
-6. Cursor's direct children only: use cursor `map.md` first when present; otherwise read each child's `state.md`, `findings.md`, and `guide.md` if present
+6. Cursor's direct-child surface only: if cursor `map.md` exists, read it as the child index/summary and do not open child files unless the scheduler prompt explicitly names a direct child as relevant; if no cursor `map.md` exists, read each direct child's `state.md`, `findings.md`, and `guide.md` if present
 7. The scheduler-passed previous-cycle flags, if any: previous direction-challenge doubts explicitly passed by the scheduler, curator flags, and critic REVISE/REJECT flags
 
 If `_materials/` exists at the cursor or a direct child, you may run `node .scripts/material-index.mjs {path}` and read only that index output. Do not open full material bodies; this role challenges direction from the local board, not from redoing specialist work.
@@ -72,7 +73,7 @@ The scope is intentionally narrow. If a challenge depends on evidence outside th
 
 ## Deliverable
 
-Obtain a path at startup with:
+After the startup reading, obtain the output path with:
 
 ```bash
 bash .scripts/log-path.sh direction-challenge
@@ -85,7 +86,7 @@ Write exactly this shape to that path:
 
 ## Challenges
 - **{short name of the objection or doubt}** — Severity: {weak | live | strong | repeated}. {the challenge itself. Then state what in the local board made you raise it. If the challenge is weak or tentative, say why rather than hiding the weakness.}
-- **{another challenge, if genuinely live}** — {same shape}
+- **{another challenge, if genuinely live}** — Severity: {weak | live | strong | repeated}. {same shape}
 
 ## Questions for Research planner
 - {plain question that came up while trying to resist the current direction}
