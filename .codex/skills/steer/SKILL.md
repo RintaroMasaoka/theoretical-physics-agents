@@ -1,213 +1,162 @@
 ---
 name: steer
-description: "Run one human-steered research cycle: present direction options, accept the user's steering decision, then execute workers, critic, curator, and wrap-up semi-automatically."
+description: "Run the normal /auto research loop with a human approval checkpoint after each planner update and before execution."
 user-invocable: true
 argument-hint: "[steering intent (optional)]"
 ---
 
-# /steer — Human-Steered Research Cycle
+# /steer — Human-Checked Auto Research
 
 Arguments: $ARGUMENTS
 
 ---
 
-`/steer` runs **one** research cycle with the human researcher owning the cycle-start direction decision. It is the interactive sibling of `/auto`: `/auto` delegates direction choice to `research-planner` and keeps moving across cycles; `/steer` pauses at the start, turns the current research state into a small set of concrete direction options, asks the user to choose or modify one, then executes the selected cycle with the same worker / critic / curator machinery as `/auto`.
+`/steer` is not a second research scheduler. It is `/auto` with one narrow override: after `research-planner` writes the next `research/focus.md`, execution pauses for a human plan checkpoint. Once the plan is approved, `/steer` resumes the current `/auto` cycle from the ordinary `research/focus.md` parse step and follows `/auto`'s current mechanics.
 
-The point is not manual worker management. Worker dispatches are an implementation of a research direction. The user's job is to steer the scientific question, priority, and framing; the scheduler's job is to translate that steering into a dispatch plan and run the mechanical orchestration.
+This structure is load-bearing. `/auto` owns the evolving execution machinery: direction challenge, planner dispatch, focus parsing, presentation boundaries, pre-worker readiness, worker dispatch, Provisional Review, repair loops, curator absorption, Durable Surface Review, guide-writer, session end, wrap-up, commit, and push. `/steer` must not copy those mechanics. It reads and follows the current `/auto` skill and phase files, then inserts only the human checkpoint between planning and execution.
+
+The human is not replacing `research-planner`. `research-planner` still makes the scientific plan in the normal `/auto` `research/focus.md` schema. The human checks whether that plan matches their research judgment before any worker, critic, curator, or session-end action consumes it.
 
 ## Constraints
 
-- **Write all prose in japanese.** Applies to conversational text, questions, `_reviews/`, `.logs/`, `research/focus.md`, curator tree writes, worker submissions, and commit messages. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and documented structural headings may stay in English.
-- When dispatching any subagent from `/steer`, include the active language requirement in the task-specific prompt so downstream submissions and outputs follow the same prose language. The skill's language contract is not satisfied by the scheduler's own messages alone.
-- `/steer` is interactive only at the **Steering Gate**. After the user approves a direction, do not ask further worker-management questions unless execution becomes structurally impossible.
-- Run exactly one cycle. Do not loop into a second cycle; end with a concise report and leave the next direction for a later `/steer`, `/auto`, or `/meeting`.
-- Acquire new full-paper text only from arXiv, to keep provenance reproducible and avoid ingesting unverified copies. Metadata or citation checks may still use other sources when needed.
+- **Write all prose in japanese.** Applies to conversational text, checkpoint questions, `_reviews/`, `.logs/`, `research/focus.md`, curator tree writes, worker submissions, presenter output, and commit messages. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and documented structural headings may stay in English.
+- Before running, read `.codex/skills/auto/SKILL.md` and the phase files it references. Treat them as the source of truth for every scheduler action not explicitly overridden here.
+- The only `/auto` rule overridden by `/steer` is the prohibition on user input during planning. `/steer` may ask the user at the Plan Checkpoint after `research-planner` updates `research/focus.md` and before execution begins. Do not ask user-management questions during worker dispatch, review, curation, durable review, guide writing, or session end. If execution becomes structurally impossible outside the checkpoint, stop and report the structural blocker rather than opening a new decision gate.
+- Do not maintain a separate `/steer` cycle implementation. If `/auto` changes a phase, `/steer` inherits that change by reading and following `/auto`.
+- `/steer` uses the same cycle limit semantics as `/auto` (`MAX_CYCLES`, `Status: session_complete`, and session-end behavior). It is not forced to one cycle.
+- Acquire new full-paper text only from arXiv, matching `/auto` provenance discipline.
 - **Paper writing is NOT `/steer`'s responsibility.** Writing is handled by `/write`.
 
 ## Relationship To Other Skills
 
 | Skill | Human role | Execution style |
 |---|---|---|
-| `/auto N` | Human sets broad direction outside the run; AI chooses each cycle's next direction | autonomous, multi-cycle |
-| `/steer` | Human chooses or revises the next cycle direction at cycle start | interactive gate, then one semi-automatic cycle |
+| `/auto N` | Human sets broad direction outside the run; AI chooses and executes each cycle without interruption | autonomous, multi-cycle |
+| `/steer N` | Human checks each planner-written `research/focus.md` before it is executed | interactive planning checkpoints, then normal `/auto` execution |
 | `/meeting` | Human interrogates direction, verification honesty, and understanding, then records oversight decisions outside execution | live review and recording |
 
-`/steer` may use meeting-like judgment, but it is not a meeting. It does not approve `findings.md` for manuscript use. It injects human research judgment into the next executable cycle.
+`/steer` may use meeting-like judgment, but it is not a meeting. It does not approve `findings.md` for manuscript use. It only gates whether a proposed execution plan should run.
 
-## Phase References
+## Overlay Boundary
 
-Reuse `/auto`'s mechanics rather than duplicating them:
+At the start of the run:
 
-| File | Loaded when | Purpose |
-|---|---|---|
-| `.codex/skills/auto/phases/dispatch.md` | After the Steering Gate, when launching workers and critic | Pattern A / B launch methods, prompt template, auto-critic rule, per-agent dynamic data |
-| `.codex/skills/auto/phases/session-lifecycle.md` | For sanity checks and Session End mechanics | Initial gates, final curator sweep, research planner wrap-up input, `session-wrap-up` handoff |
+1. Read `.codex/skills/auto/SKILL.md`.
+2. Read any `/auto` phase file needed for the current step, especially `auto/phases/dispatch.md` and `auto/phases/session-lifecycle.md`.
+3. Apply the `/auto` startup, cycle, and session-end rules unless this file explicitly says otherwise.
 
-The research information model is canonical in `.codex/research-tree.md`. `/steer` reads enough of the tree to present direction options; workers, critic, curator, and research planner keep their normal ownership boundaries.
-
----
-
-## Flow
+The overlay point is exactly:
 
 ```
-Session Start
-    ▼ Load current research state and recent execution context
-    ▼ Direction-challenger writes pre-direction opposition
-    ▼ Research planner drafts 2-4 steering options, not a final focus.md
-    ▼ Steering Gate: user chooses, combines, or modifies a direction
-    ▼ Scheduler writes research/focus.md from the approved steering decision
-    ▼ Worker dispatch → critic auto-attach → curator absorption
-    ▼ Session End: final curator sweep → research planner wrap-up → session-wrap-up
-    ▼ Final report to user
+/auto direction-challenger
+    ▼
+/auto research-planner dispatch writes research/focus.md
+    ▼
+/steer Plan Checkpoint: backup-aware human approval
+    ▼
+/auto parse research/focus.md and execute the cycle
 ```
+
+Do not re-describe `/auto`'s downstream steps in `/steer`. The correct downstream step is always: resume the current `/auto` cycle at its `Parse research/focus.md` step with the approved file.
 
 ## Session Start
 
-Perform the following `/steer` sanity gates, adapted from `/auto`:
+Run the `/auto` Session Start gates and resume handling from `.codex/skills/auto/SKILL.md` / `auto/phases/session-lifecycle.md`, with these adjustments:
 
-- `research/state.md` must exist; if missing, tell the user to run `/launch` first and stop.
-- `concepts/` exists.
-- `.gitignore` covers `.logs/.auto-active`; `/steer` does not normally write that beacon, but the shared finalizer expects the active-run beacon to be ignored.
-- If `research/focus.md` is missing, continue; the approved steering decision will initialise it.
+- If Arguments are present, treat them as the user's initial steering intent. Pass them into the next `research-planner` dispatch as additional direction context, not as approval to skip the Plan Checkpoint.
+- Before each planner dispatch, record whether `research/focus.md` exists and, if it does, record its content or a backup path so a rejected plan can be restored mechanically. If it does not exist, record the absence explicitly.
+- Before each planner dispatch, also record enough pre-dispatch tree state to identify files or directories created or modified by that single planner call. This is only for rollback of unapproved planner side effects such as minimal child-node creation. Do not use it to revert unrelated pre-existing user changes.
+- If `research/focus.md` is missing, continue as `/auto` would; the planner may initialise it. A rejected first plan restores the missing state by removing the newly created `research/focus.md` unless the user supplies a revision intent for planner retry.
 
-Load only the state needed to explain the next decision:
+Maintain the same session-local records `/auto` maintains, including direction-challenge evidence paths, curator summaries, review paths, guide target set, and pending durable review requests. `/steer` may add backup/checkpoint log paths, but those are audit aids and not research authority.
 
-- `research/state.md`
-- `research/focus.md` if present
-- `research/story.md` if present
-- `research/principles.md` if present (active research judgment principles)
-- `.logs/last_session.md` if present
-- `agenda.md` if present
-- top-level `research/*/state.md` files, and node-level files only when needed to make a candidate direction intelligible
+## Cycle Loop
 
-If Arguments are present, treat them as the user's initial steering intent. They constrain the option-generation step, but they are not approval to skip the Steering Gate.
+For each cycle, follow `/auto` through direction challenge and research-planner dispatch:
 
-## 1. Direction-Challenger Dispatch
+1. Run `/auto`'s direction-challenger step unchanged.
+2. Before dispatching `research-planner`, back up the current `research/focus.md` if it exists and record whether it was absent. Use a `.logs/` path, for example from `bash .scripts/log-path.sh steer-focus-before`, or another timestamped `.logs/` path if that log type is unavailable. Also record the pre-dispatch state of `research/**` well enough to distinguish planner-created or planner-modified paths from unrelated dirty files.
+3. Dispatch `research-planner` in the normal `/auto` direction mode. It writes `research/focus.md`; do not ask it for `/steer` options or a special presenter format.
+4. Include in the planner prompt:
+   - the ordinary `/auto` direction inputs for this cycle
+   - `Human steering intent: {Arguments or latest user revision, or "none"}`
+   - `This is a /steer run: write the normal research/focus.md plan. The plan will be shown to the human before execution; do not change output format.`
+5. After `research-planner` returns `DONE: research/focus.md`, identify any non-`research/focus.md` tree paths changed by that planner dispatch. Treat them as unapproved planner side effects until the Plan Checkpoint approves the plan. Pause before `/auto` parse/execution and run the Plan Checkpoint below.
 
-Dispatch `direction-challenger` before option generation, as in `/auto`. Its role is still opposition: it challenges inertia, value, scope, authority, and frame before the direction hardens.
+If `research-planner` returns `FAILED:`, use `/auto`'s retry/failure handling. Do not run the Plan Checkpoint unless a new `research/focus.md` plan exists.
 
-```
+## Plan Checkpoint
 
-spawn_agent(prompt="""
-Read and follow `.codex/agents/direction-challenger.md` as your role definition. Treat the rest of this prompt as task-specific input.
+The checkpoint exists to let the human evaluate the planner's research judgment, not to manage workers one by one.
 
-## Task
-Write the pre-direction challenge for this `/steer` cycle. Obtain a path via `bash .scripts/log-path.sh direction-challenge` and return it as `DONE: {path}`.
+### Presenter Dispatch
 
-
-## Context
-Steering intent from user: {Arguments, or "none"}
-Current focus summary: {brief summary of research/focus.md if present}
-Recent agenda / last session: {brief summary or paths}
-""")
-```
-
-If the challenger fails, continue with `Direction Challenge: unavailable — {failure}`. The challenge is useful input, not a blocker.
-
-## 2. Steering Option Generation
-
-Ask `research-planner` for **options**, not an update to `research/focus.md`. The planner should read the tree and return a short option packet to the scheduler, without writing files.
-
-Before dispatching research planner, run `node .scripts/literature-status.mjs --limit=8` if `literature/catalog.jsonl` exists. Pass the output verbatim in `## Literature Status`.
+Dispatch `research-plan-presenter` after `research/focus.md` has been written and before any downstream `/auto` step reads it for execution.
 
 ```
 
 spawn_agent(prompt="""
-Read and follow `.codex/agents/research-planner.md` as your role definition. Treat the rest of this prompt as task-specific input.
+Read and follow `.codex/agents/research-plan-presenter.md` as your role definition. Treat the rest of this prompt as task-specific input.
 
 ## Task
-Draft 2-4 steering options for one `/steer` cycle. Do not edit research/focus.md. Return the option packet inline.
+Present the proposed `research/focus.md` plan as a self-contained human checkpoint. Do not change `research/focus.md` or any research-tree file. Return the checkpoint inline.
 
-
-## Required Option Format
-For each option:
-- Direction: the research question or strategic move
-- Why now: what makes it valuable at the current state
-- What it would test or reduce: uncertainty / risk / bottleneck
-- Worker plan: concrete worker dispatches likely needed, with agents named
-- Tree effect: likely tree directive(s) curator would receive
-- Failure meaning: what we learn if the attempt fails or critic rejects it
 
 ## Inputs
-Steering intent from user: {Arguments, or "none"}
-Direction Challenge: {path returned by direction-challenger, or unavailable note}
-Current research state summary: {paths / concise summary loaded at Session Start}
-Literature Status: {output, or "No literature catalog present"}
+Proposed plan: research/focus.md
+Previous focus backup: {backup path, or "none"}
+Planner side effects pending approval: {created/modified paths outside research/focus.md, or "none"}
+Human steering intent: {Arguments or latest user revision, or "none"}
+Direction challenge: {path returned by direction-challenger, or unavailable note}
+Cycle: {cycle_number} of {MAX_CYCLES}
 """)
 ```
 
-If the option packet is vague, over-focused on worker names, or lacks scientific tradeoffs, re-dispatch once asking for the missing fields. Do not compensate by inventing the options silently; the value of `/steer` is the visible decision surface.
+If the presenter returns `FAILED: plan not self-contained enough to present — {reason}`, restore the previous focus state and roll back unapproved planner side effects, then re-dispatch `research-planner` once with the presenter's reason as a clarity failure. If the second presenter attempt also fails, stop before execution and report the failure; do not run workers from an opaque plan.
 
-## 3. Steering Gate
+### User Checkpoint
 
-Present the option packet to the user in compact form. Do not paste large research files into chat. Make clear that the user is choosing the **research direction**, not managing workers.
+Present the checkpoint compactly and ask one approval question with `request_user_input`:
 
-Use `request_user_input` with one question:
+- approve and run this plan
+- revise the plan with a free-form instruction
+- reject and stop before execution
 
-- Ask which direction to run for this cycle, allowing the user to choose an option, combine options, or provide a modification.
-- Keep options short enough to compare. Include the worker plan only as the execution consequence of each direction.
+The user may comment on worker choices, but interpret that as revision input for the planner unless it is a purely clerical correction to the displayed plan. The scheduler must not independently redesign the worker plan.
 
-If the user gives a modification, interpret it as a steering decision and restate the resulting direction once. If the restatement changes the substance, ask for confirmation. If the user selects cleanly, proceed.
+### Outcomes
 
-Do not ask the user to approve each worker. Worker choices can be lightly corrected by the user, but the scheduler owns translating the approved direction into a coherent dispatch plan.
+- **Approve**: leave `research/focus.md` as written by `research-planner`. Resume `/auto` at its `Parse research/focus.md` step and execute the cycle with the current `/auto` mechanics.
+- **Revise**: restore the previous focus state, then re-dispatch `research-planner` in normal `/auto` direction mode with the user's revision as `Human steering intent`. If a backup path exists, restore it to `research/focus.md`; if the previous focus state was absent, remove the newly created `research/focus.md`. Also roll back planner-created or planner-modified side-effect paths from this unapproved planner attempt. If any side effect cannot be distinguished from pre-existing user work, stop before execution and report the ambiguous rollback instead of guessing. After the restored state is clean, re-dispatch planner, then run presenter and checkpoint again. Limit retries to prevent an endless planning conversation; after two rejected revisions in the same cycle, stop before execution and suggest `/meeting` if the disagreement is conceptual.
+- **Reject / stop**: restore the previous focus state using the same backup-or-absence rule and roll back unapproved planner side effects. Proceed to `/auto` Session End only if the user asked to end and the tree state still needs mechanical finalisation; otherwise stop without worker, critic, curator, guide-writer, or wrap-up actions from the rejected plan.
 
-## 4. Materialize `research/focus.md`
+Approval is the boundary. Before approval, `research/focus.md` is a proposed plan even though it is stored at the normal path. After approval, it becomes the ordinary `/auto` scheduler interface.
 
-Write the approved steering decision into `research/focus.md` in the normal scheduler interface shape:
+## Execution After Approval
 
-```markdown
-# Focus
+After approval, do not use `/steer`-specific execution instructions. Continue with `/auto`'s current Cycle Loop from `Parse research/focus.md` through Cycle End:
 
-Cursor: research/{path}/
-Status: active
+- parse every section the current `/auto` parser expects, including sections added after this `/steer` prompt was written
+- run presentation-boundary, pre-worker readiness, worker, critic, curator, durable-review, and guide-target bookkeeping exactly as `/auto` specifies
+- carry failures, review flags, curator summaries, and pending durable-review requests exactly as `/auto` specifies
+- loop to the next planning checkpoint while `cycles_done < MAX_CYCLES` and `Status` remains `active`
 
-## Context
-{2-5 sentences: current state, user-approved steering decision, and why this direction now}
+This section is intentionally referential. If it appears less detailed than `/auto`, that is correct: `/auto` is the implementation.
 
-## Direction Challenge Response
-- Human steering: {user-approved direction; include how it accepts/rejects/overrides the direction challenge if relevant}
+## Session End
 
-## Next Session
+Use `/auto`'s current Session End mechanics from `auto/phases/session-lifecycle.md`, including final curator sweep, pending Durable Surface Review drain, guide-writer sweep, final research-planner session-end dispatch, `session-wrap-up`, commit, push, and final user summary.
 
-### Worker Dispatches
-- **{agent}**: {concrete task}
+`/steer` adjustments:
 
-### Tree Directives
-- {directive for curator}
-
-### Blockers
-{blocker, or empty}
-```
-
-The steering record is not meeting approval or manuscript authorization. It is durable execution rationale for the next agents.
-
-If the approved direction requires no worker dispatches and only tree maintenance, write an empty Worker Dispatches section and concrete Tree Directives. A structural-review cycle is legitimate.
-
-## 5. Execute One Cycle
-
-From this point, follow `/auto`'s Cycle Loop steps 3-6 for exactly one cycle:
-
-1. Parse `research/focus.md`
-2. Launch Worker Dispatches in parallel using `.codex/skills/auto/phases/dispatch.md`
-3. Auto-attach critic to every review-eligible worker submission per the Provisional Review Rule
-4. Dispatch curator once with the Tree Directives and the new evidence
-
-If the approved steering decision is explicitly a no-op or session-close decision, materialize `Status: session_complete`, skip worker dispatch, and proceed to Session End. Otherwise materialize `Status: active`.
-
-## 6. Session End
-
-Follow `/auto`'s Session End mechanics with these `/steer` adjustments:
-
-1. Run the final curator sweep.
-2. Dispatch research planner in session-end mode to write the wrap-up-input file.
-3. Dispatch `session-wrap-up` with the wrap-up-input path.
-4. Tell the user what direction was chosen, what ran, what curator recorded, and what should be considered next.
-
-Session logs should use `bash .scripts/log-path.sh steer` when the scheduler itself writes a steering log. The normal `session-wrap-up` session log may still use its own configured log type.
+- The final report should include the human-approved plan decisions and any rejected/revised checkpoint attempts that materially changed the run.
+- Session logs should identify the run as `steer` where `/auto` allows the scheduler to choose the session kind. Do not fork the session-end protocol to achieve this.
+- If a rejected plan was restored and no approved cycle ran afterward, say so plainly and do not imply that worker evidence was produced.
 
 ## Failure Handling
 
-- If a worker fails, continue to critic / curator with the failure path or failure note when possible; curator and the next planner need to see the failed attempt.
-- If critic returns `REVISE-BLOCKING`, `OPAQUE`, or `REJECT`, do not auto-resubmit beyond the one repair loop allowed by `/auto` dispatch rules. Curator records the flag, and the next `/steer` or `/auto` decides whether to retry, pivot, or close.
-- If curator fails once, re-dispatch once with the failure message appended. If it fails again, end with a partial report and leave `_reviews/` transactions and raw `.logs/` untouched.
-- If `session-wrap-up` fails, report the failure and the files that still need manual finalization.
+- If focus backup or restore fails, stop before execution; do not run a plan whose approval state is ambiguous.
+- If rollback of planner-created side effects is ambiguous, stop before execution and report the ambiguous paths. Do not run workers from a plan whose unapproved tree writes may still be present.
+- If the presenter fails twice for opacity, stop before execution and report the presentation failure.
+- If the user revises twice in the same cycle without approval, stop before execution and recommend resolving the disagreement in `/meeting`.
+- Once a plan is approved, use `/auto` failure handling for workers, critic, curator, durable reviews, guide-writer, session-wrap-up, commit, and push.
