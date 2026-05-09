@@ -84,8 +84,8 @@ Read in order:
 1. `{{ runtime.common_file }}`
 2. `{{ runtime.research_tree_file }}`
 3. `{{ runtime.notes_syntax_file }}`
-4. Root and ancestor `findings.md`, `story.md`, `conventions.md`, and relevant `checks/` summaries
-5. The target node's `state.md`, `plan.md`, `findings.md`, `story.md`, `conventions.md`, relevant `checks/`, and material-index output when applicable
+4. Root and ancestor `findings.md`, `map.md`, `story.md`, `conventions.md`, and relevant `checks/` summaries
+5. The target node's `state.md`, `map.md`, `plan.md`, `findings.md`, `story.md`, `conventions.md`, relevant `checks/`, and material-index output when applicable
 6. The target file
 7. `concepts/` only as needed for term definitions
 

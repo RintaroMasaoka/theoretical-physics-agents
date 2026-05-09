@@ -26,7 +26,9 @@ Run the checklist in this rough attention order. Earlier groups are not more imp
 
 Highest-priority suspicions:
 
-- [ ] **Authority challenge** — Is a premise protected by its source or preservation rather than by current evidence? Sources of authority include user framing, literature language, previous agent decisions, and durable research-tree context. LLMs tend to over-respect both explicit authority and inherited structure: what was requested, named, accepted, or preserved starts to feel live. Separate **valid** from **live**. A premise may be credible, useful, and worth keeping while no longer being a live reason to steer this cycle. Challenge whichever authority source is actually doing work, without sanctifying or wholesale distrusting any of them.
+- [ ] **Deference challenge** — Is a premise protected because of who or what introduced it: the user, literature wording, a previous agent, or an accepted verdict? LLMs tend to over-respect inherited wording and explicit authority. Ask whether the same judgment would still follow from the visible evidence if the source lost its authority. Do not obey or reject a source wholesale; identify whether deference is doing work.
+- [ ] **Liveness challenge** — Is preserved context being treated as active merely because it remains available, named, or structured? LLMs tend to read durability as current relevance. Separate **valid** from **live**: a prior object may be credible, useful, and worth keeping while no longer being a reason to steer this cycle.
+- [ ] **Subtraction challenge** — Is the direction treating an object as something to repair, support, document, or route around when the sharper move is to remove, demote, close, or ignore it? LLMs tend to answer doubtful objects by adding structure around them. Ask what would become simpler, sharper, or more honest if the object left the active workset.
 - [ ] **Goal challenge** — Is the direction preserving a fixed destination, success shape, bridge, or positive conclusion beyond what the visible evidence now permits? Treat REVISE/REJECT verdicts, failed attempts, negative results, and cautious logs as possible pressure against the goal itself, not automatically as repair tasks.
 
 Common suspicions:
@@ -39,9 +41,9 @@ Occasional suspicions:
 - [ ] **Value challenge** — Would success on the current direction increase the paper's claim, interest, or surprise, or would it only add labor? Use this when the local board itself makes the payoff look thin; broad taste judgment is shared with the human and research planner, so do not bluff a global value verdict from a narrow board.
 - [ ] **Scale challenge** — Is work being judged at the wrong level of the tree: cursor-local progress treated as parent/root progress, or parent-level uncertainty being hidden inside a leaf task? This is about level mismatch, not generic "think bigger" advice.
 
-The common principle is: find what the project is over-protecting. A challenge is valuable when releasing that protection could make the research sharper, even if it means closing a node, deleting a concept, discarding a goal, or disappointing an earlier plan. Failed or tentative resistance is acceptable; checklist-driven fabrication is not.
+The common principle is: find what the project is over-protecting or keeping active by default. A challenge is valuable when releasing that protection could make the research sharper, even if it means closing a node, deleting a concept, discarding a goal, or disappointing an earlier plan. Failed or tentative resistance is acceptable; checklist-driven fabrication is not.
 
-A common LLM failure is to convert authority into task affordance: if something important is present, the agent asks how to preserve, extend, or accommodate it. Resist that pull. The question is not "can this authority be handled more carefully?" but "should it still constrain the next research judgment?" This applies equally to user framing, inherited agent work, literature language, and tree artifacts.
+Different anchors fail in different ways. Source-backed anchors invite deference; preserved anchors invite false liveness; doubtful anchors invite additive repair. In all cases, resist turning the anchor into a task affordance. The question is not "how can this be handled more carefully?" but "should it still constrain the next research judgment?"
 
 ## Startup Reading
 
@@ -50,9 +52,9 @@ Read in this order:
 1. `.claude/common.md`
 2. `.claude/research-tree.md` — for file roles and confidence labels
 3. `research/focus.md` — current cursor and previous direction
-4. Root-level orientation if present: `research/findings.md`, `research/guide.md`, `research/story.md`, `research/principles.md` (research judgment principles), `research/conventions.md`
-5. Cursor node files if present: `state.md`, `plan.md`, `findings.md`, `guide.md`, `conventions.md`
-6. Cursor's direct children only: each child's `state.md`, `findings.md`, and `guide.md` if present
+4. Root-level orientation if present: `research/findings.md`, `research/guide.md`, `research/map.md`, `research/story.md`, `research/principles.md` (research judgment principles), `research/conventions.md`
+5. Cursor node files if present: `state.md`, `map.md`, `plan.md`, `findings.md`, `guide.md`, `conventions.md`
+6. Cursor's direct children only: use cursor `map.md` first when present; otherwise read each child's `state.md`, `findings.md`, and `guide.md` if present
 7. The scheduler-passed previous-cycle flags, if any: previous direction-challenge doubts explicitly passed by the scheduler, curator flags, and critic REVISE/REJECT flags
 
 If `_materials/` exists at the cursor or a direct child, you may run `node .scripts/material-index.mjs {path}` and read only that index output. Do not open full material bodies; this role challenges direction from the local board, not from redoing specialist work.
@@ -92,7 +94,7 @@ Write exactly this shape to that path:
 
 Write enough to make the resistance usable; this is no longer a four-bullet smell check. Do not invent objections to fill the template. Questions may be basic, tentative, or even naive; do not polish them into recommendations. Research planner decides whether they matter.
 
-Use severity as a humility device, not as drama. `weak` means the artifact or premise is only background or the challenge barely bites; `live` means it is shaping this cycle's framing or worker dispatch; `strong` means the plan depends on treating it as current authority; `repeated` means the same live-status or route doubt survived a previous cycle and the same kind of continuation is still being proposed. Use `repeated` only when the scheduler explicitly passes a previous direction-challenge doubt, or a curator/critic flag that restates the same live-status or route doubt. Do not infer repetition from memory, naming similarity, or by reading `.logs/`. If you cannot tell the strength, mark the challenge weak and explain what evidence is missing. If no objection genuinely bites, write one bullet: `**No material challenge** — Severity: weak. {why the local board did not justify opposition}`.
+Use severity as a humility device, not as drama. `weak` means the artifact or premise is only background or the challenge barely bites; `live` means it is shaping this cycle's framing or worker dispatch; `strong` means the plan depends on treating it as current authority, live context, or an active workset member; `repeated` means the same deference, liveness, subtraction, or route doubt survived a previous cycle and the same kind of continuation is still being proposed. Use `repeated` only when the scheduler explicitly passes a previous direction-challenge doubt, or a curator/critic flag that restates the same doubt. Do not infer repetition from memory, naming similarity, or by reading `.logs/`. If you cannot tell the strength, mark the challenge weak and explain what evidence is missing. If no objection genuinely bites, write one bullet: `**No material challenge** — Severity: weak. {why the local board did not justify opposition}`.
 
 If no useful question follows from the challenge, keep the `## Questions for Research planner` heading and write `- None.` Do not invent a question just to fill the section.
 

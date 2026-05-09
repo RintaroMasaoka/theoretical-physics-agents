@@ -14,7 +14,7 @@ The team and who owns what:
 |---|---|---|
 | **Direction challenge** | `direction-challenger` | Pre-direction opposition: challenges value, goal, necessity, frame, scale, authority, and inertia anchors before the direction hardens |
 | **Direction** | `research-planner` | `research/focus.md` — reads the tree, decides the next question, expresses it as a cursor + dispatch plan + tree directives; may create a minimal child node when immediate dispatch needs that structure |
-| **Tree transaction** | `curator` | Graph/lifecycle/placement, pre-worker readiness transactions, structural closure for planner-created children, state.md absorbed evidence, plan.md consistency, child presentation transactions, conventions/checks placement, analysis-material preservation/promotion, retraction, `dead_ends.md`, and admitted findings.md materialisation |
+| **Tree transaction** | `curator` | Graph/lifecycle/placement, pre-worker readiness transactions, structural closure for planner-created children, state.md absorbed evidence, map.md / plan.md consistency, child presentation transactions, conventions/checks placement, analysis-material preservation/promotion, retraction, `dead_ends.md`, and admitted findings.md materialisation |
 | **Verification** | `critic` | Independent Provisional Review of every review-eligible worker submission and Durable Surface Review of findings/analysis surfaces requested by curator |
 | **Execution** | researcher / simulator / reader / scout / engine-builder / concept-checker / self-check | Bounded tasks producing provisional worker submissions in `_reviews/` plus raw process logs as specified by their agent prompt |
 | **Human oversight guide** | `guide-writer` | `research/**/guide.md` — session-end sweep over scheduler-supplied target nodes; writes human-facing oversight guides from durable surfaces without deciding research claims or direction |
@@ -50,11 +50,11 @@ The team and who owns what:
 |---|---|
 | **Session** | One `/auto` execution — from start to final draft |
 | **Ordinary Cycle** | One iteration of the normal scheduler loop (direction-challenger → research planner → optional pre-worker curator readiness transaction → workers → Provisional Review → optional one repair loop → curator → optional Durable Surface Review → curator follow-up) |
-| **Presentation-Boundary Cycle** | A valid cycle variant where parent-ascent replaces workers / Provisional Review / ordinary curator dispatch with the child presentation transaction, plus Durable Surface Review if that transaction requests it |
+| **Presentation-Boundary Cycle** | A cycle with a child-to-parent ascent. The child presentation transaction runs before workers; it replaces worker dispatch only when curator invalidates the planned dispatch or research planner intentionally left `Worker Dispatches` empty |
 | **Task** | One `Agent` tool call |
-| **Presentation Boundary** | A child-to-parent cursor ascent where parent-level worker dispatch is paused until the child is made readable as a parent component |
+| **Presentation Boundary** | A child-to-parent cursor ascent where curator first makes the child readable as a parent component, usually by updating parent `map.md` / state / plan, before any parent-level workers use that context |
 | **Child Presentation Judgment** | Research planner's meaning judgment at the boundary: what the child was for, what it achieved or failed to achieve, and what the parent should now see |
-| **Child Presentation Transaction** | Curator's tree update at the boundary: applying the judgment to status, Current Board, parent plan/state, durable surfaces, archive/reframe mechanics, and link hygiene |
+| **Child Presentation Transaction** | Curator's tree update at the boundary: applying the judgment to status, Current Board, parent map/plan/state, durable surfaces, archive/reframe mechanics, and link hygiene |
 | **Guide target set** | In-memory Set of node paths the scheduler already touched or observed this session; used only at Session End to tell guide-writer which guides to inspect |
 
 One session = up to `MAX_CYCLES` cycles. Multiple tasks can run in parallel within a cycle.
@@ -185,7 +185,7 @@ The scheduler does not auto-remediate cursor jumps. If research planner violates
 
 ### 3a. Presentation Boundary — Child Presentation Transaction
 
-If **Previous cursor** is a direct child of the new **Cursor**, the research planner has floated up from child to parent. Treat this as a presentation boundary, not as an ordinary parent work cycle.
+If **Previous cursor** is a direct child of the new **Cursor**, the research planner has floated up from child to parent. Treat this as a presentation boundary readiness step before ordinary parent work, not as a mandatory workerless parent cycle.
 
 Run curator immediately, before launching any workers:
 
@@ -193,7 +193,7 @@ Run curator immediately, before launching any workers:
 
 Agent(subagent_type="curator", prompt="""
 ## Task
-Child Presentation Transaction. The cursor has just ascended from the child below to its parent. Apply research planner's Child Presentation Judgment from the Tree Directives, plus your normal transaction mechanics, so the child is readable from the parent before parent-level planning resumes: status, Current Board, parent plan/state, extracted durable surfaces, dead-end/draft/findings/guide placement, archive/reframe needs, and link hygiene.
+Child Presentation Transaction. The cursor has just ascended from the child below to its parent. Apply research planner's Child Presentation Judgment from the Tree Directives, plus your normal transaction mechanics, so the child is readable from the parent before parent-level workers or planning use the parent context: status, Current Board, parent map/plan/state, extracted durable surfaces, dead-end/draft/findings/guide placement, archive/reframe needs, and link hygiene. Return whether the planned Worker Dispatches remain valid after this presentation transaction.
 
 
 ## Boundary
@@ -203,8 +203,11 @@ Child being presented: {previous cursor path}
 ## Child Presentation Judgment / Tree Directives (from research planner, this cycle)
 {verbatim copy of focus.md § Tree Directives}
 
+## Planned Worker Dispatches (for validity check only)
+{verbatim copy of focus.md § Worker Dispatches}
+
 ## New Evidence This Cycle
-(none — this is a presentation-boundary transaction before parent-level planning resumes)
+(none — this is a presentation-boundary transaction before parent-level workers run)
 
 ## Context
 Session cycle: {cycle_number} of {MAX_CYCLES}
@@ -212,11 +215,13 @@ Presentation boundary: true
 """)
 ```
 
-This curator call executes the presentation-boundary transaction and returns a summary. Record that summary as the cycle's curator sweep. Then proceed directly to Cycle End; do **not** launch workers, Provisional Review, or the ordinary curator dispatch in this cycle. The next cycle's direction-challenger and research planner will read the parent after the planner's judgment has landed in the tree.
+This curator call executes the presentation-boundary transaction and returns a summary. Record that summary as the cycle's presentation curator summary. If it explicitly returns `Dispatch readiness: invalidated`, skip worker dispatch, Provisional Review, and the ordinary curator dispatch for this cycle; carry the summary and the full unexecuted directive set into the next research planner prompt so the planner can re-plan from the repaired parent. Do not execute ordinary `Tree Directives` in an invalidated readiness cycle; the premise for this cycle's plan has changed.
 
-If the presentation-boundary curator return contains `Durable Surface Review needed:`, run Cycle steps 6a and 6b before Cycle End. Presentation-boundary findings/analysis changes have the same durable-memory risk as ordinary curator changes; skipping the durable review here would leave a parent-facing synthesis unchecked.
+Otherwise continue toward the normal Worker Dispatch step in this same cycle. Presentation makes the parent readable; it does not by itself consume a cycle. If `Worker Dispatches` is non-empty, launch them after the presentation transaction so parent-level work can proceed from the updated `map.md` / state / plan. If `Worker Dispatches` is empty, run step 6 only when there are remaining non-presentation `Tree Directives`; otherwise proceed to Cycle End after any requested Durable Surface Review.
 
-Research planner should leave `Worker Dispatches` empty on an ascent cycle. If it listed workers anyway, skip them and carry a scheduler warning into the next research planner prompt via the curator sweep summary: parent-level workers were not launched because child presentation must land before parent-level planning continues.
+If the presentation-boundary curator return contains `Durable Surface Review needed:`, always drain that review before launching workers. Use the presentation-boundary durable-review follow-up path: dispatch critic per step 6a, then re-dispatch curator with the review result, the presentation curator summary, `New Evidence This Cycle: (none — worker dispatch has not run yet)`, and the instruction to apply only the presentation-boundary durable review before returning to step 3b / step 4. This avoids scheduler-side content judgment about whether the review affects worker context.
+
+Research planner may list parent-level workers on an ascent cycle when the next research question is already clear and the presentation transaction is only a readiness repair. The scheduler should not discard those workers solely because the cursor ascended.
 
 ### 3b. Pre-Worker Curator Readiness Transaction
 
@@ -245,7 +250,7 @@ Pre-worker readiness: true
 """)
 ```
 
-Record the returned summary as the cycle's pre-worker curator summary. The pre-worker pass must not request or launch Durable Surface Review. The normal path then continues to Worker Dispatch. Only if curator explicitly returns `Dispatch readiness: invalidated` should the scheduler skip worker dispatch, Provisional Review, and the ordinary curator pass for this cycle, then proceed to Cycle End; carry the curator summary into the next cycle's `Curator Sweep` so research planner can re-plan from the repaired tree. `Dispatch readiness: invalidated` means the memory repair showed that the planned worker target or task requires non-routing work before workers can honestly proceed, not that curator has chosen a new research direction.
+Record the returned summary as the cycle's pre-worker curator summary. The pre-worker pass must not request or launch Durable Surface Review. The normal path then continues to Worker Dispatch. Only if curator explicitly returns `Dispatch readiness: invalidated` should the scheduler skip worker dispatch, Provisional Review, and the ordinary curator pass for this cycle, then proceed to Cycle End; carry the curator summary and the full unexecuted ordinary `Tree Directives` into the next cycle's `Curator Sweep` so research planner can re-plan from the repaired tree. `Dispatch readiness: invalidated` means the memory repair showed that the planned worker target or task requires non-routing work before workers can honestly proceed, not that curator has chosen a new research direction. Do not execute ordinary `Tree Directives` after an invalidated readiness transaction; the cycle's premise has changed.
 
 If there are no `Pre-Worker Tree Directives`, skip this step. Do not synthesize a readiness pass from ordinary `Tree Directives`; timing is research planner's judgment.
 
@@ -280,7 +285,7 @@ Execute the tree directives below and absorb the new evidence (worker review tra
 {verbatim copy of focus.md § Tree Directives}
 
 ## Pre-Worker Curator Summary
-{DONE summary from step 3b, or "(none)"}
+{DONE summary from step 3a presentation transaction and/or step 3b pre-worker readiness transaction, or "(none)"}
 
 ## New Evidence This Cycle
 - {transaction directory} — worker: {worker.md or repair.md}; critic review: {critic.md or critic_rereview.md}; verdict: {ACCEPT / REJECT / REVISE-NONBLOCKING / REVISE-BLOCKING / OPAQUE}
@@ -295,7 +300,9 @@ Session cycle: {cycle_number} of {MAX_CYCLES}
 """)
 ```
 
-Curator reads the review transactions and tree state; executes the directives; absorbs admitted content into state.md without `_reviews/` or `.logs/` links; updates plan.md / conventions.md / admitted findings.md materialisations / status / _materials/analyses/*.md / checks / dead_ends.md per its operating rules; returns `DONE: {summary}`. Curator does not write guide.md.
+If there are no worker review transactions and no remaining non-presentation `Tree Directives`, skip this ordinary curator pass. Otherwise curator reads the review transactions and tree state; executes the directives; absorbs admitted content into state.md without `_reviews/` or `.logs/` links; updates map.md / plan.md / conventions.md / admitted findings.md materialisations / status / _materials/analyses/*.md / checks / dead_ends.md per its operating rules; returns `DONE: {summary}`. Curator does not write guide.md.
+
+On a presentation-boundary cycle where step 3a already executed the Child Presentation Judgment, do not ask curator to re-execute the same presentation directives in step 6. Pass the step 3a summary as pre-worker curator summary and set `Tree Directives` to any remaining non-presentation directives only; if there are none, write `(presentation directives already executed in step 3a)`. The ordinary curator pass still runs after workers when there is worker evidence to absorb.
 
 If curator returns with unresolved `REVISE-BLOCKING`, `OPAQUE`, or `REJECT` Provisional Reviews, curator flags these in its return. The scheduler records the flag; direction-challenger and research planner see the flagged transactions in the next cycle's prompts, and research planner decides whether to re-dispatch, pivot, or close.
 

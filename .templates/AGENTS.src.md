@@ -8,7 +8,7 @@ Users run `/auto` to advance research autonomously, `/steer` to choose the next 
 All user-facing output is written in **{{ language }}**. This covers:
 
 - Conversational responses to the user
-- Any file the system writes into the project — research tree (`research/**` such as `findings.md`, `state.md`, `story.md`, `plan.md`, `guide.md`, …), session records (`.logs/**` such as launch and meeting summaries), and any other prose file
+- Any file the system writes into the project — research tree (`research/**` such as `findings.md`, `state.md`, `map.md`, `story.md`, `plan.md`, `guide.md`, …), session records (`.logs/**` such as launch and meeting summaries), and any other prose file
 - Deliverables produced by worker sub-agents (see `{{ runtime.common_file }}`)
 - Commit messages
 
@@ -26,7 +26,7 @@ The system uses different orchestration models in `/auto`, `/steer`, and `/write
 |---|---|---|
 | **Direction challenge** | `direction-challenger` | Pre-direction opposition for research planner: challenges value, goal, necessity, frame, scale, authority, and inertia anchors before the direction hardens |
 | **Direction** | `research-planner` | `research/focus.md` — chooses cursor, formulates worker dispatches, issues tree directives. Thinks as a research planner (curiosity + critical thinking + narrative coherence) |
-| **Tree transaction** | `curator` | Graph/lifecycle/placement, state.md absorbed evidence, plan.md consistency, conventions/checks placement, analysis-material preservation, retraction, `dead_ends.md`, and admitted findings.md materialisation. Executes research planner's tree directives and absorbs worker evidence without choosing research direction |
+| **Tree transaction** | `curator` | Graph/lifecycle/placement, state.md absorbed evidence, map.md / plan.md consistency, conventions/checks placement, analysis-material preservation, retraction, `dead_ends.md`, and admitted findings.md materialisation. Executes research planner's tree directives and absorbs worker evidence without choosing research direction |
 | **Verification** | `critic` | Independent Provisional Review of every review-eligible worker submission and Durable Surface Review of findings/analysis surfaces requested through curator |
 | **Human oversight guide** | `guide-writer` | `research/**/guide.md` — session-end sweep over scheduler-supplied target nodes; writes human-facing reading paths, verification maps, and oversight questions without deciding claims or direction |
 | **Execution** | workers (researcher, simulator, reader, scout, engine-builder, concept-checker, self-check) | Bounded tasks — their deliverables stay provisional until critic has verified them |
@@ -48,6 +48,8 @@ The system uses different orchestration models in `/auto`, `/steer`, and `/write
 ### User
 
 The human researcher is the collaborator for all skills — sets broad direction via `/launch` and `/meeting`, steers individual cycles via `/steer`, and overrides when needed.
+
+`research/**/story.md` is the paper-narrative surface. Its write authority belongs to `/launch`, `/meeting`, and `/write`; `/auto` may read it as narrative context but does not maintain it as routing, state, fact, or strategy memory.
 
 ## Operational Rules
 

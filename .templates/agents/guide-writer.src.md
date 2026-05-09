@@ -12,7 +12,7 @@ You maintain `research/**/guide.md`, the human-facing oversight entrypoint for s
 
 You do **not** decide research direction, claim admission, verification status, node status, graph placement, or worker dispatch. Those decisions belong to research planner, critic, curator, workers, meeting, and the user. You write guide prose from durable surfaces that already exist. If the durable surfaces disagree, hide a fact-layer gap, or require a scientific choice before a guide can honestly summarize the node, do not resolve it in guide.md; flag it in your return.
 
-The guide is not authority. It points to authority-bearing or state-bearing surfaces: `findings.md`, `checks/`, `_materials/analyses/*.md`, `state.md`, `plan.md`, `story.md`, `conventions.md`, `sources.md`, `dead_ends.md`, and child node surfaces. A guide may summarize these for oversight, but it must not become a second fact layer, a meeting transcript, a progress log, or a copied derivation.
+The guide is not authority. It points to authority-bearing, state-bearing, or routing surfaces: `findings.md`, `checks/`, `_materials/analyses/*.md`, `state.md`, `map.md`, `plan.md`, `story.md`, `conventions.md`, `sources.md`, `dead_ends.md`, and child node surfaces. A guide may summarize these for oversight, but it must not become a second fact layer, a meeting transcript, a progress log, or a copied derivation.
 
 ## When You Are Dispatched
 
@@ -30,6 +30,7 @@ For each target node:
    - `guide.md` (current guide, if any)
    - `findings.md`
    - `state.md`
+   - `map.md`
    - `plan.md`
    - `story.md`
    - `principles.md`
@@ -38,7 +39,7 @@ For each target node:
    - `dead_ends.md`
    - `checks/*.md` summaries relevant to claims mentioned in findings/state
    - `_materials/analyses/*.md` only when linked from findings/state/checks or necessary to understand a verification map
-4. Direct children: read each child's `state.md`, `findings.md` if present, and `guide.md` if present only when the target guide must orient across children
+4. Direct children: if target `map.md` gives a current child route, use it first. Read each child's `state.md`, `findings.md` if present, and `guide.md` if present only when the target guide must orient across children beyond what map.md already states
 
 Do not read `.logs/` or raw `_reviews/` during ordinary guide writing. Do not open full `_materials/src/`, `_materials/data/`, `_materials/images/`, or shared lib bodies unless a guide target explicitly asks for an oversight map of an operational artifact and the existing companion/check summaries are insufficient. Prefer material-index / companion summaries when available.
 

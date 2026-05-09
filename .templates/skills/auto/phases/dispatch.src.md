@@ -87,7 +87,7 @@ Each entry is what the scheduler extracts from research planner's `### Worker Di
 - **simulator**: `Target: research/{path}/` + `Physical setup` + `Mathematical definition of observables` + `Success criteria` + `Run number: {N}` + `research/_materials/lib/ module list` + `Existing scripts in _materials/src/: {list}`
 - **engine-builder**: `Model definition` + `Computational method` + `Required features` + existing module path. Or `"Refine lib"` for self-directed improvement.
 - **concept-checker**: Document path to read + focus area for concept extraction.
-- **self-check**: Target file path (a findings.md, guide.md, or plan.md) + what to check for.
+- **self-check**: Target file path (a findings.md, guide.md, map.md, or plan.md) + what to check for.
 
 The research planner's focus.md entries are written concretely enough that these fields can be extracted mechanically. If a required field listed above cannot be extracted (e.g., a researcher entry with no `Target: research/{path}/` line, or a simulator entry missing the `Run number`), the scheduler re-dispatches research planner once, echoing the exact missing field(s); it does not "decide" whether an entry looks underspecified — structural field-absence is the only trigger. If the second attempt is still missing fields, stop the current cycle before worker launch and proceed to Session End with a failure note that worker dispatch was blocked by missing structural fields; preserve any outputs already produced earlier in the session.
 

@@ -57,7 +57,7 @@ mv research/{path}/_materials/src/{slug}.md research/{path}/_materials/src/archi
 
 Never delete — superseded scripts move to `_materials/src/archive/` so the reasoning history stays searchable. Curator records each move in its sweep output; include that summary in the wrap-up input's `## Session Log` § `### Node Changes`.
 
-These archive moves are tree maintenance, so curator executes them together with any accompanying `state.md` or `plan.md` updates. Keeping the move and the prose record in one role preserves the tree-write authority split.
+These archive moves are tree maintenance, so curator executes them together with any accompanying `state.md`, `map.md`, or `plan.md` updates. Keeping the move and the prose record in one role preserves the tree-write authority split.
 
 If research planner's focus.md has no archive directives, skip this step. Which scripts are superseded is a research judgment (research planner's), not a mechanical one.
 
@@ -71,11 +71,11 @@ Dispatch curator one final time with:
 Read and follow `{{ runtime.agents_dir }}/curator.md` as your role definition. Treat the rest of this prompt as task-specific input.
 
 ## Task
-Session-end tree-wide coherence pass. Apply your default operating rules (research-memory shape repair, admitted fact-layer materialisation, state.md compression, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree. Do not write guide.md; guide-writer runs after your sweep.
+Session-end tree-wide coherence pass. Apply your default operating rules (research-memory shape repair, parent map maintenance, admitted fact-layer materialisation, state.md compression, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree. Do not write guide.md; guide-writer runs after your sweep.
 {{else}}
 {{ runtime.tool_agent }}({{ runtime.tool_agent_type_field }}="curator", prompt="""
 ## Task
-Session-end tree-wide coherence pass. Apply your default operating rules (research-memory shape repair, admitted fact-layer materialisation, state.md compression, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree. Do not write guide.md; guide-writer runs after your sweep.
+Session-end tree-wide coherence pass. Apply your default operating rules (research-memory shape repair, parent map maintenance, admitted fact-layer materialisation, state.md compression, staleness cleanup, Markdown-link audit, cross-file coherence) across the whole tree. Do not write guide.md; guide-writer runs after your sweep.
 {{/if}}
 
 ## Tree Directives

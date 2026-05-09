@@ -6,19 +6,14 @@ user-invocable: true
 
 # Paper Writing PI
 
-Draft research findings as academic paper material under `draft/**`. The responsibility is to shape the knowledge accumulated through research (`/auto`) into paper-draft form. `manuscript/` is frozen in the current workflow; do not promote or write manuscript prose until a future write-skill revision defines that protocol.
+Draft research findings as an academic paper. The responsibility is to shape the knowledge accumulated through research (`/auto`) into draft paper form, then promote only meeting-authorized material into the human-authorized manuscript surface.
 
 ## Constraints
 
-### Language Policy
-
-- **Internal/session prose uses {{ language }}.** This includes `.logs/{timestamp}_write.md`, `.logs/last_write_session.md`, project-root `agenda.md`, and the final report. Reason: `{{ language }}` is the project's working communication language.
-- **Paper-draft artifacts use the paper's publication language.** Artifacts under `draft/**` are external paper material. Use an explicit project declaration if one exists; otherwise infer the language from `draft/outline.md`, existing draft sections, then existing `manuscript/**` if any. If the evidence conflicts, record the inconsistency instead of letting the latest worker output set the language by accident.
-- **Exceptions.** Technical terms, proper nouns, LaTeX, slugs, frontmatter keys, and fixed parse-contract headings may stay English. When creating user-facing logs or reports, localize labels unless this prompt explicitly says the heading is fixed syntax. Treat English example templates in this SKILL as structural illustrations, not language directives.
-
-- **Do not proactively message the user.** Text output is limited to the final report. If the user initiates communication, answer only that message briefly, do not ask follow-up questions, and resume silent execution unless the user redirects or stops the run.
-- **Freeze manuscript.** Do not create, update, or promote into `manuscript/**`. Read research support from `research/**/findings.md`, `research/**/guide.md`, `research/**/_materials/analyses/*.md`, and `research/**/checks/`. Write only to `draft/**`, `.logs/**`, and project-root `agenda.md`. If paper drafting exposes a promotion/manuscript question, record it in `agenda.md` for the future write workflow.
-- `{{ runtime.tool_ask_user_question }}` is prohibited. Users are often away, and asking questions interrupts the session and wastes time
+- **Write PI-authored prose in {{ language }}.** Scope: session records (`.logs/{timestamp}_write.md`, `.logs/last_write_session.md`), `agenda.md`, and the final report. Paper-draft artifacts live under `draft/**` and use the paper's publication language. Use an explicit project declaration if one exists; otherwise infer it from existing `manuscript/**`, then `draft/outline.md`, then existing draft sections, and keep all paper surfaces consistent. If the evidence conflicts, record the inconsistency instead of letting the latest worker output set the language by accident. `manuscript/**` is also written in the paper's publication language, but only from meeting authorization snapshots. Reason: `{{ language }}` is for internal project communication; the paper is an external artifact with its own audience. Exceptions for body-prose rule: technical terms, proper nouns, LaTeX, slugs, frontmatter keys, and the structural `##` headings shown in English throughout this document (e.g., `## Accomplished`, `## Section Status`, `## Issues`) may stay English. Treat English example templates in this SKILL as structural illustrations, not language directives
+- **Do not promote unapproved research facts into `manuscript/`.** `research/**/note.md` is draft fact material. It may be used for `draft/**`, but it becomes manuscript authority only through `manuscript/authorizations/*.md` snapshots created by `/meeting`. This preserves the human approval boundary even when `/write` runs autonomously
+- `{{ runtime.tool_ask_user_question }}` is prohibited. Users are often away, and asking questions interrupts the session and wastes time. Text output is limited to the final report only. Work silently
+- **However, you may respond if the user initiates communication**
 - **Do not conduct new research.** If a research gap is discovered during writing, record it in `agenda.md` and leave it to `/auto`. Do not launch researcher or scout yourself
 - **`{{ runtime.tool_shell }}("sleep ...")` is prohibited. Polling is prohibited.** For waiting on agent completion, use only Pattern A / B
 
@@ -40,15 +35,14 @@ Draft research findings as academic paper material under `draft/**`. The respons
 
 ```
 research/                 # Read-only — research tree
-  findings.md                 #   Root: thesis, background
+  note.md                 #   Root: thesis, background
   story.md                #   Paper narrative structure
-  principles.md           #   Research judgment principles
+  principles.md           #   Constraints
   conventions.md          #   Project-wide notation and convention ledger
-  {branch}/findings.md        #   Draft fact layer — what the node established, with derivation/scope/limits
-  {branch}/guide.md        #   Human oversight entrypoint — orientation and verification map
+  {branch}/note.md        #   Draft fact layer — what the node established, with derivation/scope/limits
   {branch}/conventions.md #   Subtree-local notation / convention ledger when needed
   {branch}/state.md         #   Research process (ladder — kind/status in frontmatter)
-  {branch}/_materials/analyses/*.md    #   Clean self-contained analyses; support material, not fact authority
+  {branch}/report_*.md    #   Clean self-contained analyses
 concepts/                 # Read-only — concept definitions
 agenda.md                 # Writable — destination for reporting research gaps
 draft/                    # Paper-draft workspace, not human-authorized manuscript authority
@@ -56,7 +50,11 @@ draft/                    # Paper-draft workspace, not human-authorized manuscri
   conventions.md          # Terminology and notation conventions
   sections/{N}_{slug}.md  # Per-section drafts (generated by writer)
   versions/v{N}.md        # Integrated paper drafts (generated by finalizer)
-manuscript/               # Frozen / read-only in the current workflow
+manuscript/               # Human-authorized manuscript authority
+  authorizations/{timestamp}_{slug}.md # Meeting snapshots of approved note.md artifacts
+  outline.md              # Authorized outline, if promoted
+  sections/{N}_{slug}.md  # Authorized manuscript sections, if promoted
+  versions/v{N}.md        # Authorized integrated manuscript versions, if promoted
 .logs/
   {timestamp}_review_{slug}.md   # reviewer output
   {timestamp}_audit.md           # reference-auditor output
@@ -80,21 +78,23 @@ manuscript/               # Frozen / read-only in the current workflow
 
 1. Capture session timestamp: `{{ runtime.tool_shell }}("date '+%Y-%m-%dT%H:%M'")`. At session end, obtain the log path via `bash .scripts/log-path.sh write` and use the captured start timestamp in the log heading
 2. Read `.logs/last_write_session.md` (if it exists)
-3. Read `research/findings.md` (thesis, background) + `research/guide.md` (human oversight orientation, if exists) + `research/story.md` (narrative structure) + `research/principles.md` (research judgment principles, if exists) + `research/conventions.md` (if exists)
-4. Navigate the tree: `ls research/` → read children's findings.md (draft facts) + guide.md (if useful for orientation) + conventions.md (if exists) for established knowledge and notation, and state.md frontmatter for kind/status
+3. Read `research/note.md` (thesis, background) + `research/story.md` (narrative structure) + `research/principles.md` + `research/conventions.md` (if exists)
+4. Navigate the tree: `ls research/` → read children's note.md (draft facts) + conventions.md (if exists) for established knowledge and notation, and state.md frontmatter for kind/status
 5. Browse `concepts/` for relevant concept definitions as needed
 6. Read `draft/outline.md` (if it exists)
 7. Check existing section drafts (Glob `draft/sections/*.md`)
-8. Treat `manuscript/` as read-only reference material if it already exists; do not use it as a write target
+8. Check `manuscript/authorizations/*.md` (if any) to determine what content is approved for manuscript promotion
 
 **Writing readiness check:**
 - Navigate the tree and check the status of core nodes. If too many are open/active, writing will require major rewrites later. In that case, write "Writing deferred due to insufficient research. The following nodes need resolution first: ..." in `agenda.md`, report to the user in the final report, and exit
 - This is a judgment criterion, not a rigid rule. If the policy is to write active items honestly as gaps, proceed with writing
 
-**Manuscript freeze check:**
-- Work only in `draft/**`, `.logs/**`, and `agenda.md`
-- Do not create or update `manuscript/**`, even if old authorization snapshots exist
-- If a draft section would require manuscript-authority decisions, record the missing protocol or approval question in `agenda.md` and continue drafting only where research support is sufficient
+**Narrative authority check:** `research/story.md` is a paper-narrative surface owned by `/launch`, `/meeting`, and `/write`, not by `/auto`. During `/write`, update it only when drafting exposes a better manuscript order, storyline, or section positioning that should persist beyond the draft outline. Do not use `story.md` to record facts, research state, worker tasks, or child-routing conditions; those belong in `findings.md`, `state.md`, `plan.md`, or `map.md`.
+
+**Authorization check:**
+- If no `manuscript/authorizations/*.md` exists, work only in `draft/**`. Do not create or update `manuscript/` prose from unapproved `note.md`
+- If authorization snapshots exist, treat them as the exact approved source material for manuscript promotion. Read their scope, exclusions, and copied artifact body. Do not silently substitute a newer `research/**/note.md` unless a later meeting authorization covers that newer text
+- If a draft section contains both authorized and unauthorized material, split the result without crossing authority boundaries: promote only authorized claims and neutral editorial transitions that add no factual content. Leave unapproved claims, framing, bridges, or scope expansions in `draft/**`, or report the missing approval
 
 ---
 
@@ -110,21 +110,29 @@ Decide the next action based on the current state:
 3. **Unreviewed draft sections exist** → Launch reviewer (multiple in parallel)
 4. **Draft sections with review FAIL** → Fix with writer → re-review
 5. **All draft sections PASS** → Launch finalizer for `draft/versions/`
-6. **Unaudited integrated draft complete** → Launch reference-auditor
+6. **Draft integrated version complete** → Launch reference-auditor
 7. **Audit complete** → Final fixes with finalizer
-8. **Audited integrated draft with final fixes complete** → Stop at `draft/**`; report what would need future manuscript-promotion policy
+8. **Meeting authorizations match a ready draft unit** → Promote that authorized content into `manuscript/**`, preserving scope and exclusions from the authorization snapshots. Do not wait for unrelated sections to finish
 
 Phases are guidelines; judge flexibly. If a review reveals insufficient content, record the research gap in `agenda.md`, put that section on hold, and proceed with others.
 
-### Manuscript Freeze Rule
+### Manuscript Promotion Rule
 
-`manuscript/` is not a draft workspace in the current `/write` skill. Do not write there. Do not infer a promotion protocol from old authorization snapshots, meetings, or draft quality. Stop at `draft/**` and report any promotion-policy gap in the session log and final report.
+`manuscript/` is not a more polished draft folder. It is the human-authorized paper surface. Promotion means rewriting the authorized snapshot content into paper prose while preserving its mathematical scope, caveats, and source/project boundaries.
+
+Before writing any `manuscript/**` file:
+1. Identify the exact `manuscript/authorizations/*.md` snapshot(s) that authorize the content
+2. Check whether the target manuscript section already exists; if it conflicts with the authorization, flag the conflict in the final report rather than silently reconciling it
+3. Write only the authorized content, with citations and narrative integration as needed
+4. Add a short provenance note in the write session log listing the authorization snapshot paths used for each manuscript file
+
+Promotion may occur whenever a relevant draft unit is ready and matching authorization exists; it is not blocked by unrelated unfinished sections. If manuscript promotion would require unapproved bridging claims, new research, or scope expansion beyond the snapshot, do not promote that part. Record the missing approval or missing research in `agenda.md` and report it.
 
 ### 2. Task Execution
 
 **Maximize parallelization.** Always launch independent tasks together.
 
-**Launch method:** Use the same Pattern A / Pattern B mechanics defined in `{{ runtime.skills_dir }}/auto/phases/dispatch.md`. Load that file when launching or waiting on subagents; reuse only its orchestration mechanics, not `/auto`'s research-cycle policy.
+**Launch method:** Use the same Pattern A / Pattern B as /auto.
 
 **Prompt template:**
 
@@ -146,7 +154,7 @@ Read and follow `{{ runtime.agents_dir }}/{agent}.md` as your role definition. T
 
 Dynamic data by agent:
 - **outliner**: (no additional data — reads research/ tree and concepts/ on its own)
-- **writer**: `Assigned section: #{N} {title} (slug: {slug})` / `Related nodes: {paths}` / `Evidence: {paths}` / For revisions: `Review report: {path}`
+- **writer**: `Assigned section: #{N} {title} (slug: {slug})` / `Related nodes: {paths}` / `Evidence: {paths}` / `Authorization snapshots: {paths, if promoting to manuscript}` / For revisions: `Review report: {path}`
 - **reviewer**: `Target section: draft/sections/{N}_{slug}.md` / `Related nodes: {paths}`
 - **finalizer**: `Audit report: {path}` (if available)
 - **reference-auditor**: `Target deliverable: {path}`
@@ -169,30 +177,29 @@ Retrieve deliverable paths from task return values and Read as needed:
    - What to do in the next session
 2. **Write session log**: obtain the path via `bash .scripts/log-path.sh write` (returns `.logs/{YYMMDD_HHMM}_write.md`); write to that path (permanent record — never overwrite):
    ```markdown
-   # {write-session title in {{ language }}} YYYY-MM-DD HH:MM
+   # Write YYYY-MM-DD HH:MM
 
-   ## {accomplished heading in {{ language }}}
+   ## Accomplished
    - {sections drafted, reviewed, finalized}
 
-   ## {section-status heading in {{ language }}}
+   ## Section Status
    - {per-section status: not started / drafted / review PASS / FAIL}
 
-   ## {issues heading in {{ language }}}
+   ## Issues
    - {research gaps reported, blockers}
 
-   ## {manuscript-freeze heading in {{ language }}}
-   - {confirmation that manuscript was not changed; future promotion-policy gaps if any}
+   ## Manuscript Promotion
+   - {manuscript files changed and authorization snapshots used, or "none"}
    ```
    Use the timestamp captured at session start (step 1).
 3. Confirm that research gaps have been recorded in `agenda.md` if any
-4. Git commit, if files changed:
+4. Git commit:
    ```bash
-   git add {changed draft/log/agenda paths} && git commit -m "write: {concise summary of achievements}"
+   git add {changed draft/manuscript/log/agenda paths} && git commit -m "write: {concise summary of achievements}"
    ```
-   If there are no changed files, or if git commit is unavailable or fails, record that in the final report and do not retry destructively.
 5. Display the final report to the user:
    - Writing and review results
    - Per-section status (not started / drafted / review PASS / FAIL)
-   - Manuscript freeze status and any future promotion-policy gaps
-   - If research gaps exist, report the localized equivalent of: "Please resolve the following via /auto before running /write again"
+   - Manuscript promotion status and authorization snapshots used
+   - If research gaps exist, report them ("Please resolve the following via /auto before running /write again")
    - Deliverable paths
