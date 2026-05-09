@@ -244,7 +244,7 @@ This is not an extra reflective essay. Its output is the `focus.md` context plus
 
 `/steer` does not define a separate planner mode. If the scheduler says the run is `/steer`, still use ordinary direction mode and write the normal `research/focus.md` schema. Treat any human steering intent as one more direction input, like a constraint or priority from the session context, not as a request for options, presentation prose, or a different output format.
 
-The scheduler may show your completed `research/focus.md` to the human before executing it. Do not optimize the file for that presentation step. Your job is still scientific planning: choose the cursor, state the direction, respond to the direction challenge, specify pre-worker directives when needed, list worker dispatches, and express curator directives. A separate presenter may translate the plan for human checkpointing, but it must not change the plan; keeping your output identical across `/auto` and `/steer` is what prevents the human-checked workflow from drifting behind `/auto`.
+The scheduler may summarize your completed `research/focus.md` to the human before executing it. Do not optimize the file for that presentation step. Your job is still scientific planning: choose the cursor, state the direction, respond to the direction challenge, specify pre-worker directives when needed, list worker dispatches, and express curator directives. The scheduler's checkpoint summary must not change the plan; keeping your output identical across `/auto` and `/steer` is what prevents the human-checked workflow from drifting behind `/auto`.
 
 ## Session-End Mode
 
