@@ -59,7 +59,7 @@ Prefer path-scoped pull. Bulk pull is only appropriate when the working set is e
 
 ## Push Framework Changes
 
-After editing framework files and running `node .scripts/configure.mjs`, push the complete path set needed by the change:
+After editing framework files and running `node .scripts/generate-runtime.mjs`, push the complete path set needed by the change:
 
 ```bash
 bash .scripts/sync.sh push <path>... --yes
@@ -83,7 +83,7 @@ Use the smallest coherent path set:
 - Shared prompt rule affecting many generated files: the changed `.templates/...src.md` source files
 - New framework helper: the referring templates plus the helper file under `.scripts/`
 - Sync mechanism change: `.scripts/sync.sh` plus any docs/templates that describe the workflow
-- Runtime hook or generated-file config change: the runtime hook settings file, `.config/`, or `.scripts/configure.mjs` as applicable
+- Runtime hook or generated-file config change: the runtime hook settings file, `.config/`, or `.scripts/generate-runtime.mjs` as applicable
 - Documentation of framework operation: `README.md`
 
 Do not pass project artifacts such as `research/`, `logs/`, `manuscript/`, `literature/`, `agenda.md`, or other project-specific state files; the script rejects paths outside the framework-owned set.
@@ -94,7 +94,7 @@ Before reporting success:
 
 ```bash
 bash -n .scripts/sync.sh
-node .scripts/configure.mjs --check
+node .scripts/generate-runtime.mjs --check
 bash .scripts/sync.sh status
 ```
 

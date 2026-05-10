@@ -36,12 +36,12 @@ While in problem-space work, keep candidate fixes in quarantine. You may name th
 
 ## Template System
 
-Prompt files are generated from templates — editing generated files directly is wrong because `.scripts/configure.mjs` overwrites them on each run. Templates are shared with downstream projects via an upstream remote: pull to stay current, push to share.
+Prompt files are generated from templates — editing generated files directly is wrong because `.scripts/generate-runtime.mjs` overwrites them on each run. Templates are shared with downstream projects via an upstream remote: pull to stay current, push to share.
 
 | Layer | Path | Role |
 |---|---|---|
 | **Template (source of truth)** | `.templates/**/*.src.md` | Edit these |
-| **Generated (do not edit)** | `.codex/agents/*.md`, `.codex/skills/*/SKILL.md`, `.codex/AGENTS.md`, `.codex/common.md` | Overwritten by `configure.mjs` |
+| **Generated (do not edit)** | `.codex/agents/*.md`, `.codex/skills/*/SKILL.md`, `.codex/AGENTS.md`, `.codex/common.md` | Overwritten by `generate-runtime.mjs` |
 | **Config values** | `.config/config.yaml` | Substituted into templates via `{{ key }}` |
 
 When reading a target for review, read the `.src.md`. When making changes, edit the `.src.md`.
@@ -93,7 +93,7 @@ After the Prerequisite:
 1. Frame the problem          — stay in problem-space until the integrated picture is explicit
 2. Propose a solution         — check external prior art, present one best case grounded in the frame
 3. Rewrite                    — edit .src.md at a scope that preserves coherence
-4. Regenerate & verify        — configure.mjs, blind prompt-reviewer, then fit-to-complaint check
+4. Regenerate & verify        — generate-runtime.mjs, blind prompt-reviewer, then fit-to-complaint check
 5. User confirmation & commit — push to upstream
 ```
 
@@ -186,7 +186,7 @@ Climbing sometimes fails. When it does, add the specific instruction and **mark 
 - **Scope must be explicit.** "When to apply / when not to" — if ambiguous, the instruction leaks outside its intended range or fails inside it. Scope ambiguity is especially dangerous for prohibitions: a prohibition detached from its cause mechanically over-applies and chills legitimate behavior. Write the cause next to the prohibition.
 - **Runtime neutrality in templates.** A `.src.md` file is a multi-runtime contract, not the current agent's private prompt. Do not write the source as if the runtime you are currently using is the only reader. If Claude and Codex need different operational instructions, express the shared principle once and put the runtime-specific mechanics inside ` ... ` blocks (or the corresponding runtime config placeholder). This prevents a Codex `/improve` session from accidentally making the Claude output worse, and vice versa.
 - **Length proportional to importance, within what remains after universalization.** First, universality pulls total length *down* by removing derived items. Within what remains, length reflects relative importance — don't spend a paragraph on a one-line fix, don't bury a central instruction. A distilled root-cause principle can be short and still central; emphasis comes from position and framing, not raw word count alone.
-- **Preserve `{{ placeholder }}` syntax** — config variables resolved by `configure.mjs`.
+- **Preserve `{{ placeholder }}` syntax** — config variables resolved by `generate-runtime.mjs`.
 
 ### Rewrite in coherence-preserving units
 
@@ -196,7 +196,7 @@ Choose the scope of the rewrite so that no contradictions or duplications remain
 
 ## 4. Regenerate and verify
 
-**Regenerate.** After writing the `.src.md`, run `node .scripts/configure.mjs` and confirm the generated output looks right.
+**Regenerate.** After writing the `.src.md`, run `node .scripts/generate-runtime.mjs` and confirm the generated output looks right.
 
 **Blind prompt-reviewer.** Run the prompt-reviewer as a blind coherence check on the rewritten file. The reviewer is the guard against the fixer flattering the user's complaint by overfitting the prompt, over-emphasising the incident, or leaving debate traces that feel responsive but weaken the document.
 
@@ -230,7 +230,7 @@ The agent's verification criteria live in its own prompt. It will report quoted 
 
 If the fit check fails, return to problem framing or rewrite as appropriate. Do not ask the user to approve a change that only passed blind coherence.
 
-**Reflect and confirm.** Apply valid blind-review findings and fit-check findings, then re-run `configure.mjs` if changes were made. Then present the final change to the user via request_user_input for approval.
+**Reflect and confirm.** Apply valid blind-review findings and fit-check findings, then re-run `generate-runtime.mjs` if changes were made. Then present the final change to the user via request_user_input for approval.
 
 ---
 

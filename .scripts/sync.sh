@@ -11,7 +11,7 @@
 #   bash .scripts/sync.sh doctor                  — remote 設定と framework 参照を検査する
 #
 # <path> は FRAMEWORK_FILES 配下のファイル/ディレクトリ
-# (例: .templates/skills/improve/SKILL.src.md, .scripts/configure.mjs)
+# (例: .templates/skills/improve/SKILL.src.md, .scripts/generate-runtime.mjs)
 #
 # 並列作業 (複数の /improve セッション等) では path 指定運用を推奨:
 #   - 他セッションが in-flight で触っているファイルを巻き込まずに済む
@@ -42,10 +42,13 @@ OPTIONAL_FRAMEWORK_REFERENCES=(
 )
 
 # push 時 (bulk) に upstream から削除すべき stale ファイル
+OLD_CONFIGURE_SCRIPT=".scripts/""configure.mjs"
+
 STALE_FILES=(
   "CLAUDE.md"          # .claude/CLAUDE.md と .codex/AGENTS.md に生成
   "AGENTS.md"           # CLAUDE.md に統合済み
-  "configure.mjs"       # .scripts/configure.mjs に移動済み
+  "configure.mjs"       # .scripts/generate-runtime.mjs に移動済み
+  "$OLD_CONFIGURE_SCRIPT" # .scripts/generate-runtime.mjs にリネーム済み
   "scripts/"            # .scripts/ にリネーム済み
   "templates/"          # .templates/ にリネーム済み
   ".agents/"            # .claude/skills/ に移動済み
@@ -310,8 +313,8 @@ do_pull() {
   done
 
   echo ""
-  echo "==> configure.mjs を実行してランタイムファイルを再生成中..."
-  node .scripts/configure.mjs
+  echo "==> generate-runtime.mjs を実行してランタイムファイルを再生成中..."
+  node .scripts/generate-runtime.mjs
   validate_framework_references "." "local checkout"
 
   echo ""
@@ -368,8 +371,8 @@ do_push() {
     copy_to_upstream_clone "$item" "$tmpdir/repo"
   done
 
-  echo "==> configure.mjs を実行してランタイムファイルを再生成中..."
-  (cd "$tmpdir/repo" && node .scripts/configure.mjs 2>&1 | sed 's/^/  /')
+  echo "==> generate-runtime.mjs を実行してランタイムファイルを再生成中..."
+  (cd "$tmpdir/repo" && node .scripts/generate-runtime.mjs 2>&1 | sed 's/^/  /')
 
   validate_framework_references "$tmpdir/repo" "upstream candidate"
 
@@ -477,16 +480,16 @@ do_doctor() {
 }
 
 do_check() {
-  echo "==> configure.mjs の設定・テンプレート検査:"
-  node .scripts/configure.mjs --check
+  echo "==> generate-runtime.mjs の設定・テンプレート検査:"
+  node .scripts/generate-runtime.mjs --check
 
   echo ""
   echo "==> 生成済み runtime ファイルの鮮度検査:"
   local dry_run_output
-  dry_run_output="$(node .scripts/configure.mjs --dry-run)"
+  dry_run_output="$(node .scripts/generate-runtime.mjs --dry-run)"
   printf '%s\n' "$dry_run_output"
   if printf '%s\n' "$dry_run_output" | grep -E '\((changed|new)\)' >/dev/null; then
-    die "生成済み framework/runtime ファイルが stale です。node .scripts/configure.mjs を実行して生成物をコミットしてください"
+    die "生成済み framework/runtime ファイルが stale です。node .scripts/generate-runtime.mjs を実行して生成物をコミットしてください"
   fi
 
   echo ""

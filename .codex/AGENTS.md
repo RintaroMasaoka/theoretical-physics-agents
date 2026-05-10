@@ -67,4 +67,4 @@ This checkout is a **research project workspace** unless the user explicitly say
 - Project commits may be made locally, but pushing requires a project-owned remote such as the user's private research repository
 - Framework prompt or script improvements from this child project are legitimate feedback to the framework, but they must use `/upstream-sync` or its explicit script workflow: `bash .scripts/sync.sh doctor`, `bash .scripts/sync.sh status`, path-scoped `bash .scripts/sync.sh pull <path>...`, then path-scoped `bash .scripts/sync.sh push <path>...`
 - Keep the two channels separate: `origin` is for this research project; `upstream` is for `theoretical-physics-agents` framework feedback
-- `.scripts/configure.mjs` installs a local `pre-push` guard that physically refuses pushes to the framework repository unless `TPRA_ALLOW_FRAMEWORK_PUSH=1` is set by a maintainer
+- `.scripts/generate-runtime.mjs` installs a local `pre-push` guard that physically refuses pushes to the framework repository unless `TPRA_ALLOW_FRAMEWORK_PUSH=1` is set by a maintainer

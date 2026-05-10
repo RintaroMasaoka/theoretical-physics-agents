@@ -27,18 +27,18 @@ Core operating model:
 - A compatible coding-agent environment
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) if you want to use the included `.claude/` configuration directly
 - Codex if you want to use the generated `.codex/` runtime files directly
-- [Node.js](https://nodejs.org/) for `configure.mjs`
+- [Node.js](https://nodejs.org/) for `generate-runtime.mjs`
 
 ### Setup
 
 1. Clone the repository
 2. Optionally edit `.config/config.yaml`
-3. Run `node .scripts/configure.mjs` to generate runtime files
+3. Run `node .scripts/generate-runtime.mjs` to generate runtime files
 4. Start your agent session in the project root
 
-By default, `node .scripts/configure.mjs` generates both `.claude/` and `.codex/`.
+By default, `node .scripts/generate-runtime.mjs` generates both `.claude/` and `.codex/`.
 
-If you are using Claude Code, `.claude/settings.json` runs `node .scripts/configure.mjs` automatically on session start, so generated prompt files stay in sync with the templates and config.
+If you are using Claude Code, `.claude/settings.json` runs `node .scripts/generate-runtime.mjs` automatically on session start, so generated prompt files stay in sync with the templates and config.
 
 ### Minimal Workflow
 
@@ -83,7 +83,7 @@ That means the main current value of the repository is autonomous research progr
 
 ```text
 README.md                 # Project overview and operational expectations
-.scripts/configure.mjs    # Renders generated runtime files from config + templates
+.scripts/generate-runtime.mjs    # Generates runtime files from config + templates
 
 .config/
 └── config.yaml           # Main editable shared config
@@ -147,11 +147,11 @@ Prompt content lives in `.templates/`, and generated files are rebuilt from thos
 Manual commands:
 
 ```bash
-node .scripts/configure.mjs
-node .scripts/configure.mjs --dry-run
-node .scripts/configure.mjs --check
-node .scripts/configure.mjs --target claude
-node .scripts/configure.mjs --target codex
+node .scripts/generate-runtime.mjs
+node .scripts/generate-runtime.mjs --dry-run
+node .scripts/generate-runtime.mjs --check
+node .scripts/generate-runtime.mjs --target claude
+node .scripts/generate-runtime.mjs --target codex
 ```
 
 Claude Code also has a session-start hook in `.claude/settings.json` that runs
@@ -171,7 +171,7 @@ git remote set-url origin <your-project-repo-url>
 git remote add upstream https://github.com/RintaroMasaoka/theoretical-physics-agents.git
 ```
 
-`.scripts/configure.mjs` installs a local `pre-push` guard. When a push targets
+`.scripts/generate-runtime.mjs` installs a local `pre-push` guard. When a push targets
 the framework repository, the guard first checks that the framework templates,
 config, generated runtime files, and framework-internal references are
 consistent. It blocks stale or unvalidated framework pushes, not framework
@@ -189,7 +189,7 @@ bash .scripts/sync.sh doctor
 bash .scripts/sync.sh status
 bash .scripts/sync.sh pull .templates/skills/auto/SKILL.src.md
 # edit, regenerate, test
-node .scripts/configure.mjs
+node .scripts/generate-runtime.mjs
 bash .scripts/sync.sh push .templates/skills/auto/SKILL.src.md --yes
 ```
 

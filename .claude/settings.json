@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .scripts/configure.mjs",
+            "command": "node .scripts/generate-runtime.mjs",
             "statusMessage": "Applying config templates..."
           },
           {

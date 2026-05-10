@@ -1,6 +1,6 @@
 # Project Configuration
 #
-# Edit this file, then run `node .scripts/configure.mjs` to apply.
+# Edit this file, then run `node .scripts/generate-runtime.mjs` to apply.
 # Templates are in .templates/; generated files are emitted into target runtime directories under the repository root.
 # Do not edit generated target config mirrors directly — they will be overwritten.
 
