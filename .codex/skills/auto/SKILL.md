@@ -36,7 +36,7 @@ The team and who owns what:
 `/auto` is an autonomous loop: the user is not present between cycles, and a closing-tone message mid-run stalls the run waiting for input that never arrives. Any mid-run message that summarizes progress and waits for user confirmation is a stall, regardless of the exact wording.
 
 - **Never end a turn mid-run with a user-facing progress draft.** Between cycles, the next action is a tool call — the next direction-challenger dispatch, the next research planner dispatch, the next worker batch, or Session End. If you are tempted to draft "I have finished cycle N of M; continuing with cycle N+1?", that is the stall — replace it with the actual next dispatch.
-- The **only** user-facing closing message is the final Session End draft, emitted when `MAX_CYCLES` is exhausted or research planner returns `Status: session_complete`.
+- The **only** user-facing closing message is the final Session End draft, emitted when `MAX_CYCLES` is exhausted or the scheduler exits for an unrecoverable failure. `research/focus.md` status labels are research-state records, not scheduler stop signals.
 - Compaction / reconnect / crash do not terminate a run. The `.logs/.auto-active` beacon (written at the start of every cycle) and the `SessionStart` hook jointly ensure the next session resumes the loop without a greeting. See `phases/session-lifecycle.md` § Resume for the mechanics and the fallback.
 - Progress summaries that genuinely belong somewhere go into `.logs/{timestamp}_auto.md` (session log, written by `session-wrap-up` from research planner's wrap-up input) or `research/focus.md § Context` (research planner's next-cycle direction). Neither is a yielded turn.
 
@@ -57,7 +57,7 @@ The team and who owns what:
 | **Child Presentation Transaction** | Curator's tree update at the boundary: applying the judgment to status, Current Board, parent map/plan/state, durable surfaces, archive/reframe mechanics, and link hygiene |
 | **Guide target set** | In-memory Set of node paths the scheduler already touched or observed this session; used only at Session End to tell guide-writer which guides to inspect |
 
-One session = up to `MAX_CYCLES` cycles. Multiple tasks can run in parallel within a cycle.
+One session = `MAX_CYCLES` cycles unless a startup precondition fails, the user explicitly stops the run, or the scheduler reaches an unrecoverable failure. Multiple tasks can run in parallel within a cycle.
 
 ---
 
@@ -79,7 +79,7 @@ The research information model (tree structure, file roles, context scoping, con
 Read `phases/session-lifecycle.md` § Session Start. Key outcomes:
 
 - Beacon-based resume decision (fresh vs. resume mid-cycle)
-- Initial sanity gates: `research/state.md` must exist (else "Please /launch first" and stop); `concepts/` exists; `.gitignore` covers `.logs/.auto-active`
+- Initial sanity gates: `research/state.md` must exist (else emit the stop message specified in `phases/session-lifecycle.md` and stop); `concepts/` exists; `.gitignore` covers `.logs/.auto-active`
 - `research/focus.md` existence check (if missing, the first research planner dispatch initialises it after direction-challenger runs — see session-lifecycle)
 
 `/auto` does **not** read node-level tree files at session start. The ancestor-chain read is research planner's responsibility and happens at the start of every cycle (so research planner's context always reflects the post-cycle state, not a stale session-start snapshot).
@@ -175,7 +175,7 @@ Read the new `research/focus.md`. Extract:
 
 - **Cursor** — the path into the tree (for context when forming worker prompts)
 - **Previous cursor** — carried from the pre-dispatch read above
-- **Status** — `active` or `session_complete`
+- **Status** — `active` or `session_complete` as a research-state label only
 - **Pre-Worker Tree Directives** — list of curator directives that must land before worker dispatch
 - **Worker Dispatches** — list of `{agent}: {task}` entries
 - **Tree Directives** — list of directives for curator
@@ -184,7 +184,7 @@ Read the new `research/focus.md`. Extract:
 
 If an older `focus.md` lacks `### Pre-Worker Tree Directives`, treat that section as empty for this cycle and let research planner regenerate the full format on its next write.
 
-If `Status: session_complete` → proceed to Session End (skip remaining cycles).
+Do not use `Status: session_complete` to exit the loop. The planner may record that no current research frontier is visible, but `/auto` still owns the user-requested cycle budget. Continue the ordinary cycle mechanics: if dispatch and directive sections are empty, the cycle is a recorded no-op/think-cycle and still counts toward `MAX_CYCLES`.
 
 The scheduler does not auto-remediate cursor jumps. If research planner violates its one-edge cursor discipline, the next research planner dispatch must repair the direction; the scheduler only parses fields and continues.
 
@@ -368,7 +368,7 @@ If this follow-up returns another `Durable Surface Review needed:` block for the
 
 ### 7. Cycle End
 
-Increment `cycles_done`. If `cycles_done < MAX_CYCLES` and `Status` is still `active`, loop to step 0. Else proceed to Session End.
+Increment `cycles_done`. If `cycles_done < MAX_CYCLES`, loop to step 0 regardless of the `Status` label in `research/focus.md`. If `cycles_done == MAX_CYCLES`, overwrite `.logs/.auto-active` once more with `{"remaining": 0, "max_cycles": <MAX_CYCLES>}` before proceeding to Session End, so a crash between the final cycle and wrap-up does not resume phantom work.
 
 ---
 

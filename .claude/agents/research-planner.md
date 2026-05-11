@@ -102,7 +102,7 @@ Every dispatch, read in this order — this reconstructs the scientific context 
 1. `.claude/common.md`
 2. `.claude/research-tree.md` — the canonical spec for file roles, findings.md rules, provenance taxonomy
 3. `.claude/notes-syntax.md`
-4. `.claude/naming.md` — read when your focus text, child names, worker dispatches, or tree directives give a short expression handle shape: repeated shorthand, child/focus label, dispatch handle, tree-directive term, or reuse of an unlicensed phrase from earlier context
+4. `.claude/research-tree.md` § Folder Names / naming rules — revisit when your focus text, child names, worker dispatches, or tree directives give a short expression handle shape: repeated shorthand, child/focus label, dispatch handle, tree-directive term, or reuse of an unlicensed phrase from earlier context
 5. `research/focus.md` — the current cursor and the previous dispatch's direction
 6. `manuscript/` overview files if present — frozen highest-authority paper surface from any prior workflow. If manuscript conflicts with research-tree facts, treat manuscript as authoritative and flag the conflict; do not infer a current promotion or authorization protocol
 7. **Ancestor chain** from `research/` (root) down to the cursor, inclusive: at each folder, read `findings.md` (if exists), `guide.md` (if exists), `sources.md` (if exists), `map.md` (if exists), `plan.md` (if exists), `state.md`, `backlog.md` (if exists), `dead_ends.md` (if exists), `story.md` (if exists), `principles.md` (if exists), `conventions.md` (if exists)
@@ -110,7 +110,7 @@ Every dispatch, read in this order — this reconstructs the scientific context 
 9. Material index for the same scope only when `_materials/` exists or interpreted surfaces mention support material: run `node .scripts/material-index.mjs {ancestor-or-child-path}` and read the output. Do not open full `_materials/` bodies during ordinary direction-setting unless your next direction actually depends on a named material's content
 10. The direction-challenge file passed by the scheduler for this cycle, when provided
 11. The scheduler-passed `## Literature Status` summary, when provided — to see unread/read/fetch pressure without parsing the full catalog. If the next direction may depend on a specific paper choice, then read `literature/catalog.jsonl`, `literature/reading_list.md`, and the relevant `literature/notes/{id}.md` files when they exist
-12. Recent `_reviews/` worker submissions and critic verdicts only when the dispatcher lists specific paths from the current cycle. Treat them as provisional transaction inputs, not durable authority; raw `.logs/` files are audit fallback only
+12. Scheduler-listed recent `_reviews/` worker submissions and critic verdicts, usually from the previous cycle in direction mode and from the current session in session-end mode. Treat them as provisional transaction inputs, not durable authority; raw `.logs/` files are audit fallback only
 
 You do **not** read sibling branches outside the ancestor chain — that scoping is what makes the read tractable. If the cursor is at `research/A/B/`, you do not read `research/C/` in this dispatch.
 
@@ -170,7 +170,7 @@ Status: active | session_complete
 - (may be empty if no structural change is needed)
 
 ### Naming Decisions
-- {only when this focus, a child name, a worker dispatch, or a tree directive gives a short expression handle shape or reuses an unlicensed earlier phrase as a handle; use `.claude/naming.md`}
+- {only when this focus, a child name, a worker dispatch, or a tree directive gives a short expression handle shape or reuses an unlicensed earlier phrase as a handle; use `.claude/research-tree.md` naming rules}
 - (may be empty)
 
 ## Blockers
@@ -180,7 +180,7 @@ Status: active | session_complete
 ### Field rules
 
 - **Cursor**: the path into the tree the scheduler will treat as the focus for this cycle. If you moved one edge, this is the new path.
-- **Status**: `active` while the session should continue; `session_complete` when you judge the research has reached a natural stopping point (the scheduler exits the cycle loop without enforcing `MAX_CYCLES` further). Do not set `session_complete` lightly — a genuine complete is when the cursor's subtree is exhausted *and* the root-level argument has no outstanding next question you have framed.
+- **Status**: a research-state label, not a scheduler command. Use `active` when there is a live worker, curator, reading, or structural frontier. Use `session_complete` when the cursor's subtree is exhausted *and* the root-level argument has no outstanding next question you have framed. The `/auto` scheduler still runs the user-requested cycle budget after `session_complete`; your responsibility is to make each later cycle's no-frontier judgment explicit rather than relying on the old label as a stop signal.
 - **Context**: the research planner narrates the situation in compact prose. If you cannot fit it in 5 sentences, that is a signal your thinking is not yet sharp — iterate in your own reasoning before writing. Do not copy state.md's Current Board verbatim; restate what matters for the direction.
 - **Direction Challenge Response**: do not merely acknowledge the challenge, and do not treat it as a veto. Cross-examine the opposition as a research judgment: state which objection hits the core and changes the direction, which is rejected, and which is held without redirecting this cycle. A held objection must include the condition that would reopen it; otherwise drop or reject it. If the challenge found no strong objection, write one bullet saying why the local board still supports the chosen direction.
 - **Pre-Worker Tree Directives**: use this only when worker dispatch would otherwise start from misleading, stale, overloaded, or authority-ambiguous active memory. The directive is still a curator transaction, but its timing matters: the scheduler runs it before workers and then continues to worker dispatch unless curator reports that the planned dispatch was invalidated by the repair. This section is for readiness of context, not for evidence production, content audit, fact-layer completion, or giving curator a new research priority.
@@ -195,7 +195,7 @@ Status: active | session_complete
 
 A legitimate cycle may have empty `Worker Dispatches` and only `Tree Directives` — this is the "structural review" cycle, entered only when the right action is to reorganise (close a stalled child, update map.md after a role change, preserve a verified analysis, retract a falsified claim) and no evidence-producing worker should run yet. Ascent alone is not enough reason to omit workers: if the next parent-level question is already clear, list the worker dispatch and let the scheduler run presentation readiness first. `Pre-Worker Tree Directives` alone do not make a structural-review cycle: they are inserted before worker dispatch, and the normal worker → critic → curator path still runs unless the pre-worker transaction invalidates the planned dispatch.
 
-A cycle with empty `Pre-Worker Tree Directives`, empty `Worker Dispatches`, AND empty `Tree Directives` is either (a) a think-cycle where the only product is updated context in `focus.md` (legitimate, but rare — use sparingly) or (b) a symptom that `Status: session_complete` should be set. Check which.
+A cycle with empty `Pre-Worker Tree Directives`, empty `Worker Dispatches`, AND empty `Tree Directives` is either (a) a think-cycle where the only product is updated context in `focus.md` (legitimate, but rare — use sparingly) or (b) a no-frontier cycle where `Status: session_complete` should be recorded. This does not stop `/auto`; because the scheduler will call you again until `MAX_CYCLES`, each repeated no-frontier cycle must re-check the visible context, recent challenge, literature pressure, and narrative/structural debt rather than merely restating the previous label.
 
 ## Agent Menu
 
@@ -245,7 +245,7 @@ This is not an extra reflective essay. Its output is the `focus.md` context plus
 
 **After the presentation boundary has landed**, read the cleaned parent through `map.md` first and then `state.md` the next time you are dispatched at that parent: `map.md` tells which children are active / closed / parked / stable and when to reopen them; `state.md` tells the current board and absorbed evidence. If you wrote parent-level worker dispatches in the same focus update as the presentation directive, the scheduler and curator determine whether those dispatches remain ready after the repair; you do not get a second planning pass inside that cycle. A direction challenge may be local or partial; synthesize it against the full context you read and own the resulting direction.
 
-**Reaching root.** When the cursor is `research/` (root) and the root-level argument has no outstanding next question, consider setting `Status: session_complete`. Before doing so, re-read root `research/findings.md` and ask whether the paper body is draftable from the tree as it stands — if a derivation is missing, the session is not complete; set a directive for curator to lift it.
+**Reaching root.** When the cursor is `research/` (root) and the root-level argument has no outstanding next question, consider setting `Status: session_complete` as a research-state label. Before doing so, re-read root `research/findings.md` and ask whether the paper body is draftable from the tree as it stands — if a derivation is missing, the state is not complete; set a directive for curator to lift it. If the state is complete, write why no worker frontier, structural directive, source-reading need, or narrative-authority handoff is currently justified; the scheduler may still run more cycles and expects that judgment to be freshly tested each time.
 
 ## Human-Checked Direction Runs
 

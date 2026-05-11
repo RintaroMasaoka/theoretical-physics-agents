@@ -27,7 +27,7 @@ If `/auto` and `/steer` appear to conflict, `/auto` wins for every post-approval
 - Before running, read `{{ runtime.skills_dir }}/auto/SKILL.md` and the phase files it references. Treat them as the source of truth for every scheduler action not explicitly overridden here.
 - The only `/auto` human-interaction rule overridden by `/steer` is the prohibition on user input at the planning/execution boundary. `/steer` may ask the user at the Plan Checkpoint after `research-planner` updates `research/focus.md` and before execution begins. Outside the Plan Checkpoint, do not ask the user for choices, approvals, clarifications, or steering decisions during worker dispatch, review, curation, durable review, guide writing, or session end. If execution becomes structurally impossible outside the checkpoint, stop and report the structural blocker rather than opening a new decision gate.
 - Do not maintain a separate `/steer` cycle implementation. If `/auto` changes a phase, `/steer` inherits that change by reading and following `/auto`.
-- `/steer` uses the same cycle limit semantics as `/auto` (`MAX_CYCLES`, `Status: session_complete`, and session-end behavior). It is not forced to one cycle.
+- `/steer` uses the same cycle limit semantics as `/auto`: `MAX_CYCLES` controls the run length, while `Status: session_complete` is only a research-state label. It is not forced to one cycle.
 - Acquire new full-paper text only from arXiv, matching `/auto` provenance discipline.
 - **Paper writing is NOT `/steer`'s responsibility.** Writing is handled by `/write`.
 
@@ -157,9 +157,9 @@ At minimum, the decision surface must include:
 - the previous-focus backup / restore consequence so rejection and revision are concrete
 - the three possible outcomes below
 
-If `{{ runtime.tool_ask_user_question }}` is unavailable, rejected by the runtime, or cannot carry the full checkpoint content, write a Checkpoint Resume Record before falling back to an ordinary user-facing message. The fallback message must contain the same self-contained decision surface and then stop for the user's reply. When yielding the turn at a checkpoint, the last assistant message in that turn must still contain the proposal summary and consequences; never end with only "approve / revise / reject" or equivalent option labels.
+Before yielding at any checkpoint, write a Checkpoint Resume Record. This is required even when `{{ runtime.tool_ask_user_question }}` succeeds, because the next user turn must be able to resume from a durable record rather than hidden tool state. The Checkpoint Resume Record is a timestamped `.logs/` file, preferably from `bash .scripts/log-path.sh steer-checkpoint` when available. If that log type is unavailable, use another timestamped `.logs/` path. It must include: cycle number, current `research/focus.md` proposal state, previous focus backup or absence marker, planner side effects pending approval, checkpoint text or summary, human steering intent, checkpoint-clarity retry count, human revision retry count, and the expected user replies. On the next user turn, read the latest unresolved Checkpoint Resume Record before interpreting `approve`, `revise`, or `reject`, so the decision is applied to the correct proposed plan.
 
-The Checkpoint Resume Record is a timestamped `.logs/` file, preferably from `bash .scripts/log-path.sh steer-checkpoint` when available. If that log type is unavailable, use another timestamped `.logs/` path. It must include: cycle number, current `research/focus.md` proposal state, previous focus backup or absence marker, planner side effects pending approval, checkpoint text or summary, human steering intent, checkpoint-clarity retry count, human revision retry count, and the expected user replies. On the next user turn, read the latest unresolved Checkpoint Resume Record before interpreting `approve`, `revise`, or `reject`, so the decision is applied to the correct proposed plan.
+If `{{ runtime.tool_ask_user_question }}` is unavailable, rejected by the runtime, or cannot carry the full checkpoint content, fall back to an ordinary user-facing message after writing the Checkpoint Resume Record. The fallback message must contain the same self-contained decision surface and then stop for the user's reply. When yielding the turn at a checkpoint, the last assistant message in that turn must still contain the proposal summary and consequences; never end with only "approve / revise / reject" or equivalent option labels.
 
 - approve and run this plan
 - revise the plan with a free-form instruction
@@ -177,7 +177,7 @@ Approval is the boundary. Before approval, `research/focus.md` is a proposed pla
 
 ## Execution After Approval
 
-After approval, apply the Inheritance Rule. Resume at `/auto`'s current `Parse research/focus.md` step and follow `/auto` until its cycle-end condition is reached. Parse every section the current `/auto` parser expects, including sections added after this `/steer` prompt was written; carry failures, review flags, curator summaries, guide-target bookkeeping, and pending review requests exactly as `/auto` specifies. Loop to the next planning checkpoint while `cycles_done < MAX_CYCLES` and `Status` remains `active`.
+After approval, apply the Inheritance Rule. Resume at `/auto`'s current `Parse research/focus.md` step and follow `/auto` until its cycle-end condition is reached. Parse every section the current `/auto` parser expects, including sections added after this `/steer` prompt was written; carry failures, review flags, curator summaries, guide-target bookkeeping, and pending review requests exactly as `/auto` specifies. Loop to the next planning checkpoint while `cycles_done < MAX_CYCLES`, regardless of the `Status` label in `research/focus.md`.
 
 This section is intentionally referential. If it appears less detailed than `/auto`, that is correct: `/auto` is the implementation.
 

@@ -44,18 +44,11 @@ If `research/principles.md` exists at project root, research planner and curator
 
 ## Session End
 
-Entered when `cycles_done == MAX_CYCLES`, or when research planner has returned `Status: session_complete` in `research/focus.md`, or when the scheduler exits the cycle loop for any other reason (unrecoverable failure). Execute in order.
+Entered when `cycles_done == MAX_CYCLES`, when the user explicitly stops the run, or when the scheduler exits the cycle loop for an unrecoverable failure. `research/focus.md` may say `Status: session_complete`, but that label never terminates `/auto`; it records the planner's research-state judgment while the scheduler continues consuming the user-requested cycle budget.
 
 ### 1. Simulation Housekeeping (if simulator ran this session)
 
-Research planner's final focus.md may include Tree Directives of the form `archive superseded script {path}`. Route these directives to curator during the final curator sweep; the scheduler does not move files inside `research/**`.
-
-```
-mv research/{path}/_materials/src/{slug}.{ext} research/{path}/_materials/src/archive/
-mv research/{path}/_materials/src/{slug}.md research/{path}/_materials/src/archive/
-```
-
-Never delete — superseded scripts move to `_materials/src/archive/` so the reasoning history stays searchable. Curator records each move in its sweep output; include that summary in the wrap-up input's `## Session Log` § `### Node Changes`.
+Research planner's final focus.md may include Tree Directives of the form `archive superseded script {path}`. Route these directives to curator during the final curator sweep; the scheduler does not move files inside `research/**`. Curator should move both the superseded script and its companion `.md` into the node's `_materials/src/archive/` directory and never delete them, so the reasoning history stays searchable. Curator records each move in its sweep output; include that summary in the wrap-up input's `## Session Log` § `### Node Changes`.
 
 These archive moves are tree maintenance, so curator executes them together with any accompanying `state.md`, `map.md`, or `plan.md` updates. Keeping the move and the prose record in one role preserves the tree-write authority split.
 
@@ -77,6 +70,11 @@ Session-end tree-wide coherence pass. Apply your default operating rules (resear
 
 ## New Evidence This Cycle
 (none — no worker dispatch on the final step)
+
+## This Session's Evidence
+- Deliverables: {list of worker submission paths produced this session, if any}
+- Critic verdicts: {list of Provisional Review and Durable Surface Review outputs produced this session, if any}
+- Prior curator summaries: {list of curator DONE summaries / paths from this session, if any}
 
 ## Context
 Cursor: {cursor from research/focus.md}
