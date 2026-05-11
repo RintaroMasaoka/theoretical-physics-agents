@@ -75,6 +75,9 @@ Read and follow `{{ runtime.agents_dir }}/{agent}.md` as your role definition. T
 ## Context
 Cursor: research/{path}/
 {any additional context from research planner's Worker Dispatch entry — kind, previous attempt path, specific sub-problem, etc.}
+
+## Naming Decisions From Research Planner
+{verbatim copy of research/focus.md § Naming Decisions entries that affect this worker, or "(none)"}
 ```
 
 ### Agent-Specific Dynamic Data
@@ -176,6 +179,9 @@ Pre-Worker Readiness Transaction. Execute the pre-worker tree directives below s
 ## Pre-Worker Tree Directives
 {verbatim copy of research/focus.md § Pre-Worker Tree Directives}
 
+## Naming Decisions
+{verbatim copy of research/focus.md § Naming Decisions}
+
 ## Planned Worker Dispatches
 {verbatim copy of research/focus.md § Worker Dispatches — for validity check only}
 
@@ -198,6 +204,9 @@ Execute the tree directives below and absorb the new evidence into the tree per 
 
 ## Tree Directives (from research planner, this cycle)
 {verbatim copy of research/focus.md § Tree Directives — each line is an imperative curator should apply}
+
+## Naming Decisions (from research planner, this cycle)
+{verbatim copy of research/focus.md § Naming Decisions}
 
 ## Pre-Worker Curator Summary
 {DONE summary from the pre-worker readiness transaction, or "(none)"}

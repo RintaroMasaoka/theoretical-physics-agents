@@ -187,6 +187,7 @@ Read the new `research/focus.md`. Extract:
 - **Pre-Worker Tree Directives** — list of curator directives that must land before worker dispatch
 - **Worker Dispatches** — list of `{agent}: {task}` entries
 - **Tree Directives** — list of directives for curator
+- **Naming Decisions** — reusable-name routing proposals from research planner, possibly empty
 - **Blockers** — informational
 
 If an older `focus.md` lacks `### Pre-Worker Tree Directives`, treat that section as empty for this cycle and let research planner regenerate the full format on its next write.
@@ -220,6 +221,9 @@ Child being presented: {previous cursor path}
 
 ## Child Presentation Judgment / Tree Directives (from research planner, this cycle)
 {verbatim copy of focus.md § Tree Directives}
+
+## Naming Decisions (from research planner, this cycle)
+{verbatim copy of focus.md § Naming Decisions}
 
 ## Planned Worker Dispatches (for validity check only)
 {verbatim copy of focus.md § Worker Dispatches}
@@ -260,6 +264,9 @@ Pre-Worker Readiness Transaction. Execute the pre-worker tree directives below s
 
 ## Pre-Worker Tree Directives (from research planner, this cycle)
 {verbatim copy of focus.md § Pre-Worker Tree Directives}
+
+## Naming Decisions (from research planner, this cycle)
+{verbatim copy of focus.md § Naming Decisions}
 
 ## Planned Worker Dispatches (for validity check only)
 {verbatim copy of focus.md § Worker Dispatches}
@@ -313,6 +320,9 @@ Execute the tree directives below and absorb the new evidence (worker review tra
 
 ## Tree Directives (from research planner, this cycle)
 {verbatim copy of focus.md § Tree Directives}
+
+## Naming Decisions (from research planner, this cycle)
+{verbatim copy of focus.md § Naming Decisions}
 
 ## Pre-Worker Curator Summary
 {DONE summary from step 3a presentation transaction and/or step 3b pre-worker readiness transaction, or "(none)"}

@@ -7,16 +7,17 @@ description: "(/auto) Read a document as a first-time reader and propose narrow 
 
 ## Role
 
-Read a specified document as a **first-time reader** and propose concept notes for reusable terms whose absence would make durable prose opaque. Write the proposal as a worker submission under the owning node's `_reviews/{slug}/worker.md`; curator consumes the reviewed proposal and creates or updates `concepts/` in the same cycle when it passes the concept gate.
+Read a specified document as a **first-time reader** and propose routing for reusable names whose absence or ambiguity would make durable prose opaque. Write the proposal as a worker submission under the owning node's `_reviews/{slug}/worker.md`; curator consumes the reviewed proposal and creates or updates `concepts/` in the same cycle when it passes the naming gate.
 
-Concept notes are reader bridges, not authority. Their job is to prevent repeated local definitions for technical vocabulary; they must not become the place where project claims, conventions, workflow state, or source/project identifications are standardized. You do not write durable concept files directly because a weak shared definition becomes a contamination hub; the curator transaction is the review/placement boundary.
+Concept notes are reusable-name licenses and reader bridges, not authority. Their job is to prevent later LLM passes from treating a name as a stronger, broader, or more source-backed handle than the project allows. They must not become the place where project claims, conventions, workflow state, or source/project identifications are standardized. You do not write durable concept files directly because a weak shared definition becomes a contamination hub; the curator transaction is the review/placement boundary.
 
 ## Startup Reading
 
 1. `.codex/common.md`
 2. The target file path(s) provided by the dispatcher
 3. List existing files in `concepts/` (to avoid duplicating existing notes)
-4. `.codex/research-tree.md` § concepts/ and § conventions.md (for the concept/convention boundary)
+4. `.codex/naming.md`
+5. `.codex/research-tree.md` § concepts/ and § conventions.md (for the concept/convention boundary)
 
 ## Procedure
 
@@ -28,22 +29,22 @@ Read the target file without other project context. For each unclear term encoun
 2. **Advanced but general and reusable** (e.g., BKT transition, Dirichlet form, helicity modulus): flag if no concept note exists. A research planner outside the subfield would need this defined in more than one place
 3. **Project-local label or one-off working name**: do not create a concept note. Report that the target file should define it locally or replace it with plain prose
 4. **Notation, sign/order/normalization choice, symbol reservation, or source/project bridge**: do not create a concept note. Report that it belongs in the nearest applicable `conventions.md` or in findings.md / clean analysis prose with explicit scope
-5. **Project-specific construction that may become reusable vocabulary**: flag only if it can be defined without asserting unverified project facts. Keep the concept note scoped and mark project-specific uncertainty explicitly
+5. **Project-specific construction already written as a handle**: flag only when the target file repeats it, uses it as a heading/bullet key, routes work through it, or uses it without enough local explanation. Keep the concept note scoped and mark project-specific uncertainty explicitly
 
 ### Phase 2: Definition writing
 
-For each flagged term, draft a proposed concept note:
+For each flagged term, draft a proposed route. When the route is `concepts/{term}.md`, draft a proposed concept note:
 - Check if `concepts/{term}.md` already exists
 - If it exists: read it. If the existing definition contradicts or is inconsistent with usage in the target file, do not silently broaden it. Propose a narrow update or report a convention/fact conflict for curator
-- If it does not exist: propose a small, scoped note. For general physics concepts, use standard field knowledge. For project-specific vocabulary, read only durable non-dot links from the target file and define the term as a reader aid, not as a project result
+- If it does not exist: propose a small, scoped note with the reuse-license front matter from `.codex/naming.md`. For general physics concepts, use standard field knowledge. For project-specific vocabulary, read only durable non-dot links from the target file and define the term as a reader aid, not as a project result
 - Do not read `.logs/` to write a concept note. If a concept cannot be defined without raw logs, it is not ready to become shared vocabulary
 
 ## Concept Note Format
 
-Each proposed concept note should be short and self-contained. No rigid template — write whatever makes the concept clear. Typical elements:
+Each proposed concept note should be short and self-contained. Use the front matter from `.codex/naming.md`; then write whatever body prose makes the name clear. Typical body elements:
 
 - Definition (mathematical and/or physical)
-- Scope: standard concept / this project's local usage / source-specific usage
+- Scope and intended reuse
 - Why this concept matters as vocabulary (not as evidence for a project claim)
 - Links to related concepts via explicit Markdown links such as `[related term](related_term.md)`. Use paths relative to the concept note you are writing
 
@@ -89,7 +90,7 @@ raw_log: ".logs/{timestamp}_concept_{slug}.md"
 
 ### concepts/{term}.md
 Status: create | update
-Reason: {why this is reusable vocabulary, not a one-off local label}
+Reason: {which observable handle shape triggered the proposal, why local prose is insufficient, and what reuse license it should carry}
 
 ```markdown
 {proposed concept note body}

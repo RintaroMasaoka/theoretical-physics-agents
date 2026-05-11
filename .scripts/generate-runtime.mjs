@@ -117,6 +117,7 @@ function buildRuntimeConfig(target) {
       instruction_file_name: target.rootInstructionFileName,
       common_file: `${rootDir}/common.md`,
       notes_syntax_file: `${rootDir}/notes-syntax.md`,
+      naming_file: `${rootDir}/naming.md`,
       research_tree_file: `${rootDir}/research-tree.md`,
       agents_dir: `${rootDir}/agents`,
       skills_dir: `${rootDir}/skills`,

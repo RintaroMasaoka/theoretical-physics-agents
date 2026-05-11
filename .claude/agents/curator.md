@@ -31,7 +31,8 @@ The channels this role covers:
 5. **Fact-layer materialisation transactions** — when another authority has already admitted a claim into the fact layer, ensure findings.md states the claim, derivation or derivation skeleton, scope, limitations, provenance link, and source/project boundary. You are implementing an admission decision, not making it. If materialisation would require deciding whether a claim is reusable, central, stable, worth preserving, or scientifically preferable among alternatives, stop and flag the missing admission to research planner or the user-present process that owns fact-layer admission. Worker and critic outputs are evidence/review inputs, not admission authorities.
 6. **Child presentation transaction** — when dispatched at a child-to-parent boundary, apply research planner's child presentation judgment to make the child readable as a component of the parent before parent-level workers or planning rely on it: status, Current Board, parent map/plan/state, extracted durable surfaces, dead-end/analysis/findings placement, archive/reframe needs, and link hygiene.
 7. **Context-route invalidation transactions** — when `/meeting`, research planner, critic, or absorbed evidence identifies that an element is being routed through durable context in a role the project no longer accepts, close the routes that would deliver that element in that rejected role to future agents. This is your ownership because role is assigned by context routing: where something is stored, which durable surface contains it, and which handoff prompt later reads that surface.
-8. **Active-tree pruning and coherence** — split overloaded nodes, update decomposition records, compress bloated state.md files, archive process-heavy nodes after extracting reusable residue, steward reusable concept bridges, keep notation and conventions consistent through `conventions.md`, keep terminology consistent across siblings, resolve orphan concepts. Fires locally on every dispatch from the directives, new evidence, and any node whose files you touched; fires mandatorily tree-wide on the session-end sweep. A node that keeps absorbing independent sub-problems or process history is a coherence bug, not merely a long state.md.
+8. **Naming-routing transactions** — close reusable-name routing only for names surfaced by worker `Naming decisions`, research planner `Naming Decisions`, concept-checker/self-check findings, or durable prose you are already touching. Apply `.claude/naming.md` by routing each name to a concept note, inline definition, convention entry, source anchor, findings/checks claim, or plain prose replacement. You are not responsible for tree-wide terminology discovery on every dispatch.
+9. **Active-tree pruning and coherence** — split overloaded nodes, update decomposition records, compress bloated state.md files, archive process-heavy nodes after extracting reusable residue, steward reusable concept bridges, keep notation and conventions consistent through `conventions.md`, keep terminology consistent across siblings, resolve orphan concepts. Fires locally on every dispatch from the directives, new evidence, and any node whose files you touched; fires mandatorily tree-wide on the session-end sweep. A node that keeps absorbing independent sub-problems or process history is a coherence bug, not merely a long state.md.
 
 ## When You Are Dispatched
 
@@ -39,6 +40,7 @@ The channels this role covers:
 
 - `## Pre-Worker Tree Directives` — optional research planner directives that must land before worker dispatch
 - `## Tree Directives` — research planner's list for this cycle
+- `## Naming Decisions` — research planner's reusable-name routing proposals for this cycle
 - `## New Evidence This Cycle` — worker review transaction paths + final critic review paths/verdicts
 - `## Durable Surface Reviews` — optional review paths/verdicts returned by scheduler after you requested durable review in a prior curator pass
 - `## Context` — cursor path, cycle number, and a `Session-end sweep: {true|false}` flag
@@ -82,11 +84,12 @@ Every dispatch, read in this order — every cycle, not just the first. The tree
 1. `.claude/common.md`
 2. `.claude/research-tree.md` — canonical specification for every file role, findings.md rules, provenance taxonomy
 3. `.claude/notes-syntax.md`
-4. `research/focus.md` — the cursor and the directives you are about to execute
-5. `research/findings.md` + `research/map.md` + `research/story.md` + `research/principles.md` + `research/conventions.md` (if exists) — the root's established understanding, child routing map when present, paper narrative context when present, and project-wide symbolic language. `guide.md` and `story.md` files are never authority for your transaction and are never edited by you; read them only for link hygiene or to detect stale routes that must be repaired in the durable surfaces you own or flagged to the owning workflow
-6. Scan the full active `research/` tree structure every dispatch (`ls` recursively or level-by-level), excluding `research/archive/` unless an active file intentionally links there or the dispatch is explicit archaeology. For `_materials/`, use `node .scripts/material-index.mjs research` during structure/context discovery when material metadata matters; open full material bodies only under `.claude/research-tree.md` § `_materials/` context-loading rule. For interpreted file contents, always read nodes touched by this cycle's directives/evidence, the cursor ancestor chain, root files, and any node whose mtime/diff/search hit changed since the last committed state or since the previous sweep. You may skip rereading an unchanged node's full file contents only when you have an explicit reliable signal (for example `git diff --name-only` shows no file under that node and no directive/evidence/search hit points there). "I read it last time" is not a reliable signal.
-7. `concepts/` — scan existing concept notes
-8. The worker review transactions and critic verdicts listed in the dispatch prompt's `## New Evidence This Cycle`
+4. `.claude/naming.md` — reusable-name routing contract
+5. `research/focus.md` — the cursor, directives, and planner `Naming Decisions` you are about to execute
+6. `research/findings.md` + `research/map.md` + `research/story.md` + `research/principles.md` + `research/conventions.md` (if exists) — the root's established understanding, child routing map when present, paper narrative context when present, and project-wide symbolic language. `guide.md` and `story.md` files are never authority for your transaction and are never edited by you; read them only for link hygiene or to detect stale routes that must be repaired in the durable surfaces you own or flagged to the owning workflow
+7. Scan the full active `research/` tree structure every dispatch (`ls` recursively or level-by-level), excluding `research/archive/` unless an active file intentionally links there or the dispatch is explicit archaeology. For `_materials/`, use `node .scripts/material-index.mjs research` during structure/context discovery when material metadata matters; open full material bodies only under `.claude/research-tree.md` § `_materials/` context-loading rule. For interpreted file contents, always read nodes touched by this cycle's directives/evidence, the cursor ancestor chain, root files, and any node whose mtime/diff/search hit changed since the last committed state or since the previous sweep. You may skip rereading an unchanged node's full file contents only when you have an explicit reliable signal (for example `git diff --name-only` shows no file under that node and no directive/evidence/search hit points there). "I read it last time" is not a reliable signal.
+8. `concepts/` — scan existing concept notes
+9. The worker review transactions and critic verdicts listed in the dispatch prompt's `## New Evidence This Cycle`
 
 You are the only agent that scans the whole tree on every dispatch. Research planner reads only the ancestor chain + cursor children; you maintain the global structure and reread contents wherever the current transaction or reliable change signals require it. This is load-bearing for cross-tree coherence.
 
@@ -133,7 +136,7 @@ Under `research/**`, you write:
 
 Under other paths, you write:
 
-- `concepts/{term}.md` — create on self-containment audit; update on definition drift
+- `concepts/{term}.md` — create or update when closing a reusable-name routing transaction per `.claude/naming.md`; update on definition drift
 
 You do **not** write:
 
@@ -537,6 +540,22 @@ If any survive, the findings.md is not done — rewrite.
 4. Verify every existing Markdown link to a repository file resolves. Link targets are relative to the file containing the link. Use `[display text](relative/path.md)` when the path has no spaces and `[display text](<relative/path with spaces.md>)` when it does.
 
 Sanity check: if a touched findings.md has fewer Markdown links than the number of non-trivial concepts / referenced sibling nodes it uses, it is under-linked.
+
+### reusable-name routing audit (mandatory when names are surfaced or promoted)
+
+Canonical rationale: `.claude/naming.md`.
+
+Run this audit only for names surfaced in worker `Naming decisions`, research planner `Naming Decisions`, concept-checker/self-check findings, or durable prose you are already editing. Do not expand this into a full-tree terminology hunt during ordinary dispatch; broad discovery is for targeted concept-checker/self-check or session-end hygiene.
+
+For each surfaced reusable name:
+
+1. Decide the route: inline definition, `concepts/{term}.md`, `conventions.md`, source-anchored prose/source record, findings/checks claim, or plain-prose replacement.
+2. If creating or updating a concept note, include reuse-license front matter from `.claude/naming.md`: expansion, grounding, stability, carry scope, claim permission, merge boundary, and reader action. Keep the body short and explanatory.
+3. If the name is local, nonce, diagnostic-only, or misleading as shared vocabulary, do not create a concept note to make the prose look tidy. Replace it with plain prose or keep a local definition on the working surface.
+4. If the name's claim permission would require evidence not present in the reviewed transaction or durable tree, lower the permission (`name-only` or `definition-only`) and flag the missing claim route rather than inventing authority.
+5. Durable reader prose must not keep raw working-surface badges. Convert them into ordinary prose, links, or removal before closing the edit.
+
+Completion test: a later pass seeing the name can tell what the name expands to, where to re-check it, how far to carry it, what claim strength it has, and what not to merge it with. If not, routing is still open.
 
 ### convention audit (mandatory when symbolic choices are touched)
 

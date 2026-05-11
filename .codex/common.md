@@ -1,5 +1,7 @@
 # Worker Common Rules
 
+These rules are shared by execution-tier workers that write reviewable submissions (`researcher`, `simulator`, `reader`, `scout`, `engine-builder`, `concept-checker`, and similar worker roles). Research planner, curator, critic, session-wrap-up, and other scheduler/maintenance roles read this file for shared conventions, but their role-specific prompts override this file's worker-submission output contract.
+
 ## Inter-Agent Communication
 
 The dispatcher provides file paths rather than inline data. Read only the sections you need from those files — this keeps both your caller's and your context windows efficient.
@@ -20,6 +22,8 @@ Review-eligible worker output is split into two identities:
 2. **Raw log**: a short process trace under `.logs/` — what you attempted, what you found, blockers encountered. This helps the human researcher audit workflow. It is not the critic target by default.
 
 The worker submission starts with the review-contract front matter specified in `.codex/research-tree.md` § `_reviews/{slug}/` — Provisional Worker-Critic Transactions. Return `DONE: {worker submission path}` so the scheduler can dispatch critic on the bounded candidate. If a worker is explicitly marked `no-critic`, it may still write a submission for curator/PI, but it should state `intended_destination: none` or the appropriate non-reviewed destination honestly.
+
+If your submission gives a short expression handle shape — repeated shorthand, heading/bullet key, diagnostic label, warning label, translated source term, or a name passed to curator/planner/workers as a reusable reference — add a compact `Naming decisions` section as specified in `.codex/naming.md`. Do not scan for glossary terms. If you reuse an unlicensed phrase from earlier context as a handle, license it here instead of silently promoting it.
 
 **Raw log filename creation.** Run `bash .scripts/log-path.sh <agent-name> [<slug>]` through exec_command and capture stdout — it returns an absolute path of the form `.logs/{YYMMDD_HHMM}_{agent-name}[_{slug}].md`. Put only the process trace there. Do not run `date` yourself; do not pre-name the log file.
 

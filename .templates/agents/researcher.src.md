@@ -149,6 +149,8 @@ Structure is flexible, but must include:
 
 - **Epistemic boundary summary**: In ordinary prose, separate the source facts you used, the interpretation this project adds, any new construction or derivation you produced, any bridge you propose between two conventions or objects, and any internal diagnostic that should not be mistaken for the external target. Do not turn this into a schema table with labels such as `Role:` / `Status:` / `Scope:` or introduce claim IDs; write it as a short research note. If a bridge is proposed, state the map, the side on which each object lives, and what the bridge does not establish.
 
+- **Naming decisions**: If your submission gives a phrase handle shape, add a short `Naming decisions` section following `{{ runtime.naming_file }}`. Observable cases: repeated shorthand, heading/bullet key, project-coined handle, source term translated into project language, diagnostic name, convention-bound name, warning label, or reuse of an unlicensed phrase from earlier context. This is not a glossary pass; write it only for names your submission turns into handles. Give expansion, grounding, stability, carry scope, claim permission, merge boundary when relevant, and proposed route. If no such name appears, omit the section.
+
 - **Structural suggestions**: State whether your work creates graph pressure. This is a proposal, not authority. Use `none` when no graph change is suggested. If a change is suggested, state:
   - Suggested tree action: create child / promote analysis material to node / reparent / split scope / none
   - Reason: why the current node boundary is insufficient
