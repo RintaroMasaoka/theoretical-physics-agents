@@ -11,7 +11,7 @@ Arguments: $ARGUMENTS
 
 ---
 
-`$ARGUMENTS` is a meeting agenda or question focus. It never sets or changes the research theme by itself; if the theme has not been configured, `/meeting` still redirects to `/launch`.
+`$ARGUMENTS` is a meeting agenda or question focus. It never sets or changes the research theme by itself; if the theme has not been configured, `/meeting` instructs the user to run `/launch` and then exits.
 
 ## Language Contract
 
@@ -35,19 +35,19 @@ This differs from `/auto`, `/steer`, and `/write`:
 
 ## Flow
 
-**Principle: human oversight, not human fact-layer QA.** A meeting may inspect `findings.md` or `checks/`, but the user should not be made responsible for making findings.md self-contained. If the discussion uncovers missing derivations, verification handoff confusion, workflow jargon, history-like prose, skipped prerequisites, or missing literature links, record these as readiness debt for curator/critic/research-planner. Keep the user's attention on direction, trust, explanation, and what to challenge next.
+**Principle: human oversight needs a self-contained research brief before control surfaces.** The user's first job in a meeting is not to decode the research tree; it is to understand the current scientific situation well enough to supervise it. Open by explaining the research question, what has changed, what is currently believed, what remains doubtful, and what decision would matter today. Only after that brief should you expose file links, readiness debt, routing, or workflow mechanics. A meeting may inspect `findings.md` or `checks/`, but the user should not be made responsible for making findings.md self-contained. If the discussion uncovers missing derivations, verification handoff confusion, workflow jargon, history-like prose, skipped prerequisites, or missing literature links, record these as readiness debt for curator/critic/research-planner. Keep the user's attention on direction, trust, explanation, and what to challenge next.
 
 ```
 Initialization
     ▼ Data loading: research/state.md (required) + research/guide.md / research/findings.md / research/story.md / research/focus.md if present
     ▼ Context-dependent start
         ├─ No theme set (research/state.md missing) → Tell user to run /launch first
-        └─ Theme already set → Present oversight packet
+        └─ Theme already set → Present self-contained research brief, then oversight packet
     ▼ Discuss research control questions
         ├─ Direction drift or poor question → record direction decision / focus update
         ├─ Verification doubt or self-contained defect → record readiness debt for /auto
         ├─ Human needs explanation → teach, then update guide.md if the explanation should persist
-        └─ Confirmed synthesis → update guide.md / story.md / state.md / findings.md by proper routing
+        └─ Confirmed synthesis → update guide.md / story.md / state.md by proper routing; update findings.md only for wording or interpretation of already-supported claims
     ▼ Reflect decisions and debts as they are made
 ```
 
@@ -81,16 +81,30 @@ Research theme has not been configured (`research/state.md` does not exist). Tel
 
 ### When Theme Is Already Set
 
-Open with an oversight packet, then let the user's doubts and direction judgments drive the meeting.
+Open with a self-contained research brief, then show the oversight packet, then let the user's doubts and direction judgments drive the meeting.
 
 ```
 Minimum required file: `research/state.md`. Data loading after that: `research/guide.md`, `research/findings.md`, `research/story.md`, `research/principles.md`, `research/focus.md`, and latest previous meeting log when present, excluding the newly created current log. If an optional file is missing, note the absence in the oversight packet and continue from `state.md`.
     ▼ Navigate the tree: ls research/ to see top-level children; read guide.md/state.md/findings.md where relevant
-    ▼ If project-root agenda.md exists, load it and record its contents in the meeting log before treating it as consumed. If items are consumed or dismissed, delete agenda.md and commit that deletion together with the meeting update
+    ▼ If project-root agenda.md exists, load it and record its contents in the meeting log before treating it as consumed. If all items are consumed or dismissed, delete agenda.md and commit that deletion together with the meeting update; if only some items are consumed or dismissed, remove only those items and leave the rest
+    ▼ Present self-contained research brief: question, recent progress, current belief, main doubt, decision material
     ▼ Present oversight packet: current direction, guide links, verification-risk links, likely drift points
     ▼ Ask what the user wants to interrogate first: direction, verification honesty, explanation, or priority
     ▼ Reflect decisions, readiness debt, guide updates, and next focus
 ```
+
+**Self-contained research brief:**
+Start every substantive meeting with this brief before asking the user to judge anything. It is a user-facing research explanation, not an internal status report.
+
+```
+{research question label in {{ language }}}: {one sentence naming the scientific question in ordinary research language}
+{where we are now label in {{ language }}}: {3-5 sentences summarising the current scientific state: what was tried, what survived verification, what was downgraded or parked, and what this means for the project}
+{current working claim label in {{ language }}}: {one sentence stating the strongest claim the project is currently entitled to make, with strength qualifiers}
+{main uncertainty label in {{ language }}}: {one sentence naming the most important mathematical, physical, or literature uncertainty}
+{today's judgment label in {{ language }}}: {the decision the user can reasonably make now, plus the evidence or caveat needed to make it}
+```
+
+Write the brief for a human researcher who has not read the latest `research/**` changes. Define any project-specific term, abbreviation, named route, or file-derived label on first use if the decision depends on it. Avoid framework-internal terms in the brief (`routing`, `cursor`, `ACCEPT`, `readiness debt`, `curator`, `critic`, `handoff`, `artifact`) unless the user explicitly asks about process; if one is unavoidable, translate it first into its scientific meaning. Do not ask "is the research done?", "approve this", or any equivalent decision until the brief has given the user enough scientific context to answer. If the available files are too sparse to write the brief, say what is missing as part of the brief and make that absence the first supervision issue.
 
 **Oversight packet:**
 ```
@@ -123,7 +137,7 @@ Open this transaction when all three are true:
 - **Route**: that element appears, or plausibly appears, on a durable surface or handoff path that future agents will read (`findings.md`, `guide.md`, `state.md`, `checks/`, `_materials/analyses/*.md`, `conventions.md`, `principles.md`, `research/focus.md`, active data/figure/script surfaces, or a linked archive)
 - **Risk**: leaving it in that route would let a future agent receive it as current understanding, evidence, proof, canonical method/term, validation support, or operational instruction
 
-First state your interpretation and confirm if the scope is ambiguous. Then write the decision under the localized decisions heading and dispatch curator with a transaction seed:
+First state your interpretation and confirm if the scope is ambiguous. Then write the decision under the localized decisions heading and dispatch curator with a transaction seed. In the meeting log, localize the labels; in the curator dispatch, keep the schema below stable so the curator can parse the transaction:
 
 ```markdown
 Rejected routed role:
@@ -171,7 +185,7 @@ Route meeting outcomes by what kind of thing was learned.
 - Project thesis, narrative success condition, or paper storyline → `research/story.md`
 - Decomposition, route priority, approach choice, or active strategy → relevant `plan.md` or `research/focus.md`
 - Verification doubt, self-containedness defect, missing source bridge, suspected AI overclaim, or unclear checks chain → project-root `agenda.md`, `research/focus.md`, or relevant `state.md` for curator/critic/research-planner follow-up
-- User-confirmed fact-layer wording or interpretation of already-supported content → `findings.md`; new or unverified factual claims go to `/auto`/curator/critic rather than being established by human agreement
+- User-confirmed wording or interpretation of already-supported fact-layer content → `findings.md` only when the underlying claim, claim strength, evidence, and derivation are already verified. New factual claims, stronger claim strength, new evidence, or new derivations go to `/auto`/curator/critic rather than being established by human agreement
 - Background / working state changes → `research/state.md`
 - Reusable research judgment principles → `research/principles.md` with a `> [Meeting YYYY-MM-DD]` origin marker, after the routing check below
 - Notation, sign, normalization, symbol reservation, or convention bridge → `conventions.md`
@@ -199,7 +213,7 @@ The goal is not AI reporting and ending, but user control over research directio
 
 ## Incremental Recording Principle
 
-Users may leave at any natural stopping point. Post-processing that writes everything at the end risks not being executed. **Record and reflect on the spot, committing as you go.**
+Users may leave at any natural stopping point. Post-processing that writes everything at the end risks not being executed. **Record and reflect on the spot.** Commit research-artifact changes immediately; for log-only discussion or decisions, commit at each important checkpoint and always before ending the meeting.
 
 | Timing | Action |
 |---|---|
@@ -211,6 +225,7 @@ Users may leave at any natural stopping point. Post-processing that writes every
 | When a routed role is rejected | Append the transaction seed under decisions + dispatch curator or record why it is deferred |
 | When an explanation should persist | Update guide.md, `concepts/{term}.md`, or findings.md by routing identity. Record under the localized changes-applied heading |
 | When a research artifact changes | Append under the localized changes-applied heading in the meeting log + git commit. A research artifact change means any non-log file change, or agenda.md consumption/deletion; ordinary meeting-log appends do not recursively require a changes-applied entry |
+| Before ending or pausing after log-only progress | Commit the meeting log even if no research artifact changed |
 
 **Git commits:** Specify changed files individually with `git add`. Keep the fixed `meeting:` prefix, and write the summary of changes in {{ language }}.
 
