@@ -1,6 +1,6 @@
 ---
 name: steer
-description: "Run the normal /auto research loop with a human approval checkpoint after each planner update and before execution."
+description: "Execute the normal /auto research loop with a human approval checkpoint after each planner update and before execution."
 user-invocable: true
 argument-hint: "[steering intent (optional)]"
 ---
@@ -24,10 +24,10 @@ If `/auto` and `/steer` appear to conflict, `/auto` wins for every post-approval
 ## Constraints
 
 - **Write all prose in {{ language }}.** Applies to conversational text, checkpoint questions, `_reviews/`, `.logs/`, `research/focus.md`, curator tree writes, worker submissions, checkpoint records, and commit messages. Technical terms, proper nouns, LaTeX mathematics, file/folder slugs, frontmatter keys, and documented structural headings may stay in English.
-- Before running, read `{{ runtime.skills_dir }}/auto/SKILL.md` and the phase files it references. Treat them as the source of truth for every scheduler action not explicitly overridden here.
+- Before starting, read `{{ runtime.skills_dir }}/auto/SKILL.md` and the phase files it references. Treat them as the source of truth for every scheduler action not explicitly overridden here.
 - The only `/auto` human-interaction rule overridden by `/steer` is the prohibition on user input at the planning/execution boundary. `/steer` may ask the user at the Plan Checkpoint after `research-planner` updates `research/focus.md` and before execution begins. Outside the Plan Checkpoint, do not ask the user for choices, approvals, clarifications, or steering decisions during worker dispatch, review, curation, durable review, guide writing, or session end. If execution becomes structurally impossible outside the checkpoint, stop and report the structural blocker rather than opening a new decision gate.
 - Do not maintain a separate `/steer` cycle implementation. If `/auto` changes a phase, `/steer` inherits that change by reading and following `/auto`.
-- `/steer` uses the same cycle limit semantics as `/auto`: `MAX_CYCLES` controls the run length, while `Status: session_complete` is only a research-state label. It is not forced to one cycle.
+- `/steer` uses the same cycle limit semantics as `/auto`: `MAX_CYCLES` controls the session length, while `Status: session_complete` is only a research-state label. It is not forced to one cycle.
 - Acquire new full-paper text only from arXiv, matching `/auto` provenance discipline.
 - **Paper writing is NOT `/steer`'s responsibility.** Writing is handled by `/write`.
 
@@ -35,7 +35,7 @@ If `/auto` and `/steer` appear to conflict, `/auto` wins for every post-approval
 
 | Skill | Human role | Execution style |
 |---|---|---|
-| `/auto N` | Human sets broad direction outside the run; AI chooses and executes each cycle without interruption | autonomous, multi-cycle |
+| `/auto N` | Human sets broad direction outside the session; AI chooses and executes each cycle without interruption | autonomous, multi-cycle |
 | `/steer N` | Human checks each planner-written `research/focus.md` before it is executed | interactive planning checkpoints, then normal `/auto` execution |
 | `/meeting` | Human interrogates direction, verification honesty, and understanding, then records oversight decisions outside execution | live review and recording |
 
@@ -43,7 +43,7 @@ If `/auto` and `/steer` appear to conflict, `/auto` wins for every post-approval
 
 ## Overlay Boundary
 
-At the start of the run:
+At session start:
 
 1. Read `{{ runtime.skills_dir }}/auto/SKILL.md`.
 2. Read any `/auto` phase file needed for the current step, especially `auto/phases/dispatch.md` and `auto/phases/session-lifecycle.md`.
@@ -92,7 +92,7 @@ For each cycle, follow `/auto` through direction challenge and research-planner 
 4. Include in the planner prompt:
    - the ordinary `/auto` direction inputs for this cycle
    - `Human steering intent: {Arguments or latest user revision, or "none"}`
-   - `This is a /steer run: write the normal research/focus.md plan. The plan will be shown to the human before execution; do not change output format.`
+   - `This is a /steer session: write the normal research/focus.md plan. The plan will be shown to the human before execution; do not change output format.`
 5. After `research-planner` returns `DONE: research/focus.md`, identify any non-`research/focus.md` tree paths changed by that planner dispatch. Treat them as unapproved planner side effects until the Plan Checkpoint approves the plan. Pause before `/auto` parse/execution and run the Plan Checkpoint below.
 
 If `research-planner` returns `FAILED:`, use `/auto`'s retry/failure handling. Do not run the Plan Checkpoint unless a new `research/focus.md` plan exists. Any `/auto` retry that eventually writes a new `research/focus.md` must re-enter the Plan Checkpoint before parse or execution.
@@ -142,7 +142,7 @@ The checkpoint must include:
 
 Do not change the plan while constructing the checkpoint. If the focus file says worker A and tree directive B, the Execution Consequence must preserve A and B. Include unknown or newly added `research/focus.md` sections under Execution Consequence rather than dropping them; `/auto` may evolve, and `/steer` must not silently erase sections it does not understand.
 
-If the plan cannot be made self-contained without reading a large or unclear body of context, restore the previous focus state and roll back unapproved planner side effects, then re-dispatch `research-planner` once with the opacity reason as a clarity failure. This one checkpoint-clarity retry is separate from the human revision retry limit. If the second checkpoint construction also fails, restore the previous focus state and roll back the second unapproved planner attempt before stopping. If that rollback is ambiguous, stop and report the ambiguous paths. Do not run workers from an opaque plan.
+If the plan cannot be made self-contained without reading a large or unclear body of context, restore the previous focus state and roll back unapproved planner side effects, then re-dispatch `research-planner` once with the opacity reason as a clarity failure. This one checkpoint-clarity retry is separate from the human revision retry limit. If the second checkpoint construction also fails, restore the previous focus state and roll back the second unapproved planner attempt before stopping. If that rollback is ambiguous, stop and report the ambiguous paths. Do not dispatch workers from an opaque plan.
 
 ### User Checkpoint
 
@@ -151,7 +151,7 @@ Present the checkpoint compactly and ask one approval question with `{{ runtime.
 At minimum, the decision surface must include:
 
 - the proposed plan's cursor and scientific judgment in a short faithful summary
-- whether workers will run, and which worker consequences matter if any
+- whether workers will be dispatched, and which worker consequences matter if any
 - the main tree directives or execution consequences that approval would authorize
 - pending planner side effects outside `research/focus.md`, or an explicit "none"
 - the previous-focus backup / restore consequence so rejection and revision are concrete
@@ -161,7 +161,7 @@ Before yielding at any checkpoint, write a Checkpoint Resume Record. This is req
 
 If `{{ runtime.tool_ask_user_question }}` is unavailable, rejected by the runtime, or cannot carry the full checkpoint content, fall back to an ordinary user-facing message after writing the Checkpoint Resume Record. The fallback message must contain the same self-contained decision surface and then stop for the user's reply. When yielding the turn at a checkpoint, the last assistant message in that turn must still contain the proposal summary and consequences; never end with only "approve / revise / reject" or equivalent option labels.
 
-- approve and run this plan
+- approve and execute this plan
 - revise the plan with a free-form instruction
 - reject and stop before execution
 
@@ -171,7 +171,7 @@ The user may comment on worker choices, but interpret that as revision input for
 
 - **Approve**: leave `research/focus.md` as written by `research-planner`. Resume `/auto` at its `Parse research/focus.md` step and execute the cycle with the current `/auto` mechanics.
 - **Revise**: restore the previous focus state, then re-dispatch `research-planner` in normal `/auto` direction mode with the user's revision as `Human steering intent`. If a backup path exists, restore it to `research/focus.md`; if the previous focus state was absent, remove the newly created `research/focus.md`. Also roll back planner-created or planner-modified side-effect paths from this unapproved planner attempt. If any side effect cannot be distinguished from pre-existing user work, stop before execution and report the ambiguous rollback instead of guessing. After the restored state is clean, re-dispatch planner, then construct the checkpoint again. Human revision retries are counted separately from checkpoint-clarity retries; after two human revisions in the same cycle without approval, stop before execution and suggest `/meeting` if the disagreement is conceptual.
-- **Reject / stop**: restore the previous focus state using the same backup-or-absence rule and roll back unapproved planner side effects. A plain reject is terminal for the current `/steer` run and means stop before execution; report inline and do not enter Session End, wrap up, commit, or push. If approved cycle(s) already ran and the user explicitly writes that they want to reject this plan and end the session, proceed to `/auto` Session End from the last approved state; the rejected plan itself remains unconsumed.
+- **Reject / stop**: restore the previous focus state using the same backup-or-absence rule and roll back unapproved planner side effects. A plain reject is terminal for the current `/steer` session and means stop before execution; report inline and do not enter Session End, wrap up, commit, or push. If approved cycle(s) already executed and the user explicitly writes that they want to reject this plan and end the session, proceed to `/auto` Session End from the last approved state; the rejected plan itself remains unconsumed.
 
 Approval is the boundary. Before approval, `research/focus.md` is a proposed plan even though it is stored at the normal path. After approval, it becomes the ordinary `/auto` scheduler interface.
 
@@ -187,14 +187,14 @@ Use `/auto`'s current Session End mechanics from `auto/phases/session-lifecycle.
 
 `/steer` adjustments:
 
-- The final report should include the human-approved plan decisions and any rejected/revised checkpoint attempts that materially changed the run.
-- Session logs should identify the run as `steer` where `/auto` allows the scheduler to choose the session kind. Do not fork the session-end protocol to achieve this.
+- The final report should include the human-approved plan decisions and any rejected/revised checkpoint attempts that materially changed the session.
+- Session logs should identify the session as `steer` where `/auto` allows the scheduler to choose the session kind. Do not fork the session-end protocol to achieve this.
 - If a rejected plan was restored and no approved cycle ran afterward, say so plainly and do not imply that worker evidence was produced.
 
 ## Failure Handling
 
-- If focus backup or restore fails, stop before execution; do not run a plan whose approval state is ambiguous.
-- If rollback of planner-created side effects is ambiguous, stop before execution and report the ambiguous paths. Do not run workers from a plan whose unapproved tree writes may still be present.
+- If focus backup or restore fails, stop before execution; do not execute a plan whose approval state is ambiguous.
+- If rollback of planner-created side effects is ambiguous, stop before execution and report the ambiguous paths. Do not dispatch workers from a plan whose unapproved tree writes may still be present.
 - If checkpoint construction fails twice for opacity, stop before execution and report the presentation failure.
 - If the user revises twice in the same cycle without approval, stop before execution and recommend resolving the disagreement in `/meeting`.
-- Once a plan is approved, use `/auto` failure handling for workers, critic, curator, durable reviews, guide-writer, session-wrap-up, commit, and push.
+- Once a plan is approved, use `/auto` failure handling for workers, critic, curator, durable reviews, guide-writer, the close-session transaction, commit, and push.

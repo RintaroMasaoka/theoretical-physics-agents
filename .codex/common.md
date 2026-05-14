@@ -1,6 +1,6 @@
 # Worker Common Rules
 
-These rules are shared by execution-tier workers that write reviewable submissions (`researcher`, `simulator`, `reader`, `scout`, `engine-builder`, `concept-checker`, and similar worker roles). Research planner, curator, critic, session-wrap-up, and other scheduler/maintenance roles read this file for shared conventions, but their role-specific prompts override this file's worker-submission output contract.
+These rules are shared by execution-tier workers that write reviewable submissions (`researcher`, `simulator`, `reader`, `scout`, `engine-builder`, `concept-checker`, and similar worker roles). Research planner, curator, critic, guide-writer, and other scheduler/maintenance roles read this file for shared conventions, but their role-specific prompts override this file's worker-submission output contract.
 
 ## Inter-Agent Communication
 
@@ -49,5 +49,5 @@ Rationale: idle timeouts fire on silent gaps in the output stream, not on total 
     - Display: `$$...$$`. Multi-line environments (`align`, `aligned`, `cases`, `matrix`, …) must sit **inside** the `$$...$$` wrapper
     - Do not use `\(...\)` or `\[...\]` as delimiters
     - Do not write a bare `\begin{env}...\end{env}` at the top level without wrapping it in `$$...$$`
-- Do not request user input in any form; users are often away during `/auto` and `/write`. If the user initiates communication, answer only that message briefly and continue the assigned workflow unless the user redirects or stops the run
+- Do not request user input in any form; users are often away during `/auto` and `/write`. If the user initiates communication, answer only that message briefly and continue the assigned workflow unless the user redirects or stops the session
 - No writing outside the project directory

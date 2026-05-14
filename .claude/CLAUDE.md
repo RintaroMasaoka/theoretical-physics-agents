@@ -1,7 +1,7 @@
 # Theoretical Physics Research Agents
 
 A system that advances theoretical-physics research with either autonomous or human-steered agent orchestration.
-Users run `/auto` to advance research autonomously, `/steer` to choose the next research direction before one semi-automatic cycle, `/write` to draft papers, `/meeting` for progress review and course correction, and `/improve` to enhance agent behavior.
+Users invoke `/auto` to advance research autonomously, `/steer` to choose the next research direction before one semi-automatic cycle, `/write` to draft papers, `/meeting` for progress review and course correction, and `/improve` to enhance agent behavior.
 
 ## Output Language
 
@@ -30,11 +30,11 @@ The system uses different orchestration models in `/auto`, `/steer`, and `/write
 | **Verification** | `critic` | Independent Provisional Review of every review-eligible worker submission and Durable Surface Review of findings/analysis surfaces requested through curator |
 | **Human oversight guide** | `guide-writer` | `research/**/guide.md` — session-end sweep over scheduler-supplied target nodes; writes human-facing reading paths, verification maps, and oversight questions without deciding claims or direction |
 | **Execution** | workers (researcher, simulator, reader, scout, engine-builder, concept-checker, self-check) | Bounded tasks — their deliverables stay provisional until critic has verified them |
-| **Session finalisation** | `session-wrap-up` | Mechanical transcription of research planner's session-end wrap-up input into `research/focus.md`, `.logs/last_session.md`, node-scoped `backlog.md`, and the session log; commits and pushes |
+| **Session boundary** | scheduler + `.scripts/close-session.mjs` | Transactional close of a planner-authored session-end packet: write `research/focus.md`, `.logs/last_session.md`, node-scoped `backlog.md`, `agenda.md`, and the session log; clear the resume beacon; stage declared session paths; commit and push |
 
 ### `/steer` — human-steered cycle
 
-`/steer` uses the same peer-agent execution machinery as `/auto`, but inserts a human steering gate at the start of the cycle. The AI presents direction options with their worker consequences; the human chooses or revises the research direction; then the scheduler executes one cycle through workers, critic, curator, and wrap-up.
+`/steer` uses the same peer-agent execution machinery as `/auto`, but inserts a human steering gate at the start of the cycle. The AI presents direction options with their worker consequences; the human chooses or revises the research direction; then the scheduler executes one cycle through workers, critic, curator, and session-boundary close.
 
 ### `/write` — PI-led writing
 

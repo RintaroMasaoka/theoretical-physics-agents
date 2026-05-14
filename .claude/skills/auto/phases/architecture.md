@@ -56,7 +56,7 @@ Directives cascade: a directive at a higher level applies to all descendants. De
 research/focus.md is a lightweight cursor pointing to research planner's current position in the tree. It carries:
 - Current focus path
 - Short-term context (blockers, immediate next steps)
-- Rewritten by research planner at the start of every cycle (regular dispatch) and at session end (transcribed by `session-wrap-up` from the wrap-up-input file's `## Focus` section). See `session-lifecycle.md § Session End` for the wrap-up-input path-creation step.
+- Rewritten by research planner at the start of every cycle (regular dispatch) and at session end (transcribed by `.scripts/close-session.mjs` from the close-session packet's `## Focus` section). See `session-lifecycle.md § Session End` for the packet path-creation step.
 
 ## Supporting Layers
 

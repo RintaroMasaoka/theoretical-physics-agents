@@ -96,7 +96,7 @@ The research planner's focus.md entries are written concretely enough that these
 
 ## Provisional Review Rule
 
-"Worker" here means the execution-tier agents listed in the Worker row of `{{ runtime.instruction_file }}` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Direction-support agents (`direction-challenger`) and scheduler-owned agents (`curator`, `guide-writer`, `session-wrap-up`) are not workers and receive no Provisional Review — the challenger's narrow opposition format, guide-writer's read-only-from-durable-surfaces boundary, and research planner's required response are their integrity mechanisms.
+"Worker" here means the execution-tier agents listed in the Worker row of `{{ runtime.instruction_file }}` (researcher / simulator / reader / scout / engine-builder / concept-checker / self-check). Direction-support agents (`direction-challenger`) and scheduler-owned agents (`curator`, `guide-writer`) are not workers and receive no Provisional Review — the challenger's narrow opposition format, guide-writer's read-only-from-durable-surfaces boundary, and research planner's required response are their integrity mechanisms.
 
 Every review-eligible `worker.md` submission returned from Cycle step 4 is critiqued by a critic dispatch in Cycle step 5 — this is automatic, not something research planner requests. The rule is fixed:
 
@@ -166,7 +166,7 @@ reason from curator: {reason copied from curator request}
 
 Use curator's requested mode unless it is missing; default to `contextual`. Use `blind` only when curator says the touched derivation/analysis calculation is purely mechanical and the question is internal consistency. Contextual Durable Surface Review is the only checkpoint that can see cross-tree provenance honesty: whether durable prose, linked checks metadata, source/project boundaries, declared scope, and ancestor context still agree after curator's synthesis.
 
-After the critic returns `DONE: {checks/... critic path}`, re-dispatch curator with the review result so curator can apply findings, compose provenance metadata, demote or rewrite claims, and request a follow-up review if its fixes materially changed the durable surface. One scheduler follow-up round is mandatory in the same cycle when possible. If curator requests another Durable Surface Review after applying the first review, carry that pending request into the next cycle's `Curator Sweep`; at Session End, drain pending durable reviews before `session-wrap-up` unless a review/fix loop exceeds two rounds on the same surface, in which case flag the unresolved verification gap for research planner and do not treat the affected claim as confirmed.
+After the critic returns `DONE: {checks/... critic path}`, re-dispatch curator with the review result so curator can apply findings, compose provenance metadata, demote or rewrite claims, and request a follow-up review if its fixes materially changed the durable surface. One scheduler follow-up round is mandatory in the same cycle when possible. If curator requests another Durable Surface Review after applying the first review, carry that pending request into the next cycle's `Curator Sweep`; at Session End, drain pending durable reviews before the close-session transaction unless a review/fix loop exceeds two rounds on the same surface, in which case flag the unresolved verification gap for research planner and do not treat the affected claim as confirmed.
 
 ## Curator Dispatch Input
 

@@ -171,7 +171,7 @@ Context-route invalidation transaction from /meeting. The user has rejected an e
 
 Do not ask curator to decide whether the user's rejection is scientifically correct. The meeting has already established the user-facing decision; curator's job is context-route mechanics and transaction closure. If the rejection is unresolved or the user is still deciding, do not dispatch curator yet — record it as a discussion item or agenda item instead.
 
-When curator returns, append the curator summary and changed paths under the localized changes-applied heading, then commit the meeting log plus curator-touched files with the normal `meeting:` prefix. In `/meeting`, there is no `session-wrap-up`; meeting is responsible for recording and committing curator's returned tree changes. If curator reports an open regeneration or worker task, record it in `research/focus.md` or the relevant backlog/agenda exactly as curator specifies, so the next `/auto` sees the transaction before ordinary research resumes.
+When curator returns, append the curator summary and changed paths under the localized changes-applied heading, then commit the meeting log plus curator-touched files with the normal `meeting:` prefix. In `/meeting`, there is no close-session transaction; meeting is responsible for recording and committing curator's returned tree changes. If curator reports an open regeneration or worker task, record it in `research/focus.md` or the relevant backlog/agenda exactly as curator specifies, so the next `/auto` sees the transaction before ordinary research resumes.
 
 ## Reflection Routing
 

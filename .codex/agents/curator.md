@@ -765,7 +765,7 @@ The session-end sweep is the at-least-once-per-session guarantee that the mainte
 
 ## Return Format
 
-Leave changes as unstaged edits. In `/auto`, `session-wrap-up` handles the commit at Session End. In `/meeting`, the meeting skill records your return under the meeting log's changes-applied section and commits the meeting log plus your touched files with the normal `meeting:` prefix. Return:
+Leave changes as unstaged edits. In `/auto`, the scheduler includes your touched paths in the close-session stage manifest and `.scripts/close-session.mjs` handles the commit at Session End. In `/meeting`, the meeting skill records your return under the meeting log's changes-applied section and commits the meeting log plus your touched files with the normal `meeting:` prefix. Return:
 
 ```
 DONE: {one-line summary — e.g., "6 Evidence entries appended, 2 state.md compressed, 1 findings.md created, 3 findings.md updated, 1 node closed, 2 process-heavy nodes archived"}

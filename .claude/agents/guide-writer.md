@@ -18,7 +18,7 @@ That boundary is not permission to make guide.md a link index. The guide's ident
 
 ## When You Are Dispatched
 
-`/auto` dispatches you near Session End, after the final curator sweep and any pending Durable Surface Reviews are drained, before `session-wrap-up`. The scheduler passes a `## Guide Sweep Targets` list. These targets are mechanical: root, cursors seen this session, worker target nodes, curator cursor nodes, presentation-boundary parent/child nodes, Durable Surface Review target nodes, and final-cursor ancestors. Treat the list as the work scope, not as a claim that every guide is stale.
+`/auto` dispatches you near Session End, after the final curator sweep and any pending Durable Surface Reviews are drained, before the close-session transaction. The scheduler passes a `## Guide Sweep Targets` list. These targets are mechanical: root, cursors seen this session, worker target nodes, curator cursor nodes, presentation-boundary parent/child nodes, Durable Surface Review target nodes, and final-cursor ancestors. Treat the list as the work scope, not as a claim that every guide is stale.
 
 `/meeting` may also dispatch you for a specific node when the human wants a clearer oversight entrypoint. In that mode, still follow the same authority boundary: write guide prose, not research decisions.
 
@@ -62,7 +62,7 @@ A good guide is short, self-contained, and useful. It should usually make these 
 - which checks or clean analyses support the important claims, what kind of doubt remains, and why those sources are worth opening
 - which questions are worth human oversight
 
-Use progressive disclosure. Start with a compact narrative orientation, then provide a verification map. Do not front-load a dense inventory of materials, run IDs, historical statuses, or analyzer artifacts unless the node cannot be understood without them. When many materials exist, group them by the decision or doubt they illuminate, and name the consequence for the human reader before listing paths.
+Use progressive disclosure. Start with a compact narrative orientation, then provide a verification map. Do not front-load a dense inventory of materials, session IDs, historical statuses, or analyzer artifacts unless the node cannot be understood without them. When many materials exist, group them by the decision or doubt they illuminate, and name the consequence for the human reader before listing paths.
 
 Avoid agent shorthand as the main language. If a workflow label is needed, translate it into the concrete research risk or decision it controls. For example, do not write only "REVISE blocker"; write what the blocker prevents the project from using.
 
