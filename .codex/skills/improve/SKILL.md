@@ -75,7 +75,7 @@ Example: `bash .scripts/sync.sh pull .templates/skills/improve/SKILL.src.md .tem
 
 - **Specific target known** — pull that path now, before reading.
 - **Complaint without named target** — defer until step 1 identifies the target(s), then pull before reading.
-- **Whole-system review** — run `sync.sh pull` with no arguments (bulk is the correct tool here, because the working set really is the whole framework and — by definition of this branch — you are not delegating any file to a concurrent session).
+- **Whole-system review** — run `sync.sh pull` with no arguments (bulk is the correct tool here, because the working set really is the whole framework and — by definition of the whole-system-review entry point — you are not delegating any file to a concurrent session).
 
 If you discover additional targets mid-rewrite, pull each before touching it.
 
@@ -94,7 +94,7 @@ After the Prerequisite:
 2. Propose a solution         — check external prior art, present one best case grounded in the frame
 3. Rewrite                    — edit .src.md at a scope that preserves coherence
 4. Regenerate & verify        — generate-runtime.mjs, blind prompt-reviewer, then fit-to-complaint check
-5. User confirmation & commit — push to upstream
+5. User confirmation, commit, and upstream sync — persist the accepted change before ending
 ```
 
 If an argument is given, treat it as the starting complaint, not as a complete problem statement, and go to step 1. If no argument is given, open with a single request_user_input to establish the entry point (review the whole system / a specific target / a specific complaint), load only the files implied, then proceed to step 1.
@@ -115,7 +115,7 @@ Jumping to a solution before understanding almost always produces a symptomatic 
 
 **Discussion has its own deliverable.** Before proposing an edit, produce a shared problem understanding that is valuable even if no file changes. It should explain: what the user observed, why it bothered them, what hidden expectation or workflow model it violated, what concept abstracts the issue beyond this example, and what would count as improvement. If the user cannot yet answer one of those, keep asking; the inability to answer is itself evidence that the problem is not ready for implementation.
 
-**Division of labor by where information lives.** Information **inside the user** (motivation, constraints, what they've tried, values, judgment criteria) must be asked. Information **outside the user** (prior solutions to similar prompt-design problems, general prompt-engineering principles, adjacent-domain knowledge) is AI's job to fetch via web search and background knowledge. Sending the user to look up external information is a division-of-labor failure. Equally, prompt-design implementation choices — naming a concept, deciding what to foreground, predicting how an LLM will read wording, drawing the line between a specific instruction and a general principle — are AI's domain. Returning them to the user dumps a decision the user lacks material to make. If the user volunteers vocabulary, take it as data; do not invite them to decide.
+**Division of labor by where information lives.** Information **inside the user** (motivation, constraints, what they've tried, values, judgment criteria) must be asked. Information **outside the user** (prior solutions to similar prompt-design problems, general prompt-engineering principles, adjacent-domain knowledge) is AI's job to fetch via web search and background knowledge. Sending the user to look up external information is a division-of-labor failure. Equally, prompt-design implementation choices — naming a concept, deciding what to foreground, predicting how an LLM will read wording, drawing the line between a specific instruction and a general principle — are AI's domain. Do not outsource that judgment by asking the user to choose among raw implementation options; present the recommendation you judge best, then accept the user's corrections, rejections, or explicit wording requirements as authoritative input.
 
 **Broaden before narrowing.** Before choosing a target or edit, inspect adjacent axes that could change the diagnosis: whether the problem is about timing, authorship, authority, context loading, persistence, user visibility, lifecycle, evaluation, or handoff. A complaint often names the place where pain surfaced, not the place where the design is wrong. For example, "this file should exist here" may actually be about memory durability, write ownership, reader audience, or task-local versus project-global scope. If a proposed fix would be different under one of these framings, the framing is not settled yet.
 
@@ -164,7 +164,7 @@ The checkpoint must be explicit in the conversation before editing. If the user 
 
 ## 3. Rewrite
 
-Edit the target `.src.md`. For structural changes or large rewrites, use Write for the whole file — prompt files are small (typically < 200 lines) and whole-file replacement keeps coherence. For localized fixes, Edit suffices.
+Edit the target `.src.md`. For structural changes or large rewrites, replace the whole file with the runtime's file-editing mechanism — prompt files are small (typically < 200 lines) and whole-file replacement keeps coherence. For localized fixes, use the runtime's localized edit mechanism.
 
 ### Aim for universality
 
@@ -236,7 +236,15 @@ If the fit check fails, return to problem framing or rewrite as appropriate. Do 
 
 ## Commit & Upstream Sync
 
+This step is a persistence boundary, not optional cleanup. Once `/improve` has edited files, the session must not end with the agent's own changes silently left in the working tree. A prompt improvement is not complete until it is either committed and synced, or explicitly reported as blocked.
+
 After approval:
 
-1. **Commit**: add changed `.src.md` files and their corresponding generated `.md` files individually with `git add` (not `git add -A`, to avoid committing unrelated changes). Message format: `improve: {summary}`.
-2. **Push upstream (path-scoped)**: `bash .scripts/sync.sh push <changed .src.md path>... --yes`. Pass only the `.src.md` paths you edited — symmetric with the path-scoped pull in Prerequisite, for the same concurrency-isolation reason.
+1. **Final status check**: run `git status --short --branch` and classify every changed path as one of:
+   - owned by this `/improve` change and intended to persist
+   - pre-existing or user-owned work that must not be staged
+   - a generated counterpart of an owned template change
+   - unsafe to commit (secret, credential, destructive change, unrelated broad churn, or a change the user explicitly rejected)
+2. **Commit owned changes**: add changed `.src.md` files and their corresponding generated `.md` files individually with `git add` (not `git add -A`, to avoid committing unrelated changes). Message format: `improve: {summary}`. Small, imperfect, provisional, or non-best-practice accepted changes still get committed; do not use size or elegance as a reason to leave owned edits dirty.
+3. **Blocked instead of silent dirty state**: if an owned change cannot be committed safely, stop and report `BLOCKED`, listing the uncommitted paths, why commit is unsafe or impossible, and what decision or action is needed next. Do not present the session as complete.
+4. **Push upstream (path-scoped)**: `bash .scripts/sync.sh push <changed .src.md path>... --yes`. Pass only the `.src.md` paths you edited — symmetric with the path-scoped pull in Prerequisite, for the same concurrency-isolation reason.
